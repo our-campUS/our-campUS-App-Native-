@@ -70,9 +70,12 @@ const LoginInitialScreen = ({ navigation }) => {
         </Button>
         <Button
           title="카카오 시작하기"
-          onPress={() => {
+          onPress={async () => {
             console.log('✅ 버튼 눌림');
-            onKakaoLogin();
+            const result = await onKakaoLogin();
+            if (result) {
+              navigation.navigate('SignUpFirstScreen');
+            }
           }}
           style={{
             width: 335,

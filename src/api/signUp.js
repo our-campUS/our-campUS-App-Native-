@@ -11,7 +11,9 @@ export async function onKakaoLogin() {
   try {
     const result = await login();
     console.log('✅ Kakao Login Success:', result);
+    return true;
   } catch (error) {
     console.error('❌ Kakao Login Error:', error);
+    return false;
   }
 }
