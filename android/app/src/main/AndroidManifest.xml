@@ -27,8 +27,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- 스킴 = 반드시 네이티브 앱키 그대로 -->
-                <data android:scheme="kakaocf9915ad21d898963c9b449516ca45fb"
-                       android:host="oauth" />
+                <data android:scheme="kakaocf9915ad21d898963c9b449516ca45fb"/>
             </intent-filter>
         </activity>
 

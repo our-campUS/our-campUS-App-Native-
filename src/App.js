@@ -5,6 +5,13 @@ import AuthStack from './navigations/AuthStack';
 import { StatusBar } from 'react-native';
 import { initKakao } from './api/signUp';
 import { useEffect } from 'react';
+import { getKakaoKeyHash } from '@react-native-seoul/kakao-login';
+
+// useEffect(() => {
+//   getKakaoKeyHash().then((hash) => {
+//     console.log('🔥 KAKAO HASH:', hash);
+//   });
+// }, []);
 
 const styles = StyleSheet.create({
   container: {
@@ -18,6 +25,9 @@ const styles = StyleSheet.create({
 const App = () => {
   useEffect(() => {
     initKakao();
+    // getKakaoKeyHash().then((hash) => {
+    //   console.log('🔥 KAKAO HASH:', hash);
+    // });
   }, []);
   return (
     <NavigationContainer>
