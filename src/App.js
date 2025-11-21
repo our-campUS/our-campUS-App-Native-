@@ -6,6 +6,7 @@ import { StatusBar } from 'react-native';
 import { initKakao } from './api/signUp';
 import { useEffect } from 'react';
 import { getKakaoKeyHash } from '@react-native-seoul/kakao-login';
+import useAuthStore from './store/authStore';
 
 // useEffect(() => {
 //   getKakaoKeyHash().then((hash) => {
@@ -23,17 +24,18 @@ const styles = StyleSheet.create({
 });
 
 const App = () => {
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
   useEffect(() => {
     initKakao();
-    // getKakaoKeyHash().then((hash) => {
-    //   console.log('🔥 KAKAO HASH:', hash);
-    // });
   }, []);
+
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
+      {/* {isLoggedIn ? <MainTab /> : <AuthStack />} */}
+      {/* 개발 테스트용 */}
       <AuthStack />
-      {/* <MainTab /> */}
     </NavigationContainer>
   );
 };

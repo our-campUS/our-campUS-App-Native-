@@ -5,16 +5,19 @@ import {
   Text,
   Platform,
   Pressable,
+  ScrollView,
+  Keyboard,
 } from 'react-native';
 import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import colors from '../style/colors';
 import typography from '../style/typography';
 import MagnifyingGlass from '../../assets/input-tool.svg';
+import { filterDropdownItems } from '../utils/searchLogic';
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
   },
   inputWrapper: {
     position: 'relative',
@@ -49,6 +52,25 @@ const styles = StyleSheet.create({
   focused: {
     borderColor: colors.blue[500],
   },
+  dropdownContainer: {
+    marginTop: 16,
+    gap: 8,
+    // borderColor: colors.gray[200],
+    // backgroundColor: colors.white,
+    maxHeight: 5 * 40, // 아이템 최대 5개 높이만큼만 보이게
+    overflow: 'hidden',
+  },
+  dropdownItem: {
+    padding: 10,
+    borderBottomWidth: 0.5,
+    borderColor: colors.gray[250],
+    width: '100%',
+    height: 43,
+  },
+  dropdownItemText: {
+    ...typography.body3Regular,
+    color: colors.gray[850],
+  },
 });
 
 const Input = forwardRef(
@@ -59,15 +81,23 @@ const Input = forwardRef(
       keyboardType,
       returnKeyType,
       onChangeText,
+      value, // optional controlled value
       useTitle = false,
       useMagnifyingGlass = false,
       disabled = false,
       additionalStyle = {},
+      usePopUPModal = false,
+      onPressPopUPModal = null,
+      useDropDown = false,
+      dropdownData = [],
+      onSelectDropdownItem = null,
     },
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [value, setValue] = useState('');
+    const [innerValue, setInnerValue] = useState('');
+
+    const isControlled = value !== undefined;
 
     // 내부에서 항상 사용할 실제 TextInput ref
     const innerRef = useRef(null);
@@ -91,9 +121,15 @@ const Input = forwardRef(
             additionalStyle,
           ]}
           disabled={disabled}
-          onPress={focusInput}
+          onPress={() => {
+            if (usePopUPModal && typeof onPressPopUPModal === 'function') {
+              onPressPopUPModal();
+            } else {
+              focusInput();
+            }
+          }}
         >
-          <View>
+          <View pointerEvents={usePopUPModal ? 'none' : 'auto'}>
             <TextInput
               style={[
                 styles.input,
@@ -104,9 +140,16 @@ const Input = forwardRef(
               placeholderTextColor={colors.gray[400]}
               placeholderStyle={typography.body3Regular}
               returnKeyType={returnKeyType}
-              value={value}
-              editable={!disabled}
-              onChangeText={(text) => setValue(text)}
+              value={isControlled ? value : innerValue}
+              editable={!disabled && !usePopUPModal}
+              onChangeText={(text) => {
+                if (!isControlled) {
+                  setInnerValue(text);
+                }
+                if (typeof onChangeText === 'function') {
+                  onChangeText(text);
+                }
+              }}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
             />
@@ -118,6 +161,40 @@ const Input = forwardRef(
             />
           )}
         </Pressable>
+        {useDropDown && isFocused && dropdownData.length > 0 && (
+          <View style={styles.dropdownContainer}>
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={true}
+              persistentScrollbar={true} // Android에서 스크롤바 항상 보이게
+            >
+              {filterDropdownItems(
+                dropdownData,
+                isControlled ? value || '' : innerValue
+              ).map((item) => (
+                <Pressable
+                  key={item}
+                  style={styles.dropdownItem}
+                  onPress={() => {
+                    if (!isControlled) {
+                      setInnerValue(item);
+                    }
+                    innerRef.current?.blur();
+                    Keyboard.dismiss();
+                    if (typeof onChangeText === 'function') {
+                      onChangeText(item);
+                    }
+                    if (typeof onSelectDropdownItem === 'function') {
+                      onSelectDropdownItem(item);
+                    }
+                  }}
+                >
+                  <Text style={styles.dropdownItemText}>{item}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        )}
       </View>
     );
   }
