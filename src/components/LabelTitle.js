@@ -14,8 +14,8 @@ const styles = StyleSheet.create({
     marginTop: 45,
   },
   title: {
-    ...typography.heading2,
-    color: colors.gray[850],
+    ...typography.heading6,
+    color: colors.gray[700],
     marginHorizontal: 'auto',
   },
   backButton: {
@@ -37,7 +37,7 @@ const LabelTitle = ({
     <View style={[styles.container, additionalStyle]}>
       {useBackButton && (
         <Pressable onPress={onPressBack}>
-          <BackIcon />
+          <Text style={styles.backButton}>{'<'}</Text>
         </Pressable>
       )}
       <Text style={styles.title}>{title}</Text>
