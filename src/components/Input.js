@@ -1,5 +1,12 @@
-import { TextInput, StyleSheet, View, Text, Platform } from 'react-native';
-import { useState, forwardRef } from 'react';
+import {
+  TextInput,
+  StyleSheet,
+  View,
+  Text,
+  Platform,
+  Pressable,
+} from 'react-native';
+import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import colors from '../style/colors';
 import typography from '../style/typography';
 import MagnifyingGlass from '../../assets/input-tool.svg';
@@ -54,35 +61,63 @@ const Input = forwardRef(
       onChangeText,
       useTitle = false,
       useMagnifyingGlass = false,
+      disabled = false,
+      additionalStyle = {},
     },
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
     const [value, setValue] = useState('');
 
+    // 내부에서 항상 사용할 실제 TextInput ref
+    const innerRef = useRef(null);
+
+    // 부모가 ref를 넘겨줬다면, TextInput의 실제 ref를 그대로 노출
+    useImperativeHandle(ref, () => innerRef.current, []);
+
+    const focusInput = () => {
+      if (innerRef.current) {
+        innerRef.current.focus();
+      }
+    };
+
     return (
       <View style={styles.container}>
         {useTitle && <Text style={styles.title}>{title}</Text>}
-        <View style={[styles.inputWrapper, isFocused && styles.focused]}>
-          <TextInput
-            style={[
-              styles.input,
-              Platform.OS === 'ios' && { paddingBottom: 6 },
-            ]}
-            ref={ref}
-            placeholder={placeholder}
-            placeholderTextColor={colors.gray[400]}
-            placeholderStyle={typography.body3Regular}
-            returnKeyType={returnKeyType}
-            value={value}
-            onChangeText={(text) => setValue(text)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          />
+        <Pressable
+          style={[
+            styles.inputWrapper,
+            isFocused && styles.focused,
+            additionalStyle,
+          ]}
+          disabled={disabled}
+          onPress={focusInput}
+        >
+          <View>
+            <TextInput
+              style={[
+                styles.input,
+                Platform.OS === 'ios' && { paddingBottom: 8 },
+              ]}
+              ref={innerRef}
+              placeholder={placeholder}
+              placeholderTextColor={colors.gray[400]}
+              placeholderStyle={typography.body3Regular}
+              returnKeyType={returnKeyType}
+              value={value}
+              editable={!disabled}
+              onChangeText={(text) => setValue(text)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            />
+          </View>
           {useMagnifyingGlass && (
-            <MagnifyingGlass style={styles.magnifyingGlass} />
+            <MagnifyingGlass
+              style={styles.magnifyingGlass}
+              pointerEvents="none"
+            />
           )}
-        </View>
+        </Pressable>
       </View>
     );
   }

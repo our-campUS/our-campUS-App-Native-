@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 20,
     marginTop: 56,
+    gap: 24,
   },
 });
 
@@ -43,6 +44,13 @@ const SignUpFirstScreen = ({ navigation }) => {
           useTitle={true}
           placeholder="학교 이름을 입력해주세요"
           useMagnifyingGlass={true}
+        />
+        <Input
+          title="단과 대학"
+          useTitle={true}
+          placeholder="학과 선택시 자동으로 입력됩니다"
+          disabled={true}
+          additionalStyle={{ backgroundColor: colors.gray[250] }}
         />
       </View>
     </SafeAreaView>
