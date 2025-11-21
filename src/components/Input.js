@@ -1,4 +1,4 @@
-import { TextInput, StyleSheet, View, Text } from 'react-native';
+import { TextInput, StyleSheet, View, Text, Platform } from 'react-native';
 import { useState, forwardRef } from 'react';
 import colors from '../style/colors';
 import typography from '../style/typography';
@@ -19,23 +19,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
-    // width: '100%',
-    // height: 48,
-    // borderWidth: 1,
-    // borderColor: colors.gray[300],
-    // borderRadius: 10,
     paddingVertical: 0,
     paddingHorizontal: 20,
-    // paddingTop: -10,
-    // paddingVertical: 15.5,
-    // borderRadius: 8,
-    // backgroundColor: colors.gray['050'],
-    flex: 1,
+    // flex: 1,
+    width: '100%',
     ...typography.body3Regular,
     color: colors.gray[850],
-    // textVerticalAlign: 'center',
-    // fontSize: typography.body3Regular.fontSize,
-    // lineHeight: typography.body3Regular.fontSize,
   },
   magnifyingGlass: {
     position: 'absolute',
@@ -78,7 +67,7 @@ const Input = forwardRef(
           <TextInput
             style={[
               styles.input,
-              //   value && styles.hasValueInput,
+              Platform.OS === 'ios' && { paddingBottom: 6 },
             ]}
             ref={ref}
             placeholder={placeholder}
