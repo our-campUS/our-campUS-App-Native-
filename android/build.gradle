@@ -10,6 +10,8 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        // ✅ Kakao 공식 Maven repo
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
     }
     dependencies {
         classpath("com.android.tools.build:gradle")
@@ -19,3 +21,14 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://www.jitpack.io" }
+
+        // ✅ Kakao 공식 Maven repo (여기도 동일)
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
+    }
+}

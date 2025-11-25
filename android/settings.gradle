@@ -1,6 +1,32 @@
-pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
-plugins { id("com.facebook.react.settings") }
-extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+pluginManagement {
+    includeBuild("../node_modules/@react-native/gradle-plugin")
+}
+
+plugins {
+    id("com.facebook.react.settings")
+}
+
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
+    ex.autolinkLibrariesFromCommand()
+}
+
+dependencyResolutionManagement {
+    // ❌ 이 줄 삭제해야 함
+    // repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    // repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://www.jitpack.io" }
+
+        // Kakao SDK repositories
+        maven { url 'https://devrepo.kakao.com/nexus/repository/kakao-public/' }
+        maven { url 'https://devrepo.kakao.com/nexus/repository/kakaopay-public/' }
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/android/' }
+    }
+}
+
 rootProject.name = 'ourCampusApp'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
