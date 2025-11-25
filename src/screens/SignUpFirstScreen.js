@@ -129,6 +129,7 @@ const SignUpFirstScreen = ({ navigation }) => {
           onSelect={(selectedMajor, selectedCollege) => {
             setMajor(selectedMajor);
             setDepartment(selectedCollege);
+            setIsMajorInputModalVisible(false);
           }}
         />
       )}
