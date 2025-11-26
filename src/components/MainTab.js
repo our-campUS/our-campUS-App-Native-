@@ -10,6 +10,8 @@ import MyPageIcon from '../../assets/Vector5.svg';
 import colors from '../style/colors';
 import typography from '../style/typography';
 
+import HomeScreen from '../screens/Home/HomeScreen';
+
 const Tab = createBottomTabNavigator();
 
 const PlaceholderScreen = () => {
@@ -58,7 +60,7 @@ const MainTab = () => {
     >
       <Tab.Screen
         name="Home"
-        component={PlaceholderScreen}
+        component={HomeScreen}
         options={{ title: '홈' }}
       />
       <Tab.Screen
