@@ -11,6 +11,7 @@ import MainCarousel from './MainCarousel';
 import AffiliateSection from './AffiliateSection';
 import RecommendSection from './RecommandSection';
 import CurationCarousel from './CurationCarousel';
+import BannerCard from './BannerCard';
 import { CAROUSEL_DATA } from './DummyData';
 
 const HomeScreen = () => {
@@ -54,6 +55,24 @@ const HomeScreen = () => {
       </View>
 
       <CurationCarousel />
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>💯 캠어스를 100% 이용하는 법</Text>
+      </View>
+
+      <View>
+        <BannerCard
+          title="좋은 제휴 아이디어 공유해주실래요?"
+          subtitle="원하는 제휴 혜택을 학생회에게 직접 제안해요."
+          onPress={() => console.log('제안하기 클릭')}
+        />
+
+        <BannerCard
+          title="제휴 이용하고 스탬프 받아가세요!"
+          subtitle="제휴만 이용해도 혜택이 팡팡"
+          onPress={() => console.log('스탬프 클릭')}
+        />
+      </View>
     </ScrollView>
   );
 };
