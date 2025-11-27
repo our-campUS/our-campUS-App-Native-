@@ -11,6 +11,7 @@ import {
 import theme from '../../style';
 import StoreCard from './StoreCard';
 import MainCarousel from './MainCarousel';
+import CurationCarousel from './CurationCarousel';
 import {
   CATEGORIES,
   BENEFITS_DATA,
@@ -115,6 +116,13 @@ const HomeScreen = () => {
           />
         )}
       />
+
+      {/* 큐레이션 */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>💕 추천 큐레이션</Text>
+      </View>
+
+      <CurationCarousel />
     </ScrollView>
   );
 };
@@ -133,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   eventText: { ...theme.typography.body4Regular, color: theme.colors.text },
-  boldText: { ...theme.typography.body4Bold },
+  boldText: { ...theme.typography.body4Bold, marginRigh: 8 },
   carouselWrapper: {
     marginTop: 20,
   },
