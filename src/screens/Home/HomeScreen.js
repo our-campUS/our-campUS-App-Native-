@@ -1,27 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,
   ScrollView,
 } from 'react-native';
 import theme from '../../style';
 import StoreCard from './StoreCard';
 import MainCarousel from './MainCarousel';
+import AffiliateSection from './AffiliateSection';
 import CurationCarousel from './CurationCarousel';
-import {
-  CATEGORIES,
-  BENEFITS_DATA,
-  STORE_DATA,
-  CAROUSEL_DATA,
-} from './DummyData';
+import { STORE_DATA, CAROUSEL_DATA } from './DummyData';
 
 const HomeScreen = () => {
-  const [selectedCategory, setSelectedCategory] = useState('중앙대');
-
   return (
     <ScrollView style={styles.container}>
       {/* 행사 안내 */}
@@ -45,51 +38,7 @@ const HomeScreen = () => {
         <Text style={styles.sectionTitle}>🧐 이용 가능한 제휴</Text>
       </View>
 
-      {/* 탭 메뉴 */}
-      <View style={styles.tabContainer}>
-        {CATEGORIES.map((cat) => (
-          <TouchableOpacity
-            key={cat}
-            onPress={() => setSelectedCategory(cat)}
-            style={[
-              styles.tabButton,
-              selectedCategory === cat && styles.activeTab,
-            ]}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedCategory === cat && styles.activeTabText,
-              ]}
-            >
-              {cat}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* 제휴 리스트 */}
-      <FlatList
-        data={BENEFITS_DATA}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.benefitItem}>
-            <View style={styles.benefitImage} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.brandName}>{item.name}</Text>
-              <Text style={styles.benefitDesc}>{item.desc}</Text>
-            </View>
-            <View style={styles.tagBox}>
-              <Text style={styles.tagText}>{item.tag}</Text>
-            </View>
-          </View>
-        )}
-      />
-
-      {/* 더보기 버튼 */}
-      <TouchableOpacity style={styles.moreButton}>
-        <Text style={styles.moreText}>이용 가능한 제휴 더보기</Text>
-      </TouchableOpacity>
+      <AffiliateSection />
 
       {/* 공간 추천 */}
       <View style={styles.sectionHeader}>
@@ -156,66 +105,6 @@ const styles = StyleSheet.create({
 
   sectionHeader: { marginVertical: 20 },
   sectionTitle: { ...theme.typography.heading4 },
-
-  tabContainer: { flexDirection: 'row', marginBottom: 12 },
-  tabButton: {
-    flex: 1,
-    paddingBottom: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  activeTab: { borderBottomColor: theme.colors.primary1 },
-  tabText: {
-    textAlign: 'center',
-    color: theme.colors.textDim,
-    ...theme.typography.heading5,
-  },
-  activeTabText: {
-    color: theme.colors.primary1,
-    ...theme.typography.heading5,
-  },
-
-  benefitItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderColor: theme.colors.border,
-  },
-  benefitImage: {
-    width: 48,
-    height: 48,
-    backgroundColor: theme.colors.backgroundSub,
-    borderRadius: 100,
-    marginRight: 21,
-  },
-  brandName: { ...theme.typography.body3Bold },
-  benefitDesc: {
-    ...theme.typography.body3Regular,
-    color: theme.colors.text,
-    marginTop: 2,
-  },
-  tagBox: {
-    backgroundColor: theme.colors.primary2,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 50,
-    marginLeft: 10,
-  },
-  tagText: { color: theme.colors.textWhite, ...theme.typography.caption2Bold },
-
-  moreButton: {
-    backgroundColor: theme.colors.primary1Light,
-    paddingVertical: 15,
-    borderRadius: 10,
-    marginVertical: 20,
-    marginHorizontal: 10,
-    alignItems: 'center',
-  },
-  moreText: { color: theme.colors.text, ...theme.typography.heading6 },
-  listPadding: {
-    paddingHorizontal: 20,
-  },
 });
 
 export default HomeScreen;
