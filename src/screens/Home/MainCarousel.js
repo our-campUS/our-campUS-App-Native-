@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   FlatList,
@@ -11,6 +11,12 @@ import {
 const MainCarousel = ({ data }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { width } = useWindowDimensions();
+
+  const PARENT_PADDING_TOTAL = 40;
+
+  const ITEM_WIDTH = width - PARENT_PADDING_TOTAL;
+
+  const ITEM_GAP = 5;
 
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -26,20 +32,23 @@ const MainCarousel = ({ data }) => {
     <View style={styles.container}>
       <FlatList
         data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
+        snapToInterval={ITEM_WIDTH}
+        decelerationRate="fast"
         renderItem={({ item }) => (
-          <View style={{ width }}>
-            {' '}
-            <Image source={item.image} style={styles.image} />
+          <View style={{ width: ITEM_WIDTH, paddingHorizontal: ITEM_GAP }}>
+            <View style={styles.imageWrapper}>
+              <Image source={item.image} style={styles.image} />
+            </View>
           </View>
         )}
       />
-      {/* 페이지 번호 배지 */}
+
       <View style={styles.pageBadge}>
         <Text style={styles.pageText}>
           {currentIndex + 1} / {data.length}
@@ -51,28 +60,31 @@ const MainCarousel = ({ data }) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
     height: 200,
-    marginTop: 20,
+  },
+  imageWrapper: {
+    flex: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#f0f0f0',
   },
   image: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
-    borderRadius: 10,
   },
   pageBadge: {
     position: 'absolute',
     bottom: 16,
-    left: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    left: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 20,
+    paddingHorizontal: 10,
+    borderRadius: 50,
   },
   pageText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
 });

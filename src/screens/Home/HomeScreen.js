@@ -35,7 +35,9 @@ const HomeScreen = () => {
       </View>
 
       {/* 캐러셀 */}
-      <MainCarousel data={CAROUSEL_DATA} />
+      <View style={styles.carouselWrapper}>
+        <MainCarousel data={CAROUSEL_DATA} />
+      </View>
 
       {/* 이용 가능한 제휴 */}
       <View style={styles.sectionHeader}>
@@ -132,7 +134,9 @@ const styles = StyleSheet.create({
   },
   eventText: { ...theme.typography.body4Regular, color: theme.colors.text },
   boldText: { ...theme.typography.body4Bold },
-
+  carouselWrapper: {
+    marginTop: 20,
+  },
   imagePlaceholder: {
     height: 200,
     backgroundColor: theme.colors.backgroundSub,
