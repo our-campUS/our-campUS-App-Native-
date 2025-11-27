@@ -3,16 +3,15 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import theme from '../../style';
-import StoreCard from './StoreCard';
 import MainCarousel from './MainCarousel';
 import AffiliateSection from './AffiliateSection';
+import RecommendSection from './RecommandSection';
 import CurationCarousel from './CurationCarousel';
-import { STORE_DATA, CAROUSEL_DATA } from './DummyData';
+import { CAROUSEL_DATA } from './DummyData';
 
 const HomeScreen = () => {
   return (
@@ -47,24 +46,7 @@ const HomeScreen = () => {
         </Text>
       </View>
 
-      <FlatList
-        data={STORE_DATA}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listPadding}
-        renderItem={({ item }) => (
-          <StoreCard
-            name={item.name}
-            category={item.category}
-            rating={item.rating}
-            discount={item.discount}
-            distance={item.distance}
-            tags={item.tags}
-            image={item.image}
-          />
-        )}
-      />
+      <RecommendSection />
 
       {/* 큐레이션 */}
       <View style={styles.sectionHeader}>
