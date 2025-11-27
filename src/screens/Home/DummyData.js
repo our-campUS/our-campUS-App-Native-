@@ -65,3 +65,18 @@ export const CAROUSEL_DATA = [
     image: 'https://via.placeholder.com/600x400/33FFFF/FFFFFF?text=Banner+6',
   },
 ];
+
+export const CURATION_DATA = [
+  {
+    id: 1,
+    title: '최근 오픈한 흑석 핫플 구경하기',
+    count: 9,
+    images: Array(9).fill('https://via.placeholder.com/100'),
+  },
+  {
+    id: 2,
+    title: '데이트하기 좋은 분위기 맛집',
+    count: 9,
+    images: Array(9).fill('https://via.placeholder.com/100'),
+  },
+];

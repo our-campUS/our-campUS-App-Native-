@@ -1,35 +1,14 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  FlatList,
-  StyleSheet,
-  // useWindowDimensions,
-} from 'react-native';
-import colors from '../../style/colors';
+import { View, Text, Image, FlatList, StyleSheet } from 'react-native';
 import theme from '../../style';
+import { CURATION_DATA } from './DummyData';
+import colors from '../../style/colors';
 
-const MOCK_DATA = [
-  {
-    id: 1,
-    title: '최근 오픈한 흑석 핫플 구경하기',
-    count: 9,
-    color: colors.blue[100],
-    images: Array(9).fill('https://via.placeholder.com/100'),
-  },
-  {
-    id: 2,
-    title: '데이트하기 좋은 분위기 맛집',
-    count: 9,
-    color: colors.orange[100],
-    images: Array(9).fill('https://via.placeholder.com/100'),
-  },
-];
-
-const CurationCard = ({ item, width }) => {
+const CurationCard = ({ item, width, backgroundColor }) => {
   return (
-    <View style={[styles.card, { width: width, backgroundColor: item.color }]}>
+    <View
+      style={[styles.card, { width: width, backgroundColor: backgroundColor }]}
+    >
       <View style={styles.textContainer}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.subtitle}>{item.count}개의 매장</Text>
@@ -47,14 +26,13 @@ const CurationCard = ({ item, width }) => {
 };
 
 const CurationCarousel = () => {
-  //const { width } = useWindowDimensions();
   const CARD_WIDTH = 212;
   const CARD_GAP = 13;
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={MOCK_DATA}
+        data={CURATION_DATA}
         keyExtractor={(item) => String(item.id)}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -63,9 +41,19 @@ const CurationCarousel = () => {
         decelerationRate="fast"
         contentContainerStyle={{ paddingHorizontal: 20 }}
         ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
-        renderItem={({ item }) => (
-          <CurationCard item={item} width={CARD_WIDTH} />
-        )}
+        renderItem={({ item, index }) => {
+          const isOddItem = index % 2 === 0;
+
+          const cardColor = isOddItem ? colors.blue[100] : colors.orange[100];
+
+          return (
+            <CurationCard
+              item={item}
+              width={CARD_WIDTH}
+              backgroundColor={cardColor}
+            />
+          );
+        }}
       />
     </View>
   );
