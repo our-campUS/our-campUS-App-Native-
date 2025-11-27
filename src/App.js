@@ -35,7 +35,7 @@ const App = () => {
       <StatusBar style="auto" />
       {/* {isLoggedIn ? <MainTab /> : <AuthStack />} */}
       {/* 개발 테스트용 */}
-      <AuthStack />
+      <MainTab />
     </NavigationContainer>
   );
 };
