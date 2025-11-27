@@ -1,5 +1,6 @@
 import colors from './colors';
 import { typography } from './typography';
+import shadows from './shadow';
 
 const theme = {
   colors: {
@@ -29,6 +30,7 @@ const theme = {
     border: colors.gray[200],
   },
   typography,
+  shadows,
 };
 
 export default theme;

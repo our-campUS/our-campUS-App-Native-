@@ -31,6 +31,8 @@ const styles = StyleSheet.create({
 
     borderWidth: 1,
     borderColor: theme.colors.border,
+
+    ...theme.shadows.small,
   },
   imagePlaceholder: {
     width: 52,
