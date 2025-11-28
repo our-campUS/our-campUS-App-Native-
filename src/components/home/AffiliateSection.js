@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import theme from '../../style';
-import { CATEGORIES, BENEFITS_DATA } from './DummyData';
+import { CATEGORIES, BENEFITS_DATA } from '../../constants/DummyData';
 
 const AffiliateSection = () => {
   const [selectedCategory, setSelectedCategory] = useState('중앙대');

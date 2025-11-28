@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, FlatList } from 'react-native';
-import StoreCard from './StoreCard';
-import { STORE_DATA } from './DummyData';
-
+import StoreCard from '../common/StoreCard';
+import { STORE_DATA } from '../../constants/DummyData';
 const RecommendSection = () => {
   return (
     <View>

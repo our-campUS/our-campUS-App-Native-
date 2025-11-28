@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, FlatList, StyleSheet } from 'react-native';
 import theme from '../../style';
-import { CURATION_DATA } from './DummyData';
+import { CURATION_DATA } from '../../constants/DummyData';
 import colors from '../../style/colors';
 
 const CurationCard = ({ item, width, backgroundColor }) => {

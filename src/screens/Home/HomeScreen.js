@@ -9,12 +9,12 @@ import {
 import theme from '../../style';
 import colors from '../../style/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MainCarousel from './MainCarousel';
-import AffiliateSection from './AffiliateSection';
-import RecommendSection from './RecommendSection';
-import CurationCarousel from './CurationCarousel';
-import BannerCard from './BannerCard';
-import { CAROUSEL_DATA } from './DummyData';
+import MainCarousel from '../../components/home/MainCarousel';
+import AffiliateSection from '../../components/home/AffiliateSection';
+import RecommendSection from '../../components/home/RecommendSection';
+import CurationCarousel from '../../components/home/CurationCarousel';
+import BannerCard from '../../components/common/BannerCard';
+import { CAROUSEL_DATA } from '../../constants/DummyData';
 
 const HomeSection = ({ title, children, hasDivider = false }) => {
   return (

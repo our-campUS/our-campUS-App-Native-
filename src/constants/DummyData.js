@@ -42,15 +42,15 @@ export const STORE_DATA = [
 export const CAROUSEL_DATA = [
   {
     id: '1',
-    image: require('../../../assets/default_image.jpeg'),
+    image: require('../../assets/default_image.jpeg'),
   },
   {
     id: '2',
-    image: require('../../../assets/default_image.jpeg'),
+    image: require('../../assets/default_image.jpeg'),
   },
   {
     id: '3',
-    image: require('../../../assets/default_image.jpeg'),
+    image: require('../../assets/default_image.jpeg'),
   },
   {
     id: '4',
@@ -58,7 +58,7 @@ export const CAROUSEL_DATA = [
   },
   {
     id: '5',
-    image: require('../../../assets/default_image.jpeg'),
+    image: require('../../assets/default_image.jpeg'),
   },
   {
     id: '6',
