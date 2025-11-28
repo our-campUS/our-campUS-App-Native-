@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import theme from '../../style';
 import colors from '../../style/colors';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import MainCarousel from './MainCarousel';
 import AffiliateSection from './AffiliateSection';
 import RecommendSection from './RecommendSection';
@@ -32,12 +33,31 @@ const HomeSection = ({ title, children, hasDivider = false }) => {
 };
 
 const HomeScreen = () => {
+  const [hasNewNotification, setHasNewNotification] = useState(true);
+
   return (
     <ScrollView style={styles.container}>
       {/* 행사 안내 */}
       <View style={styles.topArea}>
         <View style={styles.header}>
-          <Text style={styles.greeting}>사용자님, 안녕하세요</Text>
+          <View style={styles.headerTopRow}>
+            <Text style={styles.greeting}>사용자님, 안녕하세요</Text>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => console.log('알림 클릭')}
+              style={styles.notificationBtn}
+            >
+              <Ionicons
+                name="notifications"
+                size={24}
+                color={colors.gray[300]}
+              />
+
+              {hasNewNotification && <View style={styles.badge} />}
+            </TouchableOpacity>
+          </View>
+
           <TouchableOpacity style={styles.eventBox}>
             <Text
               style={styles.eventText}
@@ -100,7 +120,31 @@ const styles = StyleSheet.create({
   header: {
     marginTop: 30,
   },
-  greeting: { ...theme.typography.heading6, marginBottom: 15 },
+  headerTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+
+  greeting: {
+    ...theme.typography.heading6,
+  },
+
+  notificationBtn: {
+    position: 'relative',
+    padding: 4,
+  },
+
+  badge: {
+    position: 'absolute',
+    top: 5,
+    right: 6,
+    width: 4,
+    height: 4,
+    borderRadius: 3,
+    backgroundColor: theme.colors.primary2,
+  },
   eventBox: {
     backgroundColor: theme.colors.primary1Light,
     padding: 10,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../style';
 
 const StoreCard = ({
@@ -40,8 +41,8 @@ const StoreCard = ({
         </View>
 
         <View style={styles.infoRow}>
-          <Ionicons
-            name="pricetag"
+          <MaterialCommunityIcons
+            name="ticket-percent"
             size={14}
             color="black"
             style={styles.icon}
