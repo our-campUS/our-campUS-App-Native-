@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@mj-studio/react-native-naver-map": "^2.6.7",
     "@react-native-kakao/core": "^2.4.2",
     "@react-native-kakao/user": "^2.4.2",
     "@react-native-seoul/kakao-login": "^5.4.2",
