@@ -68,5 +68,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NMFNcpKeyId</key>
+	<string>c22m0sbes0</string>
 </dict>
 </plist>
