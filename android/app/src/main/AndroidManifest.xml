@@ -12,12 +12,13 @@
         android:usesCleartextTraffic="${usesCleartextTraffic}"
         android:supportsRtl="true">
 
-        <!-- 🔥 Kakao SDK 네이티브 앱 키 등록 (필수) -->
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="cf9915ad21d898963c9b449516ca45fb" />
+        <meta-data
+            android:name="com.naver.maps.map.NCP_KEY_ID"
+            android:value="${NAVER_CLIENT_ID}" />
 
-        <!-- 🔥 Kakao 인증 Redirect Activity (필수) -->
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
