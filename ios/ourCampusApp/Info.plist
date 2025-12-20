@@ -68,5 +68,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NMFNcpKeyId</key>
+	<string>c22m0sbes0</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>사용자의 현재 위치를 기반으로 캠퍼스 지도와 주변 상권 정보를 제공하기 위해 권한이 필요합니다.</string>
+
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>사용자의 현재 위치를 기반으로 캠퍼스 지도와 주변 상권 정보를 제공하기 위해 권한이 필요합니다.</string>
 </dict>
 </plist>
