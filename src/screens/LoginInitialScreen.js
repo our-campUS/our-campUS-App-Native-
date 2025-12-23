@@ -81,20 +81,22 @@ const LoginInitialScreen = ({ navigation }) => {
             const result = await onKakaoLogin();
             if (result) {
               // result 예시: { user, accessToken, refreshToken, isNewUser }
-              setAuthFromKakao({
-                user: result.user,
-                accessToken: result.accessToken,
-                refreshToken: result.refreshToken,
-              });
 
-              //개발 테스트용
+              // 테스트용: 기존 회원도 회원가입 플로우로 보내기 (MainTab 자동 전환 방지)
               navigation.navigate('SignUpFirstScreen');
 
-              if (result.isNewUser) {
-                // 신규 회원이면 회원가입 플로우로
-                navigation.navigate('SignUpFirstScreen');
-              }
-              // 기존 회원이면 isLoggedIn=true라 App에서 MainTab으로 자동 전환
+              // 원래 로직 (테스트용으로 주석 처리)
+              // setAuthFromKakao({
+              //   user: result.user,
+              //   accessToken: result.accessToken,
+              //   refreshToken: result.refreshToken,
+              // });
+              //
+              // if (result.isNewUser) {
+              //   // 신규 회원이면 회원가입 플로우로
+              //   navigation.navigate('SignUpFirstScreen');
+              // }
+              // // 기존 회원이면 isLoggedIn=true라 App에서 MainTab으로 자동 전환
             }
           }}
           style={{
@@ -123,7 +125,7 @@ const LoginInitialScreen = ({ navigation }) => {
           <Text
             style={{ color: colors.gray[600], ...typography.body4Regular }}
             onPress={() => {
-              // navigation.navigate('SignUpFirstScreen');
+              navigation.navigate('SignUpRepresentativStack');
             }}
           >
             학생회로 대표자로 시작하기 {'>'}

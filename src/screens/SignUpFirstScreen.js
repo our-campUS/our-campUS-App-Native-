@@ -62,7 +62,7 @@ const SignUpFirstScreen = ({ navigation }) => {
         <StatusBar style="auto" />
         <LabelTitle
           title="회원가입"
-          // useBackButton={}
+          useBackButton={true}
           onPressBack={() => navigation.goBack()}
           navigation={navigation}
         />
