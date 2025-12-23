@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react'; // 1. useState 추가
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { NaverMapView } from '@mj-studio/react-native-naver-map';
-
+import SearchBar from '../../components/SearchBar';
 import {
   request,
   PERMISSIONS,
@@ -10,27 +10,27 @@ import {
 } from 'react-native-permissions';
 
 const MapScreen = () => {
+  const [keyword, setKeyword] = useState('');
+
   useEffect(() => {
     const requestLocationPermission = async () => {
       try {
         if (Platform.OS === 'ios') {
           const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
           if (result === RESULTS.BLOCKED) {
-            console.log('iOS: 권한이 거부되었습니다. 설정에서 허용해주세요.');
+            console.log('iOS: 권한이 거부되었습니다.');
           }
         } else if (Platform.OS === 'android') {
           const result = await requestMultiple([
             PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
             PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
           ]);
-
           console.log('Android Permissions:', result);
         }
       } catch (e) {
         console.error('권한 요청 실패:', e);
       }
     };
-
     requestLocationPermission();
   }, []);
 
@@ -47,7 +47,13 @@ const MapScreen = () => {
       />
 
       <View style={styles.overlay}>
-        <Text style={styles.text}>네이버 지도 테스트</Text>
+        <SearchBar
+          value={keyword}
+          onChangeText={setKeyword}
+          placeholder="원하는 제휴를 검색하세요"
+          onClearPress={() => setKeyword('')}
+          onSubmit={() => console.log('검색 실행:', keyword)}
+        />
       </View>
     </View>
   );
@@ -59,15 +65,11 @@ const styles = StyleSheet.create({
   },
   overlay: {
     position: 'absolute',
-    top: 50,
-    left: 20,
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 8,
-    elevation: 5,
-  },
-  text: {
-    fontWeight: 'bold',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingTop: Platform.OS === 'ios' ? 60 : 20,
+    zIndex: 10,
   },
 });
 
