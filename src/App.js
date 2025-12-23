@@ -7,6 +7,7 @@ import { initKakao } from './api/signUp';
 import { useEffect } from 'react';
 import { getKakaoKeyHash } from '@react-native-seoul/kakao-login';
 import useAuthStore from './store/authStore';
+import MainStack from './navigations/MainStack';
 
 // useEffect(() => {
 //   getKakaoKeyHash().then((hash) => {
@@ -35,7 +36,7 @@ const App = () => {
       <StatusBar style="auto" />
       {/* {isLoggedIn ? <MainTab /> : <AuthStack />} */}
       {/* 개발 테스트용 */}
-      <MainTab />
+      <MainStack />
     </NavigationContainer>
   );
 };

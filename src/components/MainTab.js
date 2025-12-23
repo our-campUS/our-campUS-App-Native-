@@ -11,7 +11,7 @@ import colors from '../style/colors';
 import typography from '../style/typography';
 
 import HomeScreen from '../screens/Home/HomeScreen';
-import MapScreen from '../screens/Map/MapScreen';
+import MapStack from '../navigations/MapStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -66,7 +66,7 @@ const MainTab = () => {
       />
       <Tab.Screen
         name="Map"
-        component={MapScreen}
+        component={MapStack}
         options={{ title: '학교 상권' }}
       />
       <Tab.Screen
