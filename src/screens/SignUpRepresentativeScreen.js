@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
 import LabelTitle from '../components/LabelTitle';
@@ -10,6 +10,7 @@ import CheckMark from '../../assets/check.svg';
 import typography from '../style/typography';
 import Button from '../components/Button';
 import { checkUserIdDuplicate } from '../api/signUp';
+import { KeyboardAvoidingView } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
@@ -53,6 +54,7 @@ const styles = StyleSheet.create({
     color: '#006beb',
     textAlign: 'center',
     textDecorationLine: 'underline',
+    marginTop: 24,
     marginBottom: 12,
   },
   userIdStatusText: {
@@ -230,17 +232,18 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="auto" />
-      <LabelTitle
-        title="회원가입"
-        useBackButton={true}
-        onPressBack={() => navigation?.goBack()}
-        navigation={navigation}
-      />
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ flexGrow: 1 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
+        <StatusBar style="auto" />
+        <LabelTitle
+          title="회원가입"
+          useBackButton={true}
+          onPressBack={() => navigation?.goBack()}
+          navigation={navigation}
+        />
         <View style={[styles.statusBar]}>
           <View
             style={{ backgroundColor: colors.blue[400], width: '16.67%' }}
@@ -249,178 +252,184 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
             style={{ backgroundColor: colors.white, width: '83.33%' }}
           ></View>
         </View>
-        <View style={styles.inputFormContainer}>
-          <View>
-            <Input
-              title="아이디"
-              useTitle={true}
-              placeholder="아이디를 입력해주세요"
-              useMagnifyingGlass={false}
-              value={values.userId}
-              onChangeText={(text) => {
-                handleChange('userId', text);
-                setUserIdStatus(null); // 입력 시 상태 초기화
-              }}
-              onSubmitEditing={() => handleCheckUserId(true)}
-              onBlur={() => handleCheckUserId(false)}
-              returnKeyType="next"
-              hasError={!!errors.userId}
-            />
-            {errors.userId && (
-              <Text
-                style={[
-                  styles.userIdStatusText,
-                  { color: colors.common.error },
-                ]}
-              >
-                {errors.userId}
-              </Text>
-            )}
-            {userIdStatus && !errors.userId && (
-              <Text
-                style={[
-                  styles.userIdStatusText,
-                  {
-                    color:
-                      userIdStatus.type === 'success'
-                        ? colors.blue[500]
-                        : colors.common.error,
-                  },
-                ]}
-              >
-                {userIdStatus.message}
-              </Text>
-            )}
-            {isCheckingUserId && (
-              <Text
-                style={[styles.userIdStatusText, { color: colors.gray[600] }]}
-              >
-                확인 중...
-              </Text>
-            )}
-          </View>
-          <View>
-            <Input
-              ref={passwordInputRef}
-              title="비밀번호"
-              useTitle={true}
-              placeholder="비밀번호를 입력해주세요"
-              value={values.password}
-              onChangeText={(text) => {
-                handleChange('password', text);
-                // 입력 중에는 에러 제거 (blur 시에만 검사)
-                if (errors.password) {
-                  setError('password', null);
-                }
-              }}
-              onBlur={handlePasswordBlur}
-              returnKeyType="next"
-              secureTextEntry={true}
-              hasError={!!errors.password}
-            />
-            {errors.password && (
-              <Text
-                style={{
-                  color: colors.common.error,
-                  fontSize: 12,
-                  marginTop: 4,
-                  marginLeft: 4,
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.inputFormContainer}>
+            <View>
+              <Input
+                title="아이디"
+                useTitle={true}
+                placeholder="아이디를 입력해주세요"
+                useMagnifyingGlass={false}
+                value={values.userId}
+                onChangeText={(text) => {
+                  handleChange('userId', text);
+                  setUserIdStatus(null); // 입력 시 상태 초기화
                 }}
-              >
-                {errors.password}
-              </Text>
-            )}
-          </View>
-          <View style={styles.passwordReminder}>
-            <View style={styles.passwordReminderItem}>
-              <CheckMark
-                color={
-                  passwordConditions.hasMinLength
-                    ? colors.blue[400]
-                    : colors.gray[300]
-                }
+                onSubmitEditing={() => handleCheckUserId(true)}
+                onBlur={() => handleCheckUserId(false)}
+                returnKeyType="next"
+                hasError={!!errors.userId}
               />
-              <Text style={[styles.passwordReminderText, { marginLeft: 10 }]}>
-                8자리 이상
-              </Text>
+              {errors.userId && (
+                <Text
+                  style={[
+                    styles.userIdStatusText,
+                    { color: colors.common.error },
+                  ]}
+                >
+                  {errors.userId}
+                </Text>
+              )}
+              {userIdStatus && !errors.userId && (
+                <Text
+                  style={[
+                    styles.userIdStatusText,
+                    {
+                      color:
+                        userIdStatus.type === 'success'
+                          ? colors.blue[500]
+                          : colors.common.error,
+                    },
+                  ]}
+                >
+                  {userIdStatus.message}
+                </Text>
+              )}
+              {isCheckingUserId && (
+                <Text
+                  style={[styles.userIdStatusText, { color: colors.gray[600] }]}
+                >
+                  확인 중...
+                </Text>
+              )}
             </View>
-            <View style={styles.passwordReminderItem}>
-              <CheckMark
-                color={
-                  passwordConditions.hasTwoTypes
-                    ? colors.blue[400]
-                    : colors.gray[300]
-                }
+            <View>
+              <Input
+                ref={passwordInputRef}
+                title="비밀번호"
+                useTitle={true}
+                placeholder="비밀번호를 입력해주세요"
+                value={values.password}
+                onChangeText={(text) => {
+                  handleChange('password', text);
+                  // 입력 중에는 에러 제거 (blur 시에만 검사)
+                  if (errors.password) {
+                    setError('password', null);
+                  }
+                }}
+                onBlur={handlePasswordBlur}
+                returnKeyType="next"
+                secureTextEntry={true}
+                hasError={!!errors.password}
               />
-              <Text style={[styles.passwordReminderText, { marginLeft: 10 }]}>
-                대문자,소문자,숫자,특수문자 중 2개 이상
-              </Text>
+              {errors.password && (
+                <Text
+                  style={{
+                    color: colors.common.error,
+                    fontSize: 12,
+                    marginTop: 4,
+                    marginLeft: 4,
+                  }}
+                >
+                  {errors.password}
+                </Text>
+              )}
+            </View>
+            <View style={styles.passwordReminder}>
+              <View style={styles.passwordReminderItem}>
+                <CheckMark
+                  color={
+                    passwordConditions.hasMinLength
+                      ? colors.blue[400]
+                      : colors.gray[300]
+                  }
+                />
+                <Text style={[styles.passwordReminderText, { marginLeft: 10 }]}>
+                  8자리 이상
+                </Text>
+              </View>
+              <View style={styles.passwordReminderItem}>
+                <CheckMark
+                  color={
+                    passwordConditions.hasTwoTypes
+                      ? colors.blue[400]
+                      : colors.gray[300]
+                  }
+                />
+                <Text style={[styles.passwordReminderText, { marginLeft: 10 }]}>
+                  대문자,소문자,숫자,특수문자 중 2개 이상
+                </Text>
+              </View>
+            </View>
+            <View>
+              <Input
+                ref={emailInputRef}
+                title="학교 이메일"
+                useTitle={true}
+                placeholder="메일주소를 입력해주세요"
+                useMagnifyingGlass={false}
+                keyboardType="email-address"
+                value={values.email}
+                onChangeText={(text) => {
+                  handleChange('email', text);
+                  // 입력 중에는 에러 제거 (blur 시에만 검사)
+                  if (errors.email) {
+                    setError('email', null);
+                  }
+                }}
+                onBlur={handleEmailBlur}
+                hasError={!!errors.email}
+              />
+              {errors.email && (
+                <Text
+                  style={{
+                    color: colors.common.error,
+                    fontSize: 12,
+                    marginTop: 4,
+                    marginLeft: 4,
+                  }}
+                >
+                  {errors.email}
+                </Text>
+              )}
             </View>
           </View>
-          <View>
-            <Input
-              ref={emailInputRef}
-              title="학교 이메일"
-              useTitle={true}
-              placeholder="메일주소를 입력해주세요"
-              useMagnifyingGlass={false}
-              keyboardType="email-address"
-              value={values.email}
-              onChangeText={(text) => {
-                handleChange('email', text);
-                // 입력 중에는 에러 제거 (blur 시에만 검사)
-                if (errors.email) {
-                  setError('email', null);
+          <View style={styles.buttonContainer}>
+            <Text style={styles.alreadyHaveAccountText}>
+              이미 계정이 있으신가요?
+            </Text>
+            <Button
+              disabled={isButtonDisabled}
+              style={{
+                width: '100%',
+                height: 50,
+                paddingHorizontal: 10,
+                paddingVertical: 15,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.blue[400],
+                borderRadius: 10,
+              }}
+              textStyle={{
+                color: colors.common.white,
+                ...typography.heading6,
+              }}
+              title="인증번호 발송하기"
+              onPress={() => {
+                console.log('버튼 클릭됨, navigation:', navigation);
+                console.log('isButtonDisabled:', isButtonDisabled);
+                if (navigation) {
+                  navigation.navigate('ReceiveAuthCode');
                 }
               }}
-              onBlur={handleEmailBlur}
-              hasError={!!errors.email}
             />
-            {errors.email && (
-              <Text
-                style={{
-                  color: colors.common.error,
-                  fontSize: 12,
-                  marginTop: 4,
-                  marginLeft: 4,
-                }}
-              >
-                {errors.email}
-              </Text>
-            )}
           </View>
-        </View>
-        <View style={styles.buttonContainer}>
-          <Text style={styles.alreadyHaveAccountText}>
-            이미 계정이 있으신가요?
-          </Text>
-          <Button
-            disabled={isButtonDisabled}
-            style={{
-              width: '100%',
-              height: 50,
-              paddingHorizontal: 10,
-              paddingVertical: 15,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.blue[400],
-              borderRadius: 10,
-            }}
-            textStyle={{
-              color: colors.common.white,
-              ...typography.heading6,
-            }}
-            title="인증번호 발송하기"
-            onPress={() => {
-              console.log('버튼 클릭됨, navigation:', navigation);
-              console.log('isButtonDisabled:', isButtonDisabled);
-              if (navigation) {
-                navigation.navigate('ReceiveAuthCode');
-              }
-            }}
-          />
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

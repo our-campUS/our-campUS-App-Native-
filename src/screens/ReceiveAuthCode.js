@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  StatusBar,
+  Keyboard,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../components/LabelTitle';
 import colors from '../style/colors';
@@ -142,8 +149,11 @@ const ReceiveAuthCode = ({ navigation }) => {
     setIsValid(result);
 
     if (result) {
-      // 인증 성공 시 다음 화면으로 이동
-      navigation?.navigate('WriteRepresentativeInfo1');
+      // 인증 성공 시 키보드 먼저 해제 후 다음 화면으로 이동
+      Keyboard.dismiss();
+      setTimeout(() => {
+        navigation?.navigate('WriteRepresentativeInfo1');
+      }, 100);
     } else {
       // 인증 실패 시 코드 초기화
       setCode('');
