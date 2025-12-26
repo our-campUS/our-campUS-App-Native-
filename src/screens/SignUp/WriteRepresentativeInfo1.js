@@ -7,18 +7,19 @@ import {
   StatusBar,
   Pressable,
   Platform,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LabelTitle from '../components/LabelTitle';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import typography from '../style/typography';
-import colors from '../style/colors';
-import UnselectedRadioButton from '../../assets/unselected_Radio_Button.svg';
+import LabelTitle from '../../components/LabelTitle';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import typography from '../../style/typography';
+import colors from '../../style/colors';
+import UnselectedRadioButton from '../../../assets/unselected_Radio_Button.svg';
 import { useState, useEffect } from 'react';
 import { Image } from 'react-native';
-import MajorInputModal from '../components/majorInputModal';
-import CollegeInputModal from '../components/CollegeInputModal';
+import MajorInputModal from '../../components/majorInputModal';
+import CollegeInputModal from '../../components/CollegeInputModal';
 
 const styles = StyleSheet.create({
   container: {
@@ -142,7 +143,7 @@ const WriteRepresentativeInfo1 = ({ navigation }) => {
                   >
                     {selectedValue === 'total' ? (
                       <Image
-                        source={require('../../assets/RadioButton.png')}
+                        source={require('../../../assets/RadioButton.png')}
                         style={{ width: 18, height: 18 }}
                       />
                     ) : (
@@ -161,7 +162,7 @@ const WriteRepresentativeInfo1 = ({ navigation }) => {
                   >
                     {selectedValue === 'college' ? (
                       <Image
-                        source={require('../../assets/RadioButton.png')}
+                        source={require('../../../assets/RadioButton.png')}
                         style={{ width: 18, height: 18 }}
                       />
                     ) : (
@@ -180,7 +181,7 @@ const WriteRepresentativeInfo1 = ({ navigation }) => {
                   >
                     {selectedValue === 'department' ? (
                       <Image
-                        source={require('../../assets/RadioButton.png')}
+                        source={require('../../../assets/RadioButton.png')}
                         style={{ width: 18, height: 18 }}
                       />
                     ) : (
@@ -223,7 +224,10 @@ const WriteRepresentativeInfo1 = ({ navigation }) => {
               <Button
                 disabled={isButtonDisabled}
                 title="다음"
-                onPress={() => navigation.navigate('WriteRepresentativeInfo2')}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  navigation.navigate('RepresentativeProof');
+                }}
                 style={{
                   width: '100%',
                   height: 50,

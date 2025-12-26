@@ -1,11 +1,11 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
-import Button from '../components/Button';
-import colors from '../style/colors';
-import typography from '../style/typography';
-import { onKakaoLogin } from '../api/signUp';
+import Button from '../../components/Button';
+import colors from '../../style/colors';
+import typography from '../../style/typography';
+import { onKakaoLogin } from '../../api/signUp';
 import { Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import useAuthStore from '../store/authStore';
+import useAuthStore from '../../store/authStore';
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -37,11 +37,11 @@ const LoginInitialScreen = ({ navigation }) => {
     >
       <View style={{ alignItems: 'center', marginTop: 'auto' }}>
         <Image
-          source={require('../../assets/logo.png')}
+          source={require('../../../assets/logo.png')}
           style={{ width: 69.23, height: 82 }}
         />
         <Image
-          source={require('../../assets/mainLabel.png')}
+          source={require('../../../assets/mainLabel.png')}
           style={{ width: 148.86, height: 33, marginTop: 24 }}
         />
       </View>
@@ -69,7 +69,7 @@ const LoginInitialScreen = ({ navigation }) => {
             }}
           >
             <Image
-              source={require('../../assets/appleLogo.png')}
+              source={require('../../../assets/appleLogo.png')}
               style={{ width: 15.69, height: 18.93 }}
             />
           </Button>
@@ -115,7 +115,7 @@ const LoginInitialScreen = ({ navigation }) => {
           }}
         >
           <Image
-            source={require('../../assets/kakaoLogo.png')}
+            source={require('../../../assets/kakaoLogo.png')}
             style={{ width: 20.1, height: 18.76 }}
           />
         </Button>

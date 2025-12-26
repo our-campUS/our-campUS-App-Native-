@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
 const Input = forwardRef(
   (
     {
+      autoCapitalize = true,
       title,
       placeholder,
       keyboardType,
@@ -160,6 +161,8 @@ const Input = forwardRef(
               returnKeyType={returnKeyType || 'done'}
               keyboardType={useOnlyNumber ? 'number-pad' : keyboardType}
               maxLength={maxLength}
+              autoCapitalize="none"
+              autoCorrect={false}
               value={isControlled ? value : innerValue}
               editable={!disabled && !usePopUPModal}
               onChangeText={(text) => {

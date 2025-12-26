@@ -1,15 +1,15 @@
 import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
-import LabelTitle from '../components/LabelTitle';
-import colors from '../style/colors';
-import Input from '../components/Input';
-import useForm from '../hooks/useForm';
+import LabelTitle from '../../components/LabelTitle';
+import colors from '../../style/colors';
+import Input from '../../components/Input';
+import useForm from '../../hooks/useForm';
 import { useState, useRef, useEffect } from 'react';
-import CheckMark from '../../assets/check.svg';
-import typography from '../style/typography';
-import Button from '../components/Button';
-import { checkUserIdDuplicate } from '../api/signUp';
+import CheckMark from '../../../assets/check.svg';
+import typography from '../../style/typography';
+import Button from '../../components/Button';
+import { checkUserIdDuplicate } from '../../api/signUp';
 import { KeyboardAvoidingView } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -261,6 +261,8 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
             <View>
               <Input
                 title="아이디"
+                // keyboardType="email-address"
+                autoCapitalize="none"
                 useTitle={true}
                 placeholder="아이디를 입력해주세요"
                 useMagnifyingGlass={false}

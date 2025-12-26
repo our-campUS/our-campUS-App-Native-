@@ -1,13 +1,13 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import colors from '../style/colors';
+import colors from '../../style/colors';
 import { StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LabelTitle from '../components/LabelTitle';
-import Input from '../components/Input';
-import typography from '../style/typography';
+import LabelTitle from '../../components/LabelTitle';
+import Input from '../../components/Input';
+import typography from '../../style/typography';
 import { useState } from 'react';
-import MajorInputModal from '../components/majorInputModal';
-import Button from '../components/Button';
+import MajorInputModal from '../../components/majorInputModal';
+import Button from '../../components/Button';
 
 const styles = StyleSheet.create({
   statusBar: {
