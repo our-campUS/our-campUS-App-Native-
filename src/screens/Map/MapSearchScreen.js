@@ -17,8 +17,11 @@ import {
   CATEGORIES,
   RECENT_SEARCHES,
   SEARCH_ICON_CONFIG,
+  SEARCH_RESULTS,
 } from '../../constants/MapData';
 import typography from '../../style/typography';
+import SearchingPinIcon from '../../../assets/icons/search-list/searchingPin.svg';
+import SearchingShakeIcon from '../../../assets/icons/search-list/searchingShake.svg';
 
 const MapSearchScreen = () => {
   const navigation = useNavigation();
@@ -26,19 +29,40 @@ const MapSearchScreen = () => {
   const [keyword, setKeyword] = useState('');
 
   const renderHistoryItem = ({ item }) => {
-    const { Component, color } = SEARCH_ICON_CONFIG[item.type];
+    const config = SEARCH_ICON_CONFIG[item.type];
+    if (!config) return null;
+    const { Component, color } = config;
 
     return (
       <TouchableOpacity style={styles.historyItem}>
         <View style={[styles.iconCircle, { backgroundColor: color + '20' }]}>
-          <Component width={22} height={22} />
+          <Component width={22} height={22} color={color} />
         </View>
-
         <Text style={styles.historyText}>{item.text}</Text>
-
         <TouchableOpacity style={styles.deleteButton}>
           <Ionicons name="close" size={16} color={theme.colors.textDisabled} />
         </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderResultItem = ({ item }) => {
+    const IconComponent =
+      item.type === 'PARTNER' ? SearchingShakeIcon : SearchingPinIcon;
+
+    return (
+      <TouchableOpacity style={styles.resultItem}>
+        <View style={styles.resultIconWrapper}>
+          <IconComponent width={26} height={26} />
+        </View>
+
+        <View style={styles.resultTextWrapper}>
+          <Text style={styles.resultTitle}>{item.name}</Text>
+          <View style={styles.resultSubRow}>
+            <Text style={styles.resultAddress}>{item.address}</Text>
+            <Text style={styles.resultDistance}>{item.distance}</Text>
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -56,34 +80,49 @@ const MapSearchScreen = () => {
         />
       </View>
 
-      <View style={styles.categoryWrapper}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryScroll}
-        >
-          {CATEGORIES.map((cat) => (
-            <TouchableOpacity key={cat.id} style={styles.categoryChip}>
-              <cat.IconComponent
-                width={22}
-                height={22}
-                color={cat.defaultColor}
-              />
-              <Text style={styles.categoryText}>{cat.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+      {/* 조건부 렌더링 */}
+      {keyword.length > 0 ? (
+        <FlatList
+          data={SEARCH_RESULTS}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderResultItem}
+          contentContainerStyle={styles.listContent}
+          keyboardShouldPersistTaps="handled"
+        />
+      ) : (
+        <>
+          <View style={styles.categoryWrapper}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.categoryScroll}
+            >
+              {CATEGORIES.map((cat) => (
+                <TouchableOpacity key={cat.id} style={styles.categoryChip}>
+                  <View>
+                    <cat.IconComponent
+                      width={16}
+                      height={16}
+                      color={cat.defaultColor}
+                    />
+                  </View>
+                  <Text style={styles.categoryText}>{cat.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
 
-      <View style={styles.divider} />
+          <View style={styles.divider} />
 
-      <FlatList
-        data={RECENT_SEARCHES}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderHistoryItem}
-        contentContainerStyle={styles.listContent}
-        keyboardShouldPersistTaps="handled"
-      />
+          <FlatList
+            data={RECENT_SEARCHES}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderHistoryItem}
+            contentContainerStyle={styles.listContent}
+            keyboardShouldPersistTaps="handled"
+          />
+        </>
+      )}
     </View>
   );
 };
@@ -95,6 +134,7 @@ const styles = StyleSheet.create({
   },
   searchBarWrapper: {
     marginTop: 12,
+    paddingBottom: 10,
   },
   categoryWrapper: {
     paddingVertical: 12,
@@ -106,27 +146,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
+    marginRight: 8,
   },
   categoryText: {
     color: theme.colors.text,
     ...typography.body4Regular,
   },
-
   divider: {
-    height: 2,
+    height: 8,
     backgroundColor: theme.colors.border,
   },
-
   listContent: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 10,
   },
+
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
   iconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -138,6 +183,38 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 4,
+  },
+
+  resultItem: {
+    flexDirection: 'row',
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  resultIconWrapper: {
+    marginRight: 12,
+    justifyContent: 'flex-start',
+    paddingTop: 2,
+  },
+  resultTextWrapper: {
+    flex: 1,
+  },
+  resultTitle: {
+    color: theme.colors.text,
+    ...typography.body3Regular,
+  },
+  resultSubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  resultAddress: {
+    color: theme.colors.textDim,
+    ...typography.caption1Regular,
+    marginRight: 8,
+  },
+  resultDistance: {
+    color: theme.colors.textDisabled,
+    ...typography.caption2Regular,
   },
 });
 

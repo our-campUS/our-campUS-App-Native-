@@ -65,3 +65,34 @@ export const RECENT_SEARCHES = [
   { id: 2, text: '통일 공대 제휴', type: SEARCH_TYPE.KEYWORD },
   { id: 3, text: '스타벅스 상도역 2호점', type: SEARCH_TYPE.FAVORITE },
 ];
+
+export const SEARCH_RESULTS = [
+  {
+    id: 1,
+    name: '스타벅스 상도1호점',
+    address: '서울 동작구 만양로 11 2층',
+    distance: '0.0km',
+    type: 'STORE',
+  },
+  {
+    id: 2,
+    name: '스타벅스 상도2호점',
+    address: '서울 동작구 만양로 11 2층',
+    distance: '0.0km',
+    type: 'PARTNER',
+  },
+  {
+    id: 3,
+    name: '스타벅스 상도3호점',
+    address: '서울 동작구 만양로 11 2층',
+    distance: '0.0km',
+    type: 'PARTNER',
+  },
+  {
+    id: 4,
+    name: '스타벅스 상도4호점',
+    address: '서울 동작구 만양로 11 2층',
+    distance: '0.0km',
+    type: 'STORE',
+  },
+];
