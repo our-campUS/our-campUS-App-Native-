@@ -70,7 +70,7 @@ export const SEARCH_RESULTS = [
   {
     id: 1,
     name: '스타벅스 상도역 1호점',
-    category: '카페',
+    category: 'CAFE',
     address: '걸어서 4분',
     distance: '0.0km',
     rating: 5.0,
@@ -83,7 +83,7 @@ export const SEARCH_RESULTS = [
   {
     id: 2,
     name: '스타벅스 상도역 2호점',
-    category: '카페',
+    category: 'CAFE',
     address: '걸어서 5분',
     distance: '150m',
     rating: 4.8,

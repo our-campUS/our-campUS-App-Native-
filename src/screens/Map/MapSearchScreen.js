@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -112,7 +113,7 @@ const MapSearchScreen = () => {
                     <cat.IconComponent
                       width={16}
                       height={16}
-                      color={cat.defaultColor}
+                      color={theme.colors.textDim}
                     />
                   </View>
                   <Text style={styles.categoryText}>{cat.label}</Text>
@@ -142,8 +143,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   searchBarWrapper: {
-    marginTop: 12,
     paddingBottom: 10,
+    paddingTop: Platform.OS === 'ios' ? 60 : 20,
   },
   categoryWrapper: {
     paddingVertical: 12,

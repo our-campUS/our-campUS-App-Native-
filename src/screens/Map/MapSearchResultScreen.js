@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, FlatList, Platform } from 'react-native';
 import {
   NaverMapView,
   NaverMapMarkerOverlay,
@@ -14,13 +14,20 @@ import { SEARCH_RESULTS } from '../../constants/MapData';
 import theme from '../../style';
 import colors from '../../style/colors';
 
-import PinIcon from '../../../assets/icons/common/pin.svg';
+import MapPin from '../../components/common/MapPin';
 
 const MapSearchResultScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const route = useRoute();
   const { keyword } = route.params || {};
+
+  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+
+  const getPinSize = (type) => {
+    if (type === 'SELECTED') return 56;
+    return 44; // DEFAULT, PARTNER
+  };
 
   return (
     <View style={styles.container}>
@@ -33,20 +40,34 @@ const MapSearchResultScreen = () => {
         }}
         isShowLocationButton={false}
       >
-        {/* 검색 결과 핀 */}
-        {SEARCH_RESULTS.map((item) => (
-          <NaverMapMarkerOverlay
-            key={item.id}
-            latitude={item.latitude}
-            longitude={item.longitude}
-            caption={{ text: item.name }}
-            anchor={{ x: 0.5, y: 1 }}
-            onTap={() => console.log(`${item.name} 클릭됨`)}
-          />
-        ))}
+        {SEARCH_RESULTS.map((item) => {
+          let pinType = 'DEFAULT';
+          if (item.id === selectedMarkerId) {
+            pinType = 'SELECTED';
+          } else if (item.type === 'PARTNER') {
+            pinType = 'PARTNER';
+          }
+
+          const pinSize = getPinSize(pinType);
+
+          return (
+            <NaverMapMarkerOverlay
+              key={item.id}
+              latitude={item.latitude}
+              longitude={item.longitude}
+              width={pinSize}
+              height={pinSize}
+              anchor={{ x: 0.5, y: pinType === 'SELECTED' ? 1 : 0.5 }}
+              onTap={() => setSelectedMarkerId(item.id)}
+              caption={{ text: item.name }}
+            >
+              <MapPin type={pinType} category={item.category} />
+            </NaverMapMarkerOverlay>
+          );
+        })}
       </NaverMapView>
 
-      <View style={[styles.topOverlay, { paddingTop: insets.top }]}>
+      <View style={styles.topOverlay}>
         <SearchBar
           value={keyword}
           placeholder="검색어를 입력하세요"
@@ -66,7 +87,10 @@ const MapSearchResultScreen = () => {
           renderItem={({ item }) => (
             <StoreListItem
               item={item}
-              onPress={() => console.log('가게 상세로 이동')}
+              onPress={() => {
+                console.log('가게 상세로 이동');
+                setSelectedMarkerId(item.id);
+              }}
             />
           )}
         />
@@ -87,6 +111,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+    paddingTop: Platform.OS === 'ios' ? 60 : 20,
     zIndex: 10,
   },
   bottomSheet: {

@@ -13,9 +13,12 @@ import typography from '../../style/typography';
 import StarIcon from '../../../assets/icons/common/star.svg';
 import TicketIcon from '../../../assets/icons/common/ticket.svg';
 import PinIcon from '../../../assets/icons/common/pin.svg';
+import { CATEGORIES } from '../../constants/MapData';
 
 const StoreListItem = ({ item, onPress }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const categoryLabel =
+    CATEGORIES.find((cat) => cat.id === item.category)?.label || item.category;
 
   return (
     <TouchableOpacity
@@ -26,7 +29,7 @@ const StoreListItem = ({ item, onPress }) => {
       <View style={styles.headerRow}>
         <View style={styles.titleWrapper}>
           <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.category}>{item.category}</Text>
+          <Text style={styles.category}>{categoryLabel}</Text>
         </View>
         <TouchableOpacity
           style={styles.likeButton}
