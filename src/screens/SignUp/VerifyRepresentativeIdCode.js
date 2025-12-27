@@ -29,12 +29,13 @@ const styles = StyleSheet.create({
   contents: {
     width: '100%',
     paddingHorizontal: 20,
-    marginTop: 24,
+    marginTop: 28,
     gap: 8,
     flex: 1,
   },
   inputWrapper: {
     position: 'relative',
+    marginTop: 56,
   },
   timerContainer: {
     position: 'absolute',
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const ReceiveAuthCode = ({ navigation }) => {
+const VerifyRepresentativeIdCode = ({ navigation }) => {
   const [code, setCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(180); // 3분 = 180초
   const [isExpired, setIsExpired] = useState(false);
@@ -152,7 +153,7 @@ const ReceiveAuthCode = ({ navigation }) => {
       // 인증 성공 시 키보드 먼저 해제 후 다음 화면으로 이동
       Keyboard.dismiss();
       setTimeout(() => {
-        navigation?.navigate('WriteRepresentativeInfo1');
+        navigation?.navigate('FoundRepresentativeId');
       }, 100);
     } else {
       // 인증 실패 시 코드 초기화
@@ -172,7 +173,7 @@ const ReceiveAuthCode = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       <LabelTitle
-        title="본인 인증"
+        title="학생대표자 아이디 찾기"
         useBackButton={true}
         onPressBack={() => navigation?.goBack()}
         navigation={navigation}
@@ -183,13 +184,22 @@ const ReceiveAuthCode = ({ navigation }) => {
       >
         <View style={[styles.statusBar]}>
           <View
-            style={{ backgroundColor: colors.blue[400], width: '33.33%' }}
-          ></View>
-          <View
-            style={{ backgroundColor: colors.gray[100], width: '66.67%' }}
+            style={{ backgroundColor: colors.gray[100], width: '100%' }}
           ></View>
         </View>
         <View style={styles.contents}>
+          <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>
+            메일로 발송된
+          </Text>
+          <Text
+            style={{
+              ...typography.heading4,
+              color: colors.gray[850],
+              marginTop: 4,
+            }}
+          >
+            인증 번호를 입력해주세요.
+          </Text>
           <View style={styles.inputWrapper}>
             <Input
               title="인증 번호"
@@ -242,4 +252,4 @@ const ReceiveAuthCode = ({ navigation }) => {
   );
 };
 
-export default ReceiveAuthCode;
+export default VerifyRepresentativeIdCode;

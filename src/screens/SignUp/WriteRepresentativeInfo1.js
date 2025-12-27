@@ -114,7 +114,9 @@ const WriteRepresentativeInfo1 = ({ navigation }) => {
           <View
             style={{ backgroundColor: colors.blue[400], width: '50%' }}
           ></View>
-          <View style={{ backgroundColor: colors.white, width: '50%' }}></View>
+          <View
+            style={{ backgroundColor: colors.gray[100], width: '50%' }}
+          ></View>
         </View>
         <ScrollView
           keyboardShouldPersistTaps="handled"

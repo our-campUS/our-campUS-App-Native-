@@ -59,3 +59,53 @@ export const verifyAuthCode = async (authCode) => {
     return { isValid: false, message: '인증번호 검증 실패' };
   }
 };
+
+export const representativeLogin = async (userId, password) => {
+  // try {
+  //   const response = await axios.post('/api/auth/login', { userId, password });
+  //   return response.data;
+  // } catch (error) {
+  //   console.error('대표자 로그인 오류:', error);
+  //   return { isValid: false, message: '대표자 로그인 중 오류가 발생했습니다.' };
+  // }
+  if (userId === 'test' && password === '1234') {
+    return { isValid: true, message: '대표자 로그인 성공' };
+  }
+  if (userId === 'test' && password !== '1234') {
+    return {
+      isValid: false,
+      message: '비밀번호가 일치하지 않습니다.',
+      idmatch: true,
+      passwordmatch: false,
+    };
+  }
+  if (userId !== 'test') {
+    return {
+      isValid: false,
+      message: '아이디가 일치하지 않습니다.',
+      idmatch: false,
+      passwordmatch: false,
+    };
+  }
+};
+
+export const findRepresentativeEmailExist = async (email) => {
+  // try {
+  //   const response = await axios.post('/api/auth/find-representative-email', { email });
+  //   return response.data;
+  // } catch (error) {
+  //   console.error('대표자 이메일 존재 오류:', error);
+  //   return { isValid: false, message: '대표자 이메일 존재 중 오류가 발생했습니다.' };
+  // }
+  if (email === 'test@test.com') {
+    return { isValid: true, message: '대표자 이메일 존재' };
+  }
+  return { isValid: false, message: '존재하지 않는 이메일입니다.' };
+};
+
+export const checkRepresentativeIdExist = async (id) => {
+  if (id === 'test') {
+    return { isValid: true, message: '대표자 아이디 존재' };
+  }
+  return { isValid: false, message: '존재하지 않는 아이디입니다.' };
+};

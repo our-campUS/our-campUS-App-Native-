@@ -13,7 +13,8 @@ import colors from '../style/colors';
 import typography from '../style/typography';
 import MagnifyingGlass from '../../assets/input-tool.svg';
 import { filterDropdownItems } from '../utils/searchLogic';
-
+import EyeSlashIcon from '../../assets/inputHidden.svg';
+import EyeIcon from '../../assets/inputUnhidden.svg';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -54,6 +55,9 @@ const styles = StyleSheet.create({
   },
   error: {
     borderColor: colors.common.error,
+  },
+  readOnly: {
+    borderColor: colors.blue[300],
   },
   dropdownContainer: {
     marginTop: 16,
@@ -103,18 +107,21 @@ const Input = forwardRef(
       usePopUPModal = false,
       onPressPopUPModal = null,
       useDropDown = false,
+      usePassword = false,
       dropdownData = [],
       onSelectDropdownItem = null,
       hasError = false,
       usetimeLimit = false,
       useOnlyNumber = false,
       maxLength,
+      usePassWordIcon = false,
+      onlyRead = false,
     },
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
     const [innerValue, setInnerValue] = useState('');
-
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const isControlled = value !== undefined;
 
     // 내부에서 항상 사용할 실제 TextInput ref
@@ -129,17 +136,27 @@ const Input = forwardRef(
       }
     };
 
+    // onlyRead일 때 additionalStyle의 backgroundColor를 우선 적용하도록 처리
+    const finalAdditionalStyle =
+      onlyRead && additionalStyle.backgroundColor
+        ? {
+            ...additionalStyle,
+            backgroundColor: additionalStyle.backgroundColor,
+          }
+        : additionalStyle;
+
     return (
       <View style={styles.container}>
         {useTitle && <Text style={styles.title}>{title}</Text>}
         <Pressable
           style={[
             styles.inputWrapper,
+            onlyRead && styles.readOnly,
             hasError && styles.error,
-            !hasError && isFocused && styles.focused,
-            additionalStyle,
+            !hasError && isFocused && !onlyRead && styles.focused,
+            finalAdditionalStyle,
           ]}
-          disabled={disabled}
+          disabled={disabled || onlyRead}
           onPress={() => {
             if (usePopUPModal && typeof onPressPopUPModal === 'function') {
               onPressPopUPModal();
@@ -156,6 +173,7 @@ const Input = forwardRef(
               ]}
               ref={innerRef}
               placeholder={placeholder}
+              secureTextEntry={usePassword && !isPasswordVisible}
               placeholderTextColor={colors.gray[400]}
               placeholderStyle={typography.body3Regular}
               returnKeyType={returnKeyType || 'done'}
@@ -164,7 +182,8 @@ const Input = forwardRef(
               autoCapitalize="none"
               autoCorrect={false}
               value={isControlled ? value : innerValue}
-              editable={!disabled && !usePopUPModal}
+              editable={!disabled && !usePopUPModal && !onlyRead}
+              pointerEvents={onlyRead ? 'none' : 'auto'}
               onChangeText={(text) => {
                 // 숫자만 입력받기
                 let filteredText = text;
@@ -204,6 +223,22 @@ const Input = forwardRef(
               pointerEvents="none"
             />
           )}
+          {usePassWordIcon &&
+            (isPasswordVisible ? (
+              <Pressable
+                style={styles.magnifyingGlass}
+                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+              >
+                <EyeIcon pointerEvents="none" />
+              </Pressable>
+            ) : (
+              <Pressable
+                style={styles.magnifyingGlass}
+                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+              >
+                <EyeSlashIcon pointerEvents="none" />
+              </Pressable>
+            ))}
           {usetimeLimit && <Text style={styles.timeLimit}>{timeLimit}</Text>}
         </Pressable>
         {useDropDown && isFocused && dropdownData.length > 0 && (

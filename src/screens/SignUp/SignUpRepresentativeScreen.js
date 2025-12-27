@@ -249,7 +249,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
             style={{ backgroundColor: colors.blue[400], width: '16.67%' }}
           ></View>
           <View
-            style={{ backgroundColor: colors.white, width: '83.33%' }}
+            style={{ backgroundColor: colors.gray[100], width: '83.33%' }}
           ></View>
         </View>
         <ScrollView
@@ -401,7 +401,10 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
             </View>
           </View>
           <View style={styles.buttonContainer}>
-            <Text style={styles.alreadyHaveAccountText}>
+            <Text
+              style={styles.alreadyHaveAccountText}
+              onPress={() => navigation.navigate('LoginRepresentative')}
+            >
               이미 계정이 있으신가요?
             </Text>
             <Button
