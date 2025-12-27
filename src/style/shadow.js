@@ -24,7 +24,7 @@ const shadows = {
     shadowRadius: 3,
 
     // Android
-    elevation: 5,
+    elevation: 10,
   },
 };
 

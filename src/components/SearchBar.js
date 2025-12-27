@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginHorizontal: 20,
-
     ...theme.shadows.level2,
   },
   leftIcon: {

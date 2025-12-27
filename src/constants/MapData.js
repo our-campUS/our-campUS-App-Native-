@@ -1,8 +1,11 @@
-import PartnerIcon from '../assets/icons/category/partner.svg';
-import CafeIcon from '../assets/icons/category/cafe.svg';
-import RestarauntICon from '../assets/icons/category/restaraunt.svg';
-import PubICon from '../assets/icons/category/pub.svg';
-import StoreICon from '../assets/icons/category/store.svg';
+import PartnerIcon from '../../assets/icons/category/shake.svg';
+import CafeIcon from '../../assets/icons/category/cafe.svg';
+import RestarauntICon from '../../assets/icons/category/restaraunt.svg';
+import PubICon from '../../assets/icons/category/pub.svg';
+import StoreICon from '../../assets/icons/category/store.svg';
+import PinIcon from '../../assets/icons/search-list/pin.svg';
+import HeartIcon from '../../assets/icons/search-list/heart.svg';
+import SearchIcon from '../../assets/icons/search-list/search.svg';
 import theme from '../style';
 
 export const CATEGORIES = [
@@ -41,7 +44,19 @@ export const CATEGORIES = [
 export const SEARCH_TYPE = {
   STORE: 'STORE',
   KEYWORD: 'KEYWORD',
-  FAVORITE: 'FAVORITE',
+  LIKE: 'LIKE',
+};
+
+export const SEARCH_ICON_CONFIG = {
+  [SEARCH_TYPE.STORE]: {
+    Component: PinIcon,
+  },
+  [SEARCH_TYPE.FAVORITE]: {
+    Component: HeartIcon,
+  },
+  [SEARCH_TYPE.KEYWORD]: {
+    Component: SearchIcon,
+  },
 };
 
 // Dummy

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'; // 1. useState 추가
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import { NaverMapView } from '@mj-studio/react-native-naver-map';
 import SearchBar from '../../components/SearchBar';
 import {
@@ -8,9 +8,10 @@ import {
   RESULTS,
   requestMultiple,
 } from 'react-native-permissions';
+import { useNavigation } from '@react-navigation/native';
 
 const MapScreen = () => {
-  const [keyword, setKeyword] = useState('');
+  const navigation = useNavigation();
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -47,13 +48,14 @@ const MapScreen = () => {
       />
 
       <View style={styles.overlay}>
-        <SearchBar
-          value={keyword}
-          onChangeText={setKeyword}
-          placeholder="원하는 제휴를 검색하세요"
-          onClearPress={() => setKeyword('')}
-          onSubmit={() => console.log('검색 실행:', keyword)}
-        />
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => navigation.navigate('MapSearchScreen')}
+        >
+          <View pointerEvents="none">
+            <SearchBar placeholder="원하는 제휴를 검색하세요" />
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
