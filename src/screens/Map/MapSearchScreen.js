@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     ...typography.body4Regular,
   },
   divider: {
-    height: 8,
+    height: 1,
     backgroundColor: theme.colors.border,
   },
   listContent: {
@@ -165,8 +165,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   iconCircle: {
     width: 32,
