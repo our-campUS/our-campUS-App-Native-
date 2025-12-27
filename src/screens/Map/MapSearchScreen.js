@@ -20,13 +20,16 @@ import {
   SEARCH_RESULTS,
 } from '../../constants/MapData';
 import typography from '../../style/typography';
-import SearchingPinIcon from '../../../assets/icons/search-list/searchingPin.svg';
+import SearchingPinIcon from '../../../assets/icons/common/pin.svg';
 import SearchingShakeIcon from '../../../assets/icons/search-list/searchingShake.svg';
 
 const MapSearchScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [keyword, setKeyword] = useState('');
+  const onSubmit = () => {
+    navigation.navigate('MapSearchResultScreen', { keyword: keyword });
+  };
 
   const renderHistoryItem = ({ item }) => {
     const config = SEARCH_ICON_CONFIG[item.type];
@@ -51,7 +54,12 @@ const MapSearchScreen = () => {
       item.type === 'PARTNER' ? SearchingShakeIcon : SearchingPinIcon;
 
     return (
-      <TouchableOpacity style={styles.resultItem}>
+      <TouchableOpacity
+        style={styles.resultItem}
+        onPress={() =>
+          navigation.navigate('MapSearchResultScreen', { keyword: item.name })
+        }
+      >
         <View style={styles.resultIconWrapper}>
           <IconComponent width={26} height={26} />
         </View>
@@ -77,6 +85,7 @@ const MapSearchScreen = () => {
           autoFocus={true}
           onBackPress={() => navigation.goBack()}
           onClearPress={() => setKeyword('')}
+          onSubmit={onSubmit}
         />
       </View>
 

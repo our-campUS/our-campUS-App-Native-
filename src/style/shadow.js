@@ -15,7 +15,7 @@ const shadows = {
 
   level2: {
     // iOS
-    shadowColor: '#E1E4E6',
+    shadowColor: '#888', //임의 수정
     shadowOffset: {
       width: 0,
       height: 0,
@@ -24,7 +24,7 @@ const shadows = {
     shadowRadius: 3,
 
     // Android
-    elevation: 10,
+    elevation: 20,
   },
 };
 
