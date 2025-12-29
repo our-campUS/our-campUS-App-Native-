@@ -1,13 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  Platform,
-  Dimensions,
-  Animated,
-  PanResponder,
-} from 'react-native';
+import { View, StyleSheet, Platform, Dimensions } from 'react-native';
 import {
   NaverMapView,
   NaverMapMarkerOverlay,
@@ -15,7 +7,6 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import StoreListItem from '../../components/common/StoreListItem';
 import SearchBar from '../../components/SearchBar';
 import { SEARCH_RESULTS } from '../../constants/MapData';
 
@@ -23,21 +14,17 @@ import theme from '../../style';
 import colors from '../../style/colors';
 
 import MapPin from '../../components/common/MapPin';
-
-const SCREEN_HEIGHT = Dimensions.get('window').height;
-
-const HEIGHT_MAX = SCREEN_HEIGHT * 0.9;
-const HEIGHT_LIST = SCREEN_HEIGHT * 0.55;
-const HEIGHT_ITEM = 280;
+import BottomSheet from '../../components/map/BottomSheet';
 
 const MapSearchResultScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const route = useRoute();
   const { keyword } = route.params || {};
+  const screenHeight = Dimensions.get('window').height;
+  const sheetMaxHeight = screenHeight;
 
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
-  const sheetHeight = useRef(new Animated.Value(HEIGHT_LIST)).current;
 
   const getPinSize = (type) => {
     if (type === 'SELECTED') return 56;
@@ -48,57 +35,7 @@ const MapSearchResultScreen = () => {
     ? SEARCH_RESULTS.filter((item) => item.id === selectedMarkerId)
     : SEARCH_RESULTS;
 
-  useEffect(() => {
-    if (selectedMarkerId) {
-      Animated.spring(sheetHeight, {
-        toValue: HEIGHT_ITEM,
-        useNativeDriver: false,
-        friction: 8,
-      }).start();
-    } else {
-      Animated.spring(sheetHeight, {
-        toValue: HEIGHT_LIST,
-        useNativeDriver: false,
-      }).start();
-    }
-  });
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-
-      onPanResponderMove: (evt, gestureState) => {
-        const baseHeight = selectedMarkerId ? HEIGHT_ITEM : HEIGHT_LIST;
-        let newHeight = baseHeight - gestureState.dy;
-
-        if (newHeight > HEIGHT_MAX) newHeight = HEIGHT_MAX;
-        if (newHeight < HEIGHT_ITEM) newHeight = HEIGHT_ITEM;
-
-        sheetHeight.setValue(newHeight);
-      },
-
-      onPanResponderRelease: (evt, gestureState) => {
-        const dy = gestureState.dy;
-        if (dy < -50) {
-          Animated.spring(sheetHeight, {
-            toValue: HEIGHT_MAX,
-            useNativeDriver: false,
-          }).start();
-        } else if (dy > 50) {
-          Animated.spring(sheetHeight, {
-            toValue: selectedMarkerId ? HEIGHT_ITEM : HEIGHT_LIST,
-            useNativeDriver: false,
-          }).start();
-        } else {
-          Animated.spring(sheetHeight, {
-            toValue: selectedMarkerId ? HEIGHT_ITEM : HEIGHT_LIST,
-            useNativeDriver: false,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  useEffect(() => {}, []);
 
   return (
     <View style={styles.container}>
@@ -156,23 +93,12 @@ const MapSearchResultScreen = () => {
         />
       </View>
 
-      <Animated.View style={[styles.bottomSheet, { height: sheetHeight }]}>
-        <View {...panResponder.panHandlers} style={styles.handleBarWrapper}>
-          <View style={styles.handleBar} />
-        </View>
-
-        <FlatList
-          data={displayedMarkers}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <StoreListItem
-              item={item}
-              onPress={() => setSelectedMarkerId(item.id)}
-            />
-          )}
-          scrollEnabled={true}
-        />
-      </Animated.View>
+      <BottomSheet
+        displayedMarkers={displayedMarkers}
+        selectedMarkerId={selectedMarkerId}
+        onItemPress={(id) => setSelectedMarkerId(id)}
+        maxHeight={sheetMaxHeight}
+      />
     </View>
   );
 };
