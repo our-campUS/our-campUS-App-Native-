@@ -33,9 +33,9 @@ const App = () => {
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      {/* {isLoggedIn ? <MainTab /> : <AuthStack />} */}
+      {isLoggedIn ? <MainTab /> : <AuthStack />}
       {/* 개발 테스트용 */}
-      <MainTab />
+      {/* <MainTab /> */}
     </NavigationContainer>
   );
 };
