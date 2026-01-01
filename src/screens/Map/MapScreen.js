@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -17,21 +17,37 @@ import { SEARCH_RESULTS } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import MapPin from '../../components/common/MapPin';
 
+import CategoryList from '../../components/map/CategoryList';
+
 const MapScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const screenHeight = Dimensions.get('window').height;
-  const sheetMaxHeight = screenHeight * 0.9;
+  const topHeaderHeight = insets.top + 60 + 20;
+  const sheetMaxHeight = screenHeight - topHeaderHeight;
 
   const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
 
-  const displayedMarkers = selectedMarkerId
-    ? SEARCH_RESULTS.filter((item) => item.id === selectedMarkerId)
-    : SEARCH_RESULTS;
+  const displayedMarkers = useMemo(() => {
+    if (selectedMarkerId) {
+      return SEARCH_RESULTS.filter((item) => item.id === selectedMarkerId);
+    }
+    if (selectedCategory) {
+      return SEARCH_RESULTS.filter(
+        (item) => item.category === selectedCategory.id
+      );
+    }
+    return SEARCH_RESULTS;
+  }, [selectedMarkerId, selectedCategory]);
 
-  useEffect(() => {}, []);
+  const handleMapTap = () => {
+    setSelectedMarkerId(null);
+    setSelectedCategory(null);
+  };
 
   return (
     <View style={styles.container}>
@@ -39,9 +55,11 @@ const MapScreen = () => {
         style={{ flex: 1 }}
         initialCamera={{ latitude: 37.5665, longitude: 126.978, zoom: 16 }}
         isShowLocationButton={true}
-        onTapMap={() => setSelectedMarkerId(null)}
+        onTapMap={handleMapTap}
       >
-        {SEARCH_RESULTS.map((item) => {
+        {/* 지도 핀 렌더링 (카테고리 선택 시 지도 핀도 필터링해서 보여줄지 여부 결정) */}
+        {/* 여기서는 displayedMarkers를 map으로 돌려서 필터된 것만 지도에 남김 */}
+        {displayedMarkers.map((item) => {
           let pinType = 'DEFAULT';
           if (item.id === selectedMarkerId) pinType = 'SELECTED';
           else if (item.type === 'PARTNER') pinType = 'PARTNER';
@@ -76,12 +94,26 @@ const MapScreen = () => {
       >
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => navigation.navigate('MapSearchScreen')}
+          onPress={() => {
+            navigation.navigate('MapSearchScreen');
+          }}
         >
           <View pointerEvents="none">
-            <SearchBar placeholder="원하는 제휴를 검색하세요" />
+            <SearchBar
+              placeholder="원하는 제휴를 검색하세요"
+              value={selectedCategory ? selectedCategory.label : ''}
+            />
           </View>
         </TouchableOpacity>
+
+        {!selectedCategory && (
+          <CategoryList
+            onSelectCategory={(category) => {
+              setSelectedCategory(category);
+              setSelectedMarkerId(null);
+            }}
+          />
+        )}
       </View>
 
       <BottomSheet
@@ -103,8 +135,9 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 10,
+    zIndex: 999,
     paddingHorizontal: 20,
+    paddingBottom: 10,
   },
 });
 
