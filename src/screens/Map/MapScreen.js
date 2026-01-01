@@ -44,7 +44,7 @@ const MapScreen = () => {
     return SEARCH_RESULTS;
   }, [selectedMarkerId, selectedCategory]);
 
-  const handleMapTap = () => {
+  const handleReset = () => {
     setSelectedMarkerId(null);
     setSelectedCategory(null);
   };
@@ -55,10 +55,8 @@ const MapScreen = () => {
         style={{ flex: 1 }}
         initialCamera={{ latitude: 37.5665, longitude: 126.978, zoom: 16 }}
         isShowLocationButton={true}
-        onTapMap={handleMapTap}
+        onTapMap={handleReset}
       >
-        {/* 지도 핀 렌더링 (카테고리 선택 시 지도 핀도 필터링해서 보여줄지 여부 결정) */}
-        {/* 여기서는 displayedMarkers를 map으로 돌려서 필터된 것만 지도에 남김 */}
         {displayedMarkers.map((item) => {
           let pinType = 'DEFAULT';
           if (item.id === selectedMarkerId) pinType = 'SELECTED';
@@ -92,19 +90,25 @@ const MapScreen = () => {
           },
         ]}
       >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => {
-            navigation.navigate('MapSearchScreen');
-          }}
-        >
-          <View pointerEvents="none">
-            <SearchBar
-              placeholder="원하는 제휴를 검색하세요"
-              value={selectedCategory ? selectedCategory.label : ''}
-            />
-          </View>
-        </TouchableOpacity>
+        {selectedCategory ? (
+          <SearchBar
+            value={selectedCategory.label}
+            placeholder="원하는 제휴를 검색하세요"
+            onBackPress={handleReset}
+            onClearPress={handleReset}
+          />
+        ) : (
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {
+              navigation.navigate('MapSearchScreen');
+            }}
+          >
+            <View pointerEvents="none">
+              <SearchBar placeholder="원하는 제휴를 검색하세요" />
+            </View>
+          </TouchableOpacity>
+        )}
 
         {!selectedCategory && (
           <CategoryList
