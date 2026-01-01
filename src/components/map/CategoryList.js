@@ -9,6 +9,7 @@ import {
 import theme from '../../style';
 import colors from '../../style/colors';
 import { CATEGORIES } from '../../constants/MapData';
+import typograpy from '../../style/typography';
 
 const CategoryList = ({ onSelectCategory }) => {
   return (
@@ -27,7 +28,7 @@ const CategoryList = ({ onSelectCategory }) => {
               onPress={() => onSelectCategory(cat)}
               activeOpacity={0.7}
             >
-              <Icon width={18} height={18} color={cat.defaultColor} />
+              <Icon width={20} height={20} color={cat.defaultColor} />
               <Text style={styles.label}>{cat.label}</Text>
             </TouchableOpacity>
           );
@@ -42,24 +43,24 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   scrollContent: {
-    paddingHorizontal: 4,
-    paddingBottom: 4,
+    paddingLeft: 20,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingVertical: 8,
+    paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 20,
-    marginRight: 8,
+    borderRadius: 30,
+    marginRight: 4,
     ...theme.shadows.level1,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   label: {
     marginLeft: 6,
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.gray[800],
+    ...typograpy.body3Bold,
+    color: theme.colors.textDim,
   },
 });
 
