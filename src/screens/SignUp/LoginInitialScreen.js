@@ -1,11 +1,11 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
-import Button from '../components/Button';
-import colors from '../style/colors';
-import typography from '../style/typography';
-import { onKakaoLogin } from '../api/signUp';
+import Button from '../../components/Button';
+import colors from '../../style/colors';
+import typography from '../../style/typography';
+import { onKakaoLogin } from '../../api/signUp';
 import { Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import useAuthStore from '../store/authStore';
+import useAuthStore from '../../store/authStore';
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -37,11 +37,11 @@ const LoginInitialScreen = ({ navigation }) => {
     >
       <View style={{ alignItems: 'center', marginTop: 'auto' }}>
         <Image
-          source={require('../../assets/logo.png')}
+          source={require('../../../assets/logo.png')}
           style={{ width: 69.23, height: 82 }}
         />
         <Image
-          source={require('../../assets/mainLabel.png')}
+          source={require('../../../assets/mainLabel.png')}
           style={{ width: 148.86, height: 33, marginTop: 24 }}
         />
       </View>
@@ -69,7 +69,7 @@ const LoginInitialScreen = ({ navigation }) => {
             }}
           >
             <Image
-              source={require('../../assets/appleLogo.png')}
+              source={require('../../../assets/appleLogo.png')}
               style={{ width: 15.69, height: 18.93 }}
             />
           </Button>
@@ -81,20 +81,22 @@ const LoginInitialScreen = ({ navigation }) => {
             const result = await onKakaoLogin();
             if (result) {
               // result 예시: { user, accessToken, refreshToken, isNewUser }
-              setAuthFromKakao({
-                user: result.user,
-                accessToken: result.accessToken,
-                refreshToken: result.refreshToken,
-              });
 
-              //개발 테스트용
+              // 테스트용: 기존 회원도 회원가입 플로우로 보내기 (MainTab 자동 전환 방지)
               navigation.navigate('SignUpFirstScreen');
 
-              if (result.isNewUser) {
-                // 신규 회원이면 회원가입 플로우로
-                navigation.navigate('SignUpFirstScreen');
-              }
-              // 기존 회원이면 isLoggedIn=true라 App에서 MainTab으로 자동 전환
+              // 원래 로직 (테스트용으로 주석 처리)
+              // setAuthFromKakao({
+              //   user: result.user,
+              //   accessToken: result.accessToken,
+              //   refreshToken: result.refreshToken,
+              // });
+              //
+              // if (result.isNewUser) {
+              //   // 신규 회원이면 회원가입 플로우로
+              //   navigation.navigate('SignUpFirstScreen');
+              // }
+              // // 기존 회원이면 isLoggedIn=true라 App에서 MainTab으로 자동 전환
             }
           }}
           style={{
@@ -113,7 +115,7 @@ const LoginInitialScreen = ({ navigation }) => {
           }}
         >
           <Image
-            source={require('../../assets/kakaoLogo.png')}
+            source={require('../../../assets/kakaoLogo.png')}
             style={{ width: 20.1, height: 18.76 }}
           />
         </Button>
@@ -123,7 +125,7 @@ const LoginInitialScreen = ({ navigation }) => {
           <Text
             style={{ color: colors.gray[600], ...typography.body4Regular }}
             onPress={() => {
-              // navigation.navigate('SignUpFirstScreen');
+              navigation.navigate('SignUpRepresentativStack');
             }}
           >
             학생회로 대표자로 시작하기 {'>'}

@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     width: 14,
-    height: 7,
+    height: 28,
     justifySelf: 'flex-start',
     marginRight: 'auto',
   },
@@ -37,7 +37,8 @@ const LabelTitle = ({
     <View style={[styles.container, additionalStyle]}>
       {useBackButton && (
         <Pressable onPress={onPressBack}>
-          <Text style={styles.backButton}>{'<'}</Text>
+          {/* <Text style={styles.backButton}>{'<'}</Text> */}
+          <BackIcon width={20} height={10} />
         </Pressable>
       )}
       <Text style={styles.title}>{title}</Text>

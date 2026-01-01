@@ -1,13 +1,13 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import colors from '../style/colors';
+import colors from '../../style/colors';
 import { StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LabelTitle from '../components/LabelTitle';
-import Input from '../components/Input';
-import typography from '../style/typography';
+import LabelTitle from '../../components/LabelTitle';
+import Input from '../../components/Input';
+import typography from '../../style/typography';
 import { useState } from 'react';
-import MajorInputModal from '../components/majorInputModal';
-import Button from '../components/Button';
+import MajorInputModal from '../../components/majorInputModal';
+import Button from '../../components/Button';
 
 const styles = StyleSheet.create({
   statusBar: {
@@ -62,7 +62,7 @@ const SignUpFirstScreen = ({ navigation }) => {
         <StatusBar style="auto" />
         <LabelTitle
           title="회원가입"
-          // useBackButton={}
+          useBackButton={true}
           onPressBack={() => navigation.goBack()}
           navigation={navigation}
         />
@@ -75,7 +75,7 @@ const SignUpFirstScreen = ({ navigation }) => {
               style={{ backgroundColor: colors.blue[400], width: '50%' }}
             ></View>
             <View
-              style={{ backgroundColor: colors.white, width: '50%' }}
+              style={{ backgroundColor: colors.gray[100], width: '50%' }}
             ></View>
           </View>
           <View style={styles.greetingContainer}>

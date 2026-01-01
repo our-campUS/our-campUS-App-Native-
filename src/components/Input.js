@@ -13,7 +13,8 @@ import colors from '../style/colors';
 import typography from '../style/typography';
 import MagnifyingGlass from '../../assets/input-tool.svg';
 import { filterDropdownItems } from '../utils/searchLogic';
-
+import EyeSlashIcon from '../../assets/inputHidden.svg';
+import EyeIcon from '../../assets/inputUnhidden.svg';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -52,6 +53,12 @@ const styles = StyleSheet.create({
   focused: {
     borderColor: colors.blue[500],
   },
+  error: {
+    borderColor: colors.common.error,
+  },
+  readOnly: {
+    borderColor: colors.blue[300],
+  },
   dropdownContainer: {
     marginTop: 16,
     gap: 8,
@@ -71,16 +78,27 @@ const styles = StyleSheet.create({
     ...typography.body3Regular,
     color: colors.gray[850],
   },
+  timeLimit: {
+    ...typography.body3Regular,
+    color: colors.gray[400],
+    position: 'absolute',
+    right: 20,
+    top: '50%',
+    transform: [{ translateY: -13 }],
+  },
 });
 
 const Input = forwardRef(
   (
     {
+      autoCapitalize = true,
       title,
       placeholder,
       keyboardType,
       returnKeyType,
       onChangeText,
+      onSubmitEditing = null,
+      onBlur = null,
       value, // optional controlled value
       useTitle = false,
       useMagnifyingGlass = false,
@@ -89,14 +107,21 @@ const Input = forwardRef(
       usePopUPModal = false,
       onPressPopUPModal = null,
       useDropDown = false,
+      usePassword = false,
       dropdownData = [],
       onSelectDropdownItem = null,
+      hasError = false,
+      usetimeLimit = false,
+      useOnlyNumber = false,
+      maxLength,
+      usePassWordIcon = false,
+      onlyRead = false,
     },
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
     const [innerValue, setInnerValue] = useState('');
-
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const isControlled = value !== undefined;
 
     // 내부에서 항상 사용할 실제 TextInput ref
@@ -111,16 +136,27 @@ const Input = forwardRef(
       }
     };
 
+    // onlyRead일 때 additionalStyle의 backgroundColor를 우선 적용하도록 처리
+    const finalAdditionalStyle =
+      onlyRead && additionalStyle.backgroundColor
+        ? {
+            ...additionalStyle,
+            backgroundColor: additionalStyle.backgroundColor,
+          }
+        : additionalStyle;
+
     return (
       <View style={styles.container}>
         {useTitle && <Text style={styles.title}>{title}</Text>}
         <Pressable
           style={[
             styles.inputWrapper,
-            isFocused && styles.focused,
-            additionalStyle,
+            onlyRead && styles.readOnly,
+            hasError && styles.error,
+            !hasError && isFocused && !onlyRead && styles.focused,
+            finalAdditionalStyle,
           ]}
-          disabled={disabled}
+          disabled={disabled || onlyRead}
           onPress={() => {
             if (usePopUPModal && typeof onPressPopUPModal === 'function') {
               onPressPopUPModal();
@@ -137,21 +173,48 @@ const Input = forwardRef(
               ]}
               ref={innerRef}
               placeholder={placeholder}
+              secureTextEntry={usePassword && !isPasswordVisible}
               placeholderTextColor={colors.gray[400]}
               placeholderStyle={typography.body3Regular}
-              returnKeyType={returnKeyType}
+              returnKeyType={returnKeyType || 'done'}
+              keyboardType={useOnlyNumber ? 'number-pad' : keyboardType}
+              maxLength={maxLength}
+              autoCapitalize="none"
+              autoCorrect={false}
               value={isControlled ? value : innerValue}
-              editable={!disabled && !usePopUPModal}
+              editable={!disabled && !usePopUPModal && !onlyRead}
+              pointerEvents={onlyRead ? 'none' : 'auto'}
               onChangeText={(text) => {
+                // 숫자만 입력받기
+                let filteredText = text;
+                if (useOnlyNumber) {
+                  filteredText = text.replace(/[^0-9]/g, '');
+                }
+
+                // maxLength 제한 적용
+                if (maxLength && filteredText.length > maxLength) {
+                  filteredText = filteredText.slice(0, maxLength);
+                }
+
                 if (!isControlled) {
-                  setInnerValue(text);
+                  setInnerValue(filteredText);
                 }
                 if (typeof onChangeText === 'function') {
-                  onChangeText(text);
+                  onChangeText(filteredText);
                 }
               }}
+              onSubmitEditing={
+                onSubmitEditing && typeof onSubmitEditing === 'function'
+                  ? onSubmitEditing
+                  : undefined
+              }
               onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
+              onBlur={() => {
+                setIsFocused(false);
+                if (onBlur && typeof onBlur === 'function') {
+                  onBlur();
+                }
+              }}
             />
           </View>
           {useMagnifyingGlass && (
@@ -160,6 +223,23 @@ const Input = forwardRef(
               pointerEvents="none"
             />
           )}
+          {usePassWordIcon &&
+            (isPasswordVisible ? (
+              <Pressable
+                style={styles.magnifyingGlass}
+                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+              >
+                <EyeIcon pointerEvents="none" />
+              </Pressable>
+            ) : (
+              <Pressable
+                style={styles.magnifyingGlass}
+                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+              >
+                <EyeSlashIcon pointerEvents="none" />
+              </Pressable>
+            ))}
+          {usetimeLimit && <Text style={styles.timeLimit}>{timeLimit}</Text>}
         </Pressable>
         {useDropDown && isFocused && dropdownData.length > 0 && (
           <View style={styles.dropdownContainer}>

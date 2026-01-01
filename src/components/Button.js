@@ -58,7 +58,6 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   disabled: {
-    backgroundColor: colors.gray[400],
     opacity: 0.6,
   },
   content: {
