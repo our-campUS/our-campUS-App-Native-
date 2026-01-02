@@ -6,7 +6,7 @@ import CalendarIcon from '../../../assets/calendar.svg';
 
 const styles = StyleSheet.create({
   container: {
-    width: 255,
+    width: '255px',
     height: 147,
     backgroundColor: colors.common.white,
     padding: 30,
