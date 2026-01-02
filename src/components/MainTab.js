@@ -14,6 +14,7 @@ import HomeScreen from '../screens/Home/HomeScreen';
 import MapScreen from '../screens/Map/MapScreen';
 import AffiliationSelectStack from '../navigations/AffiliationSelectStack';
 import MapStack from '../navigations/MapStack';
+import MyPageStack from '../navigations/MyPageStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -83,7 +84,7 @@ const MainTab = () => {
       />
       <Tab.Screen
         name="MyPage"
-        component={PlaceholderScreen}
+        component={MyPageStack}
         options={{ title: '마이페이지' }}
       />
     </Tab.Navigator>
