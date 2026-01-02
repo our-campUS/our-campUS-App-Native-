@@ -14,7 +14,7 @@ const theme = {
 
     // 텍스트
     text: colors.gray[850],
-    textDim: colors.gray[600],
+    textDim: colors.gray[700],
     textDisabled: colors.gray[400],
     textWhite: colors.common.white,
 

@@ -12,6 +12,20 @@ const shadows = {
     // Android 속성
     elevation: 2,
   },
+
+  level2: {
+    // iOS
+    shadowColor: '#888', //임의 수정
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.7,
+    shadowRadius: 3,
+
+    // Android
+    elevation: 20,
+  },
 };
 
 export default shadows;
