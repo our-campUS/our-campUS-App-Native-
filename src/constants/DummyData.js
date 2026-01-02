@@ -80,3 +80,71 @@ export const CURATION_DATA = [
     images: Array(9).fill('https://via.placeholder.com/100'),
   },
 ];
+
+// 제휴 탭 카루셀 전용 더미 데이터 (재상)
+export const AFFILIATION_CAROUSEL_DATA = [
+  {
+    id: '1',
+    activityType: '간식행사',
+    title: '25-2학기 중간고사 간식행사',
+    place: '301관 1층',
+    date: '2025.11.18',
+  },
+  {
+    id: '2',
+    activityType: '총회',
+    title: '25-2학기 종강 총회',
+    place: '크라운호프 중앙대점',
+    date: '2025.12.30',
+  },
+];
+
+// 제휴 칼럼 리스트 전용 더미 데이터 (재상)
+export const AFFILIATION_COLUMN_LIST_DATA_AFFILIATION = [
+  {
+    title: '수아르떼 첫 방문 30% 할인',
+    place: '수아르떼 중앙대점',
+    date: '2025년 12월 1일까지',
+    image: null,
+    detailImages: [],
+  },
+  {
+    title: '맥도날드 첫 방문 30% 할인',
+    place: '맥도날드 중앙대점',
+    date: '2025년 12월 1일까지',
+    image: null,
+    detailImages: [],
+  },
+  {
+    title: '이탈리안 돈까스와 냉면 첫 방문 30% 할인',
+    place: '이탈리안 돈까스와 냉면 중앙대점',
+    date: '2025년 12월 1일까지',
+    image: null,
+    detailImages: [],
+  },
+];
+
+// 행사 칼럼 리스트 전용 더미 데이터 (재상)
+export const AFFILIATION_COLUMN_LIST_DATA_EVENT = [
+  {
+    title: '25-2학기 중간고사 간식사업',
+    place: '310관 1층',
+    date: '2025년 12월 1일',
+    image: null,
+    detailImages: [],
+  },
+  {
+    title: '25-2학기 기말고사 간식사업',
+    place: '310관 1층',
+    date: '2025년 12월 2일',
+    image: null,
+    detailImages: [],
+  },
+  {
+    title: '25-2학기 계절학기 간식사업',
+    place: '310관 1층',
+    date: '2025년 12월 3일',
+    image: null,
+    detailImages: [],
+  },
+];

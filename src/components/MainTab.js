@@ -12,6 +12,7 @@ import typography from '../style/typography';
 
 import HomeScreen from '../screens/Home/HomeScreen';
 import MapScreen from '../screens/Map/MapScreen';
+import AffiliationSelectStack from '../navigations/AffiliationSelectStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -71,7 +72,7 @@ const MainTab = () => {
       />
       <Tab.Screen
         name="Partnership"
-        component={PlaceholderScreen}
+        component={AffiliationSelectStack}
         options={{ title: '제휴 보기' }}
       />
       <Tab.Screen
