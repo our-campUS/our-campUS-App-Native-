@@ -11,12 +11,9 @@ import colors from '../style/colors';
 import typography from '../style/typography';
 
 import HomeScreen from '../screens/Home/HomeScreen';
-<<<<<<< HEAD
 import MapScreen from '../screens/Map/MapScreen';
 import AffiliationSelectStack from '../navigations/AffiliationSelectStack';
-=======
 import MapStack from '../navigations/MapStack';
->>>>>>> develop
 
 const Tab = createBottomTabNavigator();
 
