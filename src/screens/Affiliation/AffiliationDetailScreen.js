@@ -17,6 +17,12 @@ import PlaceHolderImage from '../../../assets/blankImage.svg';
 import LikeIcon from '../../../assets/Liked.svg';
 import UnLikeIcon from '../../../assets/Unliked.svg';
 import ShareIcon from '../../../assets/share.svg';
+import PlaceIcon from '../../../assets/Vector2.svg';
+import DateIcon from '../../../assets/calendar.svg';
+import { AFFILIATION_RECOMMEND_DATA } from '../../constants/DummyData';
+import PlaceHolderRepresentativeImage from '../../../assets/placeHolderImage.svg';
+import BadgeIcon from '../../../assets/badgeIcon.svg';
+import CouponIcon from '../../../assets/couponIcon.svg';
 
 const styles = StyleSheet.create({
   container: {
@@ -59,6 +65,8 @@ const styles = StyleSheet.create({
   detailInfoContainer: {
     paddingHorizontal: 20,
     paddingVertical: 28,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray[200],
   },
   topLayer: {
     flexDirection: 'row',
@@ -80,6 +88,107 @@ const styles = StyleSheet.create({
     borderColor: colors.gray[300],
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  placeAndDate: {
+    marginTop: 12,
+    gap: 4,
+  },
+  placeWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  place: {
+    marginLeft: 10,
+    ...typography.body3Regular,
+    color: colors.gray[700],
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  distance: {
+    marginLeft: 4,
+    ...typography.body4Regular,
+    color: colors.gray[400],
+    textAlignVertical: 'center',
+  },
+  dateWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+    marginLeft: -2,
+  },
+  date: {
+    marginLeft: 4,
+    ...typography.body3Regular,
+    color: colors.gray[700],
+  },
+  time: {
+    marginLeft: 2,
+    ...typography.body4Regular,
+    color: colors.gray[400],
+    textAlignVertical: 'center',
+  },
+  recommendContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 28,
+  },
+  recommendTitle: {
+    ...typography.heading6,
+  },
+  recommendItemContainer: {
+    width: 280,
+    height: 88,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.gray['050'],
+    backgroundColor: colors.gray['000'],
+    padding: 16,
+    flexDirection: 'row',
+  },
+  imageWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+  },
+  infoWrapper: {
+    marginLeft: 12,
+  },
+  titleWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  recommendTitle: {
+    ...typography.body4Bold,
+    color: colors.gray[850],
+  },
+  placeType: {
+    ...typography.caption2Regular,
+    color: colors.gray[700],
+    marginLeft: 4,
+  },
+  detailWrapper: {
+    flexDirection: 'column',
+    gap: 2,
+    marginTop: 4,
+  },
+  detailExplainWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: -2,
+  },
+  detailDistanceWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  detailExplain: {
+    ...typography.caption1Regular,
+    color: colors.gray[700],
+    marginLeft: 4,
+  },
+  detailDistance: {
+    ...typography.caption1Regular,
+    color: colors.gray[700],
+    marginLeft: 4,
   },
 });
 
@@ -113,6 +222,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
+      <View style={{ height: 20 }} />
       <ScrollView style={{ flex: 1 }}>
         <View style={{ width: '100%' }}>
           <FlatList
@@ -120,7 +230,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
             data={displayImages}
             horizontal
             pagingEnabled
-            style={{ marginTop: 20 }}
+            // style={{ marginTop: 20 }}
             contentContainerStyle={{ paddingHorizontal: 0 }}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item, index }) => (
@@ -171,6 +281,72 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
               </Pressable>
             </View>
           </View>
+          <View style={styles.placeAndDate}>
+            <View style={styles.placeWrapper}>
+              <PlaceIcon width={20} height={20} color={colors.gray[300]} />
+              <Text style={styles.place}>{route.params?.item?.place}</Text>
+              <Text style={styles.distance}>0.0km</Text>
+            </View>
+          </View>
+          <View style={styles.dateWrapper}>
+            <DateIcon width={24} height={24} color={colors.gray[300]} />
+            <Text style={styles.date}>{route.params?.item?.date}</Text>
+            <Text style={styles.time}>D-1</Text>
+          </View>
+        </View>
+        <View style={styles.recommendContainer}>
+          {route.params?.item?.type === '제휴' ? (
+            <Text style={styles.recommendTitle}>
+              총학생회에서 진행하는 {'\n'}다른 제휴 매장 둘러보기
+            </Text>
+          ) : (
+            <Text style={styles.recommendTitle}>총학생회의 다가오는 행사</Text>
+          )}
+          <FlatList
+            data={AFFILIATION_RECOMMEND_DATA}
+            horizontal
+            contentContainerStyle={{ gap: 10 }}
+            style={{ marginTop: 20 }}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View style={styles.recommendItemContainer}>
+                <View style={styles.imageWrapper}>
+                  {item.image ? (
+                    <Image
+                      source={{ uri: item.image }}
+                      style={{ width: 56, height: 56, borderRadius: 8 }}
+                    />
+                  ) : (
+                    <PlaceHolderRepresentativeImage width={56} height={56} />
+                  )}
+                </View>
+                <View style={styles.infoWrapper}>
+                  <View style={styles.titleWrapper}>
+                    {item?.approved && <BadgeIcon width={20} height={20} />}
+                    <Text style={styles.recommendTitle}>{item.title}</Text>
+                    <Text style={styles.placeType}>{item?.placeType}</Text>
+                  </View>
+                  <View style={styles.detailWrapper}>
+                    <View style={styles.detailExplainWrapper}>
+                      <CouponIcon width={15} height={15} />
+                      <Text style={styles.detailExplain}>{item?.detail}</Text>
+                    </View>
+                    <View style={styles.detailDistanceWrapper}>
+                      <PlaceIcon
+                        width={12}
+                        height={12}
+                        color={colors.gray[300]}
+                      />
+                      <Text style={styles.detailDistance}>
+                        {item?.distance}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

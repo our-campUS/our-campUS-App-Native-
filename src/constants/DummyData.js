@@ -107,6 +107,7 @@ export const AFFILIATION_COLUMN_LIST_DATA_AFFILIATION = [
     date: '2025년 12월 1일까지',
     image: null,
     detailImages: [],
+    type: '제휴',
   },
   {
     title: '맥도날드 첫 방문 30% 할인',
@@ -114,6 +115,7 @@ export const AFFILIATION_COLUMN_LIST_DATA_AFFILIATION = [
     date: '2025년 12월 1일까지',
     image: null,
     detailImages: [],
+    type: '제휴',
   },
   {
     title: '이탈리안 돈까스와 냉면 첫 방문 30% 할인',
@@ -121,6 +123,7 @@ export const AFFILIATION_COLUMN_LIST_DATA_AFFILIATION = [
     date: '2025년 12월 1일까지',
     image: null,
     detailImages: [],
+    type: '제휴',
   },
 ];
 
@@ -132,6 +135,7 @@ export const AFFILIATION_COLUMN_LIST_DATA_EVENT = [
     date: '2025년 12월 1일',
     image: null,
     detailImages: [],
+    type: '행사',
   },
   {
     title: '25-2학기 기말고사 간식사업',
@@ -139,6 +143,7 @@ export const AFFILIATION_COLUMN_LIST_DATA_EVENT = [
     date: '2025년 12월 2일',
     image: null,
     detailImages: [],
+    type: '행사',
   },
   {
     title: '25-2학기 계절학기 간식사업',
@@ -146,5 +151,37 @@ export const AFFILIATION_COLUMN_LIST_DATA_EVENT = [
     date: '2025년 12월 3일',
     image: null,
     detailImages: [],
+    type: '행사',
+  },
+];
+
+export const AFFILIATION_RECOMMEND_DATA = [
+  {
+    id: '1',
+    title: '빅브로짐 중앙대점',
+    place: '빅브로짐 중앙대점',
+    date: '2025년 12월 1일까지',
+    image: null,
+    detailImages: [],
+    type: '제휴',
+    detail: '첫 방문 20% 할인',
+    distance: '걸어서 4분 ',
+    placeType: '카페',
+    approved: true,
+    rank: null,
+  },
+  {
+    id: '2',
+    title: '빅브로짐 중앙대점',
+    place: '빅브로짐 중앙대점',
+    date: '2025년 12월 1일까지',
+    image: null,
+    detailImages: [],
+    type: '제휴',
+    detail: '첫 방문 20% 할인',
+    distance: '걸어서 4분 ',
+    placeType: '카페',
+    approved: true,
+    rank: 1,
   },
 ];
