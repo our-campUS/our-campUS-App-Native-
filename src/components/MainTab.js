@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text } from 'react-native';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { View, Text, Keyboard } from 'react-native';
 
 import HomeIcon from '../../assets/Vector1.svg';
 import MapIcon from '../../assets/Vector2.svg';
@@ -60,6 +61,7 @@ const MainTab = () => {
         tabBarActiveTintColor: colors.blue[500],
         tabBarInactiveTintColor: colors.gray[300],
         headerShown: false,
+        tabBarHideOnKeyboard: true,
       })}
     >
       <Tab.Screen
@@ -85,7 +87,18 @@ const MainTab = () => {
       <Tab.Screen
         name="MyPage"
         component={MyPageStack}
-        options={{ title: '마이페이지' }}
+        options={({ route }) => {
+          const routeName =
+            getFocusedRouteNameFromRoute(route) ?? 'MyPageDefaultScreen';
+          const hideTabBar = routeName !== 'MyPageDefaultScreen';
+
+          return {
+            title: '마이페이지',
+            tabBarStyle: hideTabBar
+              ? { display: 'none' }
+              : { height: 91, paddingTop: 20, paddingHorizontal: 20 },
+          };
+        }}
       />
     </Tab.Navigator>
   );

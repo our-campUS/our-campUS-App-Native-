@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const MyPageDefaultScreen = () => {
+const MyPageDefaultScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mainProfileWrapper}>
@@ -101,9 +101,13 @@ const MyPageDefaultScreen = () => {
             />
           </View>
           <Text style={styles.nickname}>닉넴 뭐하지</Text>
-          <View style={styles.editIconWrapper} justifySelf="flex-end">
-            <EditIcon width={18} height={18} />
-          </View>
+          <Pressable
+            onPress={() => navigation.navigate('MyPageProfileEditScreen')}
+          >
+            <View style={styles.editIconWrapper} justifySelf="flex-end">
+              <EditIcon width={18} height={18} />
+            </View>
+          </Pressable>
         </View>
         <View style={styles.interestedWrapper}>
           <View style={styles.interestedItemWrapper}>
