@@ -41,14 +41,17 @@ const MyPageDefaultScreen = ({ navigation }) => {
             />
             <Text style={styles.interestedItemText}>관심 제휴글</Text>
           </Pressable>
-          <View style={styles.interestedItemWrapper}>
+          <Pressable
+            onPress={() => navigation.navigate('InterestedPlaceScreen')}
+            style={styles.interestedItemWrapper}
+          >
             <InterestedPlaceIcon
               width={20}
               height={20}
               color={colors.blue[250]}
             />
             <Text style={styles.interestedItemText}>관심 장소</Text>
-          </View>
+          </Pressable>
           <View style={styles.interestedItemWrapper}>
             <WrittenReviewIcon width={20} height={20} />
             <Text style={styles.interestedItemText}>작성한 리뷰</Text>

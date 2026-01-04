@@ -4,6 +4,7 @@ import MyPageProfileEditScreen from '../screens/MyPage/MyPageProfileEditScreen';
 import EditNicknameScreen from '../screens/MyPage/EditNicknameScreen';
 import InterestedAffiliateScreen from '../screens/MyPage/InterestedAffiliateScreen';
 import AffiliationDetailScreen from '../screens/Affiliation/AffiliationDetailScreen';
+import InterestedPlaceScreen from '../screens/MyPage/InterestedPlaceScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,11 @@ const MyPageStack = () => {
       <Stack.Screen
         name="AffiliationDetailScreen"
         component={AffiliationDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="InterestedPlaceScreen"
+        component={InterestedPlaceScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

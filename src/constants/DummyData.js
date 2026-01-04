@@ -185,3 +185,39 @@ export const AFFILIATION_RECOMMEND_DATA = [
     rank: 1,
   },
 ];
+
+export const INTERESTED_PLACE_DATA = [
+  {
+    id: '1',
+    name: '스타벅스 상도점',
+    category: '카페',
+    rating: '5.0',
+    discount: '(~9/30) 중앙대생 할인',
+    distance: '걸어서 3분 (0.0km)',
+    tags: ['총학생회 제휴', '정치국제학과 제휴'],
+    image: 'https://via.placeholder.com/300',
+    partnership: '통일공대',
+  },
+  {
+    id: '2',
+    name: '투썸플레이스',
+    category: '식당',
+    rating: '4.5',
+    discount: '상시 10% 할인',
+    distance: '걸어서 10분 (0.8km)',
+    tags: ['중앙대 제휴'],
+    image: 'https://via.placeholder.com/300',
+    partnership: '통일공대',
+  },
+  {
+    id: '3',
+    name: '다른 가게 이름',
+    category: '식당',
+    rating: '4.5',
+    discount: '상시 10% 할인',
+    distance: '걸어서 10분 (0.8km)',
+    tags: ['중앙대 제휴'],
+    image: 'https://via.placeholder.com/300',
+    partnership: '통일공대',
+  },
+];
