@@ -6,6 +6,8 @@ import InterestedAffiliateScreen from '../screens/MyPage/InterestedAffiliateScre
 import AffiliationDetailScreen from '../screens/Affiliation/AffiliationDetailScreen';
 import InterestedPlaceScreen from '../screens/MyPage/InterestedPlaceScreen';
 import WrittenReviewScreen from '../screens/MyPage/WrittenReviewScreen';
+import AnnouncementScreen from '../screens/MyPage/AnnouncementScreen';
+import AnnouncementDetailScreen from '../screens/MyPage/AnnouncementDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +47,16 @@ const MyPageStack = () => {
       <Stack.Screen
         name="WrittenReviewScreen"
         component={WrittenReviewScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AnnouncementScreen"
+        component={AnnouncementScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AnnouncementDetailScreen"
+        component={AnnouncementDetailScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

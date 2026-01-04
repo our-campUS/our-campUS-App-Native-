@@ -68,7 +68,11 @@ const MyPageDefaultScreen = ({ navigation }) => {
         <View style={styles.customerServiceItemWrapper}>
           <View style={styles.customerServiceItem}>
             <Text style={styles.customerServiceItemText}>공지사항</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <Pressable
+              onPress={() => navigation.navigate('AnnouncementScreen')}
+            >
+              <ArrowRightIcon width={10} height={10} />
+            </Pressable>
           </View>
           <View style={styles.customerServiceItem}>
             <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
