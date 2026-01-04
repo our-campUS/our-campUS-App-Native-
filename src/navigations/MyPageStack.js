@@ -5,6 +5,7 @@ import EditNicknameScreen from '../screens/MyPage/EditNicknameScreen';
 import InterestedAffiliateScreen from '../screens/MyPage/InterestedAffiliateScreen';
 import AffiliationDetailScreen from '../screens/Affiliation/AffiliationDetailScreen';
 import InterestedPlaceScreen from '../screens/MyPage/InterestedPlaceScreen';
+import WrittenReviewScreen from '../screens/MyPage/WrittenReviewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,11 @@ const MyPageStack = () => {
       <Stack.Screen
         name="InterestedPlaceScreen"
         component={InterestedPlaceScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="WrittenReviewScreen"
+        component={WrittenReviewScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

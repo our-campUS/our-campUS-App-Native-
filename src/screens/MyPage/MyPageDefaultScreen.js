@@ -52,10 +52,13 @@ const MyPageDefaultScreen = ({ navigation }) => {
             />
             <Text style={styles.interestedItemText}>관심 장소</Text>
           </Pressable>
-          <View style={styles.interestedItemWrapper}>
+          <Pressable
+            onPress={() => navigation.navigate('WrittenReviewScreen')}
+            style={styles.interestedItemWrapper}
+          >
             <WrittenReviewIcon width={20} height={20} />
             <Text style={styles.interestedItemText}>작성한 리뷰</Text>
-          </View>
+          </Pressable>
         </View>
       </View>
       <View style={styles.customerServiceWrapper}>

@@ -221,3 +221,14 @@ export const INTERESTED_PLACE_DATA = [
     partnership: '통일공대',
   },
 ];
+
+export const REVIEW_DATA = [
+  {
+    id: '1',
+    rating: 5,
+    comment:
+      '리뷰는 두 줄까지만 보이게 노출해요! 오른쪽 더보기 누르면 나머지 내용 더 볼 수 있는 구조입니다.!! 나머지 내용을 마저 펼쳐보면 이러케~!~~~!~!~~~!~!~!~!~! \n엄청 길게써도 펼치면\n다 보여요!\n이렇게!!',
+    place: '스타벅스 상도점',
+    date: '2025-01-01',
+  },
+];
