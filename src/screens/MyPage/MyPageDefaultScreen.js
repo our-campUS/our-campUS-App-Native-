@@ -9,6 +9,71 @@ import InterestedPlaceIcon from '../../../assets/Vector2.svg';
 import WrittenReviewIcon from '../../../assets/ReviewIcon.svg';
 import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
 
+const MyPageDefaultScreen = ({ navigation }) => {
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.mainProfileWrapper}>
+        <View style={styles.mainProfileInfoWrapper}>
+          <View style={styles.mainProfileImageWrapper}>
+            <Image
+              source={defaultProfileImage}
+              style={styles.mainProfileImage}
+            />
+          </View>
+          <Text style={styles.nickname}>닉넴 뭐하지</Text>
+          <Pressable
+            onPress={() => navigation.navigate('MyPageProfileEditScreen')}
+          >
+            <View style={styles.editIconWrapper} justifySelf="flex-end">
+              <EditIcon width={18} height={18} />
+            </View>
+          </Pressable>
+        </View>
+        <View style={styles.interestedWrapper}>
+          <Pressable
+            onPress={() => navigation.navigate('InterestedAffiliateScreen')}
+            style={styles.interestedItemWrapper}
+          >
+            <InterestedAffiliationIcon
+              width={20}
+              height={20}
+              color={colors.blue[250]}
+            />
+            <Text style={styles.interestedItemText}>관심 제휴글</Text>
+          </Pressable>
+          <View style={styles.interestedItemWrapper}>
+            <InterestedPlaceIcon
+              width={20}
+              height={20}
+              color={colors.blue[250]}
+            />
+            <Text style={styles.interestedItemText}>관심 장소</Text>
+          </View>
+          <View style={styles.interestedItemWrapper}>
+            <WrittenReviewIcon width={20} height={20} />
+            <Text style={styles.interestedItemText}>작성한 리뷰</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.customerServiceWrapper}>
+        <Text style={{ ...typography.body4Bold, color: colors.gray[400] }}>
+          고객센터
+        </Text>
+        <View style={styles.customerServiceItemWrapper}>
+          <View style={styles.customerServiceItem}>
+            <Text style={styles.customerServiceItemText}>공지사항</Text>
+            <ArrowRightIcon width={10} height={10} />
+          </View>
+          <View style={styles.customerServiceItem}>
+            <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
+            <ArrowRightIcon width={10} height={10} />
+          </View>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -63,6 +128,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     gap: 8,
+    paddingVertical: 15,
   },
   interestedItemText: {
     ...typography.body4Regular,
@@ -88,67 +154,5 @@ const styles = StyleSheet.create({
     color: colors.gray[850],
   },
 });
-
-const MyPageDefaultScreen = ({ navigation }) => {
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.mainProfileWrapper}>
-        <View style={styles.mainProfileInfoWrapper}>
-          <View style={styles.mainProfileImageWrapper}>
-            <Image
-              source={defaultProfileImage}
-              style={styles.mainProfileImage}
-            />
-          </View>
-          <Text style={styles.nickname}>닉넴 뭐하지</Text>
-          <Pressable
-            onPress={() => navigation.navigate('MyPageProfileEditScreen')}
-          >
-            <View style={styles.editIconWrapper} justifySelf="flex-end">
-              <EditIcon width={18} height={18} />
-            </View>
-          </Pressable>
-        </View>
-        <View style={styles.interestedWrapper}>
-          <View style={styles.interestedItemWrapper}>
-            <InterestedAffiliationIcon
-              width={20}
-              height={20}
-              color={colors.blue[250]}
-            />
-            <Text style={styles.interestedItemText}>관심 제휴글</Text>
-          </View>
-          <View style={styles.interestedItemWrapper}>
-            <InterestedPlaceIcon
-              width={20}
-              height={20}
-              color={colors.blue[250]}
-            />
-            <Text style={styles.interestedItemText}>관심 장소</Text>
-          </View>
-          <View style={styles.interestedItemWrapper}>
-            <WrittenReviewIcon width={20} height={20} />
-            <Text style={styles.interestedItemText}>작성한 리뷰</Text>
-          </View>
-        </View>
-      </View>
-      <View style={styles.customerServiceWrapper}>
-        <Text style={{ ...typography.body4Bold, color: colors.gray[400] }}>
-          고객센터
-        </Text>
-        <View style={styles.customerServiceItemWrapper}>
-          <View style={styles.customerServiceItem}>
-            <Text style={styles.customerServiceItemText}>공지사항</Text>
-            <ArrowRightIcon width={10} height={10} />
-          </View>
-          <View style={styles.customerServiceItem}>
-            <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
-            <ArrowRightIcon width={10} height={10} />
-          </View>
-        </View>
-      </View>
-    </SafeAreaView>
-  );
-};
 
 export default MyPageDefaultScreen;
