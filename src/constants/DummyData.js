@@ -275,3 +275,50 @@ export const ANNOUNCEMENT_DATA = [
     date: '2025.00.00',
   },
 ];
+
+export const PAST_QUERY_DATA = [
+  {
+    id: '1',
+    title: '문의 카테고리1',
+    category: 1,
+    content: '문의 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다.',
+    date: '2025.00.00',
+    answerStatus: true,
+    answer:
+      '안녕하세요.캠어스입니다.\n답변 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다. ',
+    answeredDate: '2025.00.00',
+  },
+  {
+    id: '2',
+    title: '문의 카테고리2',
+    category: 2,
+    content: '문의 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다.',
+    date: '2025.00.00',
+    answerStatus: false,
+    answer:
+      '안녕하세요.캠어스입니다.\n답변 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다. ',
+    answeredDate: '2025.00.00',
+  },
+  {
+    id: '3',
+    title: '문의 카테고리3',
+    category: 3,
+    content: '문의 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다.',
+    date: '2025.00.00',
+    answerStatus: false,
+    answer:
+      '안녕하세요.캠어스입니다.\n답변 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다. ',
+    answeredDate: '2025.00.00',
+  },
+  {
+    id: '4',
+    title: '문의 카테고리4',
+    category: 4,
+    content: '문의 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다.',
+    date: '2025.00.00',
+    answerStatus: true,
+    answer:
+      '안녕하세요.캠어스입니다.\n답변 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다. ',
+    answeredDate: '2025.00.00',
+  },
+];

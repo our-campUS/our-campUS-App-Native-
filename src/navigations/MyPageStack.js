@@ -8,6 +8,7 @@ import InterestedPlaceScreen from '../screens/MyPage/InterestedPlaceScreen';
 import WrittenReviewScreen from '../screens/MyPage/WrittenReviewScreen';
 import AnnouncementScreen from '../screens/MyPage/AnnouncementScreen';
 import AnnouncementDetailScreen from '../screens/MyPage/AnnouncementDetailScreen';
+import InqueryMainScreen from '../screens/MyPage/InqueryMainScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +58,11 @@ const MyPageStack = () => {
       <Stack.Screen
         name="AnnouncementDetailScreen"
         component={AnnouncementDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="InqueryMainScreen"
+        component={InqueryMainScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

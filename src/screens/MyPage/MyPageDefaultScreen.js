@@ -76,7 +76,9 @@ const MyPageDefaultScreen = ({ navigation }) => {
           </View>
           <View style={styles.customerServiceItem}>
             <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <Pressable onPress={() => navigation.navigate('InqueryMainScreen')}>
+              <ArrowRightIcon width={10} height={10} />
+            </Pressable>
           </View>
         </View>
       </View>
