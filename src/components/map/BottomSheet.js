@@ -7,6 +7,7 @@ import {
   Animated,
   PanResponder,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import StoreListItem from '../common/StoreListItem';
 import theme from '../../style';
 import colors from '../../style/colors';
@@ -21,6 +22,7 @@ const BottomSheet = ({
   onItemPress,
   maxHeight,
 }) => {
+  const navigation = useNavigation();
   const HEIGHT_MAX = maxHeight * 0.85;
 
   const sheetHeight = useRef(new Animated.Value(HEIGHT_LIST)).current;
@@ -43,7 +45,7 @@ const BottomSheet = ({
       useNativeDriver: false,
       friction: 8,
     }).start();
-  }, [selectedMarkerId]);
+  });
 
   useEffect(() => {
     const id = sheetHeight.addListener(({ value }) => {
@@ -51,7 +53,7 @@ const BottomSheet = ({
     });
 
     return () => sheetHeight.removeListener(id);
-  }, []);
+  });
 
   const panResponder = useRef(
     PanResponder.create({
@@ -100,7 +102,14 @@ const BottomSheet = ({
         data={displayedMarkers}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <StoreListItem item={item} onPress={() => onItemPress(item.id)} />
+          <StoreListItem
+            item={item}
+            onPress={() => {
+              onItemPress(item.id);
+
+              navigation.navigate('StoreDetailScreen', { store: item });
+            }}
+          />
         )}
         scrollEnabled={true}
       />

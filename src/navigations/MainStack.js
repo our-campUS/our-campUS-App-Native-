@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainTab from '../components/MainTab';
 import MapSearchScreen from '../screens/Map/MapSearchScreen';
 import MapSearchResultScreen from '../screens/Map/MapSearchResultScreen';
+import StoreDetailScreen from '../screens/Store/StoreDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ const MainStack = () => {
         name="MapSearchResultScreen"
         component={MapSearchResultScreen}
       />
+      <Stack.Screen name="StoreDetailScreen" component={StoreDetailScreen} />
     </Stack.Navigator>
   );
 };
