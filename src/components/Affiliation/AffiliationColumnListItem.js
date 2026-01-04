@@ -64,13 +64,27 @@ const styles = StyleSheet.create({
   },
 });
 
-const AffiliationColumnListItem = ({ item, navigation }) => {
-  const [liked, setLiked] = useState(false);
+const AffiliationColumnListItem = ({ item, navigation, likedList = false }) => {
+  const [isLiked, setIsLiked] = useState(
+    likedList ? true : item.liked || false
+  );
   const [isLikeIconPressed, setIsLikeIconPressed] = useState(false);
+
+  useEffect(() => {
+    if (likedList) {
+      setIsLiked(true); // likedList가 true면 항상 하트 채워진 상태
+    } else {
+      setIsLiked(item.liked || false);
+    }
+  }, [likedList, item.liked]);
 
   const handleLikePress = () => {
     setIsLikeIconPressed(true);
-    setLiked(!liked);
+    if (likedList) {
+      setIsLiked(!isLiked);
+    } else {
+      setIsLiked(!isLiked);
+    }
     // 다음 프레임에서 플래그 리셋
     setTimeout(() => setIsLikeIconPressed(false), 100);
   };
@@ -87,7 +101,9 @@ const AffiliationColumnListItem = ({ item, navigation }) => {
         <View style={styles.imageContainer}>
           <Image source={item.image} style={styles.image} />
           <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
-            {liked ? (
+            {likedList ? (
+              <LikedIcon width={12} height={12} color={colors.orange[500]} />
+            ) : isLiked ? (
               <LikedIcon width={12} height={12} color={colors.orange[500]} />
             ) : (
               <UnlikedIcon width={12} height={12} />
@@ -98,7 +114,9 @@ const AffiliationColumnListItem = ({ item, navigation }) => {
         <View style={styles.imageContainer}>
           <PlaceHolderImage width={72} height={72} style={styles.image} />
           <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
-            {liked ? (
+            {likedList ? (
+              <LikedIcon width={12} height={12} color={colors.orange[500]} />
+            ) : isLiked ? (
               <LikedIcon width={12} height={12} color={colors.orange[500]} />
             ) : (
               <UnlikedIcon width={12} height={12} />

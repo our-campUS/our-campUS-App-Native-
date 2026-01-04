@@ -47,11 +47,53 @@ const styles = StyleSheet.create({
   },
 });
 
-const AffiliationColumnList = ({ navigation }) => {
+const AffiliationColumnList = ({ navigation, likedList = false }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
   return (
     <View style={styles.container}>
-      <View style={styles.activityTypeSelector}>
+      {likedList ? null : (
+        <View style={styles.activityTypeSelector}>
+          <Pressable
+            style={[
+              styles.activityTypeSelectorButton,
+              selectedActivityType === '제휴'
+                ? styles.activityTypeSelectorButtonPressed
+                : styles.activityTypeSelectorButton,
+            ]}
+            onPress={() => setSelectedActivityType('제휴')}
+          >
+            <Text
+              style={
+                selectedActivityType === '제휴'
+                  ? styles.activityTypeSelectorButtonTextPressed
+                  : styles.activityTypeSelectorButtonText
+              }
+            >
+              제휴
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.activityTypeSelectorButton,
+              selectedActivityType === '행사'
+                ? styles.activityTypeSelectorButtonPressed
+                : styles.activityTypeSelectorButton,
+            ]}
+            onPress={() => setSelectedActivityType('행사')}
+          >
+            <Text
+              style={
+                selectedActivityType === '행사'
+                  ? styles.activityTypeSelectorButtonTextPressed
+                  : styles.activityTypeSelectorButtonText
+              }
+            >
+              행사
+            </Text>
+          </Pressable>
+        </View>
+      )}
+      {/* <View style={styles.activityTypeSelector}>
         <Pressable
           style={[
             styles.activityTypeSelectorButton,
@@ -90,7 +132,7 @@ const AffiliationColumnList = ({ navigation }) => {
             행사
           </Text>
         </Pressable>
-      </View>
+      </View> */}
       <View style={styles.activityList}>
         <FlatList
           key={selectedActivityType}
@@ -100,7 +142,11 @@ const AffiliationColumnList = ({ navigation }) => {
               : AFFILIATION_COLUMN_LIST_DATA_EVENT
           }
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <AffiliationColumnListItem
+              item={item}
+              navigation={navigation}
+              likedList={likedList}
+            />
           )}
           keyExtractor={(item, index) => `${selectedActivityType}-${index}`}
         />
