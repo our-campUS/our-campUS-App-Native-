@@ -1,4 +1,4 @@
-const DUMMY_STORE = {
+export const DUMMY_STORE = {
   id: 1,
   name: '스타벅스 상도점',
   category: '카페',

@@ -23,6 +23,10 @@ import StarIcon from '../../../assets/icons/common/star.svg';
 import PinIcon from '../../../assets/icons/common/pin.svg';
 import PhoneIcon from '../../../assets/icons/common/phone.svg';
 import ClockIcon from '../../../assets/icons/common/clock.svg';
+import RatingIcon from '../../../assets/icons/rating.svg';
+
+import LikedIcon from '../../../assets/Liked.svg';
+import ShareIcon from '../../../assets/share.svg';
 
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
@@ -30,32 +34,35 @@ const StoreDetailScreen = () => {
 
   const paramStore = route.params?.store || {};
 
-  // 2. 데이터 병합 (넘어온 정보 + 부족한 정보는 더미로 채움)
-  const storeData = {
-    ...DUMMY_STORE, // 1. 일단 더미를 바닥에 깝니다.
-    ...paramStore, // 2. 그 위에 실제 가게 이름, 위치 등을 덮어씁니다.
+  const CATEGORY_MAP = {
+    CAFE: '카페',
+    FOOD: '음식점',
+    PUB: '술집',
+    STORE: '편의점',
+    PARTNER: '제휴',
+  };
 
-    // 3. 리스트 데이터에는 없는 상세 정보들(시간, 리뷰)은 더미에서 가져옵니다.
+  const storeData = {
+    ...DUMMY_STORE,
+    ...paramStore,
+
     hours: paramStore.hours || DUMMY_STORE.hours,
     reviews: paramStore.reviews || DUMMY_STORE.reviews,
+    category:
+      CATEGORY_MAP[paramStore.category] ||
+      paramStore.category ||
+      DUMMY_STORE.category,
 
-    // 4. 데이터 타입 변환 (PARTNER 문자열 -> true/false)
     isPartner: paramStore.type
       ? paramStore.type === 'PARTNER'
       : DUMMY_STORE.isPartner,
 
-    // 5. 제휴 명칭 변환 (문자열 -> 배열)
-    // 예: '사회과학대학' -> ['사회과학대학']
     partnerTags: paramStore.partnerTags
       ? paramStore.partnerTags
       : paramStore.partnership
       ? [paramStore.partnership]
       : DUMMY_STORE.partnerTags,
 
-    // [참고] 주소 처리 (Tip)
-    // 리스트 데이터의 address는 "걸어서 4분" 같은 요약 정보일 수 있습니다.
-    // 상세 주소("서울특별시...")가 필요하다면 더미를 우선시하거나 로직을 수정할 수 있습니다.
-    // 지금은 리스트 데이터("걸어서 4분")가 우선 적용됩니다.
     address: paramStore.address || DUMMY_STORE.address,
   };
 
@@ -73,7 +80,7 @@ const StoreDetailScreen = () => {
       <View style={styles.contentContainer}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 100 }}
+          contentContainerStyle={{ paddingBottom: 50 }}
         >
           <View style={styles.topImagePlaceholder}>
             <Ionicons name="image-outline" size={48} color={colors.gray[300]} />
@@ -87,22 +94,41 @@ const StoreDetailScreen = () => {
               </View>
 
               <View style={styles.actionButtons}>
-                <TouchableOpacity onPress={() => setIsLiked(!isLiked)}>
-                  <Ionicons
-                    name={isLiked ? 'heart' : 'heart-outline'}
-                    size={24}
-                    color={
-                      isLiked ? theme.colors.primary2 : theme.colors.border
-                    }
-                    style={{ marginRight: 12 }}
-                  />
+                <TouchableOpacity
+                  onPress={() => setIsLiked(!isLiked)}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      styles.iconCircleButton,
+                      isLiked && styles.likedBorder,
+                      { marginRight: 8 },
+                    ]}
+                  >
+                    {isLiked ? (
+                      <LikedIcon
+                        width={16}
+                        height={15}
+                        color={theme.colors.primary2}
+                      />
+                    ) : (
+                      <LikedIcon
+                        width={16}
+                        height={15}
+                        color={colors.gray[400]}
+                      />
+                    )}
+                  </View>
                 </TouchableOpacity>
-                <TouchableOpacity>
-                  <Ionicons
-                    name="share-social-outline"
-                    size={24}
-                    color={colors.gray[400]}
-                  />
+
+                <TouchableOpacity activeOpacity={0.7}>
+                  <View style={styles.iconCircleButton}>
+                    <ShareIcon
+                      width={14}
+                      height={16}
+                      color={colors.gray[400]}
+                    />
+                  </View>
                 </TouchableOpacity>
               </View>
             </View>
@@ -138,20 +164,22 @@ const StoreDetailScreen = () => {
 
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
-                <StarIcon width={16} height={16} style={{ marginRight: 4 }} />
-                <Text style={styles.detailTextBold}>{storeData.rating}</Text>
-                <Text style={styles.detailText}>({storeData.reviewCount})</Text>
+                <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
+                <Text style={styles.detailText}>{storeData.rating}</Text>
+                <Text style={styles.detailTextSub}>
+                  ({storeData.reviewCount})
+                </Text>
               </View>
               <View style={styles.detailRow}>
-                <PinIcon width={16} height={16} style={{ marginRight: 4 }} />
+                <PinIcon width={24} height={24} style={{ marginRight: 4 }} />
                 <Text style={styles.detailText}>{storeData.address}</Text>
               </View>
               <View style={styles.detailRow}>
-                <PhoneIcon width={16} height={16} style={{ marginRight: 4 }} />
+                <PhoneIcon width={24} height={24} style={{ marginRight: 4 }} />
                 <Text style={styles.detailText}>{storeData.phone}</Text>
               </View>
               <View style={styles.detailRow}>
-                <ClockIcon width={16} height={16} style={{ marginRight: 4 }} />
+                <ClockIcon width={24} height={24} style={{ marginRight: 4 }} />
                 <View>
                   {storeData.hours.map((time, idx) => (
                     <Text key={idx} style={styles.detailText}>
@@ -163,44 +191,53 @@ const StoreDetailScreen = () => {
             </View>
           </View>
 
-          <View style={styles.divider} />
-
           <View style={styles.reviewSection}>
             <View style={styles.reviewHeader}>
               <Text style={styles.reviewTitle}>
                 리뷰{' '}
-                <Text style={{ fontWeight: '400', fontSize: 16 }}>
+                <Text style={styles.detailTextSub}>
                   {storeData.reviewCount}개
                 </Text>
               </Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('ReviewListScreen', {
+                    storeName: storeData.name,
+                    rating: storeData.rating,
+                  })
+                }
+              >
                 <Ionicons
                   name="chevron-forward"
                   size={20}
-                  color={colors.gray[600]}
+                  color={colors.gray[700]}
                 />
               </TouchableOpacity>
             </View>
 
             {storeData.reviews.map((review) => (
               <View key={review.id} style={styles.reviewItem}>
-                <View style={styles.reviewRating}>
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      width={16}
-                      height={16}
-                      color={
-                        i < review.rating
-                          ? theme.colors.primary2
-                          : colors.gray[200]
-                      }
-                    />
-                  ))}
-                </View>
-                <Text style={styles.reviewContent}>{review.content}</Text>
-                <View style={styles.reviewMeta}>
-                  <Text style={styles.reviewUser}>{review.user}</Text>
-                  <Text style={styles.reviewDate}>{review.date}</Text>
+                <View style={styles.reviewTextWrapper}>
+                  <View style={styles.reviewRating}>
+                    {[...Array(5)].map((_, i) => (
+                      <RatingIcon
+                        key={i}
+                        width={16}
+                        height={16}
+                        color={
+                          i < review.rating
+                            ? theme.colors.primary2
+                            : colors.gray[200]
+                        }
+                        style={{ marginRight: 1 }}
+                      />
+                    ))}
+                  </View>
+                  <Text style={styles.reviewContent}>{review.content}</Text>
+                  <View style={styles.reviewMeta}>
+                    <Text style={styles.reviewUser}>{review.user}</Text>
+                    <Text style={styles.reviewUser}>{review.date}</Text>
+                  </View>
                 </View>
                 <View style={styles.reviewImagePlaceholder} />
               </View>
@@ -235,42 +272,49 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topImagePlaceholder: {
-    height: 200,
+    height: 220,
     backgroundColor: colors.gray[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
   infoSection: {
-    padding: 20,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
   },
   titleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
   },
   titleTextWrapper: {
     flexDirection: 'row',
     alignItems: 'baseline',
   },
   storeName: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    ...typography.heading3,
     color: theme.colors.text,
-    marginRight: 8,
+    marginRight: 6,
   },
   storeCategory: {
-    fontSize: 14,
+    ...typography.body3Regular,
     color: colors.gray[500],
   },
   actionButtons: {
     flexDirection: 'row',
   },
-
+  iconCircleButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   partnerTagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 20,
+    marginVertical: 16,
   },
   partnerTag: {
     backgroundColor: theme.colors.primary1Light,
@@ -278,7 +322,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 6,
     alignSelf: 'flex-start',
-    marginBottom: 10,
   },
   partnerTagText: {
     color: theme.colors.primary1,
@@ -288,37 +331,36 @@ const styles = StyleSheet.create({
   nonPartnerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginVertical: 16,
   },
   requestButton: {
     borderWidth: 1,
     borderColor: theme.colors.primary1,
     paddingVertical: 6,
     paddingHorizontal: 10,
-    borderRadius: 4,
-    marginRight: 10,
+    borderRadius: 6,
+    marginRight: 21,
   },
   requestButtonText: {
     color: theme.colors.primary1,
-    fontSize: 12,
-    fontWeight: '600',
+    ...typography.caption2Bold,
   },
   tooltip: {
     backgroundColor: theme.colors.primary1Light,
-    padding: 10,
-    borderRadius: 8,
+    padding: 8,
+    borderRadius: 25,
     flex: 1,
     position: 'relative',
   },
   tooltipText: {
-    fontSize: 11,
+    marginLeft: 10,
+    ...typography.caption2Regular,
     color: theme.colors.primary1,
-    lineHeight: 16,
   },
   tooltipArrow: {
     position: 'absolute',
     left: -6,
-    top: 10,
+    top: 15,
     width: 0,
     height: 0,
     borderTopWidth: 6,
@@ -337,68 +379,59 @@ const styles = StyleSheet.create({
   detailRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 4,
-    marginRight: 10,
   },
   detailText: {
     ...typography.body4Regular,
-    color: theme.colors.textDim,
-  },
-  detailTextBold: {
-    fontSize: 14,
-    fontWeight: 'bold',
     color: theme.colors.text,
-    marginRight: 4,
-    lineHeight: 20,
   },
-
-  divider: {
-    height: 8,
-    backgroundColor: theme.colors.border,
+  detailTextSub: {
+    ...typography.body4Regular,
+    color: theme.colors.textDisabled,
+    marginLeft: 4,
   },
 
   reviewSection: {
-    padding: 20,
+    paddingHorizontal: 20,
   },
   reviewHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 8,
     alignItems: 'center',
   },
   reviewTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    ...typography.heading4,
     color: theme.colors.text,
+    marginRight: 14,
   },
   reviewItem: {
-    marginBottom: 24,
     borderBottomWidth: 1,
-    borderBottomColor: colors.gray[100],
-    paddingBottom: 24,
+    borderBottomColor: theme.colors.border,
+    paddingVertical: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  reviewTextWrapper: {
+    flex: 1,
+    marginRight: 16,
   },
   reviewRating: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: 16,
   },
   reviewContent: {
-    fontSize: 14,
+    ...typography.body3Regular,
     color: theme.colors.text,
-    lineHeight: 20,
     marginBottom: 8,
   },
   reviewMeta: {
     flexDirection: 'row',
-    marginBottom: 12,
   },
   reviewUser: {
-    fontSize: 12,
-    color: colors.gray[500],
-    marginRight: 8,
-  },
-  reviewDate: {
-    fontSize: 12,
-    color: colors.gray[400],
+    ...typography.caption1Regular,
+    color: theme.colors.textDisabled,
+    marginRight: 12,
   },
   reviewImagePlaceholder: {
     width: 80,
@@ -414,19 +447,16 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 20,
     paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: colors.gray[100],
   },
 
   customButtonStyle: {
-    backgroundColor: '#6BAAF9',
-    borderRadius: 12,
-    height: 52,
+    backgroundColor: colors.blue[400],
+    borderRadius: 16,
+    height: 50,
   },
   customButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    ...typography.heading6,
+    colors: colors.gray['000'],
   },
 });
 

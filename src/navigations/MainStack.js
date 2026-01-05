@@ -5,6 +5,7 @@ import MainTab from '../components/MainTab';
 import MapSearchScreen from '../screens/Map/MapSearchScreen';
 import MapSearchResultScreen from '../screens/Map/MapSearchResultScreen';
 import StoreDetailScreen from '../screens/Store/StoreDetailScreen';
+import ReviewListScreen from '../screens/Store/ReviewListScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,11 @@ const MainStack = () => {
         component={MapSearchResultScreen}
       />
       <Stack.Screen name="StoreDetailScreen" component={StoreDetailScreen} />
+      <Stack.Screen
+        name="ReviewListScreen"
+        component={ReviewListScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
