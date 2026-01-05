@@ -53,16 +53,22 @@ const MyPageProfileEditScreen = ({ navigation }) => {
           </View>
         </View>
         <View style={styles.logoutButtonWrapper}>
-          <Pressable
+          <View
             style={styles.profileInfoItem}
             onPress={() => setIsLogoutModalVisible(true)}
           >
             <Text style={styles.profileInfoItemTitle}>로그아웃</Text>
-            <ArrowRightIcon width={10} height={10} />
-          </Pressable>
+            <Pressable onPress={() => setIsLogoutModalVisible(true)}>
+              <ArrowRightIcon width={10} height={10} />
+            </Pressable>
+          </View>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>회원 탈퇴</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <Pressable
+              onPress={() => navigation.navigate('CancelMembershipScreen')}
+            >
+              <ArrowRightIcon width={10} height={10} />
+            </Pressable>
           </View>
         </View>
       </SafeAreaView>
