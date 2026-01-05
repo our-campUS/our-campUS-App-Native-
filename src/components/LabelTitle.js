@@ -9,14 +9,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+    // backgroundColor: 'red',
     paddingHorizontal: 20,
     // justifyContent: 'center',
     marginTop: 45,
+    position: 'relative',
   },
   title: {
     ...typography.heading6,
     color: colors.gray[700],
-    marginHorizontal: 'auto',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
   },
   backButton: {
     width: 14,
@@ -36,12 +41,24 @@ const LabelTitle = ({
   return (
     <View style={[styles.container, additionalStyle]}>
       {useBackButton && (
-        <Pressable onPress={onPressBack}>
+        <Pressable
+          onPress={() => {
+            if (onPressBack) {
+              onPressBack();
+            } else if (navigation) {
+              navigation.goBack();
+            }
+          }}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={{ padding: 5, zIndex: 1 }}
+        >
           {/* <Text style={styles.backButton}>{'<'}</Text> */}
           <BackIcon width={20} height={10} />
         </Pressable>
       )}
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title} pointerEvents="none">
+        {title}
+      </Text>
     </View>
   );
 };

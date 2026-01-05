@@ -15,6 +15,7 @@ import MagnifyingGlass from '../../assets/input-tool.svg';
 import { filterDropdownItems } from '../utils/searchLogic';
 import EyeSlashIcon from '../../assets/inputHidden.svg';
 import EyeIcon from '../../assets/inputUnhidden.svg';
+import ArrowDownIcon from '../../assets/ArrowDown.svg';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     borderColor: colors.common.error,
   },
   readOnly: {
-    borderColor: colors.blue[300],
+    // borderColor: colors.blue[300],
   },
   dropdownContainer: {
     marginTop: 16,
@@ -81,6 +82,12 @@ const styles = StyleSheet.create({
   timeLimit: {
     ...typography.body3Regular,
     color: colors.gray[400],
+    position: 'absolute',
+    right: 20,
+    top: '50%',
+    transform: [{ translateY: -13 }],
+  },
+  toggleIconWrapper: {
     position: 'absolute',
     right: 20,
     top: '50%',
@@ -116,6 +123,7 @@ const Input = forwardRef(
       maxLength,
       usePassWordIcon = false,
       onlyRead = false,
+      useToggleIcon = false,
     },
     ref
   ) => {
@@ -239,6 +247,11 @@ const Input = forwardRef(
                 <EyeSlashIcon pointerEvents="none" />
               </Pressable>
             ))}
+          {useToggleIcon && (
+            <View style={styles.toggleIconWrapper}>
+              <ArrowDownIcon width={24} height={24} />
+            </View>
+          )}
           {usetimeLimit && <Text style={styles.timeLimit}>{timeLimit}</Text>}
         </Pressable>
         {useDropDown && isFocused && dropdownData.length > 0 && (

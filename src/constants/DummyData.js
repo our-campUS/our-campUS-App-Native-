@@ -185,3 +185,140 @@ export const AFFILIATION_RECOMMEND_DATA = [
     rank: 1,
   },
 ];
+
+export const INTERESTED_PLACE_DATA = [
+  {
+    id: '1',
+    name: '스타벅스 상도점',
+    category: '카페',
+    rating: '5.0',
+    discount: '(~9/30) 중앙대생 할인',
+    distance: '걸어서 3분 (0.0km)',
+    tags: ['총학생회 제휴', '정치국제학과 제휴'],
+    image: 'https://via.placeholder.com/300',
+    partnership: '통일공대',
+  },
+  {
+    id: '2',
+    name: '투썸플레이스',
+    category: '식당',
+    rating: '4.5',
+    discount: '상시 10% 할인',
+    distance: '걸어서 10분 (0.8km)',
+    tags: ['중앙대 제휴'],
+    image: 'https://via.placeholder.com/300',
+    partnership: '통일공대',
+  },
+  {
+    id: '3',
+    name: '다른 가게 이름',
+    category: '식당',
+    rating: '4.5',
+    discount: '상시 10% 할인',
+    distance: '걸어서 10분 (0.8km)',
+    tags: ['중앙대 제휴'],
+    image: 'https://via.placeholder.com/300',
+    partnership: '통일공대',
+  },
+];
+
+export const REVIEW_DATA = [
+  {
+    id: '1',
+    rating: 5,
+    comment:
+      '리뷰는 두 줄까지만 보이게 노출해요! 오른쪽 더보기 누르면 나머지 내용 더 볼 수 있는 구조입니다.!! 나머지 내용을 마저 펼쳐보면 이러케~!~~~!~!~~~!~!~!~!~! \n엄청 길게써도 펼치면\n다 보여요!\n이렇게!!',
+    place: '스타벅스 상도점',
+    date: '2025-01-01',
+  },
+];
+
+export const ANNOUNCEMENT_DATA = [
+  {
+    id: '1',
+    title: '캠어스 새로워진 검색을 소개합니다',
+    content:
+      '안녕하세요 캠어스입니다.\n캠어스의 공지사항이 새로워집니다.\n\n아래 내용을 잘 읽어보세요.',
+    isNew: true,
+    date: '2025.00.00',
+  },
+  {
+    id: '2',
+    title: '캠어스 새로워진 검색을 소개합니다',
+    content:
+      '안녕하세요 캠어스입니다.\n캠어스의 공지사항이 새로워집니다.\n\n아래 내용을 잘 읽어보세요.',
+    isNew: true,
+    date: '2025.00.00',
+  },
+  {
+    id: '3',
+    title: '캠어스 새로워진 검색을 소개합니다',
+    content:
+      '안녕하세요 캠어스입니다.\n캠어스의 공지사항이 새로워집니다.\n\n아래 내용을 잘 읽어보세요.',
+    isNew: false,
+    date: '2025.00.00',
+  },
+  {
+    id: '4',
+    title: '캠어스 새로워진 검색을 소개합니다',
+    content:
+      '안녕하세요 캠어스입니다.\n캠어스의 공지사항이 새로워집니다.\n\n아래 내용을 잘 읽어보세요.',
+    isNew: false,
+    date: '2025.00.00',
+  },
+  {
+    id: '5',
+    title: '캠어스 새로워진 검색을 소개합니다',
+    content:
+      '안녕하세요 캠어스입니다.\n캠어스의 공지사항이 새로워집니다.\n\n아래 내용을 잘 읽어보세요.',
+    isNew: false,
+    date: '2025.00.00',
+  },
+];
+
+export const PAST_QUERY_DATA = [
+  {
+    id: '1',
+    title: '문의 카테고리1',
+    category: 1,
+    content: '문의 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다.',
+    date: '2025.00.00',
+    answerStatus: true,
+    answer:
+      '안녕하세요.캠어스입니다.\n답변 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다. ',
+    answeredDate: '2025.00.00',
+  },
+  {
+    id: '2',
+    title: '문의 카테고리2',
+    category: 2,
+    content: '문의 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다.',
+    date: '2025.00.00',
+    answerStatus: false,
+    answer:
+      '안녕하세요.캠어스입니다.\n답변 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다. ',
+    answeredDate: '2025.00.00',
+  },
+  {
+    id: '3',
+    title: '문의 카테고리3',
+    category: 3,
+    content: '문의 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다.',
+    date: '2025.00.00',
+    answerStatus: false,
+    answer:
+      '안녕하세요.캠어스입니다.\n답변 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다. ',
+    answeredDate: '2025.00.00',
+  },
+  {
+    id: '4',
+    title: '문의 카테고리4',
+    category: 4,
+    content: '문의 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다.',
+    date: '2025.00.00',
+    answerStatus: true,
+    answer:
+      '안녕하세요.캠어스입니다.\n답변 내용은 다음과 같습니다.\n좋은 하루 되세요.감사합니다. ',
+    answeredDate: '2025.00.00',
+  },
+];

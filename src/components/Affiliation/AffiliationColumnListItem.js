@@ -8,7 +8,6 @@ import CalendarIcon from '../../../assets/calendar.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 import LikedIcon from '../../../assets/Liked.svg';
 import { useState } from 'react';
-import { useEffect } from 'react';
 
 const styles = StyleSheet.create({
   container: {
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
 });
 
 const AffiliationColumnListItem = ({ item, navigation }) => {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(item.liked || false);
   const [isLikeIconPressed, setIsLikeIconPressed] = useState(false);
 
   const handleLikePress = () => {
