@@ -12,15 +12,16 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
+import theme from '../../style';
 import colors from '../../style/colors';
 import FlipCameraIcon from '../../../assets/icons/flip_camera.png';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const SCAN_AREA_SIZE = width * 0.7;
 
 const CameraScanScreen = () => {
   const navigation = useNavigation();
-  const [flashMode, setFlashMode] = useState('off');
 
   const handleClose = () => {
     navigation.goBack();
@@ -66,10 +67,15 @@ const CameraScanScreen = () => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleCapture} activeOpacity={0.7}>
-            <View style={styles.shutterOuter}>
+          <TouchableOpacity onPress={handleCapture} activeOpacity={0.9}>
+            <LinearGradient
+              colors={[colors.blue[300], colors.orange[200]]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.shutterOuter}
+            >
               <View style={styles.shutterInner} />
-            </View>
+            </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.subButton}>
@@ -190,11 +196,8 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    borderWidth: 4,
-    borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent',
   },
   shutterInner: {
     width: 54,
