@@ -6,6 +6,7 @@ import { onKakaoLogin } from '../../api/signUp';
 import { Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../../store/authStore';
+import { useState } from 'react';
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -28,6 +29,7 @@ const styles = StyleSheet.create({
 
 const LoginInitialScreen = ({ navigation }) => {
   const setAuthFromKakao = useAuthStore((state) => state.setAuthFromKakao);
+  const [userName, setUserName] = useState(null);
   return (
     <SafeAreaView
       style={{
@@ -51,7 +53,7 @@ const LoginInitialScreen = ({ navigation }) => {
           <Button
             title="Apple 시작하기"
             onPress={() => {
-              navigation.navigate('SignUpFirstScreen');
+              navigation.navigate('SignUpStack');
             }}
             style={{
               width: 335,
@@ -79,24 +81,19 @@ const LoginInitialScreen = ({ navigation }) => {
           onPress={async () => {
             console.log('✅ 버튼 눌림');
             const result = await onKakaoLogin();
-            if (result) {
-              // result 예시: { user, accessToken, refreshToken, isNewUser }
-
-              // 테스트용: 기존 회원도 회원가입 플로우로 보내기 (MainTab 자동 전환 방지)
-              navigation.navigate('SignUpFirstScreen');
-
-              // 원래 로직 (테스트용으로 주석 처리)
-              // setAuthFromKakao({
-              //   user: result.user,
-              //   accessToken: result.accessToken,
-              //   refreshToken: result.refreshToken,
-              // });
-              //
-              // if (result.isNewUser) {
-              //   // 신규 회원이면 회원가입 플로우로
-              //   navigation.navigate('SignUpFirstScreen');
-              // }
-              // // 기존 회원이면 isLoggedIn=true라 App에서 MainTab으로 자동 전환
+            if (result.isValid) {
+              if (result.isProfileNotCompleted) {
+                console.log('✅ 프로필 미완료');
+                navigation.navigate('SignUpStack', {
+                  screen: 'SignUpFirstScreen',
+                  params: {
+                    userName: result.nickname,
+                  },
+                });
+              } else {
+                console.log('✅ 프로필 완료');
+                useAuthStore.getState().login();
+              }
             }
           }}
           style={{

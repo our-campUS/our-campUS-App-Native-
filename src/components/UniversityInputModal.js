@@ -4,7 +4,7 @@ import colors from '../style/colors';
 import CloseIcon from '../../assets/proicons_cancel.svg';
 import Input from './Input';
 import majorList from '../constants/majorlist';
-import { searchMajor } from '../api/signUp';
+import { searchUniversity } from '../api/signUp';
 import { useState } from 'react';
 
 const styles = StyleSheet.create({
@@ -57,13 +57,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const MajorInputModal = ({ onClose, onSelect, universityId }) => {
+const UniversityInputModal = ({ onClose, onSelect }) => {
   const [dropdownData, setDropdownData] = useState([]);
   return (
     <View style={styles.layout}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>학과 검색하기</Text>
+          <Text style={styles.headerTitle}>학교 검색하기</Text>
           <Pressable style={styles.headerCloseButton} onPress={onClose}>
             <CloseIcon style={styles.headerCloseButtonIcon} />
           </Pressable>
@@ -72,23 +72,17 @@ const MajorInputModal = ({ onClose, onSelect, universityId }) => {
           <Input
             useMagnifyingGlass={true}
             useDropDown={true}
-            isMajorSelect={true}
             onChangeText={async (text) => {
-              console.log('✅ University ID:', universityId);
-              console.log('✅ Text:', text);
-              const result = await searchMajor(universityId, text);
+              const result = await searchUniversity(text);
               if (result && text.length > 0) {
                 setDropdownData(result);
               }
-              console.log('✅ Major Dropdown Data:', dropdownData);
-              console.log(
-                '✅ Major Dropdown Data Length:',
-                dropdownData.length
-              );
+              console.log('✅ Dropdown Data:', dropdownData);
+              console.log('✅ Dropdown Data Length:', dropdownData.length);
             }}
             dropdownData={dropdownData}
-            onSelectDropdownItem={(selectedMajor) => {
-              onSelect(selectedMajor);
+            onSelectDropdownItem={(selectedUniversity) => {
+              onSelect(selectedUniversity);
             }}
           />
         </View>
@@ -97,4 +91,4 @@ const MajorInputModal = ({ onClose, onSelect, universityId }) => {
   );
 };
 
-export default MajorInputModal;
+export default UniversityInputModal;
