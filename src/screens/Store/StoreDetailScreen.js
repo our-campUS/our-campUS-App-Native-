@@ -18,6 +18,7 @@ import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import DUMMY_STORE from '../../constants/StoreData';
+import ReviewActionModal from '../../components/review/ReviewActionModal';
 
 import StarIcon from '../../../assets/icons/common/star.svg';
 import PinIcon from '../../../assets/icons/common/pin.svg';
@@ -31,6 +32,7 @@ import ShareIcon from '../../../assets/share.svg';
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const paramStore = route.params?.store || {};
 
@@ -248,7 +250,7 @@ const StoreDetailScreen = () => {
         <View style={styles.bottomButtonContainer}>
           <Button
             title="리뷰 작성하기"
-            onPress={() => console.log('리뷰 작성 클릭')}
+            onPress={() => setModalVisible(true)}
             style={styles.customButtonStyle}
             textStyle={styles.customButtonText}
           >
@@ -256,6 +258,16 @@ const StoreDetailScreen = () => {
           </Button>
         </View>
       </View>
+
+      <ReviewActionModal
+        isVisible={modalVisible}
+        storeName={storeData.name}
+        onClose={() => setModalVisible(false)}
+        onConfirmScan={() => {
+          console.log('카메라 스캔 화면으로 이동!');
+          navigation.navigate('CameraScanScreen');
+        }}
+      />
     </View>
   );
 };

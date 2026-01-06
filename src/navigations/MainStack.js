@@ -6,6 +6,7 @@ import MapSearchScreen from '../screens/Map/MapSearchScreen';
 import MapSearchResultScreen from '../screens/Map/MapSearchResultScreen';
 import StoreDetailScreen from '../screens/Store/StoreDetailScreen';
 import ReviewListScreen from '../screens/Store/ReviewListScreen';
+import CameraScanScreen from '../screens/Store/ScanScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,11 @@ const MainStack = () => {
       <Stack.Screen
         name="ReviewListScreen"
         component={ReviewListScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CameraScanScreen"
+        component={CameraScanScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
