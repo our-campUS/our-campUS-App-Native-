@@ -5,7 +5,7 @@ import {
   Text,
   Platform,
   Pressable,
-  ScrollView,
+  FlatList,
   Keyboard,
 } from 'react-native';
 import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
@@ -124,6 +124,7 @@ const Input = forwardRef(
       usePassWordIcon = false,
       onlyRead = false,
       useToggleIcon = false,
+      isMajorSelect = false,
     },
     ref
   ) => {
@@ -256,36 +257,71 @@ const Input = forwardRef(
         </Pressable>
         {useDropDown && isFocused && dropdownData.length > 0 && (
           <View style={styles.dropdownContainer}>
-            <ScrollView
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={true}
-              persistentScrollbar={true} // Android에서 스크롤바 항상 보이게
-            >
-              {filterDropdownItems(
-                dropdownData,
-                isControlled ? value || '' : innerValue
-              ).map((item) => (
-                <Pressable
-                  key={item}
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    if (!isControlled) {
-                      setInnerValue(item);
-                    }
-                    innerRef.current?.blur();
-                    Keyboard.dismiss();
-                    if (typeof onChangeText === 'function') {
-                      onChangeText(item);
-                    }
-                    if (typeof onSelectDropdownItem === 'function') {
-                      onSelectDropdownItem(item);
-                    }
-                  }}
-                >
-                  <Text style={styles.dropdownItemText}>{item}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+            {isMajorSelect ? (
+              <FlatList
+                data={dropdownData}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
+                keyExtractor={(item) => Object.values(item)[2]}
+                renderItem={({ item }) => {
+                  const name = Object.values(item)[3];
+                  const departmentId = Object.values(item)[2];
+                  const departmentName = Object.values(item)[3];
+
+                  return (
+                    <Pressable
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        if (!isControlled) {
+                          setInnerValue(name);
+                        }
+                        innerRef.current?.blur();
+                        Keyboard.dismiss();
+                        if (typeof onChangeText === 'function') {
+                          onChangeText(name);
+                        }
+                        if (typeof onSelectDropdownItem === 'function') {
+                          onSelectDropdownItem(item);
+                        }
+                      }}
+                    >
+                      <Text style={styles.dropdownItemText}>{name}</Text>
+                    </Pressable>
+                  );
+                }}
+              />
+            ) : (
+              <FlatList
+                data={dropdownData}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
+                keyExtractor={(item) => Object.values(item)[0]}
+                renderItem={({ item }) => {
+                  const name = Object.values(item)[1];
+
+                  return (
+                    <Pressable
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        if (!isControlled) {
+                          setInnerValue(name);
+                        }
+                        innerRef.current?.blur();
+                        Keyboard.dismiss();
+                        if (typeof onChangeText === 'function') {
+                          onChangeText(name);
+                        }
+                        if (typeof onSelectDropdownItem === 'function') {
+                          onSelectDropdownItem(item);
+                        }
+                      }}
+                    >
+                      <Text style={styles.dropdownItemText}>{name}</Text>
+                    </Pressable>
+                  );
+                }}
+              />
+            )}
           </View>
         )}
       </View>
