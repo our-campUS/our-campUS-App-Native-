@@ -9,6 +9,7 @@ export const DUMMY_STORE = {
   address: '서울특별시 동작구 흑석로 84 (1층)',
   phone: '1234-5678',
   hours: ['평일 10:00 - 21:00', '주말 10:00 - 21:00'],
+  discount: '9/30 할인',
   reviews: [
     {
       id: 1,

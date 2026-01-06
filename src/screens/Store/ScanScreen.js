@@ -29,6 +29,9 @@ const CameraScanScreen = () => {
 
   const handleCapture = () => {
     console.log('OCR 요청 시작');
+    navigation.navigate('ScanConfirmScreen', {
+      //실제로는 OCR 결과값
+    });
   };
 
   return (
