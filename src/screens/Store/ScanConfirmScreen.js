@@ -22,7 +22,7 @@ const ScanConfirmScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const IS_ALREADY_REGISTERED = true;
+  const IS_ALREADY_REGISTERED = false;
 
   const storeData = DUMMY_STORE;
 
@@ -56,7 +56,7 @@ const ScanConfirmScreen = () => {
           style={[styles.button, styles.buttonBlue]}
           onPress={() => {
             console.log('리뷰 작성 화면으로 이동');
-            // navigation.navigate('WriteReviewScreen', { store: storeData });
+            navigation.navigate('WriteReviewScreen', { store: storeData });
           }}
         >
           <Text style={styles.buttonTextWhite}>네, 맞아요</Text>
