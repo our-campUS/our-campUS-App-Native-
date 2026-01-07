@@ -10,6 +10,7 @@ import colors from '../style/colors';
 const Button = ({
   title,
   onPress,
+  isOrange = false,
   disabled = false,
   isLoading = false,
   useIsLoading = false,
@@ -24,7 +25,7 @@ const Button = ({
         styles.container,
         style,
         pressed && !disabled && styles.pressed,
-        disabled && styles.disabled,
+        disabled && (isOrange ? styles.orangeDisabled : styles.disabled),
       ]}
       disabled={disabled}
       onPress={onPress}
@@ -59,6 +60,9 @@ const styles = StyleSheet.create({
   },
   disabled: {
     backgroundColor: colors.blue[100],
+  },
+  orangeDisabled: {
+    backgroundColor: colors.orange[100],
   },
   content: {
     flexDirection: 'row',

@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import LabelTitle from '../../components/LabelTitle';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
+import colors from '../../../style/colors';
+import typography from '../../../style/typography';
+import LabelTitle from '../../../components/LabelTitle';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const UniversityInputModal = ({ onClose, onSelect }) => {
+const UniversityInputModal = ({ onClose, onSelect, isOrange = false }) => {
   const [dropdownData, setDropdownData] = useState([]);
   return (
     <View style={styles.layout}>
@@ -70,8 +70,10 @@ const UniversityInputModal = ({ onClose, onSelect }) => {
         </View>
         <View style={styles.mainContent}>
           <Input
+            isOrange={isOrange}
             useMagnifyingGlass={true}
             useDropDown={true}
+            useKoreanOnly={true}
             onChangeText={async (text) => {
               const result = await searchUniversity(text);
               if (result && text.length > 0) {

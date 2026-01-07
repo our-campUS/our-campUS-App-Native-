@@ -4,6 +4,8 @@ import colors from '../style/colors';
 import CloseIcon from '../../assets/proicons_cancel.svg';
 import Input from './Input';
 import collegeList from '../constants/collegeList';
+import { searchCollege } from '../api/signUp';
+import { useState } from 'react';
 
 const styles = StyleSheet.create({
   layout: {
@@ -55,7 +57,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const CollegeInputModal = ({ onClose, onSelect }) => {
+const CollegeInputModal = ({
+  onClose,
+  onSelect,
+  universityId,
+  isOrange = false,
+}) => {
+  const [dropdownData, setDropdownData] = useState([]);
   return (
     <View style={styles.layout}>
       <View style={styles.container}>
@@ -67,13 +75,19 @@ const CollegeInputModal = ({ onClose, onSelect }) => {
         </View>
         <View style={styles.mainContent}>
           <Input
+            isOrange={isOrange}
             useMagnifyingGlass={true}
             useDropDown={true}
-            dropdownData={collegeList}
-            onSelectDropdownItem={(selectedCollege) => {
-              if (typeof onSelect === 'function') {
-                onSelect(selectedCollege);
+            dropdownData={dropdownData}
+            useKoreanOnly={true}
+            onChangeText={async (text) => {
+              const result = await searchCollege(universityId, text);
+              if (result && text.length > 0) {
+                setDropdownData(result);
               }
+            }}
+            onSelectDropdownItem={(selectedCollege) => {
+              onSelect(selectedCollege);
             }}
           />
         </View>

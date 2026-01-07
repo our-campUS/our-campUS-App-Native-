@@ -7,12 +7,12 @@ import {
   Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LabelTitle from '../../components/LabelTitle';
-import colors from '../../style/colors';
-import Input from '../../components/Input';
+import LabelTitle from '../../../components/LabelTitle';
+import colors from '../../../style/colors';
+import Input from '../../../components/Input';
 import { useState, useEffect, useRef } from 'react';
-import typography from '../../style/typography';
-import Button from '../../components/Button';
+import typography from '../../../style/typography';
+import Button from '../../../components/Button';
 
 const styles = StyleSheet.create({
   container: {

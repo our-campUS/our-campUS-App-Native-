@@ -54,6 +54,9 @@ const styles = StyleSheet.create({
   focused: {
     borderColor: colors.blue[500],
   },
+  orangeFocused: {
+    borderColor: colors.orange[500],
+  },
   error: {
     borderColor: colors.common.error,
   },
@@ -100,6 +103,7 @@ const Input = forwardRef(
     {
       autoCapitalize = true,
       title,
+      isOrange = false,
       placeholder,
       keyboardType,
       returnKeyType,
@@ -125,6 +129,10 @@ const Input = forwardRef(
       onlyRead = false,
       useToggleIcon = false,
       isMajorSelect = false,
+      useEnglishOnly = false,
+      useId = false,
+      useEmail = false,
+      useKoreanOnly = false,
     },
     ref
   ) => {
@@ -162,7 +170,10 @@ const Input = forwardRef(
             styles.inputWrapper,
             onlyRead && styles.readOnly,
             hasError && styles.error,
-            !hasError && isFocused && !onlyRead && styles.focused,
+            !hasError &&
+              isFocused &&
+              !onlyRead &&
+              (isOrange ? styles.orangeFocused : styles.focused),
             finalAdditionalStyle,
           ]}
           disabled={disabled || onlyRead}
@@ -180,13 +191,20 @@ const Input = forwardRef(
                 styles.input,
                 Platform.OS === 'ios' && { paddingBottom: 8 },
               ]}
+              // autoCapitalize={!autoCapitalize ? 'none' : autoCapitalize}
               ref={innerRef}
               placeholder={placeholder}
               secureTextEntry={usePassword && !isPasswordVisible}
               placeholderTextColor={colors.gray[400]}
               placeholderStyle={typography.body3Regular}
               returnKeyType={returnKeyType || 'done'}
-              keyboardType={useOnlyNumber ? 'number-pad' : keyboardType}
+              keyboardType={
+                useOnlyNumber
+                  ? 'number-pad'
+                  : useEnglishOnly
+                  ? 'ascii-capable'
+                  : keyboardType
+              }
               maxLength={maxLength}
               autoCapitalize="none"
               autoCorrect={false}
@@ -199,7 +217,21 @@ const Input = forwardRef(
                 if (useOnlyNumber) {
                   filteredText = text.replace(/[^0-9]/g, '');
                 }
-
+                if (useEnglishOnly && !useOnlyNumber) {
+                  filteredText = text.replace(/[^\x00-\x7F]/g, '');
+                }
+                if (useId) {
+                  filteredText = text.replace(/[^a-zA-Z0-9]/g, '');
+                } else if (usePassword) {
+                  filteredText = text.replace(
+                    /[^a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g,
+                    ''
+                  );
+                } else if (useEmail) {
+                  filteredText = text.replace(/[^a-zA-Z0-9@.]/g, '');
+                } else if (useKoreanOnly) {
+                  filteredText = text.replace(/[^ㄱ-ㅎㅏ-ㅣ가-힣]/g, '');
+                }
                 // maxLength 제한 적용
                 if (maxLength && filteredText.length > maxLength) {
                   filteredText = filteredText.slice(0, maxLength);

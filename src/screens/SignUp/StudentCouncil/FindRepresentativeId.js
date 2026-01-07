@@ -6,13 +6,13 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import LabelTitle from '../../components/LabelTitle';
-import Input from '../../components/Input';
-import { findRepresentativeEmailExist } from '../../api/signUp';
+import colors from '../../../style/colors';
+import typography from '../../../style/typography';
+import LabelTitle from '../../../components/LabelTitle';
+import Input from '../../../components/Input';
+import { findRepresentativeEmailExist } from '../../../api/signUp';
 import { useState } from 'react';
-import Button from '../../components/Button';
+import Button from '../../../components/Button';
 
 const styles = StyleSheet.create({
   container: {
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const UseEmailForPassword = ({ navigation }) => {
+const FindRepresentativeId = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState(false);
 
@@ -48,7 +48,7 @@ const UseEmailForPassword = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
-        title="학생대표자 비밀번호 찾기"
+        title="학생대표자 아이디 찾기"
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
@@ -104,7 +104,7 @@ const UseEmailForPassword = ({ navigation }) => {
                 const result = await findRepresentativeEmailExist(email);
                 if (result && result.isValid) {
                   setEmailError(false);
-                  navigation.navigate('ReceiveAuthCodeForPassword');
+                  navigation.navigate('VerifyRepresentativeIdCode');
                 } else {
                   setEmailError(true);
                 }
@@ -130,4 +130,4 @@ const UseEmailForPassword = ({ navigation }) => {
   );
 };
 
-export default UseEmailForPassword;
+export default FindRepresentativeId;

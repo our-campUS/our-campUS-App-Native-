@@ -1,49 +1,12 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import LabelTitle from '../../components/LabelTitle';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
+import colors from '../../../style/colors';
+import typography from '../../../style/typography';
+import LabelTitle from '../../../components/LabelTitle';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
 import { useState, useRef, useEffect } from 'react';
-import CheckMark from '../../../assets/check.svg';
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.common.white,
-  },
-  statusBar: {
-    width: '100%',
-    height: 5,
-    marginTop: 10,
-  },
-  contents: {
-    width: '100%',
-    paddingHorizontal: 20,
-    marginTop: 28,
-    flex: 1,
-  },
-  inputWrapper: {
-    marginTop: 56,
-  },
-  passwordReminder: {
-    marginTop: 8,
-    gap: 4,
-  },
-  passwordReminderItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  passwordReminderText: {
-    ...typography.caption1Regular,
-    color: colors.gray[600],
-  },
-  buttonWrapper: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-    marginTop: 'auto',
-  },
-});
+import CheckMark from '../../../../assets/check.svg';
 
 // 비밀번호 조건 검사 함수
 const checkPasswordConditions = (password) => {
@@ -235,5 +198,43 @@ const ResetRepresentativePassword = ({ navigation }) => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.common.white,
+  },
+  statusBar: {
+    width: '100%',
+    height: 5,
+    marginTop: 10,
+  },
+  contents: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop: 28,
+    flex: 1,
+  },
+  inputWrapper: {
+    marginTop: 56,
+  },
+  passwordReminder: {
+    marginTop: 8,
+    gap: 4,
+  },
+  passwordReminderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  passwordReminderText: {
+    ...typography.caption1Regular,
+    color: colors.gray[600],
+  },
+  buttonWrapper: {
+    paddingHorizontal: 20,
+    marginBottom: 30,
+    marginTop: 'auto',
+  },
+});
 
 export default ResetRepresentativePassword;

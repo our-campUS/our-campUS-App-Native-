@@ -1,68 +1,26 @@
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Platform,
+  ActivityIndicator,
+  Keyboard,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
-import LabelTitle from '../../components/LabelTitle';
-import colors from '../../style/colors';
-import Input from '../../components/Input';
-import useForm from '../../hooks/useForm';
+import LabelTitle from '../../../components/LabelTitle';
+import colors from '../../../style/colors';
+import Input from '../../../components/Input';
+import useForm from '../../../hooks/useForm';
 import { useState, useRef, useEffect } from 'react';
-import CheckMark from '../../../assets/check.svg';
-import typography from '../../style/typography';
-import Button from '../../components/Button';
-import { checkUserIdDuplicate } from '../../api/signUp';
+import CheckMark from '../../../../assets/check.svg';
+import typography from '../../../style/typography';
+import Button from '../../../components/Button';
+import { checkUserIdDuplicate } from '../../../api/signUp';
 import { KeyboardAvoidingView } from 'react-native';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#fff',
-  },
-  statusBar: {
-    height: 5,
-    width: '100%',
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-  inputFormContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    marginTop: 28,
-    gap: 24,
-  },
-  passwordReminder: {
-    marginTop: -10,
-    gap: 4,
-  },
-  passwordReminderItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  passwordReminderText: {
-    ...typography.caption1Regular,
-    color: colors.gray[600],
-  },
-  buttonContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    marginTop: 'auto',
-    marginBottom: 30,
-    gap: 10,
-  },
-  alreadyHaveAccountText: {
-    ...typography.caption1Bold,
-    color: '#006beb',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
-    marginTop: 24,
-    marginBottom: 12,
-  },
-  userIdStatusText: {
-    fontSize: 12,
-    marginTop: 4,
-    marginLeft: 4,
-  },
-});
+import { sendCouncilEmail } from '../../../api/councilSignUp';
+import { checkCouncilLoginIdDuplicate } from '../../../api/councilSignUp';
 
 // 비밀번호 조건 검사 함수
 const checkPasswordConditions = (password) => {
@@ -116,25 +74,6 @@ const validatePassword = (password) => {
   return null; // 유효함
 };
 
-// 이메일 유효성 검사 함수
-const validateEmail = (email) => {
-  if (!email) return null; // 빈 값은 에러 없음 (required로 처리)
-
-  // 기본 이메일 형식 검사
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return '올바른 이메일 형식이 아닙니다.';
-  }
-
-  // 학교 이메일 도메인 검사 (선택사항 - 필요시 추가)
-  // const schoolEmailRegex = /^[^\s@]+@(ac\.kr|edu)$/i;
-  // if (!schoolEmailRegex.test(email)) {
-  //   return '학교 이메일을 입력해주세요.';
-  // }
-
-  return null; // 유효함
-};
-
 const SignUpRepresentativeScreen = ({ navigation }) => {
   const { values, handleChange, errors, setError } = useForm({
     userId: '',
@@ -146,6 +85,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
   const [isCheckingUserId, setIsCheckingUserId] = useState(false);
   const passwordInputRef = useRef(null);
   const emailInputRef = useRef(null);
+  const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
 
   // 비밀번호 조건 상태
   const passwordConditions = checkPasswordConditions(values.password);
@@ -156,13 +96,8 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
       const error = validatePassword(values.password);
       if (error) {
         setError('password', error);
-        // 유효성 검사 실패 시 포커스 유지
       } else {
         setError('password', null);
-        // 유효성 검사 통과 시 이메일 필드로 포커스 이동
-        if (emailInputRef.current) {
-          emailInputRef.current.focus();
-        }
       }
     } else {
       // 빈 값일 때는 에러 제거
@@ -170,64 +105,59 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
     }
   };
 
-  // 이메일 유효성 검사 핸들러 (blur 시 실행)
-  const handleEmailBlur = () => {
-    if (values.email) {
-      const error = validateEmail(values.email);
-      if (error) {
-        setError('email', error);
-      } else {
-        setError('email', null);
-      }
-    } else {
-      // 빈 값일 때는 에러 제거
-      setError('email', null);
-    }
-  };
-
   // 모든 필드 유효성 검사 및 버튼 활성화 체크
   useEffect(() => {
     const isUserIdValid =
-      values.userId &&
-      values.userId.trim() !== '' &&
-      !errors.userId &&
-      userIdStatus?.type === 'success';
+      values.userId && values.userId.trim() !== '' && !errors.userId;
     const isPasswordValid =
       values.password &&
       !errors.password &&
       validatePassword(values.password) === null;
-    const isEmailValid =
-      values.email && !errors.email && validateEmail(values.email) === null;
+    const isEmailValid = values.email.trim() !== '' && !errors.email;
 
     setIsButtonDisabled(!(isUserIdValid && isPasswordValid && isEmailValid));
   }, [values.userId, values.password, values.email, errors, userIdStatus]);
 
-  // 아이디 중복검사 핸들러
-  const handleCheckUserId = async (shouldFocusNext = false) => {
-    if (!values.userId || values.userId.trim() === '') {
-      setError('userId', '아이디를 입력해주세요.');
-      setUserIdStatus(null);
+  const handleSendEmailButtonPress = async () => {
+    Keyboard.dismiss();
+    console.log('handleSendEmailButtonPress');
+    let loginIdDuplicatePass = false;
+    let emailValidPass = false;
+    const loginIdDuplicateResult = await checkCouncilLoginIdDuplicate(
+      values.userId
+    );
+    if (loginIdDuplicateResult.isDuplicate) {
+      setError(
+        'userId',
+        loginIdDuplicateResult.message || '이미 사용중인 아이디입니다.'
+      );
+      return;
+    } else {
+      loginIdDuplicatePass = true;
+    }
+    setLoadingSpinnerVisible(true);
+    const emailValidResult = await sendCouncilEmail(values.email);
+    if (emailValidResult.isValid) {
+      emailValidPass = true;
+    } else {
+      setLoadingSpinnerVisible(false);
+      setError(
+        'email',
+        emailValidResult.message || '이메일 형식이 올바르지 않습니다.'
+      );
       return;
     }
-
-    setIsCheckingUserId(true);
-    setUserIdStatus(null);
-
-    const result = await checkUserIdDuplicate(values.userId);
-
-    setIsCheckingUserId(false);
-
-    if (result.isValid) {
-      setError('userId', null);
-      setUserIdStatus({ type: 'success', message: result.message });
-      // 중복검사 성공 시 다음 필드로 포커스 이동 (onSubmitEditing에서 호출된 경우만)
-      if (shouldFocusNext && passwordInputRef.current) {
-        passwordInputRef.current.focus();
-      }
-    } else {
-      setError('userId', result.message);
-      setUserIdStatus({ type: 'error', message: result.message });
+    setLoadingSpinnerVisible(false);
+    if (loginIdDuplicatePass && emailValidPass) {
+      setLoadingSpinnerVisible(false);
+      console.log('handleSendEmailButtonPress success');
+      navigation.navigate('ReceiveAuthCode', {
+        email: values.email,
+        loginId: values.userId,
+        password: values.password,
+      });
     }
+    setLoadingSpinnerVisible(false);
   };
 
   return (
@@ -244,9 +174,10 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
           onPressBack={() => navigation?.goBack()}
           navigation={navigation}
         />
+        <View style={{ width: '100%', height: 20 }}></View>
         <View style={[styles.statusBar]}>
           <View
-            style={{ backgroundColor: colors.blue[400], width: '16.67%' }}
+            style={{ backgroundColor: colors.orange[400], width: '16.67%' }}
           ></View>
           <View
             style={{ backgroundColor: colors.gray[100], width: '83.33%' }}
@@ -260,8 +191,11 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
           <View style={styles.inputFormContainer}>
             <View>
               <Input
+                isOrange={true}
                 title="아이디"
                 // keyboardType="email-address"
+                // useEnglishOnly={true}
+                useId={true}
                 autoCapitalize="none"
                 useTitle={true}
                 placeholder="아이디를 입력해주세요"
@@ -271,8 +205,11 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
                   handleChange('userId', text);
                   setUserIdStatus(null); // 입력 시 상태 초기화
                 }}
-                onSubmitEditing={() => handleCheckUserId(true)}
-                onBlur={() => handleCheckUserId(false)}
+                onSubmitEditing={() => {
+                  if (passwordInputRef.current) {
+                    passwordInputRef.current.focus();
+                  }
+                }}
                 returnKeyType="next"
                 hasError={!!errors.userId}
               />
@@ -311,19 +248,26 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
             </View>
             <View>
               <Input
+                isOrange={true}
                 ref={passwordInputRef}
                 title="비밀번호"
                 useTitle={true}
+                usePassword={true}
+                usePassWordIcon={true}
                 placeholder="비밀번호를 입력해주세요"
                 value={values.password}
                 onChangeText={(text) => {
                   handleChange('password', text);
-                  // 입력 중에는 에러 제거 (blur 시에만 검사)
                   if (errors.password) {
                     setError('password', null);
                   }
                 }}
                 onBlur={handlePasswordBlur}
+                onSubmitEditing={() => {
+                  if (emailInputRef.current) {
+                    emailInputRef.current.focus();
+                  }
+                }}
                 returnKeyType="next"
                 secureTextEntry={true}
                 hasError={!!errors.password}
@@ -346,7 +290,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
                 <CheckMark
                   color={
                     passwordConditions.hasMinLength
-                      ? colors.blue[400]
+                      ? colors.orange[400]
                       : colors.gray[300]
                   }
                 />
@@ -358,7 +302,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
                 <CheckMark
                   color={
                     passwordConditions.hasTwoTypes
-                      ? colors.blue[400]
+                      ? colors.orange[400]
                       : colors.gray[300]
                   }
                 />
@@ -369,21 +313,21 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
             </View>
             <View>
               <Input
+                isOrange={true}
                 ref={emailInputRef}
                 title="학교 이메일"
                 useTitle={true}
+                useEmail={true}
                 placeholder="메일주소를 입력해주세요"
                 useMagnifyingGlass={false}
                 keyboardType="email-address"
                 value={values.email}
                 onChangeText={(text) => {
                   handleChange('email', text);
-                  // 입력 중에는 에러 제거 (blur 시에만 검사)
                   if (errors.email) {
                     setError('email', null);
                   }
                 }}
-                onBlur={handleEmailBlur}
                 hasError={!!errors.email}
               />
               {errors.email && (
@@ -409,6 +353,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
             </Text>
             <Button
               disabled={isButtonDisabled}
+              isOrange={true}
               style={{
                 width: '100%',
                 height: 50,
@@ -416,7 +361,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
                 paddingVertical: 15,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: colors.blue[400],
+                backgroundColor: colors.orange[400],
                 borderRadius: 10,
               }}
               textStyle={{
@@ -427,16 +372,82 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
               onPress={() => {
                 console.log('버튼 클릭됨, navigation:', navigation);
                 console.log('isButtonDisabled:', isButtonDisabled);
-                if (navigation) {
-                  navigation.navigate('ReceiveAuthCode');
-                }
+                handleSendEmailButtonPress();
               }}
             />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      {loadingSpinnerVisible && (
+        <View style={styles.loadingSpinnerContainer}>
+          <ActivityIndicator size="large" color={colors.blue[400]} />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#fff',
+  },
+  statusBar: {
+    height: 5,
+    width: '100%',
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  inputFormContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop: 28,
+    gap: 24,
+  },
+  passwordReminder: {
+    marginTop: -10,
+    gap: 4,
+  },
+  passwordReminderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  passwordReminderText: {
+    ...typography.caption1Regular,
+    color: colors.gray[600],
+  },
+  buttonContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop: 'auto',
+    marginBottom: 30,
+    gap: 10,
+  },
+  alreadyHaveAccountText: {
+    ...typography.caption1Bold,
+    color: colors.orange[400],
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  userIdStatusText: {
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+  },
+  loadingSpinnerContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 1000,
+  },
+});
 
 export default SignUpRepresentativeScreen;
