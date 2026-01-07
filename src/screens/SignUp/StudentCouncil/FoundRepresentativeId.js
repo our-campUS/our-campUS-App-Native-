@@ -31,7 +31,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const FoundRepresentativeId = ({ navigation }) => {
+const FoundRepresentativeId = ({ navigation, route }) => {
+  const loginId = route.params?.loginId;
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
@@ -62,7 +63,7 @@ const FoundRepresentativeId = ({ navigation }) => {
             useTitle={true}
             title="아이디"
             onlyRead={true}
-            value="qwer1234"
+            value={loginId}
             additionalStyle={{
               backgroundColor: colors.blue['050'],
             }}
@@ -71,6 +72,7 @@ const FoundRepresentativeId = ({ navigation }) => {
       </View>
       <View style={styles.buttonWrapper}>
         <Button
+          isOrange={true}
           title="로그인하러 가기"
           onPress={() => navigation.navigate('LoginRepresentative')}
           style={{
@@ -80,7 +82,7 @@ const FoundRepresentativeId = ({ navigation }) => {
             paddingVertical: 15,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.blue[400],
+            backgroundColor: colors.orange[400],
             borderRadius: 10,
           }}
         />

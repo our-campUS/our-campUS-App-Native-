@@ -380,7 +380,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
       </KeyboardAvoidingView>
       {loadingSpinnerVisible && (
         <View style={styles.loadingSpinnerContainer}>
-          <ActivityIndicator size="large" color={colors.blue[400]} />
+          <ActivityIndicator size="large" color={colors.orange[400]} />
         </View>
       )}
     </SafeAreaView>
