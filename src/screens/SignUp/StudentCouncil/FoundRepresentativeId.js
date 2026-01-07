@@ -74,7 +74,12 @@ const FoundRepresentativeId = ({ navigation, route }) => {
         <Button
           isOrange={true}
           title="로그인하러 가기"
-          onPress={() => navigation.navigate('LoginRepresentative')}
+          onPress={() => {
+            navigation?.reset({
+              index: 0,
+              routes: [{ name: 'SignUpRepresentativeScreen' }],
+            });
+          }}
           style={{
             width: '100%',
             height: 50,

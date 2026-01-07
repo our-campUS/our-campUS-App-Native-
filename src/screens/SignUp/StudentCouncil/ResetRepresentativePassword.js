@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Keyboard,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';
@@ -7,6 +14,8 @@ import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { useState, useRef, useEffect } from 'react';
 import CheckMark from '../../../../assets/check.svg';
+import { resetCouncilPassword } from '../../../api/councilLogin';
+import Toast from 'react-native-toast-message';
 
 // 비밀번호 조건 검사 함수
 const checkPasswordConditions = (password) => {
@@ -60,7 +69,9 @@ const validatePassword = (password) => {
   return null; // 유효함
 };
 
-const ResetRepresentativePassword = ({ navigation }) => {
+const ResetRepresentativePassword = ({ navigation, route }) => {
+  const email = route.params?.email;
+  const loginId = route.params?.loginId;
   const [newPassword, setNewPassword] = useState('');
   const [passwordError, setPasswordError] = useState(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -91,6 +102,33 @@ const ResetRepresentativePassword = ({ navigation }) => {
     setIsButtonDisabled(!isPasswordValid);
   }, [newPassword, passwordError]);
 
+  const handleResetPassword = async () => {
+    console.log(' api 호출 전 email', email);
+    console.log(' api 호출 전 loginId', loginId);
+    console.log(' api 호출 전 newPassword', newPassword);
+    const result = await resetCouncilPassword(email, loginId, newPassword);
+    console.log('resetCouncilPassword result', result);
+    if (result.isSuccess) {
+      Toast.show({
+        type: 'success',
+        text1: '비밀번호 재설정 성공',
+        text2: '비밀번호가 성공적으로 재설정되었습니다.',
+        position: 'top',
+        visibilityTime: 1000,
+        autoHide: true,
+      });
+      Keyboard.dismiss();
+      setTimeout(() => {
+        navigation?.reset({
+          index: 0,
+          routes: [{ name: 'LoginRepresentative' }],
+        });
+      }, 1000);
+    } else {
+      Alert.alert(result.message);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
@@ -106,7 +144,7 @@ const ResetRepresentativePassword = ({ navigation }) => {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.contents}>
           <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>
-            통일공대 학생회계정의
+            학생회계정의
           </Text>
           <Text
             style={{
@@ -119,6 +157,7 @@ const ResetRepresentativePassword = ({ navigation }) => {
           </Text>
           <View style={styles.inputWrapper}>
             <Input
+              isOrange={true}
               ref={passwordInputRef}
               useTitle={true}
               title="새로운 비밀번호"
@@ -155,7 +194,7 @@ const ResetRepresentativePassword = ({ navigation }) => {
               <CheckMark
                 color={
                   passwordConditions.hasMinLength
-                    ? colors.blue[400]
+                    ? colors.orange[400]
                     : colors.gray[300]
                 }
               />
@@ -167,7 +206,7 @@ const ResetRepresentativePassword = ({ navigation }) => {
               <CheckMark
                 color={
                   passwordConditions.hasTwoTypes
-                    ? colors.blue[400]
+                    ? colors.orange[400]
                     : colors.gray[300]
                 }
               />
@@ -180,9 +219,10 @@ const ResetRepresentativePassword = ({ navigation }) => {
       </ScrollView>
       <View style={styles.buttonWrapper}>
         <Button
-          title="로그인하러 가기"
+          isOrange={true}
+          title="비밀번호 재설정"
           disabled={isButtonDisabled}
-          onPress={() => navigation.navigate('LoginRepresentative')}
+          onPress={() => handleResetPassword()}
           style={{
             width: '100%',
             height: 50,
@@ -190,11 +230,12 @@ const ResetRepresentativePassword = ({ navigation }) => {
             paddingVertical: 15,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.blue[400],
+            backgroundColor: colors.orange[400],
             borderRadius: 10,
           }}
         />
       </View>
+      <Toast />
     </SafeAreaView>
   );
 };

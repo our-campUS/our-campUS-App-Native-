@@ -130,3 +130,210 @@ export async function findCouncilLoginId(email) {
     return error.response.data;
   }
 }
+
+// 비밀번호 찾기를 위한 아이디 검증
+export async function findCouncilPasswordValidateLoginId(loginId) {
+  try {
+    const response = await api.post('auth/council/find/password/validate/id', {
+      loginId: loginId,
+    });
+    if (response.data.code === 200) {
+      console.log('성공 시 response', response);
+      return {
+        isValid: true,
+        data: response.data,
+      };
+    } else {
+      console.log('실패 시 response', response);
+      return {
+        isValid: false,
+        message: response.data.message || '아이디 검증에 실패했습니다.',
+      };
+    }
+  } catch (error) {
+    console.log('오류 시 error', error);
+    return {
+      isValid: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        '아이디 검증 중 오류가 발생했습니다.',
+    };
+  }
+}
+
+// 비밀번호를 찾기 위한 이메일 존재 여부 확인
+export async function findCouncilPasswordValidateEmail({ loginId, email }) {
+  console.log('서버 전송 데이터 : { loginId, email }', { loginId, email });
+  try {
+    const response = await api.post(
+      'auth/council/find/password/validate/email',
+      {
+        loginId: loginId,
+        email: email,
+      }
+    );
+    if (response.data.code === 200) {
+      console.log('성공 시 response', response);
+      return {
+        isValid: true,
+        data: response.data,
+      };
+    } else {
+      console.log('실패 시 response', response);
+      return {
+        isValid: false,
+        message: response.data.message || '이메일 검증에 실패했습니다.',
+      };
+    }
+  } catch (error) {
+    console.log('오류 시 error', error);
+    console.log('오류 시 error.response.data', error.response.data);
+    console.log('오류 시 error.message', error.message);
+    return {
+      isValid: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        '이메일 검증 중 오류가 발생했습니다.',
+    };
+  }
+}
+
+// 비밀번호 찾기를 위한 이메일 인증 코드 전송
+export async function sendCouncilPasswordFindEmailCode(email) {
+  try {
+    const response = await api.post('auth/council/find/password/email/code', {
+      email: email,
+    });
+    if (response.data.code === 200) {
+      console.log('성공 시 response', response);
+      return {
+        isSuccess: true,
+        data: response.data,
+      };
+    } else {
+      console.log('실패 시 response', response);
+      return {
+        isSuccess: false,
+        message:
+          response.data.message || '이메일 인증 코드 전송에 실패했습니다.',
+      };
+    }
+  } catch (error) {
+    console.log('오류 시 error', error);
+    console.log('오류 시 error.response.data', error.response.data);
+    console.log('오류 시 error.message', error.message);
+    return error.response.data;
+  }
+}
+
+// 비밀번호 찾기를 위한 이메일 인증 코드 검증
+export async function verifyCouncilPasswordFindEmailCode(email, code) {
+  try {
+    const response = await api.post(
+      'auth/council/find/password/email/code/verify',
+      {
+        email: email,
+        code: code,
+      }
+    );
+    if (response.data.code === 200) {
+      console.log('성공 시 response', response);
+      return {
+        isValid: true,
+        data: response.data,
+      };
+    } else {
+      console.log('실패 시 response', response);
+      return {
+        isValid: false,
+        message: response.data.message || '인증번호 검증에 실패했습니다.',
+      };
+    }
+  } catch (error) {
+    console.log('오류 시 error', error);
+    console.log('오류 시 error.response.data', error.response.data);
+    console.log('오류 시 error.message', error.message);
+    return {
+      isValid: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        '인증번호 검증 중 오류가 발생했습니다.',
+    };
+  }
+}
+
+// 비밀번호 찾기를 위한 이메일 인증 코드 재전송
+export async function resendCouncilPasswordFindEmailCode(email) {
+  try {
+    const response = await api.post('auth/council/find/password/email/code', {
+      email: email,
+    });
+    if (response.data.code === 200) {
+      console.log('성공 시 response', response);
+      return {
+        isSuccess: true,
+        data: response.data,
+      };
+    } else {
+      console.log('실패 시 response', response);
+      return {
+        isSuccess: false,
+        message: response.data.message || '인증번호 재전송에 실패했습니다.',
+      };
+    }
+  } catch (error) {
+    console.log('오류 시 error', error);
+    console.log('오류 시 error.response.data', error.response.data);
+    console.log('오류 시 error.message', error.message);
+    return {
+      isSuccess: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        '인증번호 재전송 중 오류가 발생했습니다.',
+    };
+  }
+}
+
+// 비밀번호 재설정
+export async function resetCouncilPassword(email, loginId, password) {
+  console.log('서버 전송 데이터 : { email, loginId, password }', {
+    email,
+    loginId,
+    password,
+  });
+  try {
+    const response = await api.patch('auth/council/find/password', {
+      email: email,
+      loginId: loginId,
+      password: password,
+    });
+    if (response.data.code === 200) {
+      console.log('성공 시 response', response);
+      return {
+        isSuccess: true,
+        data: response.data,
+      };
+    } else {
+      console.log('실패 시 response', response);
+      return {
+        isSuccess: false,
+        message: response.data.message || '비밀번호 재설정에 실패했습니다.',
+      };
+    }
+  } catch (error) {
+    console.log('오류 시 error', error);
+    console.log('오류 시 error.response.data', error.response.data);
+    console.log('오류 시 error.message', error.message);
+    return {
+      isSuccess: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        '비밀번호 재설정 중 오류가 발생했습니다.',
+    };
+  }
+}
