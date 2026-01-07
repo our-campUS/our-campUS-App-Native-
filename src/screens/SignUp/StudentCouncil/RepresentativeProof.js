@@ -1,59 +1,26 @@
 import { View, Text, StyleSheet, Image, Pressable, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import LabelTitle from '../../components/LabelTitle';
-import ImageUpload from '../../../assets/imageUpload.svg';
-import UploadFile from '../../../assets/uploadFile.svg';
-import { useState } from 'react';
+import colors from '../../../style/colors';
+import typography from '../../../style/typography';
+import LabelTitle from '../../../components/LabelTitle';
+import ImageUpload from '../../../../assets/imageUpload.svg';
+import UploadFile from '../../../../assets/uploadFile.svg';
+import { useState, useEffect } from 'react';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
-import Button from '../../components/Button';
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.white,
-  },
-  statusBar: {
-    height: 5,
-    width: '100%',
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-    marginTop: 24,
-  },
-  imageUploadWrapper: {
-    width: '100%',
-    marginTop: 32,
-    position: 'relative',
-  },
-  uploadFileButton: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -60 }, { translateY: -20 }],
-    zIndex: 1,
-  },
-  uploadedImage: {
-    width: '100%',
-    height: 150,
-    borderRadius: 12,
-    resizeMode: 'cover',
-  },
-  buttonContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    marginTop: 'auto',
-    marginBottom: 30,
-  },
-});
+import Button from '../../../components/Button';
+import { submitCouncilSignUp } from '../../../api/councilSignUp';
+import {
+  getCommonImagePresignedUrl,
+  convertToPng,
+  uploadImageToPresignedUrl,
+} from '../../../api/uploadImage';
 
-const RepresentativeProof = ({ navigation }) => {
+const RepresentativeProof = ({ navigation, route }) => {
+  const finalData = route.params?.finalData;
   const [selectedImage, setSelectedImage] = useState(null);
 
   const handleImagePicker = () => {
+    console.log('finalData', finalData);
     Alert.alert(
       '이미지 선택',
       '이미지를 선택하는 방법을 선택해주세요',
@@ -102,7 +69,7 @@ const RepresentativeProof = ({ navigation }) => {
                   return;
                 }
                 if (response.assets && response.assets[0]) {
-                  setSelectedImage(response.assets[0].uri);
+                  setSelectedImage(response.assets[0]);
                 }
               }
             );
@@ -117,6 +84,33 @@ const RepresentativeProof = ({ navigation }) => {
     );
   };
 
+  const handleFinalSubmit = async () => {
+    console.log('finalData', finalData);
+    console.log('selectedImage', selectedImage);
+    let convertedImage = await convertToPng(selectedImage);
+    console.log('convertedImage', convertedImage);
+    let { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
+      convertedImage
+    );
+    console.log('imageUrl', imageUrl);
+    console.log('uploadUrl', uploadUrl);
+
+    await uploadImageToPresignedUrl(uploadUrl, convertedImage);
+
+    let finalDataReady = {
+      ...finalData,
+      electionImageUrl: imageUrl,
+    };
+    console.log('finalDataReady', finalDataReady);
+    let response = await submitCouncilSignUp(finalDataReady);
+    console.log('response', response);
+    if (response.isSuccess) {
+      navigation.navigate('RepresentativeSuccess');
+    } else {
+      Alert.alert('오류', response.message);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
@@ -125,9 +119,10 @@ const RepresentativeProof = ({ navigation }) => {
         onPressBack={() => navigation.goBack()}
         navigation={navigation}
       />
+      <View style={{ width: '100%', height: 20 }}></View>
       <View style={styles.statusBar}>
         <View
-          style={{ backgroundColor: colors.blue[400], width: '75%' }}
+          style={{ backgroundColor: colors.orange[400], width: '75%' }}
         ></View>
         <View
           style={{ backgroundColor: colors.gray[100], width: '25%' }}
@@ -152,7 +147,7 @@ const RepresentativeProof = ({ navigation }) => {
         >
           {selectedImage ? (
             <Image
-              source={{ uri: selectedImage }}
+              source={{ uri: selectedImage.uri }}
               style={styles.uploadedImage}
             />
           ) : (
@@ -177,9 +172,10 @@ const RepresentativeProof = ({ navigation }) => {
       </View>
       <View style={styles.buttonContainer}>
         <Button
+          isOrange={true}
           disabled={!selectedImage}
           title="다음"
-          onPress={() => navigation.navigate('RepresentativeSuccess')}
+          onPress={() => handleFinalSubmit()}
           style={{
             width: '100%',
             height: 50,
@@ -187,7 +183,7 @@ const RepresentativeProof = ({ navigation }) => {
             paddingVertical: 15,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.blue[400],
+            backgroundColor: colors.orange[400],
             borderRadius: 10,
           }}
         />
@@ -195,5 +191,47 @@ const RepresentativeProof = ({ navigation }) => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  statusBar: {
+    height: 5,
+    width: '100%',
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 24,
+  },
+  imageUploadWrapper: {
+    width: '100%',
+    marginTop: 32,
+    position: 'relative',
+  },
+  uploadFileButton: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -60 }, { translateY: -20 }],
+    zIndex: 1,
+  },
+  uploadedImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 12,
+    resizeMode: 'cover',
+  },
+  buttonContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop: 'auto',
+    marginBottom: 30,
+  },
+});
 
 export default RepresentativeProof;

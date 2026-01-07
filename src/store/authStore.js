@@ -40,6 +40,15 @@ const useAuthStore = create((set) => ({
       isLoggedIn: true,
     })),
 
+  // 학생회 로그인
+  loginCouncil: ({ user, accessToken, refreshToken }) =>
+    set(() => ({
+      isLoggedIn: true,
+      user: user || null,
+      accessToken: accessToken || null,
+      refreshToken: refreshToken || null,
+    })),
+
   // 프로필 부분만 업데이트하고 싶을 때
   updateUser: (partialUser) =>
     set((state) => ({

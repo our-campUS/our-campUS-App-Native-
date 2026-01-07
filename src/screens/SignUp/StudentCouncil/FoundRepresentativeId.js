@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import LabelTitle from '../../components/LabelTitle';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
+import colors from '../../../style/colors';
+import typography from '../../../style/typography';
+import LabelTitle from '../../../components/LabelTitle';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -31,7 +31,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const FoundRepresentativeId = ({ navigation }) => {
+const FoundRepresentativeId = ({ navigation, route }) => {
+  const loginId = route.params?.loginId;
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
@@ -62,7 +63,7 @@ const FoundRepresentativeId = ({ navigation }) => {
             useTitle={true}
             title="아이디"
             onlyRead={true}
-            value="qwer1234"
+            value={loginId}
             additionalStyle={{
               backgroundColor: colors.blue['050'],
             }}
@@ -71,8 +72,14 @@ const FoundRepresentativeId = ({ navigation }) => {
       </View>
       <View style={styles.buttonWrapper}>
         <Button
+          isOrange={true}
           title="로그인하러 가기"
-          onPress={() => navigation.navigate('LoginRepresentative')}
+          onPress={() => {
+            navigation?.reset({
+              index: 0,
+              routes: [{ name: 'SignUpRepresentativeScreen' }],
+            });
+          }}
           style={{
             width: '100%',
             height: 50,
@@ -80,7 +87,7 @@ const FoundRepresentativeId = ({ navigation }) => {
             paddingVertical: 15,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.blue[400],
+            backgroundColor: colors.orange[400],
             borderRadius: 10,
           }}
         />

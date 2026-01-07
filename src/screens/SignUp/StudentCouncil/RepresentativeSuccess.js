@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
-import LabelTitle from '../../components/LabelTitle';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import Button from '../../components/Button';
+import LabelTitle from '../../../components/LabelTitle';
+import colors from '../../../style/colors';
+import typography from '../../../style/typography';
+import Button from '../../../components/Button';
 
 const styles = StyleSheet.create({
   statusBar: {
@@ -61,15 +61,16 @@ const RepresentativeSuccess = ({ navigation }) => {
         onPressBack={() => navigation.goBack()}
         navigation={navigation}
       />
+      <View style={{ width: '100%', height: 20 }} />
       <View style={[styles.statusBar]}>
         <View
-          style={{ backgroundColor: colors.blue[400], width: '100%' }}
+          style={{ backgroundColor: colors.orange[400], width: '100%' }}
         ></View>
       </View>
       <View style={styles.container}>
         <View style={styles.mainContent}>
           <Image
-            source={require('../../../assets/logo.png')}
+            source={require('../../../../assets/logo.png')}
             style={styles.logo}
           />
           <Text style={styles.congratulationsTitle}>승인 요청 중입니다.</Text>

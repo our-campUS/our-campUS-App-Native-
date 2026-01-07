@@ -10,7 +10,7 @@ export function initKakao() {
   console.log('KAKAO_NATIVE_APP_KEY', KAKAO_NATIVE_APP_KEY);
 }
 
-// 카카오 로그인 API
+// 카카오 로그인 API (일반회원)
 export async function onKakaoLogin() {
   try {
     const result = await login();
@@ -33,6 +33,7 @@ export async function onKakaoLogin() {
           name: nickname,
           email: email,
           profileImage: profileImage,
+          role: 'USER',
         },
         isLoggedIn: false,
         accessToken: accessToken,
@@ -130,9 +131,11 @@ export async function sendUserProfile(schoolId, majorId) {
         schoolName: response.data.data.schoolName,
       });
       console.log('✅ Update User Success:', useAuthStore.getState());
-      useAuthStore.getState().finishInitialLogin();
+      // useAuthStore.getState().finishInitialLogin();
+      return true;
     } else {
       console.error('❌ Send User Profile Error:', response.data);
+      return false;
     }
   } catch (error) {
     console.error('❌ Send User Profile Error:', error);
