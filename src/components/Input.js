@@ -28,15 +28,23 @@ const styles = StyleSheet.create({
     borderColor: colors.gray[300],
     borderRadius: 8,
     backgroundColor: colors.gray['050'],
-    justifyContent: 'center',
+    // justifyContent: 'center',
+    ...(Platform.OS === 'android' && {
+      justifyContent: 'center',
+    }),
+    overflow: Platform.OS === 'ios' ? 'visible' : 'hidden',
   },
   input: {
-    paddingVertical: 0,
+    // paddingVertical: 0,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 0,
     paddingHorizontal: 20,
     // flex: 1,
     width: '100%',
     ...typography.body3Regular,
     color: colors.gray[850],
+    ...(Platform.OS === 'ios' && {
+      lineHeight: typography.body3Regular.fontSize * 1.4,
+    }),
   },
   magnifyingGlass: {
     position: 'absolute',
@@ -189,7 +197,7 @@ const Input = forwardRef(
             <TextInput
               style={[
                 styles.input,
-                Platform.OS === 'ios' && { paddingBottom: 8 },
+                // Platform.OS === 'ios' && { paddingBottom: 8 },
               ]}
               // autoCapitalize={!autoCapitalize ? 'none' : autoCapitalize}
               ref={innerRef}
