@@ -1,8 +1,8 @@
 import { initializeKakaoSDK } from '@react-native-kakao/core';
-import { login } from '@react-native-kakao/user';
+// import { login } from '@react-native-kakao/user';
 import { KAKAO_NATIVE_APP_KEY } from '@env';
-import api from './axiosInstance';
-import useAuthStore from '../store/authStore';
+// import api from './axiosInstance';
+// import useAuthStore from '../store/authStore';
 
 // 카카오 SDK 초기화
 export function initKakao() {
@@ -10,43 +10,53 @@ export function initKakao() {
   console.log('KAKAO_NATIVE_APP_KEY', KAKAO_NATIVE_APP_KEY);
 }
 
-// 카카오 로그인 API (일반회원)
+import {
+  loginWithKakaoAccount,
+  getProfile,
+} from '@react-native-seoul/kakao-login';
+import api from './axiosInstance';
+import useAuthStore from '../store/authStore';
+
 export async function onKakaoLogin() {
   try {
-    const result = await login();
+    const result = await loginWithKakaoAccount();
     console.log('✅ Kakao Login Success:', result);
-    console.log('✅ Kakao Access Token:', result.accessToken);
+
     const response = await api.post('auth/login/kakao', null, {
       params: {
         token: result.accessToken,
       },
     });
-    console.log('✅ Kakao Login Success:', response.data);
+
     if (response.data.code === 200) {
-      const nickname = response.data.data.nickname;
-      const email = response.data.data.email;
-      const profileImage = response.data.data.profileImage;
-      const accessToken = response.data.data.accessToken;
-      const refreshToken = response.data.data.refreshToken;
+      const {
+        nickname,
+        email,
+        profileImage,
+        accessToken,
+        refreshToken,
+        isProfileNotCompleted,
+      } = response.data.data;
+
       useAuthStore.getState().setAuthFromKakao({
         user: {
           name: nickname,
-          email: email,
-          profileImage: profileImage,
+          email,
+          profileImage,
           role: 'USER',
         },
-        isLoggedIn: false,
-        accessToken: accessToken,
-        refreshToken: refreshToken,
+        accessToken,
+        refreshToken,
       });
+
       return {
         isValid: true,
-        isProfileNotCompleted: response.data.data.isProfileNotCompleted,
-        nickname: nickname,
+        isProfileNotCompleted,
+        nickname,
       };
-    } else {
-      return { isValid: false, isProfileNotCompleted: false };
     }
+
+    return { isValid: false, isProfileNotCompleted: false };
   } catch (error) {
     console.error('❌ Kakao Login Error:', error);
     return false;
