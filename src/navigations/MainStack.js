@@ -9,6 +9,7 @@ import ReviewListScreen from '../screens/Store/ReviewListScreen';
 import CameraScanScreen from '../screens/Store/ScanScreen';
 import ScanConfirmScreen from '../screens/Store/ScanConfirmScreen';
 import WriteReviewScreen from '../screens/Store/WriteReviewScreen';
+import ReviewResultScreen from '../screens/Store/ReviewResultScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,11 @@ const MainStack = () => {
       <Stack.Screen
         name="WriteReviewScreen"
         component={WriteReviewScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReviewResultScreen"
+        component={ReviewResultScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

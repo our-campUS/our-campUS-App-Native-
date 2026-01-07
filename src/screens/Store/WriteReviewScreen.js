@@ -48,7 +48,7 @@ const WriteReviewScreen = () => {
   const handleSubmit = () => {
     if (!isValid) return;
     console.log('리뷰 등록 완료', { rating, reviewText });
-    navigation.popToTop(); // 메인으로 돌아가기
+    navigation.navigate('ReviewResultScreen');
   };
 
   return (
