@@ -109,7 +109,18 @@ const MainTab = () => {
             title: '마이페이지',
             tabBarStyle: hideTabBar
               ? { display: 'none' }
-              : { height: 91, paddingTop: 20, paddingHorizontal: 20 },
+              : Platform.OS === 'ios'
+              ? {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                  marginBottom: 10,
+                }
+              : {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                },
           };
         }}
       />
