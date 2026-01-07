@@ -27,14 +27,14 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kakaocf9915ad21d898963c9b449516ca45fb</string>
+				<string>kakao0f9184fd81013e6c5cee65e7e2d21151</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>KAKAO_APP_KEY</key>
-	<string>cf9915ad21d898963c9b449516ca45fb</string>
+	<string>0f9184fd81013e6c5cee65e7e2d21151</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kakao</string>
@@ -46,9 +46,19 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<false/>
+		<true/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>158.179.193.224</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
