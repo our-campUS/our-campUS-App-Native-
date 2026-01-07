@@ -6,6 +6,7 @@ import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import Button from '../../../components/Button';
 import { sendUserProfile } from '../../../api/signUp';
+import useAuthStore from '../../../store/authStore';
 
 const styles = StyleSheet.create({
   statusBar: {
@@ -89,11 +90,8 @@ const SignUpSecondScreen = ({ navigation, route }) => {
             backgroundColor: colors.blue[400],
           }}
           title="홈으로"
-          onPress={async () => {
-            const result = await sendUserProfile(
-              route.params?.universityId,
-              route.params?.majorId
-            );
+          onPress={() => {
+            useAuthStore.getState().finishInitialLogin();
             // if (result.isValid) {
             //   navigation.navigate('MainTab');
             // }

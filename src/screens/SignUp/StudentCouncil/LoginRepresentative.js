@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import Button from '../../../components/Button';
 import typography from '../../../style/typography';
 import { representativeLogin } from '../../../api/signUp';
+import { councilLogin } from '../../../api/councilLogin';
 
 const styles = StyleSheet.create({
   statusBar: {
@@ -51,6 +52,43 @@ const LoginRepresentative = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [idError, setIdError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  useEffect(() => {
+    if (userId.trim() && password.trim() && !idError && !passwordError) {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  }, [userId, password]);
+
+  const handleLoginPress = async (data) => {
+    const response = await councilLogin(data);
+    console.log('response', response);
+
+    // councilLogin이 에러를 반환하는 경우 처리
+    if (response && (response.error || response.message)) {
+      const errorMessage = response.message || response.error || '';
+      // 아이디 관련 에러인지 비밀번호 관련 에러인지 판단하여 설정
+      if (
+        errorMessage.includes('아이디') ||
+        errorMessage.includes('존재') ||
+        errorMessage.includes('loginId')
+      ) {
+        setIdError(true);
+      } else if (
+        errorMessage.includes('비밀번호') ||
+        errorMessage.includes('일치') ||
+        errorMessage.includes('password')
+      ) {
+        setPasswordError(true);
+      }
+      return;
+    }
+
+    // 로그인 성공 시 처리 로직 추가 필요
+    // 예: navigation.navigate('Home') 등
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.common.white }}>
@@ -62,6 +100,7 @@ const LoginRepresentative = ({ navigation }) => {
           useBackButton={true}
           onPressBack={() => navigation.goBack()}
         />
+        <View style={{ width: '100%', height: 20 }}></View>
         <View style={styles.statusBar}>
           <View
             style={{ backgroundColor: colors.gray[100], width: '100%' }}
@@ -70,6 +109,8 @@ const LoginRepresentative = ({ navigation }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.contentContainer}>
             <Input
+              useId={true}
+              isOrange={true}
               placeholder="아이디를 입력해주세요"
               title="아이디"
               useTitle={true}
@@ -85,6 +126,7 @@ const LoginRepresentative = ({ navigation }) => {
               <Text style={styles.errorText}>존재하지 않는 아이디입니다.</Text>
             )}
             <Input
+              isOrange={true}
               placeholder="비밀번호를 입력해주세요"
               title="비밀번호"
               useMagnifyingGlass={false}
@@ -122,46 +164,12 @@ const LoginRepresentative = ({ navigation }) => {
             </Text>
           </View>
           <Button
+            disabled={isButtonDisabled}
+            isOrange={true}
             title="로그인하기"
-            onPress={() => {
-              // 입력값 검증
-              if (!userId.trim()) {
-                setIdError(true);
-                setPasswordError(false);
-                return;
-              }
-              if (!password.trim()) {
-                setIdError(false);
-                setPasswordError(true);
-                return;
-              }
-
-              representativeLogin(userId, password)
-                .then((res) => {
-                  if (res.isValid) {
-                    setIdError(false);
-                    setPasswordError(false);
-                    navigation.navigate('MainTab');
-                  } else {
-                    if (res.idmatch && !res.passwordmatch) {
-                      setIdError(false);
-                      setPasswordError(true);
-                    } else if (!res.idmatch) {
-                      setIdError(true);
-                      setPasswordError(true);
-                    } else {
-                      // 기타 에러 경우
-                      setIdError(true);
-                      setPasswordError(true);
-                    }
-                  }
-                })
-                .catch((error) => {
-                  console.error('로그인 오류:', error);
-                  setIdError(true);
-                  setPasswordError(true);
-                });
-            }}
+            onPress={() =>
+              handleLoginPress({ loginId: userId, password: password })
+            }
             style={{
               width: '100%',
               height: 50,
@@ -169,7 +177,7 @@ const LoginRepresentative = ({ navigation }) => {
               paddingVertical: 15,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.blue[400],
+              backgroundColor: colors.orange[400],
               borderRadius: 10,
             }}
           />

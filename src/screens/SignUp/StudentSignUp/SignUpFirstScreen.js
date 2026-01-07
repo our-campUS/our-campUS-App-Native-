@@ -10,6 +10,7 @@ import MajorInputModal from '../../../components/majorInputModal';
 import Button from '../../../components/Button';
 import UniversityInputModal from '../../../components/UniversityInputModal';
 import { searchCollege } from '../../../api/signUp';
+import { sendUserProfile } from '../../../api/signUp';
 
 const SignUpFirstScreen = ({ navigation, route }) => {
   const [isMajorInputModalVisible, setIsMajorInputModalVisible] =
@@ -50,6 +51,21 @@ const SignUpFirstScreen = ({ navigation, route }) => {
     console.log('majorName:', majorName);
     const result = await searchCollege(schoolId, majorName);
     console.log('✅ Match College Response:', result);
+  };
+
+  const handleFinalSignUpSubmit = async () => {
+    const result = await sendUserProfile(universityId, majorId);
+    console.log('✅ Final Sign Up Submit Response:', result);
+    if (result) {
+      navigation.navigate('SignUpSecondScreen', {
+        userName: route.params?.userName,
+        university: university,
+        department: department,
+        major: major,
+      });
+    } else {
+      Alert.alert('오류', '회원가입에 실패하였습니다.');
+    }
   };
 
   return (
@@ -133,15 +149,16 @@ const SignUpFirstScreen = ({ navigation, route }) => {
             <Button
               title="다음"
               disabled={!university || !major || !department}
-              onPress={() =>
-                navigation.navigate('SignUpSecondScreen', {
-                  userName: route.params?.userName,
-                  university: university,
-                  department: department,
-                  major: major,
-                  universityId: universityId,
-                  majorId: majorId,
-                })
+              onPress={
+                () => handleFinalSignUpSubmit()
+                // navigation.navigate('SignUpSecondScreen', {
+                //   userName: route.params?.userName,
+                //   university: university,
+                //   department: department,
+                //   major: major,
+                //   universityId: universityId,
+                //   majorId: majorId,
+                // })
               }
               style={styles.button}
             />
