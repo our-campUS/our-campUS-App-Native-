@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 
 // 카카오 로그인/회원 인증 상태 전역 관리
-// TypeScript 사용 안 함 (순수 JS)
 
 const useAuthStore = create((set) => ({
   // ----- 상태 -----
@@ -19,7 +18,30 @@ const useAuthStore = create((set) => ({
   //   accessToken: '...',
   //   refreshToken: '...',
   // }
-  setAuthFromKakao: ({ user, accessToken, refreshToken }) =>
+
+  // 최초 로그인 시 호출
+  setAuthFromKakao: ({ user, isLoggedIn, accessToken, refreshToken }) =>
+    set(() => ({
+      isLoggedIn: isLoggedIn || false,
+      user: user || null,
+      accessToken: accessToken || null,
+      refreshToken: refreshToken || null,
+    })),
+
+  //최초 로그인 시 마무리 단계 처리 함수
+  finishInitialLogin: () =>
+    set(() => ({
+      isLoggedIn: true,
+    })),
+
+  // 일반 로그인
+  login: () =>
+    set(() => ({
+      isLoggedIn: true,
+    })),
+
+  // 학생회 로그인
+  loginCouncil: ({ user, accessToken, refreshToken }) =>
     set(() => ({
       isLoggedIn: true,
       user: user || null,
@@ -44,5 +66,3 @@ const useAuthStore = create((set) => ({
 }));
 
 export default useAuthStore;
-
-

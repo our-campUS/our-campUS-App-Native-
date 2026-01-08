@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
-import LabelTitle from '../../components/LabelTitle';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import Button from '../../components/Button';
+import LabelTitle from '../../../components/LabelTitle';
+import colors from '../../../style/colors';
+import typography from '../../../style/typography';
+import Button from '../../../components/Button';
+import { sendUserProfile } from '../../../api/signUp';
+import useAuthStore from '../../../store/authStore';
 
 const styles = StyleSheet.create({
   statusBar: {
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const SignUpSecondScreen = ({ navigation }) => {
+const SignUpSecondScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView
       style={{ flex: 1, width: '100%', backgroundColor: '#FFFFFF' }}
@@ -57,9 +59,11 @@ const SignUpSecondScreen = ({ navigation }) => {
       <StatusBar style="auto" />
       <LabelTitle
         title="가입 완료"
+        useBackButton={true}
         onPressBack={() => navigation.goBack()}
         navigation={navigation}
       />
+      <View style={{ width: '100%', height: 20 }}></View>
       <View style={[styles.statusBar]}>
         <View
           style={{ backgroundColor: colors.blue[400], width: '100%' }}
@@ -68,14 +72,14 @@ const SignUpSecondScreen = ({ navigation }) => {
       <View style={styles.container}>
         <View style={styles.mainContent}>
           <Image
-            source={require('../../../assets/logo.png')}
+            source={require('../../../../assets/logo.png')}
             style={styles.logo}
           />
           <Text style={styles.congratulationsTitle}>
             회원가입을 축하드려요!
           </Text>
           <Text style={styles.congratulationsSubtitle}>
-            캠어스에서 xx님이 받을 수 있는 {'\n'}
+            캠어스에서 {route.params?.userName}님이 받을 수 있는 {'\n'}
             제휴 혜택들을 확인해보세요!
           </Text>
         </View>
@@ -86,7 +90,12 @@ const SignUpSecondScreen = ({ navigation }) => {
             backgroundColor: colors.blue[400],
           }}
           title="홈으로"
-          onPress={() => navigation.navigate('MainTab')}
+          onPress={() => {
+            useAuthStore.getState().finishInitialLogin();
+            // if (result.isValid) {
+            //   navigation.navigate('MainTab');
+            // }
+          }}
         />
       </View>
     </SafeAreaView>

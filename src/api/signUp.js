@@ -1,20 +1,154 @@
 import { initializeKakaoSDK } from '@react-native-kakao/core';
-import { login } from '@react-native-kakao/user';
+// import { login } from '@react-native-kakao/user';
 import { KAKAO_NATIVE_APP_KEY } from '@env';
+// import api from './axiosInstance';
+// import useAuthStore from '../store/authStore';
 
-// const KAKAO_NATIVE_APP_KEY = 'cf9915ad21d898963c9b449516ca45fb';
-
+// 카카오 SDK 초기화
 export function initKakao() {
   initializeKakaoSDK(KAKAO_NATIVE_APP_KEY);
+  console.log('KAKAO_NATIVE_APP_KEY', KAKAO_NATIVE_APP_KEY);
 }
+
+import {
+  loginWithKakaoAccount,
+  getProfile,
+} from '@react-native-seoul/kakao-login';
+import api from './axiosInstance';
+import useAuthStore from '../store/authStore';
 
 export async function onKakaoLogin() {
   try {
-    const result = await login();
+    const result = await loginWithKakaoAccount();
     console.log('✅ Kakao Login Success:', result);
-    return true;
+
+    const response = await api.post('auth/login/kakao', null, {
+      params: {
+        token: result.accessToken,
+      },
+    });
+
+    if (response.data.code === 200) {
+      const {
+        nickname,
+        email,
+        profileImage,
+        accessToken,
+        refreshToken,
+        isProfileNotCompleted,
+      } = response.data.data;
+
+      useAuthStore.getState().setAuthFromKakao({
+        user: {
+          name: nickname,
+          email,
+          profileImage,
+          role: 'USER',
+        },
+        accessToken,
+        refreshToken,
+      });
+
+      return {
+        isValid: true,
+        isProfileNotCompleted,
+        nickname,
+      };
+    }
+
+    return { isValid: false, isProfileNotCompleted: false };
   } catch (error) {
     console.error('❌ Kakao Login Error:', error);
+    return false;
+  }
+}
+
+// 학교 검색 API
+export async function searchUniversity(keyword) {
+  const response = await api.get('search/schools', {
+    params: {
+      keyword: keyword,
+    },
+  });
+  console.log('✅ Search University Response:', response.data);
+  if (response.data.code === 200) {
+    console.log('found data');
+    return response.data.data;
+  } else {
+    return false;
+  }
+}
+
+// 학과 검색 API
+export async function searchMajor(schoolId, keyword) {
+  const response = await api.get('search/majors', {
+    params: {
+      schoolId: schoolId,
+      keyword: keyword,
+    },
+  });
+  console.log('✅ Search Major Response:', response.data);
+  if (response.data.code === 200) {
+    console.log('found data');
+    return response.data.data;
+  } else {
+    return false;
+  }
+}
+
+// 단과대학 검색 API
+export async function searchCollege(schoolId, keyword) {
+  const response = await api.get('search/colleges', {
+    params: {
+      schoolId: schoolId,
+      keyword: keyword,
+    },
+  });
+  console.log('✅ Search College Response:', response.data);
+  if (response.data.code === 200) {
+    console.log('found data');
+    return response.data.data;
+  } else {
+    return false;
+  }
+}
+
+// 최초 로그인 마지막 완료 단계 api 호출 (jwt 토큰 사용) + authStore 업데이트
+export async function sendUserProfile(schoolId, majorId) {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    console.log('✅ Access Token:', accessToken);
+    console.log('✅ School ID:', schoolId);
+    console.log('✅ Major ID:', majorId);
+    const response = await api.patch(
+      'users/profile',
+      {
+        schoolId: schoolId,
+        majorId: majorId,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    if (response.data.code === 200) {
+      console.log('✅ Send User Profile Success:', response.data);
+      useAuthStore.getState().updateUser({
+        colledgeName: response.data.data.colledgeName,
+        majorName: response.data.data.majorName,
+        schoolName: response.data.data.schoolName,
+      });
+      console.log('✅ Update User Success:', useAuthStore.getState());
+      // useAuthStore.getState().finishInitialLogin();
+      return true;
+    } else {
+      console.error('❌ Send User Profile Error:', response.data);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Send User Profile Error:', error);
     return false;
   }
 }

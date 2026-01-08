@@ -4,6 +4,9 @@ import colors from '../style/colors';
 import CloseIcon from '../../assets/proicons_cancel.svg';
 import Input from './Input';
 import majorList from '../constants/majorlist';
+import { searchMajor } from '../api/signUp';
+import { useState } from 'react';
+
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
@@ -54,7 +57,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const MajorInputModal = ({ onClose, onSelect }) => {
+const MajorInputModal = ({
+  onClose,
+  onSelect,
+  universityId,
+  isOrange = false,
+}) => {
+  const [dropdownData, setDropdownData] = useState([]);
   return (
     <View style={styles.layout}>
       <View style={styles.container}>
@@ -66,17 +75,27 @@ const MajorInputModal = ({ onClose, onSelect }) => {
         </View>
         <View style={styles.mainContent}>
           <Input
+            isOrange={isOrange}
             useMagnifyingGlass={true}
             useDropDown={true}
-            dropdownData={majorList.map(([major]) => major)}
-            onSelectDropdownItem={(selectedMajor) => {
-              const found = majorList.find(
-                ([major]) => major === selectedMajor
-              );
-              if (found && typeof onSelect === 'function') {
-                const [major, college] = found;
-                onSelect(major, college);
+            isMajorSelect={true}
+            useKoreanOnly={true}
+            onChangeText={async (text) => {
+              console.log('✅ University ID:', universityId);
+              console.log('✅ Text:', text);
+              const result = await searchMajor(universityId, text);
+              if (result && text.length > 0) {
+                setDropdownData(result);
               }
+              console.log('✅ Major Dropdown Data:', dropdownData);
+              console.log(
+                '✅ Major Dropdown Data Length:',
+                dropdownData.length
+              );
+            }}
+            dropdownData={dropdownData}
+            onSelectDropdownItem={(selectedMajor) => {
+              onSelect(selectedMajor);
             }}
           />
         </View>

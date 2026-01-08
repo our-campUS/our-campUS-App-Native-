@@ -3,8 +3,8 @@ import typography from '../style/typography';
 import colors from '../style/colors';
 import CloseIcon from '../../assets/proicons_cancel.svg';
 import Input from './Input';
-import collegeList from '../constants/collegeList';
-import { searchCollege } from '../api/signUp';
+import majorList from '../constants/majorlist';
+import { searchUniversity } from '../api/signUp';
 import { useState } from 'react';
 
 const styles = StyleSheet.create({
@@ -57,18 +57,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const CollegeInputModal = ({
-  onClose,
-  onSelect,
-  universityId,
-  isOrange = false,
-}) => {
+const UniversityInputModal = ({ onClose, onSelect, isOrange = false }) => {
   const [dropdownData, setDropdownData] = useState([]);
   return (
     <View style={styles.layout}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>단과대학 검색하기</Text>
+          <Text style={styles.headerTitle}>학교 검색하기</Text>
           <Pressable style={styles.headerCloseButton} onPress={onClose}>
             <CloseIcon style={styles.headerCloseButtonIcon} />
           </Pressable>
@@ -78,16 +73,18 @@ const CollegeInputModal = ({
             isOrange={isOrange}
             useMagnifyingGlass={true}
             useDropDown={true}
-            dropdownData={dropdownData}
             useKoreanOnly={true}
             onChangeText={async (text) => {
-              const result = await searchCollege(universityId, text);
+              const result = await searchUniversity(text);
               if (result && text.length > 0) {
                 setDropdownData(result);
               }
+              console.log('✅ Dropdown Data:', dropdownData);
+              console.log('✅ Dropdown Data Length:', dropdownData.length);
             }}
-            onSelectDropdownItem={(selectedCollege) => {
-              onSelect(selectedCollege);
+            dropdownData={dropdownData}
+            onSelectDropdownItem={(selectedUniversity) => {
+              onSelect(selectedUniversity);
             }}
           />
         </View>
@@ -96,4 +93,4 @@ const CollegeInputModal = ({
   );
 };
 
-export default CollegeInputModal;
+export default UniversityInputModal;

@@ -5,7 +5,7 @@ import {
   Text,
   Platform,
   Pressable,
-  ScrollView,
+  FlatList,
   Keyboard,
 } from 'react-native';
 import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
@@ -15,6 +15,7 @@ import MagnifyingGlass from '../../assets/input-tool.svg';
 import { filterDropdownItems } from '../utils/searchLogic';
 import EyeSlashIcon from '../../assets/inputHidden.svg';
 import EyeIcon from '../../assets/inputUnhidden.svg';
+import ArrowDownIcon from '../../assets/ArrowDown.svg';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -27,15 +28,23 @@ const styles = StyleSheet.create({
     borderColor: colors.gray[300],
     borderRadius: 8,
     backgroundColor: colors.gray['050'],
-    justifyContent: 'center',
+    // justifyContent: 'center',
+    ...(Platform.OS === 'android' && {
+      justifyContent: 'center',
+    }),
+    overflow: Platform.OS === 'ios' ? 'visible' : 'hidden',
   },
   input: {
-    paddingVertical: 0,
+    // paddingVertical: 0,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 0,
     paddingHorizontal: 20,
     // flex: 1,
     width: '100%',
     ...typography.body3Regular,
     color: colors.gray[850],
+    ...(Platform.OS === 'ios' && {
+      lineHeight: typography.body3Regular.fontSize * 1.4,
+    }),
   },
   magnifyingGlass: {
     position: 'absolute',
@@ -53,11 +62,14 @@ const styles = StyleSheet.create({
   focused: {
     borderColor: colors.blue[500],
   },
+  orangeFocused: {
+    borderColor: colors.orange[500],
+  },
   error: {
     borderColor: colors.common.error,
   },
   readOnly: {
-    borderColor: colors.blue[300],
+    // borderColor: colors.blue[300],
   },
   dropdownContainer: {
     marginTop: 16,
@@ -86,6 +98,12 @@ const styles = StyleSheet.create({
     top: '50%',
     transform: [{ translateY: -13 }],
   },
+  toggleIconWrapper: {
+    position: 'absolute',
+    right: 20,
+    top: '50%',
+    transform: [{ translateY: -13 }],
+  },
 });
 
 const Input = forwardRef(
@@ -93,6 +111,7 @@ const Input = forwardRef(
     {
       autoCapitalize = true,
       title,
+      isOrange = false,
       placeholder,
       keyboardType,
       returnKeyType,
@@ -116,6 +135,12 @@ const Input = forwardRef(
       maxLength,
       usePassWordIcon = false,
       onlyRead = false,
+      useToggleIcon = false,
+      isMajorSelect = false,
+      useEnglishOnly = false,
+      useId = false,
+      useEmail = false,
+      useKoreanOnly = false,
     },
     ref
   ) => {
@@ -153,7 +178,10 @@ const Input = forwardRef(
             styles.inputWrapper,
             onlyRead && styles.readOnly,
             hasError && styles.error,
-            !hasError && isFocused && !onlyRead && styles.focused,
+            !hasError &&
+              isFocused &&
+              !onlyRead &&
+              (isOrange ? styles.orangeFocused : styles.focused),
             finalAdditionalStyle,
           ]}
           disabled={disabled || onlyRead}
@@ -169,15 +197,22 @@ const Input = forwardRef(
             <TextInput
               style={[
                 styles.input,
-                Platform.OS === 'ios' && { paddingBottom: 8 },
+                // Platform.OS === 'ios' && { paddingBottom: 8 },
               ]}
+              // autoCapitalize={!autoCapitalize ? 'none' : autoCapitalize}
               ref={innerRef}
               placeholder={placeholder}
               secureTextEntry={usePassword && !isPasswordVisible}
               placeholderTextColor={colors.gray[400]}
               placeholderStyle={typography.body3Regular}
               returnKeyType={returnKeyType || 'done'}
-              keyboardType={useOnlyNumber ? 'number-pad' : keyboardType}
+              keyboardType={
+                useOnlyNumber
+                  ? 'number-pad'
+                  : useEnglishOnly
+                  ? 'ascii-capable'
+                  : keyboardType
+              }
               maxLength={maxLength}
               autoCapitalize="none"
               autoCorrect={false}
@@ -190,7 +225,21 @@ const Input = forwardRef(
                 if (useOnlyNumber) {
                   filteredText = text.replace(/[^0-9]/g, '');
                 }
-
+                if (useEnglishOnly && !useOnlyNumber) {
+                  filteredText = text.replace(/[^\x00-\x7F]/g, '');
+                }
+                if (useId) {
+                  filteredText = text.replace(/[^a-zA-Z0-9]/g, '');
+                } else if (usePassword) {
+                  filteredText = text.replace(
+                    /[^a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g,
+                    ''
+                  );
+                } else if (useEmail) {
+                  filteredText = text.replace(/[^a-zA-Z0-9@.]/g, '');
+                } else if (useKoreanOnly) {
+                  filteredText = text.replace(/[^ㄱ-ㅎㅏ-ㅣ가-힣]/g, '');
+                }
                 // maxLength 제한 적용
                 if (maxLength && filteredText.length > maxLength) {
                   filteredText = filteredText.slice(0, maxLength);
@@ -239,40 +288,80 @@ const Input = forwardRef(
                 <EyeSlashIcon pointerEvents="none" />
               </Pressable>
             ))}
+          {useToggleIcon && (
+            <View style={styles.toggleIconWrapper}>
+              <ArrowDownIcon width={24} height={24} />
+            </View>
+          )}
           {usetimeLimit && <Text style={styles.timeLimit}>{timeLimit}</Text>}
         </Pressable>
         {useDropDown && isFocused && dropdownData.length > 0 && (
           <View style={styles.dropdownContainer}>
-            <ScrollView
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={true}
-              persistentScrollbar={true} // Android에서 스크롤바 항상 보이게
-            >
-              {filterDropdownItems(
-                dropdownData,
-                isControlled ? value || '' : innerValue
-              ).map((item) => (
-                <Pressable
-                  key={item}
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    if (!isControlled) {
-                      setInnerValue(item);
-                    }
-                    innerRef.current?.blur();
-                    Keyboard.dismiss();
-                    if (typeof onChangeText === 'function') {
-                      onChangeText(item);
-                    }
-                    if (typeof onSelectDropdownItem === 'function') {
-                      onSelectDropdownItem(item);
-                    }
-                  }}
-                >
-                  <Text style={styles.dropdownItemText}>{item}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+            {isMajorSelect ? (
+              <FlatList
+                data={dropdownData}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
+                keyExtractor={(item) => Object.values(item)[2]}
+                renderItem={({ item }) => {
+                  const name = Object.values(item)[3];
+                  const departmentId = Object.values(item)[2];
+                  const departmentName = Object.values(item)[3];
+
+                  return (
+                    <Pressable
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        if (!isControlled) {
+                          setInnerValue(name);
+                        }
+                        innerRef.current?.blur();
+                        Keyboard.dismiss();
+                        if (typeof onChangeText === 'function') {
+                          onChangeText(name);
+                        }
+                        if (typeof onSelectDropdownItem === 'function') {
+                          onSelectDropdownItem(item);
+                        }
+                      }}
+                    >
+                      <Text style={styles.dropdownItemText}>{name}</Text>
+                    </Pressable>
+                  );
+                }}
+              />
+            ) : (
+              <FlatList
+                data={dropdownData}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
+                keyExtractor={(item) => Object.values(item)[0]}
+                renderItem={({ item }) => {
+                  const name = Object.values(item)[1];
+
+                  return (
+                    <Pressable
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        if (!isControlled) {
+                          setInnerValue(name);
+                        }
+                        innerRef.current?.blur();
+                        Keyboard.dismiss();
+                        if (typeof onChangeText === 'function') {
+                          onChangeText(name);
+                        }
+                        if (typeof onSelectDropdownItem === 'function') {
+                          onSelectDropdownItem(item);
+                        }
+                      }}
+                    >
+                      <Text style={styles.dropdownItemText}>{name}</Text>
+                    </Pressable>
+                  );
+                }}
+              />
+            )}
           </View>
         )}
       </View>

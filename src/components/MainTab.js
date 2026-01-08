@@ -1,5 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text } from 'react-native';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { View, Text, Keyboard } from 'react-native';
+import { Platform } from 'react-native';
 
 import HomeIcon from '../../assets/Vector1.svg';
 import MapIcon from '../../assets/Vector2.svg';
@@ -14,6 +16,7 @@ import HomeScreen from '../screens/Home/HomeScreen';
 import MapScreen from '../screens/Map/MapScreen';
 import AffiliationSelectStack from '../navigations/AffiliationSelectStack';
 import MapStack from '../navigations/MapStack';
+import MyPageStack from '../navigations/MyPageStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -50,7 +53,19 @@ const MainTab = () => {
             />
           );
         },
-        tabBarStyle: { height: 91, paddingTop: 20, paddingHorizontal: 20 },
+        tabBarStyle:
+          Platform.OS === 'ios'
+            ? {
+                height: 91,
+                paddingTop: 20,
+                paddingHorizontal: 20,
+                marginBottom: 10,
+              }
+            : {
+                height: 91,
+                paddingTop: 20,
+                paddingHorizontal: 20,
+              },
         tabBarItemStyle: { height: 51, width: 67, gap: 6 },
         tabBarLabelStyle: [
           typography.caption2Bold,
@@ -59,6 +74,7 @@ const MainTab = () => {
         tabBarActiveTintColor: colors.blue[500],
         tabBarInactiveTintColor: colors.gray[300],
         headerShown: false,
+        tabBarHideOnKeyboard: true,
       })}
     >
       <Tab.Screen
@@ -83,8 +99,30 @@ const MainTab = () => {
       />
       <Tab.Screen
         name="MyPage"
-        component={PlaceholderScreen}
-        options={{ title: '마이페이지' }}
+        component={MyPageStack}
+        options={({ route }) => {
+          const routeName =
+            getFocusedRouteNameFromRoute(route) ?? 'MyPageDefaultScreen';
+          const hideTabBar = routeName !== 'MyPageDefaultScreen';
+
+          return {
+            title: '마이페이지',
+            tabBarStyle: hideTabBar
+              ? { display: 'none' }
+              : Platform.OS === 'ios'
+              ? {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                  marginBottom: 10,
+                }
+              : {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                },
+          };
+        }}
       />
     </Tab.Navigator>
   );

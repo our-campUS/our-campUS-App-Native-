@@ -6,45 +6,43 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import LabelTitle from '../../components/LabelTitle';
-import Input from '../../components/Input';
-import { checkRepresentativeIdExist } from '../../api/signUp';
-import { useState } from 'react';
-import Button from '../../components/Button';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.common.white,
-  },
-  statusBar: {
-    width: '100%',
-    height: 5,
-    marginTop: 10,
-  },
-  contentContainer: {
-    paddingHorizontal: 20,
-    marginTop: 28,
-    flex: 1,
-  },
-  buttonContainer: {
-    marginTop: 'auto',
-    // paddingHorizontal: 20,
-    marginBottom: 30,
-    alignItems: 'center',
-  },
-});
+import colors from '../../../style/colors';
+import typography from '../../../style/typography';
+import LabelTitle from '../../../components/LabelTitle';
+import Input from '../../../components/Input';
+import { checkRepresentativeIdExist } from '../../../api/signUp';
+import { useState, useEffect } from 'react';
+import Button from '../../../components/Button';
+import { findCouncilPasswordValidateLoginId } from '../../../api/councilLogin';
 
 const FindRepresentativePassword = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState(false);
+  const [loginId, setLoginId] = useState('');
+  const [loginIdError, setLoginIdError] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-  const handleEmailChange = (text) => {
-    setEmail(text);
-    setEmailError(false);
+  useEffect(() => {
+    if (loginId.trim()) {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  }, [loginId]);
+
+  const handleLoginIdChange = (text) => {
+    setLoginId(text);
+    setLoginIdError(false);
   };
+
+  const handleValidateLoginId = async () => {
+    const result = await findCouncilPasswordValidateLoginId(loginId);
+    if (result && result.isValid) {
+      setLoginIdError(false);
+      navigation.navigate('UseEmailForPassword', { loginId: loginId });
+    } else {
+      setLoginIdError(true);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
@@ -73,14 +71,16 @@ const FindRepresentativePassword = ({ navigation }) => {
           </Text>
           <View style={{ marginTop: 56 }}></View>
           <Input
+            useId={true}
+            isOrange={true}
             placeholder="아이디를 입력해주세요."
             useTitle={true}
             title="아이디"
-            value={email}
-            onChangeText={handleEmailChange}
-            hasError={emailError}
+            value={loginId}
+            onChangeText={handleLoginIdChange}
+            hasError={loginIdError}
           />
-          {emailError && (
+          {loginIdError && (
             <Text
               style={{
                 ...typography.caption1Regular,
@@ -94,19 +94,15 @@ const FindRepresentativePassword = ({ navigation }) => {
         </ScrollView>
         <View style={styles.buttonContainer}>
           <Button
+            disabled={isButtonDisabled}
+            isOrange={true}
             title="다음"
             onPress={async () => {
-              if (!email.trim()) {
-                setEmailError(true);
+              if (!loginId.trim()) {
+                setLoginIdError(true);
                 return;
               }
-              const result = await checkRepresentativeIdExist(email);
-              if (result && result.isValid) {
-                setEmailError(false);
-                navigation.navigate('UseEmailForPassword');
-              } else {
-                setEmailError(true);
-              }
+              handleValidateLoginId();
             }}
             style={{
               width: '100%',
@@ -115,7 +111,7 @@ const FindRepresentativePassword = ({ navigation }) => {
               paddingVertical: 15,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.blue[400],
+              backgroundColor: colors.orange[400],
               borderRadius: 10,
             }}
           />
@@ -124,5 +120,28 @@ const FindRepresentativePassword = ({ navigation }) => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.common.white,
+  },
+  statusBar: {
+    width: '100%',
+    height: 5,
+    marginTop: 10,
+  },
+  contentContainer: {
+    paddingHorizontal: 20,
+    marginTop: 28,
+    flex: 1,
+  },
+  buttonContainer: {
+    marginTop: 'auto',
+    // paddingHorizontal: 20,
+    marginBottom: 30,
+    alignItems: 'center',
+  },
+});
 
 export default FindRepresentativePassword;
