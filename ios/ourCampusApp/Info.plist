@@ -60,8 +60,12 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<key>NSCameraUsageDescription</key>
+    <string>학생회 인증을 위해 사진 촬영이 필요합니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>학생회 인증 자료 업로드를 위해 사진 접근이 필요합니다.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+    <string>촬영한 사진을 저장하기 위해 사진 접근이 필요합니다.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>
