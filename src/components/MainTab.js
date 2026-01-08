@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { View, Text, Keyboard } from 'react-native';
+import { Platform } from 'react-native';
 
 import HomeIcon from '../../assets/Vector1.svg';
 import MapIcon from '../../assets/Vector2.svg';
@@ -52,7 +53,19 @@ const MainTab = () => {
             />
           );
         },
-        tabBarStyle: { height: 91, paddingTop: 20, paddingHorizontal: 20 },
+        tabBarStyle:
+          Platform.OS === 'ios'
+            ? {
+                height: 91,
+                paddingTop: 20,
+                paddingHorizontal: 20,
+                marginBottom: 10,
+              }
+            : {
+                height: 91,
+                paddingTop: 20,
+                paddingHorizontal: 20,
+              },
         tabBarItemStyle: { height: 51, width: 67, gap: 6 },
         tabBarLabelStyle: [
           typography.caption2Bold,
@@ -96,7 +109,18 @@ const MainTab = () => {
             title: '마이페이지',
             tabBarStyle: hideTabBar
               ? { display: 'none' }
-              : { height: 91, paddingTop: 20, paddingHorizontal: 20 },
+              : Platform.OS === 'ios'
+              ? {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                  marginBottom: 10,
+                }
+              : {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                },
           };
         }}
       />

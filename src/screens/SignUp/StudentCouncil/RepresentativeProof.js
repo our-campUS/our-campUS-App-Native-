@@ -44,7 +44,7 @@ const RepresentativeProof = ({ navigation, route }) => {
                   return;
                 }
                 if (response.assets && response.assets[0]) {
-                  setSelectedImage(response.assets[0].uri);
+                  setSelectedImage(response.assets[0]);
                 }
               }
             );
@@ -56,9 +56,12 @@ const RepresentativeProof = ({ navigation, route }) => {
             launchCamera(
               {
                 mediaType: 'photo',
+                saveToPhotos: true,
                 quality: 0.8,
                 maxWidth: 1000,
                 maxHeight: 1000,
+                includeBase64: false,
+                cameraType: 'back',
               },
               (response) => {
                 if (response.didCancel) {
