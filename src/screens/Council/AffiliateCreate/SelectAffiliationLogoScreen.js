@@ -16,7 +16,6 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     useState(false);
   console.log(route.params);
 
-  // Hook은 항상 컴포넌트 최상위에서 호출해야 함
   const { pickImage } = useImagePicker({
     onSelectImages: (images) => {
       if (images && images.length > 0) {

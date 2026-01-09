@@ -21,8 +21,10 @@ import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import useFormDraftStore from '../../../store/formDraftStore';
+import { Appearance } from 'react-native';
 
 const WriteAffiliatePostScreen = ({ navigation, route }) => {
+  const colorScheme = Appearance.getColorScheme();
   const eventType = route.params?.type;
   const { formDraft, resetFormDraft } = useFormDraftStore();
   const [selectedImages, setSelectedImages] = useState([]);
@@ -282,6 +284,11 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
       {showStartPicker && Platform.OS === 'ios' && (
         <View style={styles.datePickerContainer}>
           <DateTimePicker
+            customStyles={{
+              datePicker: {
+                backgroundColor: colorScheme === 'dark' ? '#222' : 'white',
+              },
+            }}
             value={startDate ?? new Date()}
             mode="date"
             minimumDate={new Date(2026, 0, 1)}
@@ -298,15 +305,43 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
       {showStartPicker && Platform.OS === 'ios' && (
         <>
           <View style={styles.datePickerOverlay} />
-          <View style={styles.pickerWrapper}>
-            <View style={styles.pickerHeader}>
+          <View
+            style={[
+              styles.pickerWrapper,
+              {
+                backgroundColor:
+                  colorScheme === 'dark'
+                    ? colors.gray[900]
+                    : colors.common.white,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.pickerHeader,
+                {
+                  borderBottomColor:
+                    colorScheme === 'dark' ? colors.gray[800] : '#eee',
+                },
+              ]}
+            >
               <Text
                 style={styles.cancelText}
                 onPress={() => setShowStartPicker(false)}
               >
                 취소
               </Text>
-              <Text style={styles.headerTitle}>시작일</Text>
+              <Text
+                style={[
+                  styles.headerTitle,
+                  {
+                    color:
+                      colorScheme === 'dark' ? colors.common.white : '#222',
+                  },
+                ]}
+              >
+                시작일
+              </Text>
               <Text
                 style={styles.confirmText}
                 onPress={() => {
@@ -339,15 +374,43 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
       {showEndPicker && Platform.OS === 'ios' && (
         <>
           <View style={styles.datePickerOverlay} />
-          <View style={styles.pickerWrapper}>
-            <View style={styles.pickerHeader}>
+          <View
+            style={[
+              styles.pickerWrapper,
+              {
+                backgroundColor:
+                  colorScheme === 'dark'
+                    ? colors.gray[900]
+                    : colors.common.white,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.pickerHeader,
+                {
+                  borderBottomColor:
+                    colorScheme === 'dark' ? colors.gray[800] : '#eee',
+                },
+              ]}
+            >
               <Text
                 style={styles.cancelText}
                 onPress={() => setShowEndPicker(false)}
               >
                 취소
               </Text>
-              <Text style={styles.headerTitle}>종료일</Text>
+              <Text
+                style={[
+                  styles.headerTitle,
+                  {
+                    color:
+                      colorScheme === 'dark' ? colors.common.white : '#222',
+                  },
+                ]}
+              >
+                종료일
+              </Text>
               <Text
                 style={styles.confirmText}
                 onPress={() => {
@@ -360,6 +423,11 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
             </View>
             <View style={styles.pickerContent}>
               <DateTimePicker
+                customStyles={{
+                  datePicker: {
+                    color: colors.common.black,
+                  },
+                }}
                 maximumDate={new Date(2026, 11, 31)}
                 value={tempEndDate}
                 mode="date"
@@ -472,7 +540,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    backgroundColor: 'white',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingBottom: 10,
@@ -492,7 +559,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#222',
   },
 
   cancelText: {
