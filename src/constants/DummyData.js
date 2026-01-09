@@ -322,3 +322,43 @@ export const PAST_QUERY_DATA = [
     answeredDate: '2025.00.00',
   },
 ];
+
+// 학생회 제휴 장소 검색 더미 데이터
+export const AFFILIATION_PLACE_SEARCH_DATA = [
+  {
+    id: '1',
+    placeName: '스타벅스 상도점',
+    placeAddress: '서울 동작구 안양로 11 2층',
+    distance: '0.0km',
+  },
+  {
+    id: '2',
+    placeName: '투썸플레이스 상도점',
+    placeAddress: '서울 동작구 안양로 11 2층',
+    distance: '0.8km',
+  },
+  {
+    id: '3',
+    placeName: '맥도날드 상도점',
+    placeAddress: '서울 동작구 안양로 11 2층',
+    distance: '0.8km',
+  },
+  {
+    id: '4',
+    placeName: '버거킹 상도점',
+    placeAddress: '서울 동작구 안양로 11 2층',
+    distance: '0.8km',
+  },
+  {
+    id: '5',
+    placeName: '빅브로짐 상도점',
+    placeAddress: '서울 동작구 안양로 11 2층',
+    distance: '0.8km',
+  },
+  {
+    id: '6',
+    placeName: '수아르떼 상도점',
+    placeAddress: '서울 동작구 안양로 11 2층',
+    distance: '0.8km',
+  },
+];

@@ -19,6 +19,8 @@ import AffiliationSelectStack from '../navigations/AffiliationSelectStack';
 import MapStack from '../navigations/MapStack';
 import MyPageStack from '../navigations/MyPageStack';
 
+import CouncilAffiliateStack from '../navigations/Council/CouncilAffiliateStack';
+
 const Tab = createBottomTabNavigator();
 
 const PlaceholderScreen = () => {
@@ -91,8 +93,32 @@ const CouncilMainTab = () => {
       /> */}
       <Tab.Screen
         name="Partnership"
-        component={PlaceholderScreen}
-        options={{ title: '제휴 보기' }}
+        component={CouncilAffiliateStack}
+        options={({ route }) => {
+          const routeName =
+            getFocusedRouteNameFromRoute(route) ?? 'CouncilAffiliateScreen';
+          const hideTabBar =
+            routeName !== 'CouncilAffiliateScreen' &&
+            routeName !== 'CouncilAffiliateDetailScreen';
+
+          return {
+            title: '제휴 보기',
+            tabBarStyle: hideTabBar
+              ? { display: 'none' }
+              : Platform.OS === 'ios'
+              ? {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                  marginBottom: 10,
+                }
+              : {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                },
+          };
+        }}
       />
       <Tab.Screen
         name="Report"
