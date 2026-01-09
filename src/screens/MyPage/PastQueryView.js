@@ -7,9 +7,11 @@ import ArrowDownIcon from '../../../assets/ArrowDown.svg';
 import ArrowUpIcon from '../../../assets/ArrowUp.svg';
 import PendingInqueryIcon from '../../../assets/PendingInqueryIcon.svg';
 import AnsweredInqueryIcon from '../../../assets/AnsweredInqueryIcon.svg';
+import useAuthStore from '../../store/authStore';
 
 const PastQueryView = () => {
   const [expandedItems, setExpandedItems] = useState({});
+  const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
 
   const toggleItem = (itemId) => {
     setExpandedItems((prev) => ({
@@ -33,7 +35,11 @@ const PastQueryView = () => {
                 )}
                 <View style={styles.itemDateWrapper}>
                   {item.answerStatus ? (
-                    <AnsweredInqueryIcon width={45} height={17} />
+                    <AnsweredInqueryIcon
+                      width={45}
+                      height={17}
+                      color={isCouncil ? colors.orange[500] : colors.blue[500]}
+                    />
                   ) : (
                     <PendingInqueryIcon width={45} height={17} />
                   )}
@@ -49,7 +55,16 @@ const PastQueryView = () => {
               </Pressable>
             </View>
             {isExpanded && item.answerStatus && (
-              <View style={styles.inqueryAnswerWrapper}>
+              <View
+                style={[
+                  styles.inqueryAnswerWrapper,
+                  {
+                    backgroundColor: isCouncil
+                      ? colors.orange['000']
+                      : colors.blue['000'],
+                  },
+                ]}
+              >
                 <Text style={styles.inqueryAnswerContent}>{item.answer}</Text>
                 <Text style={styles.answeredDate}>{item.answeredDate}</Text>
               </View>

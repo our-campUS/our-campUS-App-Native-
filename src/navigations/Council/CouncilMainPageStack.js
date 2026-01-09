@@ -9,6 +9,9 @@ import CouncilChangePasswordEmail from '../../screens/Council/MyPage/CouncilChan
 import CouncilChangePasswordVerifyCode from '../../screens/Council/MyPage/CouncilChangePasswordVerifyCode';
 import CouncilResetPassword from '../../screens/Council/MyPage/CouncilResetPassword';
 import CouncilCancelMembershipScreen from '../../screens/Council/MyPage/CouncilCancelMembership';
+import AnnouncementScreen from '../../screens/MyPage/AnnouncementScreen';
+import AnnouncementDetailScreen from '../../screens/MyPage/AnnouncementDetailScreen';
+import InqueryMainScreen from '../../screens/MyPage/InqueryMainScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -63,6 +66,21 @@ const CouncilMainPageStack = () => {
       <Stack.Screen
         name="CouncilCancelMembershipScreen"
         component={CouncilCancelMembershipScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AnnouncementScreen"
+        component={AnnouncementScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AnnouncementDetailScreen"
+        component={AnnouncementDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="InqueryMainScreen"
+        component={InqueryMainScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

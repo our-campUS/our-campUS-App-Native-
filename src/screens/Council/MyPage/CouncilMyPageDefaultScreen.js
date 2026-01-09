@@ -61,9 +61,7 @@ const CouncilMyPageDefaultScreen = ({ navigation }) => {
           </View>
           <View style={styles.customerServiceItem}>
             <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
-            <Pressable
-              onPress={() => navigation.navigate('AnnouncementScreen')}
-            >
+            <Pressable onPress={() => navigation.navigate('InqueryMainScreen')}>
               <ArrowRightIcon width={10} height={10} />
             </Pressable>
           </View>
