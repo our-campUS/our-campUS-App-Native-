@@ -13,9 +13,9 @@ import useAuthStore from '../../store/authStore';
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 4,
     width: '100%',
-    height: 72,
+    height: 108,
     backgroundColor: colors.common.white,
     alignItems: 'center',
   },
@@ -26,13 +26,13 @@ const styles = StyleSheet.create({
     ...typography.body4Bold,
   },
   placeAndDate: {
-    marginTop: 8,
+    marginTop: 12,
     // gap: 4,
   },
   placeAndDateItem: {
     flexDirection: 'row',
-    gap: 4,
-    height: 20,
+    gap: 6,
+    height: 30,
     alignItems: 'center',
   },
   place: {
@@ -46,21 +46,21 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   image: {
-    width: 72,
-    height: 72,
+    width: 108,
+    height: 108,
     position: 'relative',
   },
   imageContainer: {
     position: 'relative',
-    width: 72,
-    height: 72,
+    width: 108,
+    height: 108,
   },
   unlikedIcon: {
     position: 'absolute',
-    top: 12.5,
-    left: 12.5,
-    width: 12,
-    height: 12,
+    top: 18.75,
+    left: 18.75,
+    width: 18,
+    height: 18,
   },
 });
 
@@ -93,20 +93,20 @@ const AffiliationColumnListItem = ({ item, navigation }) => {
           <Image source={item.image} style={styles.image} />
           <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
             {liked ? (
-              <LikedIcon width={12} height={12} color={colors.orange[500]} />
+              <LikedIcon width={18} height={18} color={colors.orange[500]} />
             ) : (
-              <UnlikedIcon width={12} height={12} />
+              <UnlikedIcon width={18} height={18} />
             )}
           </Pressable>
         </View>
       ) : (
         <View style={styles.imageContainer}>
-          <PlaceHolderImage width={72} height={72} style={styles.image} />
+          <PlaceHolderImage width={108} height={108} style={styles.image} />
           <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
             {liked ? (
-              <LikedIcon width={12} height={12} color={colors.orange[500]} />
+              <LikedIcon width={18} height={18} color={colors.orange[500]} />
             ) : (
-              <UnlikedIcon width={12} height={12} />
+              <UnlikedIcon width={18} height={18} />
             )}
           </Pressable>
         </View>
@@ -115,13 +115,13 @@ const AffiliationColumnListItem = ({ item, navigation }) => {
         <Text style={styles.title}>{item.title}</Text>
         <View style={styles.placeAndDate}>
           <View style={styles.placeAndDateItem}>
-            <PlaceIcon width={16} height={16} color={colors.gray[300]} />
+            <PlaceIcon width={24} height={24} color={colors.gray[300]} />
             <Text style={styles.place}>{item.place}</Text>
           </View>
           <View style={styles.placeAndDateItem}>
             <CalendarIcon
-              width={20}
-              height={20}
+              width={30}
+              height={30}
               color={colors.gray[300]}
               style={{ marginLeft: -2 }}
             />

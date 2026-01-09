@@ -40,9 +40,11 @@ const styles = StyleSheet.create({
     borderColor: colors.orange[400],
   },
   activityTypeSelectorOrangeButtonTextPressed: {
+    ...typography.body4Regular,
     color: colors.orange[600],
   },
   activityTypeSelectorButtonTextPressed: {
+    ...typography.body4Regular,
     color: colors.blue[600],
   },
   activityList: {
