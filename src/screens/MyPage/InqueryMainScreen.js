@@ -7,8 +7,10 @@ import InquerySelectTab from '../../components/MyPage/InquerySelectTab';
 import { useState } from 'react';
 import PastQueryView from './PastQueryView';
 import CreateNewQueryView from './CreateNewQueryView';
+import useAuthStore from '../../store/authStore';
 
 const InqueryMainScreen = ({ navigation }) => {
+  const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
   const [activeTab, setActiveTab] = useState('pastInquery');
   const handleCreateQuery = () => {
     setActiveTab('pastInquery');
