@@ -86,12 +86,11 @@ const CouncilProfileScreen = ({ navigation, route }) => {
           <Text style={{ ...typography.body4Bold, color: colors.gray[400] }}>
             계정 보안
           </Text>
-          <View
-            style={styles.profileInfoItem}
-            onPress={() => setIsLogoutModalVisible(true)}
-          >
+          <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>비밀번호 변경</Text>
-            <Pressable onPress={() => setIsLogoutModalVisible(true)}>
+            <Pressable
+              onPress={() => navigation.navigate('CouncilChangePasswordEmail')}
+            >
               <ArrowRightIcon width={10} height={10} />
             </Pressable>
           </View>
@@ -107,7 +106,9 @@ const CouncilProfileScreen = ({ navigation, route }) => {
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>탈퇴하기</Text>
             <Pressable
-              onPress={() => navigation.navigate('CancelMembershipScreen')}
+              onPress={() =>
+                navigation.navigate('CouncilCancelMembershipScreen')
+              }
             >
               <ArrowRightIcon width={10} height={10} />
             </Pressable>
@@ -126,6 +127,7 @@ const CouncilProfileScreen = ({ navigation, route }) => {
               정말로 로그아웃하시겠어요?
             </Text>
             <Button
+              isOrange={true}
               title="로그아웃"
               onPress={() => setIsLogoutModalVisible(false)}
               style={{
@@ -135,7 +137,7 @@ const CouncilProfileScreen = ({ navigation, route }) => {
                 paddingVertical: 15,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: colors.blue[400],
+                backgroundColor: colors.orange[400],
                 borderRadius: 10,
                 marginTop: 16,
               }}

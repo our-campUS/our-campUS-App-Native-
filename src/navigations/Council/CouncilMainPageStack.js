@@ -5,6 +5,10 @@ import CouncilEditProfileScreen from '../../screens/Council/MyPage/CouncilEditPr
 import CouncilSendEmailCode from '../../screens/Council/MyPage/CouncilSendEmailCode';
 import CouncilVerfiyEmailCode from '../../screens/Council/MyPage/CouncilVerfiyEmailCode';
 import CouncilSendProof from '../../screens/Council/MyPage/CouncilSendProof';
+import CouncilChangePasswordEmail from '../../screens/Council/MyPage/CouncilChangePasswordEmail';
+import CouncilChangePasswordVerifyCode from '../../screens/Council/MyPage/CouncilChangePasswordVerifyCode';
+import CouncilResetPassword from '../../screens/Council/MyPage/CouncilResetPassword';
+import CouncilCancelMembershipScreen from '../../screens/Council/MyPage/CouncilCancelMembership';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +43,26 @@ const CouncilMainPageStack = () => {
       <Stack.Screen
         name="CouncilSendProof"
         component={CouncilSendProof}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CouncilChangePasswordEmail"
+        component={CouncilChangePasswordEmail}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CouncilChangePasswordVerifyCode"
+        component={CouncilChangePasswordVerifyCode}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CouncilResetPassword"
+        component={CouncilResetPassword}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CouncilCancelMembershipScreen"
+        component={CouncilCancelMembershipScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
