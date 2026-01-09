@@ -33,17 +33,17 @@ const MyPageProfileEditScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('EditNicknameScreen')}
           >
             <Text style={styles.profileInfoItemTitle}>닉네임</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </View>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <View style={styles.profileInfoItemRightWrapper}>
               <Text style={styles.profileInfoItemRightText}>미인증</Text>
-              <ArrowRightIcon width={10} height={10} />
+              <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
             </View>
           </View>
           <View style={styles.profileInfoItem}>
@@ -57,14 +57,14 @@ const MyPageProfileEditScreen = ({ navigation }) => {
             onPress={() => setIsLogoutModalVisible(true)}
           >
             <Text style={styles.profileInfoItemTitle}>로그아웃</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
           <Pressable
             style={styles.profileInfoItem}
             onPress={() => navigation.navigate('CancelMembershipScreen')}
           >
             <Text style={styles.profileInfoItemTitle}>회원 탈퇴</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
         </View>
       </SafeAreaView>

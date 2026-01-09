@@ -28,6 +28,7 @@ import RatingIcon from '../../../assets/icons/rating.svg';
 
 import LikedIcon from '../../../assets/Liked.svg';
 import ShareIcon from '../../../assets/share.svg';
+import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
 
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
@@ -139,18 +140,24 @@ const StoreDetailScreen = () => {
               <View style={styles.partnerTagRow}>
                 {storeData.partnerTags?.map((tag, index) => (
                   <TouchableOpacity key={index} style={styles.partnerTag}>
-                    <Text style={styles.partnerTagText}>
-                      {tag} {'>'}
-                    </Text>
+                    <Text style={styles.partnerTagText}>{tag}</Text>
+                    <ArrowRightIcon
+                      width={8}
+                      height={8}
+                      color={theme.colors.primary1}
+                    />
                   </TouchableOpacity>
                 ))}
               </View>
             ) : (
               <View style={styles.nonPartnerRow}>
                 <TouchableOpacity style={styles.requestButton}>
-                  <Text style={styles.requestButtonText}>
-                    제휴 요청하기 {'>'}
-                  </Text>
+                  <Text style={styles.requestButtonText}>제휴 요청하기</Text>
+                  <ArrowRightIcon
+                    width={8}
+                    height={8}
+                    color={theme.colors.primary1}
+                  />
                 </TouchableOpacity>
                 <View style={styles.tooltip}>
                   <Text style={styles.tooltipText}>
@@ -326,14 +333,18 @@ const styles = StyleSheet.create({
   partnerTagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginVertical: 16,
+    marginVertical: 10,
   },
   partnerTag: {
-    backgroundColor: theme.colors.primary1Light,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderColor: colors.blue[600],
+    borderWidth: 0.8,
+    borderRadius: 36,
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   partnerTagText: {
     color: theme.colors.primary1,
@@ -352,6 +363,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 6,
     marginRight: 21,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   requestButtonText: {
     color: theme.colors.primary1,
