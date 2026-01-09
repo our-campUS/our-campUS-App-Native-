@@ -8,17 +8,31 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import theme from '../../style';
+import colors from '../../style/colors';
 import typography from '../../style/typography';
 
 import StarIcon from '../../../assets/icons/common/star.svg';
 import TicketIcon from '../../../assets/icons/common/ticket.svg';
 import PinIcon from '../../../assets/icons/common/pin.svg';
 import { CATEGORIES } from '../../constants/MapData';
+import LikedIcon from '../../../assets/Liked.svg';
 
-const StoreListItem = ({ item, onPress }) => {
+const StoreListItem = ({
+  item,
+  onPress,
+  showImages = true,
+  showDiscountDetail = false,
+}) => {
   const [isLiked, setIsLiked] = useState(false);
   const categoryLabel =
     CATEGORIES.find((cat) => cat.id === item.category)?.label || item.category;
+
+  const tags =
+    item.partnerTags && item.partnerTags.length > 0
+      ? item.partnerTags
+      : item.partnership
+      ? [item.partnership]
+      : [];
 
   return (
     <TouchableOpacity
@@ -36,50 +50,66 @@ const StoreListItem = ({ item, onPress }) => {
           onPress={() => setIsLiked(!isLiked)}
           activeOpacity={0.7}
         >
-          <Ionicons
-            name={isLiked ? 'heart' : 'heart-outline'}
-            size={18}
-            color={isLiked ? theme.colors.primary2 : theme.colors.border}
-          />
+          {isLiked ? (
+            <LikedIcon width={16} height={15} color={theme.colors.primary2} />
+          ) : (
+            <LikedIcon width={16} height={15} color={colors.gray[400]} />
+          )}
         </TouchableOpacity>
       </View>
 
-      {item.partnership && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{item.partnership}</Text>
+      {tags.length > 0 && (
+        <View style={styles.tagRow}>
+          {tags.map((tag, index) => (
+            <View key={index} style={styles.badge}>
+              <Text style={styles.badgeText}>{tag}</Text>
+            </View>
+          ))}
         </View>
       )}
 
-      <View style={styles.infoRow}>
+      <View style={[styles.infoRow, !showImages && { marginBottom: 0 }]}>
         <View style={styles.infoItem}>
           <StarIcon width={16} height={16} style={{ marginRight: 4 }} />
           <Text style={styles.infoText}>{item.rating}</Text>
         </View>
 
-        {item.discount && (
-          <View style={styles.infoItem}>
-            <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
-            <Text style={styles.infoText}>{item.discount}</Text>
-          </View>
+        {showDiscountDetail ? (
+          item.discount && (
+            <View style={styles.infoItem}>
+              <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
+              <Text style={styles.infoText}>{item.discount}</Text>
+            </View>
+          )
+        ) : (
+          <>
+            {item.discount && (
+              <View style={styles.infoItem}>
+                <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
+                <Text style={styles.infoText}>{item.discount}</Text>
+              </View>
+            )}
+            <View style={styles.infoItem}>
+              <PinIcon width={20} height={20} style={{ marginRight: 4 }} />
+              <Text style={styles.infoText}>
+                {item.address} {item.distance}
+              </Text>
+            </View>
+          </>
         )}
-
-        <View style={styles.infoItem}>
-          <PinIcon width={20} height={20} style={{ marginRight: 4 }} />
-          <Text style={styles.infoText}>
-            {item.address} {item.distance}
-          </Text>
-        </View>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.imageScroll}
-      >
-        {[1, 2, 3, 4].map((img, index) => (
-          <View key={index} style={styles.imagePlaceholder} />
-        ))}
-      </ScrollView>
+      {showImages && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.imageScroll}
+        >
+          {[1, 2, 3, 4].map((img, index) => (
+            <View key={index} style={styles.imagePlaceholder} />
+          ))}
+        </ScrollView>
+      )}
     </TouchableOpacity>
   );
 };
@@ -123,26 +153,30 @@ const styles = StyleSheet.create({
     ...typography.caption1Regular,
     color: theme.colors.textDim,
   },
+
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 10,
+    gap: 6,
+  },
   badge: {
     backgroundColor: theme.colors.primary1Light,
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 6,
-    alignSelf: 'flex-start',
-    marginBottom: 10,
   },
   badgeText: {
     color: theme.colors.primary1,
     ...typography.caption2Bold,
   },
+
   infoRow: {
     marginBottom: 8,
   },
-
   infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
     marginRight: 10,
   },
   infoText: {
