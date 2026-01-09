@@ -36,6 +36,12 @@ const styles = StyleSheet.create({
   activityTypeSelectorButtonPressed: {
     borderColor: colors.blue[400],
   },
+  activityTypeSelectorOrangeButtonPressed: {
+    borderColor: colors.orange[400],
+  },
+  activityTypeSelectorOrangeButtonTextPressed: {
+    color: colors.orange[600],
+  },
   activityTypeSelectorButtonTextPressed: {
     color: colors.blue[600],
   },
@@ -47,7 +53,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const AffiliationColumnList = ({ navigation }) => {
+const AffiliationColumnList = ({ navigation, isOrange = false }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
   return (
     <View style={styles.container}>
@@ -56,7 +62,9 @@ const AffiliationColumnList = ({ navigation }) => {
           style={[
             styles.activityTypeSelectorButton,
             selectedActivityType === '제휴'
-              ? styles.activityTypeSelectorButtonPressed
+              ? isOrange
+                ? styles.activityTypeSelectorOrangeButtonPressed
+                : styles.activityTypeSelectorButtonPressed
               : styles.activityTypeSelectorButton,
           ]}
           onPress={() => setSelectedActivityType('제휴')}
@@ -64,7 +72,9 @@ const AffiliationColumnList = ({ navigation }) => {
           <Text
             style={
               selectedActivityType === '제휴'
-                ? styles.activityTypeSelectorButtonTextPressed
+                ? isOrange
+                  ? styles.activityTypeSelectorOrangeButtonTextPressed
+                  : styles.activityTypeSelectorButtonTextPressed
                 : styles.activityTypeSelectorButtonText
             }
           >
@@ -75,7 +85,9 @@ const AffiliationColumnList = ({ navigation }) => {
           style={[
             styles.activityTypeSelectorButton,
             selectedActivityType === '행사'
-              ? styles.activityTypeSelectorButtonPressed
+              ? isOrange
+                ? styles.activityTypeSelectorOrangeButtonPressed
+                : styles.activityTypeSelectorButtonPressed
               : styles.activityTypeSelectorButton,
           ]}
           onPress={() => setSelectedActivityType('행사')}
@@ -83,7 +95,9 @@ const AffiliationColumnList = ({ navigation }) => {
           <Text
             style={
               selectedActivityType === '행사'
-                ? styles.activityTypeSelectorButtonTextPressed
+                ? isOrange
+                  ? styles.activityTypeSelectorOrangeButtonTextPressed
+                  : styles.activityTypeSelectorButtonTextPressed
                 : styles.activityTypeSelectorButtonText
             }
           >

@@ -12,11 +12,11 @@ export async function councilLogin(data) {
       const refreshToken = response.data.refreshToken;
       const user = {
         role: 'COUNCIL',
-        councilName: response.data.councilName,
+        councilName: response.data.data.councilName,
         councilId: response.data.councilId,
-        schoolName: response.data.schoolName,
-        majorName: response.data.majorName,
-        collegeName: response.data.collegeName,
+        schoolName: response.data.data.schoolName,
+        majorName: response.data.data.majorName,
+        collegeName: response.data.data.collegeName,
       };
       useAuthStore.getState().loginCouncil({ user, accessToken, refreshToken });
       return response.data;

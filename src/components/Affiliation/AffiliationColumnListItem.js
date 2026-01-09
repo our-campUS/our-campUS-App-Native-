@@ -8,6 +8,7 @@ import CalendarIcon from '../../../assets/calendar.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 import LikedIcon from '../../../assets/Liked.svg';
 import { useState } from 'react';
+import useAuthStore from '../../store/authStore';
 
 const styles = StyleSheet.create({
   container: {
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
 });
 
 const AffiliationColumnListItem = ({ item, navigation }) => {
+  const user = useAuthStore((state) => state.user);
   const [liked, setLiked] = useState(item.liked || false);
   const [isLikeIconPressed, setIsLikeIconPressed] = useState(false);
 
@@ -76,7 +78,11 @@ const AffiliationColumnListItem = ({ item, navigation }) => {
 
   const handleItemPress = () => {
     if (!isLikeIconPressed) {
-      navigation?.navigate('AffiliationDetailScreen', { item });
+      if (user?.role === 'COUNCIL') {
+        navigation?.navigate('CouncilAffiliateDetailScreen', { item });
+      } else {
+        navigation?.navigate('AffiliationDetailScreen', { item });
+      }
     }
   };
 
