@@ -129,32 +129,37 @@ const CouncilAffiliateScreen = ({ navigation }) => {
             style={styles.writeEventTypeSelectorItem}
             onPress={() => {
               setIsWriteEventButtonPressed(false);
-              navigation.navigate('WriteEventPostScreen', {
-                type: 'event',
+              navigation.navigate('WriteAffiliatePostScreen', {
+                type: 'affiliate',
               });
             }}
           >
-            <EventSelectIcon
-              width={25}
-              height={25}
-              color={colors.orange[500]}
-            />
+            <View style={{ marginTop: -3 }}>
+              <AffiliateSelectIcon width={25} height={25} />
+            </View>
             <Text style={styles.writeEventTypeSelectorItemText}>
-              행사 글쓰기
+              제휴 글쓰기
             </Text>
           </Pressable>
           <Pressable
             style={styles.writeEventTypeSelectorItem}
             onPress={() => {
               setIsWriteEventButtonPressed(false);
-              navigation.navigate('WriteAffiliatePostScreen', {
-                type: 'affiliate',
+              navigation.navigate('WriteEventPostScreen', {
+                type: 'event',
               });
             }}
           >
-            <AffiliateSelectIcon width={25} height={25} />
+            <View style={{ marginTop: -3 }}>
+              <EventSelectIcon
+                width={25}
+                height={25}
+                color={colors.orange[500]}
+              />
+            </View>
+
             <Text style={styles.writeEventTypeSelectorItemText}>
-              제휴 글쓰기
+              행사 글쓰기
             </Text>
           </Pressable>
         </View>
@@ -206,7 +211,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   writeEventTypeSelectorItem: {
-    width: '100%',
+    width: 163,
+    height: 25,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
