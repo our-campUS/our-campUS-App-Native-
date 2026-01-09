@@ -20,9 +20,6 @@ const styles = StyleSheet.create({
   activeButton: {
     borderBottomColor: colors.blue[600],
   },
-  activeOrangeButton: {
-    borderBottomColor: colors.orange[600],
-  },
   buttonText: {
     ...typography.heading5,
     color: colors.gray[850],
@@ -31,18 +28,9 @@ const styles = StyleSheet.create({
   activeButtonText: {
     color: colors.blue[600],
   },
-  activeOrangeButtonText: {
-    color: colors.orange[600],
-  },
 });
 
-const HostByTab = ({
-  navigation,
-  university,
-  college,
-  department,
-  isOrange = false,
-}) => {
+const HostByTab = ({ navigation, university, college, department }) => {
   const [activeTab, setActiveTab] = useState('university');
 
   return (
@@ -50,38 +38,27 @@ const HostByTab = ({
       <Pressable
         style={[
           styles.button,
-          activeTab === 'university' &&
-            (isOrange ? styles.activeOrangeButton : styles.activeButton),
+          activeTab === 'university' && styles.activeButton,
         ]}
         onPress={() => setActiveTab('university')}
       >
         <Text
           style={[
             styles.buttonText,
-            activeTab === 'university' &&
-              (isOrange
-                ? styles.activeOrangeButtonText
-                : styles.activeButtonText),
+            activeTab === 'university' && styles.activeButtonText,
           ]}
         >
           {university}
         </Text>
       </Pressable>
       <Pressable
-        style={[
-          styles.button,
-          activeTab === 'college' &&
-            (isOrange ? styles.activeOrangeButton : styles.activeButton),
-        ]}
+        style={[styles.button, activeTab === 'college' && styles.activeButton]}
         onPress={() => setActiveTab('college')}
       >
         <Text
           style={[
             styles.buttonText,
-            activeTab === 'college' &&
-              (isOrange
-                ? styles.activeOrangeButtonText
-                : styles.activeButtonText),
+            activeTab === 'college' && styles.activeButtonText,
           ]}
         >
           {college}
@@ -90,18 +67,14 @@ const HostByTab = ({
       <Pressable
         style={[
           styles.button,
-          activeTab === 'department' &&
-            (isOrange ? styles.activeOrangeButton : styles.activeButton),
+          activeTab === 'department' && styles.activeButton,
         ]}
         onPress={() => setActiveTab('department')}
       >
         <Text
           style={[
             styles.buttonText,
-            activeTab === 'department' &&
-              (isOrange
-                ? styles.activeOrangeButtonText
-                : styles.activeButtonText),
+            activeTab === 'department' && styles.activeButtonText,
           ]}
         >
           {department}

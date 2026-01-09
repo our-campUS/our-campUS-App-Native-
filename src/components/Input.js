@@ -16,7 +16,6 @@ import { filterDropdownItems } from '../utils/searchLogic';
 import EyeSlashIcon from '../../assets/inputHidden.svg';
 import EyeIcon from '../../assets/inputUnhidden.svg';
 import ArrowDownIcon from '../../assets/ArrowDown.svg';
-import DatePickerIcon from '../../assets/mdi_event.svg';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -110,7 +109,6 @@ const styles = StyleSheet.create({
 const Input = forwardRef(
   (
     {
-      useDatePicker = false,
       autoCapitalize = true,
       title,
       isOrange = false,
@@ -272,13 +270,6 @@ const Input = forwardRef(
             <MagnifyingGlass
               style={styles.magnifyingGlass}
               pointerEvents="none"
-            />
-          )}
-          {useDatePicker && (
-            <DatePickerIcon
-              style={styles.magnifyingGlass}
-              pointerEvents="none"
-              color={colors.gray[300]}
             />
           )}
           {usePassWordIcon &&

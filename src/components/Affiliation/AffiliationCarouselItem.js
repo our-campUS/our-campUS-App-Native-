@@ -22,15 +22,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  activeOrangeActivityTypeContainer: {
-    backgroundColor: colors.orange['050'],
-  },
   activityType: {
     ...typography.caption2Bold,
     color: colors.blue[600],
-  },
-  activeOrangeActivityType: {
-    color: colors.orange[600],
   },
   title: {
     ...typography.heading5,
@@ -65,31 +59,12 @@ const styles = StyleSheet.create({
   },
 });
 
-const AffiliationCarouselItem = ({ item, isOrange = false }) => {
+const AffiliationCarouselItem = ({ item }) => {
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.activityTypeContainer,
-          isOrange && styles.activeOrangeActivityTypeContainer,
-        ]}
-      >
-        <Text
-          style={[
-            styles.activityType,
-            isOrange && styles.activeOrangeActivityType,
-          ]}
-        >
-          {item.activityType}
-        </Text>
-        <Text
-          style={[
-            styles.activityType,
-            isOrange && styles.activeOrangeActivityType,
-          ]}
-        >
-          {'>'}
-        </Text>
+      <View style={styles.activityTypeContainer}>
+        <Text style={styles.activityType}>{item.activityType}</Text>
+        <Text style={styles.activityType}>{'>'}</Text>
       </View>
       <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
         {item.title}

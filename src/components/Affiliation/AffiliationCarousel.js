@@ -12,19 +12,14 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 20,
   },
-  activeOrangeContainer: {
-    backgroundColor: colors.orange['050'],
-  },
 });
 
-const AffiliationCarousel = ({ isOrange = false }) => {
+const AffiliationCarousel = () => {
   return (
-    <View style={[styles.container, isOrange && styles.activeOrangeContainer]}>
+    <View style={styles.container}>
       <FlatList
         data={AFFILIATION_CAROUSEL_DATA}
-        renderItem={({ item }) => (
-          <AffiliationCarouselItem item={item} isOrange={isOrange} />
-        )}
+        renderItem={({ item }) => <AffiliationCarouselItem item={item} />}
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
