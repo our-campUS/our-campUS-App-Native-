@@ -21,13 +21,26 @@ import StampBoard from '../../components/Stamp/StampBoard';
 import ShareFriendIcon from '../../../assets/icons/invite/share_friend.svg';
 import InviteIcon from '../../../assets/icons/invite/invite.svg';
 import BulletText from '../../components/common/BulletText';
-import { HISTORY_DATA, NOTICE_DATA } from '../../constants/StampData';
+import RewardItem from '../../components/Stamp/RewardItem';
+import ImageDetailModal from '../../components/common/ImageDetailModal';
+import {
+  HISTORY_DATA,
+  NOTICE_DATA,
+  REWARD_DATA,
+} from '../../constants/StampData';
 
 const StampScreen = () => {
   const [activeTab, setActiveTab] = useState('stamp');
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedReward, setSelectedReward] = useState(null);
+
+  const handleRewardClick = (item) => {
+    setSelectedReward(item);
+    setModalVisible(true);
+  };
 
   const renderTopTabs = () => (
     <View style={styles.tabContainer}>
@@ -187,13 +200,31 @@ const StampScreen = () => {
           </>
         ) : (
           // 리워드 탭
-          <View style={styles.emptyContainer}>
-            <Text style={{ color: colors.gray[400] }}>
-              보유 중인 리워드가 없습니다.
-            </Text>
+          <View style={styles.rewardListContainer}>
+            {REWARD_DATA.length > 0 ? (
+              REWARD_DATA.map((item) => (
+                <RewardItem
+                  key={item.id}
+                  item={item}
+                  onPress={() => handleRewardClick(item)}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Text style={{ color: colors.gray[400] }}>
+                  보유 중인 리워드가 없습니다.
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </ScrollView>
+
+      <ImageDetailModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        imageSource={selectedReward?.image}
+      />
     </SafeAreaView>
   );
 };
@@ -367,6 +398,10 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: 50,
     alignItems: 'center',
+  },
+  rewardListContainer: {
+    backgroundColor: 'white',
+    minHeight: 500,
   },
 });
 

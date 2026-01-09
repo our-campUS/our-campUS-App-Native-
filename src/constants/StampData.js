@@ -46,3 +46,20 @@ export const NOTICE_DATA = [
     ],
   },
 ];
+
+export const REWARD_DATA = [
+  {
+    id: 1,
+    title: '스타벅스 아메리카노',
+    date: '2025. 00. 00',
+    status: 'pending',
+    image: null,
+  },
+  {
+    id: 2,
+    title: '스타벅스 아메리카노',
+    date: '2025. 00. 00',
+    status: 'complete',
+    image: null,
+  },
+];
