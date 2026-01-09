@@ -56,7 +56,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
             style={styles.writeEventTypeSelectorItem}
             onPress={() => {
               setIsWriteEventButtonPressed(false);
-              navigation.navigate('WriteAffiliatePostScreen', {
+              navigation.navigate('WriteEventPostScreen', {
                 type: 'event',
               });
             }}
