@@ -241,7 +241,7 @@ const StampScreen = () => {
         onClose={() => setIsReviewModalVisible(false)}
         onConfirmScan={() => {
           setIsReviewModalVisible(false);
-          navigation.navigate('CameraScanScreen');
+          navigation.navigate('SelectStoreScreen');
         }}
         storeName="스타벅스"
         initialStep={reviewModalStartStep}
