@@ -32,14 +32,13 @@ const CouncilMyPageDefaultScreen = ({ navigation }) => {
           계정관리
         </Text>
         <View style={styles.customerServiceItemWrapper}>
-          <View style={styles.customerServiceItem}>
+          <Pressable
+            style={styles.customerServiceItem}
+            onPress={() => navigation.navigate('CouncilProfileScreen')}
+          >
             <Text style={styles.customerServiceItemText}>내 계정</Text>
-            <Pressable
-              onPress={() => navigation.navigate('CouncilProfileScreen')}
-            >
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
         </View>
         <Text
           style={{
@@ -51,20 +50,20 @@ const CouncilMyPageDefaultScreen = ({ navigation }) => {
           고객 센터
         </Text>
         <View style={styles.customerServiceItemWrapper}>
-          <View style={styles.customerServiceItem}>
+          <Pressable
+            style={styles.customerServiceItem}
+            onPress={() => navigation.navigate('AnnouncementScreen')}
+          >
             <Text style={styles.customerServiceItemText}>공지사항</Text>
-            <Pressable
-              onPress={() => navigation.navigate('AnnouncementScreen')}
-            >
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
-          <View style={styles.customerServiceItem}>
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
+          <Pressable
+            style={styles.customerServiceItem}
+            onPress={() => navigation.navigate('InqueryMainScreen')}
+          >
             <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
-            <Pressable onPress={() => navigation.navigate('InqueryMainScreen')}>
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
@@ -139,6 +138,7 @@ const styles = StyleSheet.create({
   },
   textInfoContainer: {
     flexDirection: 'column',
+    gap: 10,
   },
   councilIdentityNickname: {
     ...typography.heading4,

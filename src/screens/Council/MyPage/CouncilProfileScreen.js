@@ -86,33 +86,27 @@ const CouncilProfileScreen = ({ navigation, route }) => {
           <Text style={{ ...typography.body4Bold, color: colors.gray[400] }}>
             계정 보안
           </Text>
-          <View style={styles.profileInfoItem}>
+          <Pressable
+            style={styles.profileInfoItem}
+            onPress={() => navigation.navigate('CouncilChangePasswordEmail')}
+          >
             <Text style={styles.profileInfoItemTitle}>비밀번호 변경</Text>
-            <Pressable
-              onPress={() => navigation.navigate('CouncilChangePasswordEmail')}
-            >
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
-          <View
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
+          <Pressable
             style={styles.profileInfoItem}
             onPress={() => setIsLogoutModalVisible(true)}
           >
             <Text style={styles.profileInfoItemTitle}>로그아웃</Text>
-            <Pressable onPress={() => setIsLogoutModalVisible(true)}>
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
-          <View style={styles.profileInfoItem}>
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
+          <Pressable
+            style={styles.profileInfoItem}
+            onPress={() => navigation.navigate('CouncilCancelMembershipScreen')}
+          >
             <Text style={styles.profileInfoItemTitle}>탈퇴하기</Text>
-            <Pressable
-              onPress={() =>
-                navigation.navigate('CouncilCancelMembershipScreen')
-              }
-            >
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
         </View>
       </SafeAreaView>
       <Modal
