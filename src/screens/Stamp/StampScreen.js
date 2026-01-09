@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import theme from '../../style';
@@ -23,6 +24,7 @@ import InviteIcon from '../../../assets/icons/invite/invite.svg';
 import BulletText from '../../components/common/BulletText';
 import RewardItem from '../../components/Stamp/RewardItem';
 import ImageDetailModal from '../../components/common/ImageDetailModal';
+import ReviewActionModal from '../../components/review/ReviewActionModal';
 import {
   HISTORY_DATA,
   NOTICE_DATA,
@@ -30,16 +32,24 @@ import {
 } from '../../constants/StampData';
 
 const StampScreen = () => {
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('stamp');
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReward, setSelectedReward] = useState(null);
+  const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
+  const [reviewModalStartStep, setReviewModalStartStep] = useState(1);
 
   const handleRewardClick = (item) => {
     setSelectedReward(item);
     setModalVisible(true);
+  };
+
+  const handleReviewButtonPress = () => {
+    setReviewModalStartStep(2);
+    setIsReviewModalVisible(true);
   };
 
   const renderTopTabs = () => (
@@ -83,7 +93,7 @@ const StampScreen = () => {
         </Text>
       </View>
 
-      <StampBoard />
+      <StampBoard onPressReview={handleReviewButtonPress} />
     </View>
   );
 
@@ -224,6 +234,17 @@ const StampScreen = () => {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         imageSource={selectedReward?.image}
+      />
+
+      <ReviewActionModal
+        isVisible={isReviewModalVisible}
+        onClose={() => setIsReviewModalVisible(false)}
+        onConfirmScan={() => {
+          setIsReviewModalVisible(false);
+          navigation.navigate('CameraScanScreen');
+        }}
+        storeName="스타벅스"
+        initialStep={reviewModalStartStep}
       />
     </SafeAreaView>
   );

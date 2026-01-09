@@ -36,7 +36,7 @@ const StampItem = ({ index, currentStampCount }) => {
 
 const HorizontalLine = () => <View style={styles.dottedLineHorizontal} />;
 
-const StampBoard = () => {
+const StampBoard = ({ onPressReview }) => {
   const currentStampCount = 2;
 
   return (
@@ -77,7 +77,7 @@ const StampBoard = () => {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.reviewButton}>
+      <TouchableOpacity style={styles.reviewButton} onPress={onPressReview}>
         <PencilIcon width={16} height={16} color={colors.blue[600]} />
         <Text style={styles.reviewButtonText}>리뷰 쓰고 스탬프 받기</Text>
       </TouchableOpacity>

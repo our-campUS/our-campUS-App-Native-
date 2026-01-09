@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -16,11 +16,17 @@ const ReviewActionModal = ({
   onClose,
   onConfirmScan,
   storeName,
+  initialStep = 1,
 }) => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(initialStep);
+
+  useEffect(() => {
+    if (isVisible) {
+      setStep(initialStep);
+    }
+  }, [isVisible, initialStep]);
 
   const handleClose = () => {
-    setStep(1);
     onClose();
   };
 
