@@ -221,7 +221,7 @@ const StampScreen = () => {
               ))
             ) : (
               <View style={styles.emptyContainer}>
-                <Text style={{ color: colors.gray[400] }}>
+                <Text style={{ color: colors.background }}>
                   보유 중인 리워드가 없습니다.
                 </Text>
               </View>
@@ -307,7 +307,9 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
   },
-
+  contentScroll: {
+    backgroundColor: theme.colors.background,
+  },
   // === Invite Event ===
   inviteContainer: {
     alignItems: 'center',
@@ -421,8 +423,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rewardListContainer: {
-    backgroundColor: 'white',
-    minHeight: 500,
+    backgroundColor: theme.colors.background,
+    minHeight: '100%',
   },
 });
 

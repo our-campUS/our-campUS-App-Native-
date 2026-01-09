@@ -62,4 +62,25 @@ export const REWARD_DATA = [
     status: 'complete',
     image: null,
   },
+  {
+    id: 3,
+    title: '스타벅스 아메리카노',
+    date: '2025. 00. 00',
+    status: 'complete',
+    image: null,
+  },
+  {
+    id: 4,
+    title: '스타벅스 아메리카노',
+    date: '2025. 00. 00',
+    status: 'complete',
+    image: null,
+  },
+  {
+    id: 5,
+    title: '스타벅스 아메리카노',
+    date: '2025. 00. 00',
+    status: 'complete',
+    image: null,
+  },
 ];
