@@ -13,8 +13,10 @@ import typography from '../../style/typography';
 import { useEffect, useState } from 'react';
 import CreateQueryBottomSheet from '../../components/MyPage/CreateQueryBottomSheet';
 import Button from '../../components/Button';
+import useAuthStore from '../../store/authStore';
 
 const CreateNewQueryView = ({ handleCreateQuery }) => {
+  const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [inqueryContent, setInqueryContent] = useState('');
@@ -70,6 +72,7 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
         </View>
         <View style={styles.buttonWrapper}>
           <Button
+            isOrange={isCouncil}
             disabled={isButtonDisabled}
             title="등록하기"
             style={{
@@ -79,7 +82,9 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
               paddingVertical: 15,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.blue[400],
+              backgroundColor: isCouncil
+                ? colors.orange[400]
+                : colors.blue[400],
               borderRadius: 10,
             }}
             onPress={handleCreateQuery}

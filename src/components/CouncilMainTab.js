@@ -20,6 +20,7 @@ import MapStack from '../navigations/MapStack';
 import MyPageStack from '../navigations/MyPageStack';
 
 import CouncilAffiliateStack from '../navigations/Council/CouncilAffiliateStack';
+import CouncilMainPageStack from '../navigations/Council/CouncilMainPageStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -127,11 +128,11 @@ const CouncilMainTab = () => {
       />
       <Tab.Screen
         name="MyPage"
-        component={MyPageStack}
+        component={CouncilMainPageStack}
         options={({ route }) => {
           const routeName =
-            getFocusedRouteNameFromRoute(route) ?? 'MyPageDefaultScreen';
-          const hideTabBar = routeName !== 'MyPageDefaultScreen';
+            getFocusedRouteNameFromRoute(route) ?? 'CouncilMyPageDefaultScreen';
+          const hideTabBar = routeName !== 'CouncilMyPageDefaultScreen';
 
           return {
             title: '마이페이지',
