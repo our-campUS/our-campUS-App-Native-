@@ -16,6 +16,7 @@ import TicketIcon from '../../../assets/icons/common/ticket.svg';
 import PinIcon from '../../../assets/icons/common/pin.svg';
 import { CATEGORIES } from '../../constants/MapData';
 import LikedIcon from '../../../assets/Liked.svg';
+import UnlikedIcon from '../../../assets/Unliked.svg';
 
 const StoreListItem = ({
   item,
@@ -53,7 +54,7 @@ const StoreListItem = ({
           {isLiked ? (
             <LikedIcon width={16} height={15} color={theme.colors.primary2} />
           ) : (
-            <LikedIcon width={16} height={15} color={colors.gray[400]} />
+            <UnlikedIcon width={16} height={15} />
           )}
         </TouchableOpacity>
       </View>

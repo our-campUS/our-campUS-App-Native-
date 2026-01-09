@@ -27,6 +27,7 @@ import ClockIcon from '../../../assets/icons/common/clock.svg';
 import RatingIcon from '../../../assets/icons/rating.svg';
 
 import LikedIcon from '../../../assets/Liked.svg';
+import UnlikedIcon from '../../../assets/Unliked.svg';
 import ShareIcon from '../../../assets/share.svg';
 import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
 
@@ -115,11 +116,7 @@ const StoreDetailScreen = () => {
                         color={theme.colors.primary2}
                       />
                     ) : (
-                      <LikedIcon
-                        width={16}
-                        height={15}
-                        color={colors.gray[400]}
-                      />
+                      <UnlikedIcon width={16} height={15} />
                     )}
                   </View>
                 </TouchableOpacity>
