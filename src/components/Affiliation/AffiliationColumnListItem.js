@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   title: {
-    ...typography.body4Bold,
+    ...typography.body3Bold,
   },
   placeAndDate: {
     marginTop: 12,
@@ -116,13 +116,13 @@ const AffiliationColumnListItem = ({ item, navigation }) => {
         <Text style={styles.title}>{item.title}</Text>
         <View style={styles.placeAndDate}>
           <View style={styles.placeAndDateItem}>
-            <PlaceIcon width={24} height={24} color={colors.gray[300]} />
+            <PlaceIcon width={16} height={16} color={colors.gray[300]} />
             <Text style={styles.place}>{item.place}</Text>
           </View>
           <View style={styles.placeAndDateItem}>
             <CalendarIcon
-              width={30}
-              height={30}
+              width={20}
+              height={20}
               color={colors.gray[300]}
               style={{ marginLeft: -2 }}
             />

@@ -125,6 +125,14 @@ export const AFFILIATION_COLUMN_LIST_DATA_AFFILIATION = [
     detailImages: [],
     type: '제휴',
   },
+  {
+    title: '이탈리안 돈까스와 냉면 첫 방문 30% 할인',
+    place: '이탈리안 돈까스와 냉면 중앙대점',
+    date: '2025년 12월 1일까지',
+    image: null,
+    detailImages: [],
+    type: '제휴',
+  },
 ];
 
 // 행사 칼럼 리스트 전용 더미 데이터 (재상)
