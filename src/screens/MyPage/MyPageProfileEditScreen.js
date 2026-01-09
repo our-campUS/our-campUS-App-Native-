@@ -28,14 +28,13 @@ const MyPageProfileEditScreen = ({ navigation }) => {
         </View>
         <Text style={styles.nickname}>닉넴 뭐하지</Text>
         <View style={styles.profileInfoWrapper}>
-          <View style={styles.profileInfoItem}>
+          <Pressable
+            style={styles.profileInfoItem}
+            onPress={() => navigation.navigate('EditNicknameScreen')}
+          >
             <Text style={styles.profileInfoItemTitle}>닉네임</Text>
-            <Pressable
-              onPress={() => navigation.navigate('EditNicknameScreen')}
-            >
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <ArrowRightIcon width={10} height={10} />
@@ -53,23 +52,20 @@ const MyPageProfileEditScreen = ({ navigation }) => {
           </View>
         </View>
         <View style={styles.logoutButtonWrapper}>
-          <View
+          <Pressable
             style={styles.profileInfoItem}
             onPress={() => setIsLogoutModalVisible(true)}
           >
             <Text style={styles.profileInfoItemTitle}>로그아웃</Text>
-            <Pressable onPress={() => setIsLogoutModalVisible(true)}>
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
-          <View style={styles.profileInfoItem}>
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
+          <Pressable
+            style={styles.profileInfoItem}
+            onPress={() => navigation.navigate('CancelMembershipScreen')}
+          >
             <Text style={styles.profileInfoItemTitle}>회원 탈퇴</Text>
-            <Pressable
-              onPress={() => navigation.navigate('CancelMembershipScreen')}
-            >
-              <ArrowRightIcon width={10} height={10} />
-            </Pressable>
-          </View>
+            <ArrowRightIcon width={10} height={10} />
+          </Pressable>
         </View>
       </SafeAreaView>
       <Modal
