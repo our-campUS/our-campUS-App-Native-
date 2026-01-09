@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     height: 108,
     backgroundColor: colors.common.white,
     alignItems: 'center',
+    marginLeft: -10,
   },
   content: {
     flexDirection: 'column',

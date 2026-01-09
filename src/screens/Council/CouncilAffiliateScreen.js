@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
     alignItems: 'center',
     position: 'relative',
-    paddingBottom: 40,
   },
   writeEventButton: {
     position: 'absolute',
