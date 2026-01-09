@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
 
 const AffiliationMainScreen = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={{ marginTop: 9.5 }}>
         <HostByTab
           university={'중앙대학교'}

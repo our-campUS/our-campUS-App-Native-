@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
     alignItems: 'center',
     position: 'relative',
+    paddingBottom: 40,
   },
   writeEventButton: {
     position: 'absolute',
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   textInfoContainer: {
+    gap: 10,
     flexDirection: 'column',
   },
   councilIdentityNickname: {
