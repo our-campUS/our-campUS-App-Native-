@@ -1,26 +1,32 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import {
   View,
   StyleSheet,
   Platform,
   TouchableOpacity,
   Dimensions,
+  Alert,
+  PermissionsAndroid,
 } from 'react-native';
 import {
   NaverMapView,
   NaverMapMarkerOverlay,
 } from '@mj-studio/react-native-naver-map';
+import Geolocation from '@react-native-community/geolocation';
 import SearchBar from '../../components/SearchBar';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SEARCH_RESULTS } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import MapPin from '../../components/common/MapPin';
+import theme from '../../style';
 
 import CategoryList from '../../components/map/CategoryList';
+import LocationIcon from '../../../assets/icons/location.svg';
 
 const MapScreen = () => {
   const navigation = useNavigation();
+  const mapRef = useRef(null);
   const insets = useSafeAreaInsets();
 
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
@@ -49,12 +55,35 @@ const MapScreen = () => {
     setSelectedCategory(null);
   };
 
+  const handleCurrentLocation = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert(
+            '권한 거부',
+            '위치 권한을 허용해야 현재 위치를 찾을 수 있습니다.'
+          );
+          return;
+        }
+      }
+      mapRef.current?.setLocationTrackingMode('Follow');
+    } catch (e) {
+      console.error(e);
+      Alert.alert('오류', '현위치로 이동할 수 없습니다.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <NaverMapView
+        ref={mapRef}
         style={{ flex: 1 }}
         initialCamera={{ latitude: 37.5665, longitude: 126.978, zoom: 16 }}
-        isShowLocationButton={true}
+        isShowLocationButton={false}
+        isShowZoomControls={false}
         onTapMap={handleReset}
       >
         {displayedMarkers.map((item) => {
@@ -119,6 +148,13 @@ const MapScreen = () => {
           />
         )}
       </View>
+      <TouchableOpacity
+        style={styles.myLocationButton}
+        onPress={handleCurrentLocation}
+        activeOpacity={0.8}
+      >
+        <LocationIcon width={24} height={24} color={theme.colors.textDim} />
+      </TouchableOpacity>
 
       <BottomSheet
         displayedMarkers={displayedMarkers}
@@ -142,6 +178,21 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 20,
     paddingBottom: 10,
+  },
+  myLocationButton: {
+    position: 'absolute',
+    top: '50%',
+    marginTop: -24,
+    right: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...theme.shadows.level1,
+    elevation: 5,
+    zIndex: 2,
   },
 });
 
