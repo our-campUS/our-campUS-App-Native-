@@ -100,7 +100,7 @@ const HomeScreen = () => {
           <View>
             <BannerCard
               title="좋은 제휴 아이디어 공유해주실래요?"
-              subtitle="원하는 제휴 혜택을 학생회에게 직접 제안해요."
+              subtitle="원하는 제휴 혜택을 학생회에게 직접 제안해요"
               onPress={() => console.log('제안하기 클릭')}
             />
             <BannerCard
