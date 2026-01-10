@@ -61,11 +61,13 @@ const MainTab = () => {
                 paddingTop: 20,
                 paddingHorizontal: 20,
                 marginBottom: 10,
+                backgroundColor: colors.common.white,
               }
             : {
                 height: 91,
                 paddingTop: 20,
                 paddingHorizontal: 20,
+                backgroundColor: colors.common.white,
               },
         tabBarItemStyle: { height: 51, width: 67, gap: 6 },
         tabBarLabelStyle: [
@@ -116,11 +118,13 @@ const MainTab = () => {
                   paddingTop: 20,
                   paddingHorizontal: 20,
                   marginBottom: 10,
+                  backgroundColor: colors.common.white,
                 }
               : {
                   height: 91,
                   paddingTop: 20,
                   paddingHorizontal: 20,
+                  backgroundColor: colors.common.white,
                 },
           };
         }}

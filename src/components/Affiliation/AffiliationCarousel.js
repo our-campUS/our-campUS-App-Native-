@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     height: 208,
     backgroundColor: colors.blue['000'],
     paddingVertical: 30,
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
   },
   activeOrangeContainer: {
     backgroundColor: colors.orange['050'],
@@ -22,8 +22,17 @@ const AffiliationCarousel = ({ isOrange = false }) => {
     <View style={[styles.container, isOrange && styles.activeOrangeContainer]}>
       <FlatList
         data={AFFILIATION_CAROUSEL_DATA}
-        renderItem={({ item }) => (
-          <AffiliationCarouselItem item={item} isOrange={isOrange} />
+        renderItem={({ item, index }) => (
+          <View
+            style={[
+              index === 0 && { marginLeft: 20 },
+              index === AFFILIATION_CAROUSEL_DATA.length - 1 && {
+                marginRight: 20,
+              },
+            ]}
+          >
+            <AffiliationCarouselItem item={item} isOrange={isOrange} />
+          </View>
         )}
         keyExtractor={(item) => item.id}
         horizontal

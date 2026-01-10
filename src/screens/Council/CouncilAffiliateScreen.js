@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Image,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../style/colors';
@@ -20,8 +21,14 @@ import EventSelectIcon from '../../../assets/mdi_event.svg';
 import AffiliateSelectIcon from '../../../assets/supportIcon.svg';
 import CouncilDefaultImage from '../../../assets/councilDefaultImage.png';
 import useAuthStore from '../../store/authStore';
+import AffiliationColumnListItem from '../../components/Affiliation/AffiliationColumnListItem';
+import {
+  AFFILIATION_COLUMN_LIST_DATA_AFFILIATION,
+  AFFILIATION_COLUMN_LIST_DATA_EVENT,
+} from '../../constants/DummyData';
 
 const CouncilAffiliateScreen = ({ navigation }) => {
+  const [selectedActivityType, setSelectedActivityType] = useState('제휴');
   const { user } = useAuthStore();
   console.log(user);
   const [isWriteEventButtonPressed, setIsWriteEventButtonPressed] =
@@ -49,27 +56,75 @@ const CouncilAffiliateScreen = ({ navigation }) => {
         </View>
       </View>
       <AffiliationCarousel isOrange={true} />
-      <AffiliationColumnList navigation={navigation} isOrange={true} />
+
+      <View style={styles.activityTypeSelector}>
+        <Pressable
+          style={[
+            styles.activityTypeSelectorButton,
+            selectedActivityType === '제휴'
+              ? styles.activityTypeSelectorOrangeButtonPressed
+              : styles.activityTypeSelectorButton,
+          ]}
+          onPress={() => setSelectedActivityType('제휴')}
+        >
+          <Text
+            style={
+              selectedActivityType === '제휴'
+                ? styles.activityTypeSelectorOrangeButtonTextPressed
+                : styles.activityTypeSelectorButtonText
+            }
+          >
+            제휴
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.activityTypeSelectorButton,
+            selectedActivityType === '행사'
+              ? styles.activityTypeSelectorOrangeButtonPressed
+              : styles.activityTypeSelectorButton,
+          ]}
+          onPress={() => setSelectedActivityType('행사')}
+        >
+          <Text
+            style={
+              selectedActivityType === '행사'
+                ? styles.activityTypeSelectorOrangeButtonTextPressed
+                : styles.activityTypeSelectorButtonText
+            }
+          >
+            행사
+          </Text>
+        </Pressable>
+      </View>
+      {selectedActivityType === '제휴' && (
+        <FlatList
+          style={{ width: '100%' }}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={{ paddingHorizontal: 20 }}
+          data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
+          renderItem={({ item }) => (
+            <AffiliationColumnListItem item={item} navigation={navigation} />
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      )}
+      {selectedActivityType === '행사' && (
+        <FlatList
+          style={{ width: '100%' }}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={{ paddingHorizontal: 20 }}
+          data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
+          renderItem={({ item }) => (
+            <AffiliationColumnListItem item={item} navigation={navigation} />
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      )}
+
+      {/* <AffiliationColumnList navigation={navigation} isOrange={true} /> */}
       {isWriteEventButtonPressed && (
         <View style={styles.writeEventTypeSelector}>
-          <Pressable
-            style={styles.writeEventTypeSelectorItem}
-            onPress={() => {
-              setIsWriteEventButtonPressed(false);
-              navigation.navigate('WriteEventPostScreen', {
-                type: 'event',
-              });
-            }}
-          >
-            <EventSelectIcon
-              width={25}
-              height={25}
-              color={colors.orange[500]}
-            />
-            <Text style={styles.writeEventTypeSelectorItemText}>
-              행사 글쓰기
-            </Text>
-          </Pressable>
           <Pressable
             style={styles.writeEventTypeSelectorItem}
             onPress={() => {
@@ -79,9 +134,32 @@ const CouncilAffiliateScreen = ({ navigation }) => {
               });
             }}
           >
-            <AffiliateSelectIcon width={25} height={25} />
+            <View style={{ marginTop: -3 }}>
+              <AffiliateSelectIcon width={25} height={25} />
+            </View>
             <Text style={styles.writeEventTypeSelectorItemText}>
               제휴 글쓰기
+            </Text>
+          </Pressable>
+          <Pressable
+            style={styles.writeEventTypeSelectorItem}
+            onPress={() => {
+              setIsWriteEventButtonPressed(false);
+              navigation.navigate('WriteEventPostScreen', {
+                type: 'event',
+              });
+            }}
+          >
+            <View style={{ marginTop: -3 }}>
+              <EventSelectIcon
+                width={25}
+                height={25}
+                color={colors.orange[500]}
+              />
+            </View>
+
+            <Text style={styles.writeEventTypeSelectorItemText}>
+              행사 글쓰기
             </Text>
           </Pressable>
         </View>
@@ -133,7 +211,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   writeEventTypeSelectorItem: {
-    width: '100%',
+    width: 163,
+    height: 25,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -149,6 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   textInfoContainer: {
+    gap: 10,
     flexDirection: 'column',
   },
   councilIdentityNickname: {
@@ -169,6 +249,39 @@ const styles = StyleSheet.create({
   councilIdentityImage: {
     width: '100%',
     height: '100%',
+  },
+  activityTypeSelector: {
+    width: '100%',
+    padding: 20,
+    flexDirection: 'row',
+    gap: 9,
+  },
+  activityTypeSelectorButton: {
+    borderRadius: 30,
+    borderWidth: 1.5,
+    borderColor: colors.gray[250],
+    width: 47,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activityTypeSelectorButtonText: {
+    ...typography.body4Regular,
+    color: colors.gray[700],
+  },
+  activityTypeSelectorButtonPressed: {
+    borderColor: colors.blue[400],
+  },
+  activityTypeSelectorOrangeButtonPressed: {
+    borderColor: colors.orange[400],
+  },
+  activityTypeSelectorOrangeButtonTextPressed: {
+    ...typography.body4Regular,
+    color: colors.orange[600],
+  },
+  activityTypeSelectorButtonTextPressed: {
+    ...typography.body4Regular,
+    color: colors.blue[600],
   },
 });
 

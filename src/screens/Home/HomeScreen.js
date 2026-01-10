@@ -37,7 +37,7 @@ const HomeScreen = () => {
   const [hasNewNotification, setHasNewNotification] = useState(true);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ScrollView style={styles.container}>
         {/* 행사 안내 */}
         <View style={styles.topArea}>
