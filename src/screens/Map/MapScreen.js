@@ -29,18 +29,54 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
 const HEIGHT_ITEM = 280;
 
-const MapScreen = () => {
+const MapScreen = ({ route }) => {
   const navigation = useNavigation();
   const mapRef = useRef(null);
   const insets = useSafeAreaInsets();
 
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState(null);
 
   const screenHeight = Dimensions.get('window').height;
   const topHeaderHeight = insets.top + 60 + 20;
   const sheetMaxHeight = screenHeight - topHeaderHeight;
   const sheetHeightAnimated = useRef(new Animated.Value(HEIGHT_LIST)).current;
+
+  useEffect(() => {
+    if (route.params) {
+      const { searchType, keyword, selectedLocation } = route.params;
+
+      if (searchType === 'KEYWORD' && keyword) {
+        setSearchKeyword(keyword);
+        setSelectedCategory(null);
+        setSelectedMarkerId(null);
+        const firstResult = SEARCH_RESULTS.find(
+          (item) =>
+            item.name.includes(keyword) || item.address.includes(keyword)
+        );
+        if (firstResult) {
+          mapRef.current?.animateCameraTo({
+            latitude: firstResult.latitude,
+            longitude: firstResult.longitude,
+            zoom: 15,
+            duration: 500,
+          });
+        }
+      } else if (searchType === 'LOCATION' && selectedLocation) {
+        setSearchKeyword(selectedLocation.name);
+        setSelectedCategory(null);
+        setSelectedMarkerId(selectedLocation.id);
+
+        mapRef.current?.animateCameraTo({
+          latitude: selectedLocation.latitude,
+          longitude: selectedLocation.longitude,
+          zoom: 16,
+          duration: 500,
+        });
+      }
+    }
+  }, [route.params]);
 
   const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
 
@@ -48,17 +84,28 @@ const MapScreen = () => {
     if (selectedMarkerId) {
       return SEARCH_RESULTS.filter((item) => item.id === selectedMarkerId);
     }
+
+    if (searchKeyword) {
+      return SEARCH_RESULTS.filter(
+        (item) =>
+          item.name.includes(searchKeyword) ||
+          item.address.includes(searchKeyword)
+      );
+    }
+
     if (selectedCategory) {
       return SEARCH_RESULTS.filter(
         (item) => item.category === selectedCategory.id
       );
     }
+
     return SEARCH_RESULTS;
-  }, [selectedMarkerId, selectedCategory]);
+  }, [selectedMarkerId, selectedCategory, searchKeyword]);
 
   const handleReset = () => {
     setSelectedMarkerId(null);
     setSelectedCategory(null);
+    setSearchKeyword(null);
   };
 
   const handleCurrentLocation = async () => {
@@ -104,7 +151,10 @@ const MapScreen = () => {
         isShowZoomControls={false}
         onTapMap={handleReset}
       >
-        {displayedMarkers.map((item) => {
+        {SEARCH_RESULTS.map((item) => {
+          const isVisible = displayedMarkers.some(
+            (marker) => marker.id === item.id
+          );
           let pinType = 'DEFAULT';
           if (item.id === selectedMarkerId) pinType = 'SELECTED';
           else if (item.type === 'PARTNER') pinType = 'PARTNER';
@@ -121,6 +171,7 @@ const MapScreen = () => {
               anchor={{ x: 0.5, y: pinType === 'SELECTED' ? 1 : 0.5 }}
               onTap={() => setSelectedMarkerId(item.id)}
               caption={{ text: item.name }}
+              isHidden={!isVisible}
             >
               <MapPin type={pinType} category={item.category} />
             </NaverMapMarkerOverlay>
@@ -137,7 +188,16 @@ const MapScreen = () => {
           },
         ]}
       >
-        {selectedCategory ? (
+        {searchKeyword ? (
+          <SearchBar
+            value={searchKeyword}
+            onPress={() => navigation.navigate('MapSearchScreen')}
+            placeholder="원하는 제휴를 검색하세요"
+            onBackPress={handleReset}
+            onClearPress={handleReset}
+            showSoftInputOnFocus={false}
+          />
+        ) : selectedCategory ? (
           <SearchBar
             value={selectedCategory.label}
             placeholder="원하는 제휴를 검색하세요"
@@ -157,7 +217,7 @@ const MapScreen = () => {
           </TouchableOpacity>
         )}
 
-        {!selectedCategory && (
+        {!selectedCategory && !searchKeyword && (
           <CategoryList
             onSelectCategory={(category) => {
               setSelectedCategory(category);
@@ -166,6 +226,7 @@ const MapScreen = () => {
           />
         )}
       </View>
+
       <Animated.View
         style={[
           styles.myLocationButtonWrapper,

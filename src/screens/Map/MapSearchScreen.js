@@ -29,7 +29,10 @@ const MapSearchScreen = () => {
   const insets = useSafeAreaInsets();
   const [keyword, setKeyword] = useState('');
   const onSubmit = () => {
-    navigation.navigate('MapSearchResultScreen', { keyword: keyword });
+    navigation.navigate('MapScreen', {
+      searchType: 'KEYWORD',
+      keyword: keyword,
+    });
   };
 
   const renderHistoryItem = ({ item }) => {
@@ -58,7 +61,10 @@ const MapSearchScreen = () => {
       <TouchableOpacity
         style={styles.resultItem}
         onPress={() =>
-          navigation.navigate('MapSearchResultScreen', { keyword: item.name })
+          navigation.navigate('MapScreen', {
+            searchType: 'LOCATION',
+            selectedLocation: item,
+          })
         }
       >
         <View style={styles.resultIconWrapper}>

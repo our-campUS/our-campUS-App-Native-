@@ -88,7 +88,28 @@ const MainTab = () => {
       <Tab.Screen
         name="Map"
         component={MapStack}
-        options={{ title: '학교 상권' }}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'MapScreen';
+          const hideTabBar = routeName !== 'MapScreen';
+
+          return {
+            title: '학교상권',
+            tabBarStyle: hideTabBar
+              ? { display: 'none' }
+              : Platform.OS === 'ios'
+              ? {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                  marginBottom: 10,
+                }
+              : {
+                  height: 91,
+                  paddingTop: 20,
+                  paddingHorizontal: 20,
+                },
+          };
+        }}
       />
       <Tab.Screen
         name="Partnership"
