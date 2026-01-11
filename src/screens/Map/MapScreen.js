@@ -38,9 +38,12 @@ const MapScreen = ({ route }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState(null);
 
+  const isCategoryVisible = !searchKeyword && !selectedCategory;
+  const categoryBarHeight = isCategoryVisible ? 60 : 0;
+
   const screenHeight = Dimensions.get('window').height;
   const topHeaderHeight = insets.top + 60 + 20;
-  const sheetMaxHeight = screenHeight - topHeaderHeight;
+  const sheetMaxHeight = screenHeight - topHeaderHeight - categoryBarHeight;
   const sheetHeightAnimated = useRef(new Animated.Value(HEIGHT_LIST)).current;
 
   useEffect(() => {
@@ -130,14 +133,14 @@ const MapScreen = ({ route }) => {
   };
 
   const buttonOpacity = sheetHeightAnimated.interpolate({
-    inputRange: [HEIGHT_LIST, sheetMaxHeight],
+    inputRange: [HEIGHT_LIST, HEIGHT_LIST + 100],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
 
   const buttonTranslateY = sheetHeightAnimated.interpolate({
     inputRange: [HEIGHT_LIST, sheetMaxHeight],
-    outputRange: [0, 50],
+    outputRange: [0, 100],
     extrapolate: 'clamp',
   });
 
