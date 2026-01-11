@@ -21,14 +21,14 @@ const BottomSheet = ({
   selectedMarkerId,
   onItemPress,
   maxHeight,
+  sheetHeightAnimated,
 }) => {
   const navigation = useNavigation();
   const HEIGHT_MAX = maxHeight * 0.85;
 
-  const sheetHeight = useRef(new Animated.Value(HEIGHT_LIST)).current;
+  const sheetHeight = sheetHeightAnimated;
   const startHeight = useRef(HEIGHT_LIST);
   const selectedMarkerIdRef = useRef(selectedMarkerId);
-
   const [isScrollable, setIsScrollable] = useState(false);
 
   const SNAP_POINTS = {

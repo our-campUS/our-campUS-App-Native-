@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import {
   View,
+  Animated,
   StyleSheet,
   Platform,
   TouchableOpacity,
@@ -24,6 +25,10 @@ import theme from '../../style';
 import CategoryList from '../../components/map/CategoryList';
 import LocationIcon from '../../../assets/icons/location.svg';
 
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
+const HEIGHT_ITEM = 280;
+
 const MapScreen = () => {
   const navigation = useNavigation();
   const mapRef = useRef(null);
@@ -35,6 +40,7 @@ const MapScreen = () => {
   const screenHeight = Dimensions.get('window').height;
   const topHeaderHeight = insets.top + 60 + 20;
   const sheetMaxHeight = screenHeight - topHeaderHeight;
+  const sheetHeightAnimated = useRef(new Animated.Value(HEIGHT_LIST)).current;
 
   const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
 
@@ -75,6 +81,18 @@ const MapScreen = () => {
       Alert.alert('오류', '현위치로 이동할 수 없습니다.');
     }
   };
+
+  const buttonOpacity = sheetHeightAnimated.interpolate({
+    inputRange: [HEIGHT_LIST, sheetMaxHeight],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const buttonTranslateY = sheetHeightAnimated.interpolate({
+    inputRange: [HEIGHT_LIST, sheetMaxHeight],
+    outputRange: [0, 50],
+    extrapolate: 'clamp',
+  });
 
   return (
     <View style={styles.container}>
@@ -148,19 +166,31 @@ const MapScreen = () => {
           />
         )}
       </View>
-      <TouchableOpacity
-        style={styles.myLocationButton}
-        onPress={handleCurrentLocation}
-        activeOpacity={0.8}
+      <Animated.View
+        style={[
+          styles.myLocationButtonWrapper,
+          {
+            opacity: buttonOpacity,
+            transform: [{ translateY: buttonTranslateY }],
+          },
+        ]}
+        pointerEvents="box-none"
       >
-        <LocationIcon width={24} height={24} color={theme.colors.textDim} />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.myLocationButton}
+          onPress={handleCurrentLocation}
+          activeOpacity={0.8}
+        >
+          <LocationIcon width={24} height={24} color={theme.colors.textDim} />
+        </TouchableOpacity>
+      </Animated.View>
 
       <BottomSheet
         displayedMarkers={displayedMarkers}
         selectedMarkerId={selectedMarkerId}
         onItemPress={(id) => setSelectedMarkerId(id)}
         maxHeight={sheetMaxHeight}
+        sheetHeightAnimated={sheetHeightAnimated}
       />
     </View>
   );
@@ -179,11 +209,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 10,
   },
-  myLocationButton: {
+  myLocationButtonWrapper: {
     position: 'absolute',
     top: '50%',
     marginTop: -24,
     right: 20,
+    zIndex: 2,
+  },
+  myLocationButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -192,7 +225,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...theme.shadows.level1,
     elevation: 5,
-    zIndex: 2,
   },
 });
 

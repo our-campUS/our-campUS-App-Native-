@@ -6,9 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import theme from '../../style';
-import colors from '../../style/colors';
 import typography from '../../style/typography';
 
 import StarIcon from '../../../assets/icons/common/star.svg';
@@ -36,69 +34,71 @@ const StoreListItem = ({
       : [];
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={onPress}
-      activeOpacity={0.9}
-    >
-      <View style={styles.headerRow}>
-        <View style={styles.titleWrapper}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.category}>{categoryLabel}</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.likeButton}
-          onPress={() => setIsLiked(!isLiked)}
-          activeOpacity={0.7}
-        >
-          {isLiked ? (
-            <LikedIcon width={16} height={15} color={theme.colors.primary2} />
-          ) : (
-            <UnlikedIcon width={16} height={15} />
-          )}
-        </TouchableOpacity>
-      </View>
-
-      {tags.length > 0 && (
-        <View style={styles.tagRow}>
-          {tags.map((tag, index) => (
-            <View key={index} style={styles.badge}>
-              <Text style={styles.badgeText}>{tag}</Text>
-            </View>
-          ))}
-        </View>
-      )}
-
-      <View style={[styles.infoRow, !showImages && { marginBottom: 0 }]}>
-        <View style={styles.infoItem}>
-          <StarIcon width={16} height={16} style={{ marginRight: 4 }} />
-          <Text style={styles.infoText}>{item.rating}</Text>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+        <View style={styles.headerRow}>
+          <View style={styles.titleWrapper}>
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.category}>{categoryLabel}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.likeButton}
+            onPress={() => setIsLiked(!isLiked)}
+            activeOpacity={0.7}
+          >
+            {isLiked ? (
+              <LikedIcon width={16} height={15} color={theme.colors.primary2} />
+            ) : (
+              <UnlikedIcon width={16} height={15} />
+            )}
+          </TouchableOpacity>
         </View>
 
-        {showDiscountDetail ? (
-          item.discount && (
-            <View style={styles.infoItem}>
-              <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
-              <Text style={styles.infoText}>{item.discount}</Text>
-            </View>
-          )
-        ) : (
-          <>
-            {item.discount && (
+        {tags.length > 0 && (
+          <View style={styles.tagRow}>
+            {tags.map((tag, index) => (
+              <View key={index} style={styles.badge}>
+                <Text style={styles.badgeText}>{tag}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={[styles.infoRow, !showImages && { marginBottom: 0 }]}>
+          <View style={styles.infoItem}>
+            <StarIcon width={16} height={16} style={{ marginRight: 4 }} />
+            <Text style={styles.infoText}>{item.rating}</Text>
+          </View>
+
+          {showDiscountDetail ? (
+            item.discount && (
               <View style={styles.infoItem}>
                 <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
                 <Text style={styles.infoText}>{item.discount}</Text>
               </View>
-            )}
-            <View style={styles.infoItem}>
-              <PinIcon width={20} height={20} style={{ marginRight: 4 }} />
-              <Text style={styles.infoText}>
-                {item.address} {item.distance}
-              </Text>
-            </View>
-          </>
-        )}
-      </View>
+            )
+          ) : (
+            <>
+              {item.discount && (
+                <View style={styles.infoItem}>
+                  <TicketIcon
+                    width={20}
+                    height={20}
+                    style={{ marginRight: 4 }}
+                  />
+                  <Text style={styles.infoText}>{item.discount}</Text>
+                </View>
+              )}
+              <View style={styles.infoItem}>
+                <PinIcon width={20} height={20} style={{ marginRight: 4 }} />
+                <Text style={styles.infoText}>
+                  {item.address} {item.distance}
+                </Text>
+              </View>
+            </>
+          )}
+        </View>
+      </TouchableOpacity>
 
       {showImages && (
         <ScrollView
@@ -111,7 +111,7 @@ const StoreListItem = ({
           ))}
         </ScrollView>
       )}
-    </TouchableOpacity>
+    </View>
   );
 };
 
