@@ -30,11 +30,13 @@ import LikedIcon from '../../../assets/Liked.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 import ShareIcon from '../../../assets/share.svg';
 import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
+import CloseIcon from '../../../assets/icons/common/close.svg';
 
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [modalVisible, setModalVisible] = useState(false);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
   const paramStore = route.params?.store || {};
 
@@ -156,15 +158,32 @@ const StoreDetailScreen = () => {
                     color={theme.colors.primary1}
                   />
                 </TouchableOpacity>
-                <View style={styles.tooltip}>
-                  <Text style={styles.tooltipText}>
-                    아직 이용할 수 있는 제휴가 없는 매장이에요.
-                  </Text>
-                  <Text style={styles.tooltipText}>
-                    학생회에게 제휴를 요청하실래요?
-                  </Text>
-                  <View style={styles.tooltipArrow} />
-                </View>
+                {isTooltipVisible && (
+                  <View style={styles.tooltip}>
+                    <View style={styles.tooltipArrow} />
+
+                    <View style={styles.tooltipTextContainer}>
+                      <Text style={styles.tooltipText}>
+                        아직 이용할 수 있는 제휴가 없는 매장이에요.
+                      </Text>
+                      <Text style={styles.tooltipText}>
+                        학생회에게 제휴를 요청하실래요?
+                      </Text>
+                    </View>
+
+                    <TouchableOpacity
+                      onPress={() => setIsTooltipVisible(false)}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      style={styles.closeButton}
+                    >
+                      <CloseIcon
+                        width={10}
+                        height={10}
+                        color={theme.colors.primary1}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -370,8 +389,9 @@ const styles = StyleSheet.create({
   },
   tooltip: {
     backgroundColor: theme.colors.primary1Light,
-    padding: 8,
-    borderRadius: 25,
+    paddingHorizontal: 12,
+    paddingVertical: 20,
+    borderRadius: 50,
     flex: 1,
     position: 'relative',
   },
