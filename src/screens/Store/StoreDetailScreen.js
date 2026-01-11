@@ -390,16 +390,30 @@ const styles = StyleSheet.create({
   tooltip: {
     backgroundColor: theme.colors.primary1Light,
     paddingHorizontal: 12,
-    paddingVertical: 20,
-    borderRadius: 50,
+    paddingVertical: 12,
+    borderRadius: 20,
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+
     position: 'relative',
   },
-  tooltipText: {
+  tooltipTextContainer: {
+    flex: 1,
     marginLeft: 10,
+    marginRight: 8,
+  },
+
+  tooltipText: {
     ...typography.caption2Regular,
     color: theme.colors.primary1,
   },
+
+  closeButton: {
+    padding: 4,
+  },
+
   tooltipArrow: {
     position: 'absolute',
     left: -6,
@@ -415,7 +429,6 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
     borderRightColor: theme.colors.primary1Light,
   },
-
   detailList: {
     gap: 8,
   },
