@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: 12,
     borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    borderBottomColor: theme.colors.border,
   },
   activeTab: {
     borderBottomColor: theme.colors.primary1,
