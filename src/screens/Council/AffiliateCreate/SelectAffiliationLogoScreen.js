@@ -110,6 +110,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
       endDateTime: dataFromPreviousScreen.endDate.slice(0, 10) + 'T00:00',
       thumbnailIcon: selectedLogo.type,
       imageUrls: finalImages,
+      thumbnailImageUrl: finalImages[0],
     };
     console.log('finalData', finalData);
     let response = await createCouncilPost(finalData, accessToken);

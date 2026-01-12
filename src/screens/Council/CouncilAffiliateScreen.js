@@ -16,7 +16,7 @@ import AffiliationCarousel from '../../components/Affiliation/AffiliationCarouse
 import AffiliationColumnList from '../../components/Affiliation/AffiliationColumnList';
 import WriteEventButton from '../../../assets/WriteEvent.svg';
 import CancelButton from '../../../assets/cancelButton.svg';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import EventSelectIcon from '../../../assets/mdi_event.svg';
 import AffiliateSelectIcon from '../../../assets/supportIcon.svg';
 import CouncilDefaultImage from '../../../assets/councilDefaultImage.png';
@@ -26,13 +26,24 @@ import {
   AFFILIATION_COLUMN_LIST_DATA_AFFILIATION,
   AFFILIATION_COLUMN_LIST_DATA_EVENT,
 } from '../../constants/DummyData';
+import { getCouncilAffiliatePosts } from '../../api/councilAffiliate';
 
 const CouncilAffiliateScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
-  const { user } = useAuthStore();
+  const { user, accessToken } = useAuthStore();
   console.log(user);
+  console.log('accessToken', accessToken);
   const [isWriteEventButtonPressed, setIsWriteEventButtonPressed] =
     useState(false);
+  const [councilAffiliatePosts, setCouncilAffiliatePosts] = useState([]);
+  useEffect(() => {
+    const fetchCouncilAffiliatePosts = async () => {
+      const response = await getCouncilAffiliatePosts(accessToken);
+      console.log('response at fetchCouncilAffiliatePosts', response);
+      setCouncilAffiliatePosts(response.data.data.content);
+    };
+    fetchCouncilAffiliatePosts();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ marginTop: 9.5, width: '100%' }}>
@@ -101,8 +112,9 @@ const CouncilAffiliateScreen = ({ navigation }) => {
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          // data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
+          data={councilAffiliatePosts}
           renderItem={({ item }) => (
             <AffiliationColumnListItem item={item} navigation={navigation} />
           )}

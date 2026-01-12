@@ -22,3 +22,52 @@ export const createCouncilPost = async (data, accessToken) => {
     console.log(error.response);
   }
 };
+
+// 학생회 전용 제휴 게시글 조회 api
+export const getCouncilAffiliatePosts = async (accessToken) => {
+  console.log('accessToken at getCouncilAffiliatePosts', accessToken);
+  try {
+    const response = await api.get('/student-councils/posts', {
+      params: {
+        category: 'PARTNERSHIP',
+        size: 100,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.data.code === 200) {
+      console.log('getCouncilAffiliatePosts success');
+      console.log(response.data);
+      return response;
+    } else {
+      console.log('getCouncilAffiliatePosts error');
+      console.log(response.data);
+    }
+  } catch (error) {
+    console.log('getCouncilAffiliatePosts error');
+    console.log(error.response);
+  }
+};
+
+// 학생회 전용 제휴 게시글 상세 조회 api
+export const getCouncilAffiliatePostDetail = async (postId, accessToken) => {
+  try {
+    const response = await api.get(`/student-councils/posts/${postId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.data.code === 200) {
+      console.log('getCouncilAffiliatePostDetail success');
+      console.log(response.data);
+      return response;
+    } else {
+      console.log('getCouncilAffiliatePostDetail error');
+      console.log(response.data);
+    }
+  } catch (error) {
+    console.log('getCouncilAffiliatePostDetail error');
+    console.log(error.response);
+  }
+};
