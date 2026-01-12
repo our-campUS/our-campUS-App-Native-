@@ -1,5 +1,3 @@
-export const CATEGORIES = ['총학생회', '사회과학대', '정치국제'];
-
 export const BENEFITS_DATA = [
   { id: '1', name: '중앙대 카페', desc: '아메리카노 30% 할인', tag: '인기' },
   { id: '2', name: '블루포트', desc: '모든 음료 10% 할인', tag: '인기' },

@@ -136,7 +136,7 @@ export async function sendUserProfile(schoolId, majorId) {
     if (response.data.code === 200) {
       console.log('✅ Send User Profile Success:', response.data);
       useAuthStore.getState().updateUser({
-        colledgeName: response.data.data.colledgeName,
+        collegeName: response.data.data.collegeName,
         majorName: response.data.data.majorName,
         schoolName: response.data.data.schoolName,
       });

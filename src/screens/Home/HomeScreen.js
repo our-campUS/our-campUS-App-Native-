@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import CurationCarousel from '../../components/home/CurationCarousel';
 import BannerCard from '../../components/common/BannerCard';
 import { CAROUSEL_DATA } from '../../constants/DummyData';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import useAuthStore from '../../store/authStore';
+import { getUserInfo } from '../../api/user';
 
 const HomeSection = ({
   title,
@@ -43,6 +45,25 @@ const HomeSection = ({
 const HomeScreen = () => {
   const [hasNewNotification, setHasNewNotification] = useState(true);
 
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log('유저 정보 로딩');
+      await getUserInfo();
+    };
+
+    fetchData();
+  }, []);
+
+  if (!user) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>로딩 중...</Text>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ScrollView style={styles.container}>
@@ -50,7 +71,7 @@ const HomeScreen = () => {
         <View style={styles.topArea}>
           <View style={styles.header}>
             <View style={styles.headerTopRow}>
-              <Text style={styles.greeting}>사용자님, 안녕하세요</Text>
+              <Text style={styles.greeting}>{user.name}님, 안녕하세요</Text>
 
               <TouchableOpacity
                 activeOpacity={0.7}

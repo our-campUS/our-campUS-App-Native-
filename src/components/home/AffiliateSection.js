@@ -7,31 +7,39 @@ import {
   StyleSheet,
 } from 'react-native';
 import theme from '../../style';
-import { CATEGORIES, BENEFITS_DATA } from '../../constants/DummyData';
+import { BENEFITS_DATA } from '../../constants/DummyData';
+import useAuthStore from '../../store/authStore';
 
 const AffiliateSection = () => {
-  const [selectedCategory, setSelectedCategory] = useState('중앙대');
+  const user = useAuthStore((state) => state.user);
+  const TABS = [
+    { id: 'SCHOOL', label: '총학생회' || '학교' },
+    { id: 'COLLEGE', label: user?.collegeName || '단과대' },
+    { id: 'MAJOR', label: user?.majorName || '학과' },
+  ];
+  const [selectedTabId, setSelectedTabId] = useState(TABS[0].id);
 
   return (
     <View>
       {/* 탭 메뉴 */}
       <View style={styles.tabContainer}>
-        {CATEGORIES.map((cat) => (
+        {TABS.map((tab) => (
           <TouchableOpacity
-            key={cat}
-            onPress={() => setSelectedCategory(cat)}
+            key={tab.id}
+            onPress={() => setSelectedTabId(tab.id)}
             style={[
               styles.tabButton,
-              selectedCategory === cat && styles.activeTab,
+              selectedTabId === tab.id && styles.activeTab,
             ]}
           >
             <Text
               style={[
                 styles.tabText,
-                selectedCategory === cat && styles.activeTabText,
+                selectedTabId === tab.id && styles.activeTabText,
               ]}
+              numberOfLines={1}
             >
-              {cat}
+              {tab.label}
             </Text>
           </TouchableOpacity>
         ))}
