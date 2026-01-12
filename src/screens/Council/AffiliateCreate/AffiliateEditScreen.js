@@ -22,8 +22,11 @@ import Button from '../../../components/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import useFormDraftStore from '../../../store/formDraftStore';
 import { Appearance } from 'react-native';
+import useAuthStore from '../../../store/authStore';
+import { getCouncilAffiliatePostDetail } from '../../../api/councilAffiliate';
 
-const WriteAffiliatePostScreen = ({ navigation, route }) => {
+const AffiliateEditScreen = ({ navigation, route }) => {
+  const { accessToken } = useAuthStore();
   const [placeInfo, setPlaceInfo] = useState(null);
   const colorScheme = Appearance.getColorScheme();
   const eventType = route.params?.type;
@@ -36,16 +39,57 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
+  const [previousPostData, setPreviousPostData] = useState(null);
+  const [previousPostDataId, setPreviousPostDataId] = useState(null);
+  const [isImageUnChanged, setIsImageUnChanged] = useState(true);
 
   useEffect(() => {
-    handleImagePicker();
-  }, []);
+    if (route.params?.item) {
+      console.log('previousPostDataId', route.params?.item.postId);
+      setPreviousPostDataId(route.params?.item.postId);
+    }
+  }, [route.params?.item]);
+
+  //   useEffect(() => {
+  //     handleImagePicker();
+  //   }, []);
   useEffect(() => {
     if (formDraft?.placeInfo) {
       setPlace(formDraft?.placeInfo?.placeName);
       setPlaceInfo(formDraft?.placeInfo);
     }
   }, [formDraft?.placeInfo]);
+
+  useEffect(() => {
+    if (previousPostDataId) {
+      const fetchPreviousPostData = async () => {
+        const response = await getCouncilAffiliatePostDetail(
+          previousPostDataId,
+          accessToken
+        );
+        setPreviousPostData(response.data.data);
+      };
+      fetchPreviousPostData();
+    }
+  }, [previousPostDataId]);
+
+  useEffect(() => {
+    if (previousPostData) {
+      console.log('previousPostData', previousPostData);
+      setTitle(previousPostData?.title);
+      setPlace(previousPostData?.place?.placeName);
+      // 날짜를 로드할 때도 createDateOnly 사용하여 시간대 변환 문제 방지
+      if (previousPostData?.startDate) {
+        setStartDate(createDateOnly(new Date(previousPostData.startDate)));
+      }
+      if (previousPostData?.endDate) {
+        setEndDate(createDateOnly(new Date(previousPostData.endDate)));
+      }
+      setSelectedImages(previousPostData?.images);
+      setPlaceInfo(previousPostData?.place);
+      setIsImageUnChanged(true); // 초기 데이터 로드 시 이미지 변경되지 않음
+    }
+  }, [previousPostData]);
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -67,6 +111,25 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
       setCurrentIndex(viewableItems[0].index || 0);
     }
   }).current;
+
+  //   const checkChanged = () => {
+  //     if (title !== previousPostData?.title) {
+  //       return true;
+  //     }
+  //     if (placeInfo !== previousPostData?.place) {
+  //       return true;
+  //     }
+  //     if (startDate?.slice(0, 10) !== previousPostData?.startDate?.slice(0, 10)) {
+  //       return true;
+  //     }
+  //     if (endDate?.slice(0, 10) !== previousPostData?.endDate?.slice(0, 10)) {
+  //       return true;
+  //     }
+  //     if (!isImageUnChanged) {
+  //       return true;
+  //     }
+  //     return false;
+  //   };
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
@@ -98,6 +161,7 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
 
                 if (response.assets && response.assets.length > 0) {
                   setSelectedImages(response.assets); // 🔥 배열로 저장
+                  setIsImageUnChanged(false); // 이미지 변경됨
                 }
               }
             );
@@ -130,12 +194,26 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
+    if (!previousPostData) {
+      setIsButtonDisabled(true);
+      return;
+    }
+
     if (title && place && startDate && endDate) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
-  }, [title, place, startDate, endDate]);
+  }, [
+    title,
+    place,
+    startDate,
+    endDate,
+    selectedImages,
+    placeInfo,
+    isImageUnChanged,
+    previousPostData,
+  ]);
 
   const handleSubmit = () => {
     if (eventType === 'affiliate') {
@@ -148,10 +226,6 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
         return `${year}-${month}-${day}T00:00:00.000Z`;
       };
 
-      console.log('startDate', startDate);
-      console.log('endDate', endDate);
-      console.log('startDate ISO', formatDateToISO(startDate));
-      console.log('endDate ISO', formatDateToISO(endDate));
       navigation.navigate('SelectAffiliationLogoScreen', {
         type: 'affiliate',
         title: title,
@@ -159,6 +233,10 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
         startDate: formatDateToISO(startDate),
         endDate: formatDateToISO(endDate),
         images: selectedImages,
+        isEdit: true,
+        postId: previousPostDataId,
+        isImageUnChanged: isImageUnChanged,
+        thumbnailIcon: previousPostData?.thumbnailIcon,
       });
     } else {
       // navigation.navigate('PostFinishScreen', { type: 'affiliate' , title, place, startDate, endDate });
@@ -169,13 +247,18 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
     <SafeAreaView style={styles.container} edges={['top']}>
       <LabelTitle
         navigation={navigation}
-        title="제휴 글쓰기"
+        title="제휴 수정"
         useBackButton={true}
         useTitle={true}
         onPressBack={() => {
           navigation.goBack();
           resetFormDraft();
         }}
+        useRightButton={true}
+        onPressRight={() => {
+          handleImagePicker();
+        }}
+        rightButtonText="이미지 변경"
       />
       <View style={{ height: 20 }} />
       <ScrollView
@@ -201,7 +284,9 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
                   />
                 ) : (
                   <Image
-                    source={{ uri: item.uri }}
+                    source={
+                      isImageUnChanged ? { uri: item } : { uri: item.uri }
+                    }
                     style={[styles.detailImage, { width }]}
                   />
                 )}
@@ -290,7 +375,7 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
           <Button
             disabled={isButtonDisabled}
             isOrange={true}
-            title="게시하기"
+            title="수정하기"
             onPress={() => handleSubmit()}
             style={{
               width: '100%',
@@ -605,4 +690,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WriteAffiliatePostScreen;
+export default AffiliateEditScreen;

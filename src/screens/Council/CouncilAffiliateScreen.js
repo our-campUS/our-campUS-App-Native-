@@ -27,23 +27,32 @@ import {
   AFFILIATION_COLUMN_LIST_DATA_EVENT,
 } from '../../constants/DummyData';
 import { getCouncilAffiliatePosts } from '../../api/councilAffiliate';
+import EditPostBottomSheet from '../../components/Council/EditPostBottomSheet';
 
 const CouncilAffiliateScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
   const { user, accessToken } = useAuthStore();
-  console.log(user);
-  console.log('accessToken', accessToken);
+  // console.log(user);
+  // console.log('accessToken', accessToken);
   const [isWriteEventButtonPressed, setIsWriteEventButtonPressed] =
     useState(false);
   const [councilAffiliatePosts, setCouncilAffiliatePosts] = useState([]);
+  const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
+  const [threeDotIconItem, setThreeDotIconItem] = useState(null);
   useEffect(() => {
     const fetchCouncilAffiliatePosts = async () => {
       const response = await getCouncilAffiliatePosts(accessToken);
-      console.log('response at fetchCouncilAffiliatePosts', response);
+      // console.log('response at fetchCouncilAffiliatePosts', response);
       setCouncilAffiliatePosts(response.data.data.content);
     };
     fetchCouncilAffiliatePosts();
   }, []);
+
+  const handleThreeDotIconPress = (item) => {
+    setThreeDotIconItem(item);
+    setIsThreeDotIconPressed(true);
+    console.log('item', item);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ marginTop: 9.5, width: '100%' }}>
@@ -116,7 +125,11 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           // data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
           data={councilAffiliatePosts}
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <AffiliationColumnListItem
+              item={item}
+              navigation={navigation}
+              handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
+            />
           )}
           keyExtractor={(item) => item.id}
         />
@@ -128,7 +141,11 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20 }}
           data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <AffiliationColumnListItem
+              item={item}
+              navigation={navigation}
+              handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
+            />
           )}
           keyExtractor={(item) => item.id}
         />
@@ -184,6 +201,24 @@ const CouncilAffiliateScreen = ({ navigation }) => {
       </Pressable>
       {isWriteEventButtonPressed && (
         <View style={styles.writeEventTypeSelectorBackground} />
+      )}
+      {isThreeDotIconPressed && (
+        <EditPostBottomSheet
+          isVisible={isThreeDotIconPressed}
+          onClose={() => setIsThreeDotIconPressed(false)}
+          onSelectEdit={() => {
+            console.log('onSelectEdit');
+            navigation.navigate('AffiliateEditScreen', {
+              type: 'affiliate',
+              item: threeDotIconItem,
+            });
+            setIsThreeDotIconPressed(false);
+          }}
+          onSelectDelete={() => {
+            console.log('onSelectDelete');
+            setIsThreeDotIconPressed(false);
+          }}
+        />
       )}
     </SafeAreaView>
   );

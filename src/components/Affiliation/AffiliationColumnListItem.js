@@ -9,6 +9,7 @@ import UnlikedIcon from '../../../assets/Unliked.svg';
 import LikedIcon from '../../../assets/Liked.svg';
 import { useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
+import ThreeDotIcon from '../../../assets/threeDot.svg';
 
 const styles = StyleSheet.create({
   container: {
@@ -18,11 +19,19 @@ const styles = StyleSheet.create({
     height: 108,
     backgroundColor: colors.common.white,
     alignItems: 'center',
+    position: 'relative',
     // marginLeft: -10,
     // backgroundColor: 'red',
   },
   content: {
     flexDirection: 'column',
+    // position: 'relative',
+    // backgroundColor: 'red',
+  },
+  threeDotIconContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
   },
   title: {
     ...typography.body3Bold,
@@ -67,13 +76,24 @@ const styles = StyleSheet.create({
   },
 });
 
-const AffiliationColumnListItem = ({ item, navigation }) => {
+const AffiliationColumnListItem = ({
+  item,
+  navigation,
+  handleThreeDotIconPress = null,
+}) => {
   const [endYear, setEndYear] = useState(null);
   const [endMonth, setEndMonth] = useState(null);
   const [endDay, setEndDay] = useState(null);
   const user = useAuthStore((state) => state.user);
   const [liked, setLiked] = useState(item.liked || false);
   const [isLikeIconPressed, setIsLikeIconPressed] = useState(false);
+  const [isCouncil, setIsCouncil] = useState(false);
+  const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
+  useEffect(() => {
+    if (user?.role === 'COUNCIL') {
+      setIsCouncil(true);
+    }
+  }, [user]);
 
   useEffect(() => {
     setEndYear(item?.dateTime?.slice(0, 4));
@@ -103,6 +123,13 @@ const AffiliationColumnListItem = ({ item, navigation }) => {
 
   return (
     <Pressable style={styles.container} onPress={handleItemPress}>
+      <View style={styles.threeDotIconContainer}>
+        {isCouncil && (
+          <Pressable onPress={() => handleThreeDotIconPress?.(item)}>
+            <ThreeDotIcon width={20} height={20} color={colors.gray[300]} />
+          </Pressable>
+        )}
+      </View>
       {item?.thumbnailImageUrl ? (
         <View style={styles.imageContainer}>
           {/* <Image source={item.image} style={styles.image} /> */}

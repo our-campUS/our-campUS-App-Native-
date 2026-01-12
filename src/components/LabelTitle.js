@@ -22,12 +22,24 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
+    marginRight: -10,
   },
   backButton: {
     width: 14,
     height: 28,
     justifySelf: 'flex-start',
     marginRight: 'auto',
+  },
+  rightButton: {
+    position: 'absolute',
+    right: 10,
+    // padding:
+    zIndex: 1,
+    alignItems: 'center',
+  },
+  rightButtonText: {
+    ...typography.body3Regular,
+    color: colors.orange[500],
   },
 });
 
@@ -37,6 +49,9 @@ const LabelTitle = ({
   additionalStyle = null,
   onPressBack,
   useBackButton = false,
+  useRightButton = false,
+  onPressRight = null,
+  rightButtonText = null,
 }) => {
   return (
     <View style={[styles.container, additionalStyle]}>
@@ -59,6 +74,11 @@ const LabelTitle = ({
       <Text style={styles.title} pointerEvents="none">
         {title}
       </Text>
+      {useRightButton && (
+        <Pressable onPress={onPressRight} style={styles.rightButton}>
+          <Text style={styles.rightButtonText}>{rightButtonText}</Text>
+        </Pressable>
+      )}
     </View>
   );
 };

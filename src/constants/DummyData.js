@@ -429,4 +429,22 @@ export const AFFILIATION_PLACE_DATA = [
     ],
     // distance: '0.0km', // 임의 추가 (서버 연동 x)
   },
+  {
+    placeName: '에이바우트커피 망포점',
+    placeKey:
+      '0d7099a10998434976388817a2249c03a1e844132ddcb5c152be1b774d4b8003',
+    address: '경기도 수원시 영통구 망포동 570-5',
+    category: '음식점>카페,디저트>카페',
+    link: 'https://map.naver.com/v5/search/%EC%97%90%EC%9D%B4%EB%B0%94%EC%9A%B0%ED%8A%B8%EC%BB%A4%ED%94%BC+%EB%A7%9D%ED%8F%AC%EC%A0%90?c=37.237535,127.058129,15,0,0,0,dh',
+    telephone: '',
+    coordinate: {
+      latitude: 37.2375354,
+      longitude: 127.0581285,
+    },
+    imgUrls: [
+      'https://objectstorage.ap-chuncheon-1.oraclecloud.com/n/ax3xfkknvnm8/b/campus/o/places%2Ffe164c57-71e8-41a3-9b0c-0b3d4e097f1f.jpg',
+      'https://objectstorage.ap-chuncheon-1.oraclecloud.com/n/ax3xfkknvnm8/b/campus/o/places%2F1871ae17-6008-4a6c-8d2e-faf24d8543d6.jpg',
+      'https://objectstorage.ap-chuncheon-1.oraclecloud.com/n/ax3xfkknvnm8/b/campus/o/places%2Fd2875ccf-7600-4421-90a1-c5ebf7bf8a6a.jpg',
+    ],
+  },
 ];
