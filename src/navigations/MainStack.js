@@ -3,8 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import MainTab from '../components/MainTab';
 import CouncilMainTab from '../components/CouncilMainTab';
-import MapSearchScreen from '../screens/Map/MapSearchScreen';
-import MapSearchResultScreen from '../screens/Map/MapSearchResultScreen';
+
 import StoreDetailScreen from '../screens/Store/StoreDetailScreen';
 import ReviewListScreen from '../screens/Store/ReviewListScreen';
 import CameraScanScreen from '../screens/Store/ScanScreen';
@@ -28,11 +27,6 @@ const MainStack = () => {
         <Stack.Screen name="MainTab" component={MainTab} />
       )}
 
-      <Stack.Screen name="MapSearchScreen" component={MapSearchScreen} />
-      <Stack.Screen
-        name="MapSearchResultScreen"
-        component={MapSearchResultScreen}
-      />
       <Stack.Screen name="StoreDetailScreen" component={StoreDetailScreen} />
       <Stack.Screen
         name="ReviewListScreen"

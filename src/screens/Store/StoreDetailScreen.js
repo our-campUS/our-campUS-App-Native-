@@ -27,12 +27,16 @@ import ClockIcon from '../../../assets/icons/common/clock.svg';
 import RatingIcon from '../../../assets/icons/rating.svg';
 
 import LikedIcon from '../../../assets/Liked.svg';
+import UnlikedIcon from '../../../assets/Unliked.svg';
 import ShareIcon from '../../../assets/share.svg';
+import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
+import CloseIcon from '../../../assets/icons/common/close.svg';
 
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [modalVisible, setModalVisible] = useState(false);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
   const paramStore = route.params?.store || {};
 
@@ -114,11 +118,7 @@ const StoreDetailScreen = () => {
                         color={theme.colors.primary2}
                       />
                     ) : (
-                      <LikedIcon
-                        width={16}
-                        height={15}
-                        color={colors.gray[400]}
-                      />
+                      <UnlikedIcon width={16} height={15} />
                     )}
                   </View>
                 </TouchableOpacity>
@@ -139,28 +139,51 @@ const StoreDetailScreen = () => {
               <View style={styles.partnerTagRow}>
                 {storeData.partnerTags?.map((tag, index) => (
                   <TouchableOpacity key={index} style={styles.partnerTag}>
-                    <Text style={styles.partnerTagText}>
-                      {tag} {'>'}
-                    </Text>
+                    <Text style={styles.partnerTagText}>{tag}</Text>
+                    <ArrowRightIcon
+                      width={8}
+                      height={8}
+                      color={theme.colors.primary1}
+                    />
                   </TouchableOpacity>
                 ))}
               </View>
             ) : (
               <View style={styles.nonPartnerRow}>
                 <TouchableOpacity style={styles.requestButton}>
-                  <Text style={styles.requestButtonText}>
-                    제휴 요청하기 {'>'}
-                  </Text>
+                  <Text style={styles.requestButtonText}>제휴 요청하기</Text>
+                  <ArrowRightIcon
+                    width={8}
+                    height={8}
+                    color={theme.colors.primary1}
+                  />
                 </TouchableOpacity>
-                <View style={styles.tooltip}>
-                  <Text style={styles.tooltipText}>
-                    아직 이용할 수 있는 제휴가 없는 매장이에요.
-                  </Text>
-                  <Text style={styles.tooltipText}>
-                    학생회에게 제휴를 요청하실래요?
-                  </Text>
-                  <View style={styles.tooltipArrow} />
-                </View>
+                {isTooltipVisible && (
+                  <View style={styles.tooltip}>
+                    <View style={styles.tooltipArrow} />
+
+                    <View style={styles.tooltipTextContainer}>
+                      <Text style={styles.tooltipText}>
+                        아직 이용할 수 있는 제휴가 없는 매장이에요.
+                      </Text>
+                      <Text style={styles.tooltipText}>
+                        학생회에게 제휴를 요청하실래요?
+                      </Text>
+                    </View>
+
+                    <TouchableOpacity
+                      onPress={() => setIsTooltipVisible(false)}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      style={styles.closeButton}
+                    >
+                      <CloseIcon
+                        width={10}
+                        height={10}
+                        color={theme.colors.primary1}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -326,14 +349,18 @@ const styles = StyleSheet.create({
   partnerTagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginVertical: 16,
+    marginVertical: 10,
   },
   partnerTag: {
-    backgroundColor: theme.colors.primary1Light,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderColor: colors.blue[600],
+    borderWidth: 0.8,
+    borderRadius: 36,
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   partnerTagText: {
     color: theme.colors.primary1,
@@ -352,6 +379,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 6,
     marginRight: 21,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   requestButtonText: {
     color: theme.colors.primary1,
@@ -359,16 +389,31 @@ const styles = StyleSheet.create({
   },
   tooltip: {
     backgroundColor: theme.colors.primary1Light,
-    padding: 8,
-    borderRadius: 25,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 20,
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+
     position: 'relative',
   },
-  tooltipText: {
+  tooltipTextContainer: {
+    flex: 1,
     marginLeft: 10,
+    marginRight: 8,
+  },
+
+  tooltipText: {
     ...typography.caption2Regular,
     color: theme.colors.primary1,
   },
+
+  closeButton: {
+    padding: 4,
+  },
+
   tooltipArrow: {
     position: 'absolute',
     left: -6,
@@ -384,7 +429,6 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
     borderRightColor: theme.colors.primary1Light,
   },
-
   detailList: {
     gap: 8,
   },

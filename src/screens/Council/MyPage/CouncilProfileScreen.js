@@ -91,21 +91,21 @@ const CouncilProfileScreen = ({ navigation, route }) => {
             onPress={() => navigation.navigate('CouncilChangePasswordEmail')}
           >
             <Text style={styles.profileInfoItemTitle}>비밀번호 변경</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
           <Pressable
             style={styles.profileInfoItem}
             onPress={() => setIsLogoutModalVisible(true)}
           >
             <Text style={styles.profileInfoItemTitle}>로그아웃</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
           <Pressable
             style={styles.profileInfoItem}
             onPress={() => navigation.navigate('CouncilCancelMembershipScreen')}
           >
             <Text style={styles.profileInfoItemTitle}>탈퇴하기</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
         </View>
       </SafeAreaView>

@@ -71,14 +71,14 @@ const MyPageDefaultScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('AnnouncementScreen')}
           >
             <Text style={styles.customerServiceItemText}>공지사항</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
           <Pressable
             style={styles.customerServiceItem}
             onPress={() => navigation.navigate('InqueryMainScreen')}
           >
             <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
-            <ArrowRightIcon width={10} height={10} />
+            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
         </View>
       </View>

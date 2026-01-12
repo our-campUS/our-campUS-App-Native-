@@ -10,6 +10,7 @@ const RecommendSection = () => {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingHorizontal: 20 }}
         renderItem={({ item }) => <StoreCard {...item} />}
       />
     </View>

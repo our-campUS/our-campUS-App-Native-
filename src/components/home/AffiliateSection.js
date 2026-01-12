@@ -69,12 +69,13 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     marginBottom: 12,
+    paddingTop: 4,
   },
   tabButton: {
     flex: 1,
     paddingBottom: 12,
     borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    borderBottomColor: theme.colors.border,
   },
   activeTab: {
     borderBottomColor: theme.colors.primary1,

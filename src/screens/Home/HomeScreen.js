@@ -17,7 +17,12 @@ import BannerCard from '../../components/common/BannerCard';
 import { CAROUSEL_DATA } from '../../constants/DummyData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const HomeSection = ({ title, children, hasDivider = false }) => {
+const HomeSection = ({
+  title,
+  children,
+  hasDivider = false,
+  fullWidthContent = false, // ★ 추가: 컨텐츠를 화면 꽉 차게 쓸지 여부
+}) => {
   return (
     <View style={styles.sectionContainer}>
       {hasDivider && <View style={styles.divider} />}
@@ -28,7 +33,9 @@ const HomeSection = ({ title, children, hasDivider = false }) => {
         </View>
       )}
 
-      {children}
+      <View style={fullWidthContent ? {} : styles.contentPadding}>
+        {children}
+      </View>
     </View>
   );
 };
@@ -87,12 +94,17 @@ const HomeScreen = () => {
         <HomeSection
           title="🚀 3시간 공강, 이런 공간은 어때요?"
           hasDivider={true}
+          fullWidthContent={true}
         >
           <RecommendSection />
         </HomeSection>
 
         {/* 큐레이션 */}
-        <HomeSection title="💕 추천 큐레이션" hasDivider={true}>
+        <HomeSection
+          title="💕 추천 큐레이션"
+          hasDivider={true}
+          fullWidthContent={true}
+        >
           <CurationCarousel />
         </HomeSection>
 
@@ -100,7 +112,7 @@ const HomeScreen = () => {
           <View>
             <BannerCard
               title="좋은 제휴 아이디어 공유해주실래요?"
-              subtitle="원하는 제휴 혜택을 학생회에게 직접 제안해요."
+              subtitle="원하는 제휴 혜택을 학생회에게 직접 제안해요"
               onPress={() => console.log('제안하기 클릭')}
             />
             <BannerCard
@@ -167,21 +179,27 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
+  sectionTitle: {
+    ...theme.typography.heading4,
+  },
+
   sectionContainer: {
     marginBottom: 30,
+  },
+
+  sectionHeader: {
+    marginBottom: 20,
     paddingHorizontal: 20,
   },
+
+  contentPadding: {
+    paddingHorizontal: 20,
+  },
+
   divider: {
     height: 8,
     backgroundColor: colors.gray[100],
     marginBottom: 24,
-    marginHorizontal: -20,
-  },
-  sectionHeader: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    ...theme.typography.heading4,
   },
 });
 
