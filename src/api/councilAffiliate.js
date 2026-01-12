@@ -97,3 +97,26 @@ export const EditCouncilPost = async (data, accessToken, postId) => {
     console.log(error.response);
   }
 };
+
+// 학생회 전용 제휴 게시글 삭제 api
+export const deleteCouncilPost = async (postId, accessToken) => {
+  console.log('postId at deleteCouncilPost', postId);
+  try {
+    const response = await api.delete(`/student-councils/posts/${postId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.data.code === 200) {
+      console.log('deleteCouncilPost success');
+      console.log(response.data);
+      // return response;
+    } else {
+      console.log('deleteCouncilPost error');
+      console.log(response.data);
+    }
+  } catch (error) {
+    console.log('deleteCouncilPost error');
+    console.log(error.response);
+  }
+};

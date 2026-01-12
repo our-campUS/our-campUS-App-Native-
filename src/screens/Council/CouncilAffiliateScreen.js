@@ -16,7 +16,8 @@ import AffiliationCarousel from '../../components/Affiliation/AffiliationCarouse
 import AffiliationColumnList from '../../components/Affiliation/AffiliationColumnList';
 import WriteEventButton from '../../../assets/WriteEvent.svg';
 import CancelButton from '../../../assets/cancelButton.svg';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import EventSelectIcon from '../../../assets/mdi_event.svg';
 import AffiliateSelectIcon from '../../../assets/supportIcon.svg';
 import CouncilDefaultImage from '../../../assets/councilDefaultImage.png';
@@ -26,7 +27,10 @@ import {
   AFFILIATION_COLUMN_LIST_DATA_AFFILIATION,
   AFFILIATION_COLUMN_LIST_DATA_EVENT,
 } from '../../constants/DummyData';
-import { getCouncilAffiliatePosts } from '../../api/councilAffiliate';
+import {
+  getCouncilAffiliatePosts,
+  deleteCouncilPost,
+} from '../../api/councilAffiliate';
 import EditPostBottomSheet from '../../components/Council/EditPostBottomSheet';
 
 const CouncilAffiliateScreen = ({ navigation }) => {
@@ -39,14 +43,24 @@ const CouncilAffiliateScreen = ({ navigation }) => {
   const [councilAffiliatePosts, setCouncilAffiliatePosts] = useState([]);
   const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
   const [threeDotIconItem, setThreeDotIconItem] = useState(null);
+
+  // 데이터를 불러오는 함수
+  const fetchCouncilAffiliatePosts = useCallback(async () => {
+    const response = await getCouncilAffiliatePosts(accessToken);
+    // console.log('response at fetchCouncilAffiliatePosts', response);
+    setCouncilAffiliatePosts(response.data.data.content);
+  }, [accessToken]);
+
   useEffect(() => {
-    const fetchCouncilAffiliatePosts = async () => {
-      const response = await getCouncilAffiliatePosts(accessToken);
-      // console.log('response at fetchCouncilAffiliatePosts', response);
-      setCouncilAffiliatePosts(response.data.data.content);
-    };
     fetchCouncilAffiliatePosts();
-  }, []);
+  }, [fetchCouncilAffiliatePosts]);
+
+  // 화면이 포커스될 때마다 데이터를 다시 불러오기
+  useFocusEffect(
+    useCallback(() => {
+      fetchCouncilAffiliatePosts();
+    }, [fetchCouncilAffiliatePosts])
+  );
 
   const handleThreeDotIconPress = (item) => {
     setThreeDotIconItem(item);
@@ -214,9 +228,16 @@ const CouncilAffiliateScreen = ({ navigation }) => {
             });
             setIsThreeDotIconPressed(false);
           }}
-          onSelectDelete={() => {
+          onSelectDelete={async () => {
             console.log('onSelectDelete');
             setIsThreeDotIconPressed(false);
+            const response = await deleteCouncilPost(
+              threeDotIconItem.postId,
+              accessToken
+            );
+            console.log('response at onSelectDelete', response);
+            // 데이터를 다시 불러오기
+            await fetchCouncilAffiliatePosts();
           }}
         />
       )}
