@@ -120,3 +120,28 @@ export const deleteCouncilPost = async (postId, accessToken) => {
     console.log(error.response);
   }
 };
+
+// 제휴 게시글 장소 검색 api
+export const searchCouncilAffiliatePlace = async (keyword, accessToken) => {
+  try {
+    const response = await api.get('places/search/keyword', {
+      params: {
+        keyword: keyword,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.data.code === 200) {
+      console.log('searchCouncilAffiliatePlace success');
+      console.log(response.data);
+      return response;
+    } else {
+      console.log('searchCouncilAffiliatePlace error');
+      console.log(response.data);
+    }
+  } catch (error) {
+    console.log('searchCouncilAffiliatePlace error');
+    console.log(error.response);
+  }
+};

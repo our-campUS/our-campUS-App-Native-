@@ -19,13 +19,26 @@ import {
 } from '../../../constants/DummyData';
 import AffiliatePlaceItem from '../../../components/Council/AffiliatePlaceItem';
 import useFormDraftStore from '../../../store/formDraftStore';
+import MagnifyingGlass from '../../../../assets/input-tool.svg';
+import { searchCouncilAffiliatePlace } from '../../../api/councilAffiliate';
+import useAuthStore from '../../../store/authStore';
 
 const SelectPlaceAffiliateScreen = ({ navigation }) => {
-  const [affiliationPlaceData, setAffiliationPlaceData] = useState(
-    AFFILIATION_PLACE_DATA
-  );
+  const [affiliationPlaceData, setAffiliationPlaceData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const { setFormDraft } = useFormDraftStore();
+  const { accessToken } = useAuthStore();
+
+  const handleSearch = async () => {
+    console.log('handleSearch');
+    const response = await searchCouncilAffiliatePlace(
+      searchQuery,
+      accessToken
+    );
+    console.log('response at handleSearch', response);
+    setAffiliationPlaceData(response.data.data);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.searchBarWrapper}>
@@ -46,11 +59,8 @@ const SelectPlaceAffiliateScreen = ({ navigation }) => {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          <Pressable
-            style={styles.cancelButton}
-            onPress={() => setSearchQuery('')}
-          >
-            <CancelIcon width={20} height={20} />
+          <Pressable style={styles.cancelButton} onPress={handleSearch}>
+            <MagnifyingGlass width={20} height={20} />
           </Pressable>
         </View>
       </View>
