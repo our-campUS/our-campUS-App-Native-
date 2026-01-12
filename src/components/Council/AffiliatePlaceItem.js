@@ -10,7 +10,8 @@ const AffiliatePlaceItem = ({ item, onPress }) => {
       <View style={styles.content}>
         <Text style={styles.placeName}>{item.placeName}</Text>
         <View style={styles.placeAddressWrapper}>
-          <Text style={styles.placeAddress}>{item.placeAddress}</Text>
+          {/* <Text style={styles.placeAddress}>{item.placeAddress}</Text> */}
+          <Text style={styles.placeAddress}>{item.address}</Text>
           <Text style={styles.distance}>{item.distance}</Text>
         </View>
       </View>

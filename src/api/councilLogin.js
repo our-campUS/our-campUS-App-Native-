@@ -8,8 +8,8 @@ export async function councilLogin(data) {
     const response = await api.post('/auth/council/login', data);
     if (response.data.code === 200) {
       console.log('성공 시 response', response);
-      const accessToken = response.data.accessToken;
-      const refreshToken = response.data.refreshToken;
+      const accessToken = response.data.data.accessToken;
+      const refreshToken = response.data.data.refreshToken;
       const user = {
         role: 'COUNCIL',
         councilName: response.data.data.councilName,

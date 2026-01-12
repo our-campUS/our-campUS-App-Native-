@@ -1,20 +1,36 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Alert } from 'react-native';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../../../components/LabelTitle';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '../../../components/Button';
 import ChooseLogoBottomSheet from '../../../components/Council/ChooseLogoBottomSheet';
 import useImagePicker from '../../../hooks/useImagePicker';
+import {
+  convertToPng,
+  getCouncilImagePresignedUrl,
+  uploadImageToPresignedUrl,
+} from '../../../api/uploadImage';
+import useAuthStore from '../../../store/authStore';
+import { createCouncilPost } from '../../../api/councilAffiliate';
+import Toast from 'react-native-toast-message';
 
 const SelectAffiliationLogoScreen = ({ navigation, route }) => {
+  const accessToken = useAuthStore((state) => state?.accessToken);
   const [selectedLogo, setSelectedLogo] = useState(null);
   const [selectedLogoType, setSelectedLogoType] = useState(null);
   const isButtonDisabled = !selectedLogo;
   const [isChooseLogoBottomSheetVisible, setIsChooseLogoBottomSheetVisible] =
     useState(false);
   console.log(route.params);
+  const [dataFromPreviousScreen, setDataFromPreviousScreen] = useState(null);
+  useEffect(() => {
+    if (route.params) {
+      setDataFromPreviousScreen(route.params);
+      console.log('dataFromPreviousScreen', dataFromPreviousScreen);
+    }
+  }, [route.params]);
 
   const { pickImage } = useImagePicker({
     onSelectImages: (images) => {
@@ -34,6 +50,88 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     } else {
       setSelectedLogo(logo);
       setSelectedLogoType(logo.type);
+    }
+  };
+
+  const handleImagesBeforeSubmit = async () => {
+    console.log('handleImagesBeforeSubmit');
+    const images = route.params?.images || [];
+    if (images.length === 0) {
+      return [];
+    }
+    console.log('images', images);
+    const pngConvertedImages = await Promise.all(
+      images.map(async (image) => {
+        const convertedResult = convertToPng(image);
+        console.log('convertedResult', convertedResult);
+        return convertedResult;
+      })
+    );
+    console.log('pngConvertedImages', pngConvertedImages);
+    const presignedUrls = await Promise.all(
+      pngConvertedImages.map(async (image) => {
+        const { uploadUrl, imageUrl } = await getCouncilImagePresignedUrl(
+          image,
+          accessToken
+        );
+        return { uploadUrl, imageUrl, image: image };
+      })
+    );
+    console.log('presignedUrls', presignedUrls);
+    await Promise.all(
+      presignedUrls.map(async (presignedUrl) => {
+        await uploadImageToPresignedUrl(
+          presignedUrl.uploadUrl,
+          presignedUrl.image
+        );
+      })
+    );
+    if (
+      presignedUrls.some((presignedUrl) => presignedUrl.isSuccess === false)
+    ) {
+      Alert.alert('이미지 업로드에 실패했습니다.', '다시 시도해주세요.');
+      return;
+    }
+    return presignedUrls.map((presignedUrl) => presignedUrl.imageUrl);
+  };
+
+  const handleSubmit = async () => {
+    console.log('accessToken', accessToken);
+    console.log('handleSubmit');
+    console.log('dataFromPreviousScreen', dataFromPreviousScreen);
+    const finalImages = await handleImagesBeforeSubmit();
+    let finalData = {
+      category:
+        dataFromPreviousScreen.type === 'affiliate' ? 'PARTNERSHIP' : 'EVENT',
+      place: dataFromPreviousScreen.placeInfo,
+      title: dataFromPreviousScreen.title,
+      content: dataFromPreviousScreen.content || '내용없음',
+      startDateTime: dataFromPreviousScreen.startDate.slice(0, 10) + 'T00:00',
+      endDateTime: dataFromPreviousScreen.endDate.slice(0, 10) + 'T00:00',
+      thumbnailIcon: selectedLogo.type,
+      imageUrls: finalImages,
+    };
+    console.log('finalData', finalData);
+    let response = await createCouncilPost(finalData, accessToken);
+    console.log('response at handleSubmit', response);
+    if (response.data.code === 201) {
+      Toast.show({
+        type: 'success',
+        text1: '제휴 글쓰기 성공',
+        text2: '제휴 글이 성공적으로 등록되었습니다.',
+        position: 'top',
+        topOffset: 100,
+        visibilityTime: 1000,
+        autoHide: true,
+      });
+      setTimeout(() => {
+        navigation?.reset({
+          index: 0,
+          routes: [{ name: 'CouncilAffiliateScreen' }],
+        });
+      }, 1000);
+    } else {
+      Alert.alert(result.message);
     }
   };
 
@@ -64,7 +162,9 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
             />
           </View>
           <View style={styles.previewInfoContainer}>
-            <Text style={styles.previewPlaceName}>{route.params.place}</Text>
+            <Text style={styles.previewPlaceName}>
+              {route.params.placeInfo?.placeName}
+            </Text>
             <Text style={styles.previewTitle}>{route.params.title}</Text>
           </View>
         </View>
@@ -89,9 +189,10 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
             borderRadius: 10,
             marginTop: 'auto',
           }}
-          // onPress={() => navigation.navigate('SelectAffiliationLogoScreen')}
+          onPress={() => handleSubmit()}
         />
       </View>
+      <Toast />
       <ChooseLogoBottomSheet
         isVisible={isChooseLogoBottomSheetVisible}
         onClose={() => setIsChooseLogoBottomSheetVisible(false)}

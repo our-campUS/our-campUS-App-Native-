@@ -13,11 +13,17 @@ import typography from '../../../style/typography';
 import BackIcon from '../../../../assets/back.svg';
 import CancelIcon from '../../../../assets/proicons_cancel.svg';
 import { useState } from 'react';
-import { AFFILIATION_PLACE_SEARCH_DATA } from '../../../constants/DummyData';
+import {
+  AFFILIATION_PLACE_SEARCH_DATA,
+  AFFILIATION_PLACE_DATA,
+} from '../../../constants/DummyData';
 import AffiliatePlaceItem from '../../../components/Council/AffiliatePlaceItem';
 import useFormDraftStore from '../../../store/formDraftStore';
 
 const SelectPlaceAffiliateScreen = ({ navigation }) => {
+  const [affiliationPlaceData, setAffiliationPlaceData] = useState(
+    AFFILIATION_PLACE_DATA
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const { setFormDraft } = useFormDraftStore();
   return (
@@ -49,12 +55,13 @@ const SelectPlaceAffiliateScreen = ({ navigation }) => {
         </View>
       </View>
       <FlatList
-        data={AFFILIATION_PLACE_SEARCH_DATA}
+        // data={AFFILIATION_PLACE_SEARCH_DATA}
+        data={affiliationPlaceData}
         renderItem={({ item }) => (
           <AffiliatePlaceItem
             item={item}
             onPress={() => {
-              setFormDraft({ place: item.placeName });
+              setFormDraft({ placeInfo: item });
               navigation.goBack();
             }}
           />

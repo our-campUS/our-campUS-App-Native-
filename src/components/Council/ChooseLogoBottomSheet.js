@@ -47,7 +47,7 @@ const LOGO_CATEGORIES = [
     id: 6,
     name: '운동시설',
     image: require('../../../assets/gymLogo.png'),
-    type: 'GYM',
+    type: 'SPORTS',
   },
   {
     id: 7,

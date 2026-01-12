@@ -24,6 +24,7 @@ import useFormDraftStore from '../../../store/formDraftStore';
 import { Appearance } from 'react-native';
 
 const WriteAffiliatePostScreen = ({ navigation, route }) => {
+  const [placeInfo, setPlaceInfo] = useState(null);
   const colorScheme = Appearance.getColorScheme();
   const eventType = route.params?.type;
   const { formDraft, resetFormDraft } = useFormDraftStore();
@@ -40,10 +41,11 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
     handleImagePicker();
   }, []);
   useEffect(() => {
-    if (formDraft?.place) {
-      setPlace(formDraft.place);
+    if (formDraft?.placeInfo) {
+      setPlace(formDraft?.placeInfo?.placeName);
+      setPlaceInfo(formDraft?.placeInfo);
     }
-  }, [formDraft?.place]);
+  }, [formDraft?.placeInfo]);
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -131,7 +133,7 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
       navigation.navigate('SelectAffiliationLogoScreen', {
         type: 'affiliate',
         title: title,
-        place: place,
+        placeInfo: placeInfo,
         startDate: startDate ? startDate.toISOString() : null,
         endDate: endDate ? endDate.toISOString() : null,
         images: selectedImages,
