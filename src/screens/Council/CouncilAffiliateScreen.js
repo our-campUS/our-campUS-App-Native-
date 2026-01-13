@@ -31,8 +31,10 @@ import {
   getCouncilAffiliatePosts,
   deleteCouncilPost,
   getCouncilEventPosts,
+  getAvailableEvents,
 } from '../../api/councilAffiliate';
 import EditPostBottomSheet from '../../components/Council/EditPostBottomSheet';
+import useFormDraftStore from '../../store/formDraftStore';
 
 const CouncilAffiliateScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
@@ -45,7 +47,8 @@ const CouncilAffiliateScreen = ({ navigation }) => {
   const [councilEventPosts, setCouncilEventPosts] = useState([]);
   const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
   const [threeDotIconItem, setThreeDotIconItem] = useState(null);
-
+  const [availabeEvents, setAvailabeEvents] = useState([]);
+  const { formDraft, resetFormDraft } = useFormDraftStore();
   // 데이터를 불러오는 함수
   const fetchCouncilAffiliatePosts = useCallback(async () => {
     const response = await getCouncilAffiliatePosts(accessToken);
@@ -54,6 +57,9 @@ const CouncilAffiliateScreen = ({ navigation }) => {
 
     const responseEvent = await getCouncilEventPosts(accessToken);
     setCouncilEventPosts(responseEvent.data.data.content);
+
+    const responseAvailableEvents = await getAvailableEvents(accessToken);
+    setAvailabeEvents(responseAvailableEvents.data.data.content);
   }, [accessToken]);
 
   useEffect(() => {
@@ -94,7 +100,13 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           </View>
         </View>
       </View>
-      <AffiliationCarousel isOrange={true} />
+      {availabeEvents.length > 0 && (
+        <AffiliationCarousel
+          isOrange={true}
+          data={availabeEvents}
+          navigation={navigation}
+        />
+      )}
 
       <View style={styles.activityTypeSelector}>
         <Pressable
@@ -178,6 +190,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
             style={styles.writeEventTypeSelectorItem}
             onPress={() => {
               setIsWriteEventButtonPressed(false);
+              resetFormDraft();
               navigation.navigate('WriteAffiliatePostScreen', {
                 type: 'affiliate',
               });
@@ -194,6 +207,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
             style={styles.writeEventTypeSelectorItem}
             onPress={() => {
               setIsWriteEventButtonPressed(false);
+              resetFormDraft();
               navigation.navigate('WriteEventPostScreen', {
                 type: 'event',
               });

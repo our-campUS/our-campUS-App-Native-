@@ -172,3 +172,28 @@ export const searchCouncilAffiliatePlace = async (keyword, accessToken) => {
     console.log(error.response);
   }
 };
+
+// 학생회 전용 72시간 내에 다가오는 행사 조회 api
+export const getAvailableEvents = async (accessToken) => {
+  try {
+    const response = await api.get('/student-councils/posts/events/upcoming', {
+      params: {
+        size: 100,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.data.code === 200) {
+      console.log('getAvailableEvents success');
+      console.log(response.data);
+      return response;
+    } else {
+      console.log('getAvailableEvents error');
+      console.log(response.data);
+    }
+  } catch (error) {
+    console.log('getAvailableEvents error');
+    console.log(error.response);
+  }
+};

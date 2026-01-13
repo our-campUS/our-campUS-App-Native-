@@ -76,7 +76,7 @@ const SelectPlaceAffiliateScreen = ({ navigation }) => {
             }}
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.placeKey}
         contentContainerStyle={styles.flatListContent}
       />
     </SafeAreaView>
