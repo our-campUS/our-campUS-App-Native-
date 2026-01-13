@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Alert,
+} from 'react-native';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import LabelTitle from '../../components/LabelTitle';
@@ -8,8 +15,50 @@ import CheckIcon from '../../../assets/check.svg';
 import { useState } from 'react';
 import Button from '../../components/Button';
 
+import useAuthStore from '../../store/authStore';
+import { withdrawUser } from '../../api/user';
+
 const CancelMembershipScreen = ({ navigation }) => {
   const [isChecked, setIsChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleWithdraw = async () => {
+    if (!user?.name) {
+      Alert.alert('오류', '유저 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const isSuccess = await withdrawUser(user.name);
+
+      if (isSuccess) {
+        Alert.alert('알림', '회원 탈퇴가 완료되었습니다.', [
+          {
+            text: '확인',
+            onPress: () => {
+              logout();
+            },
+          },
+        ]);
+      } else {
+        Alert.alert(
+          '실패',
+          '회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.'
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('오류', '알 수 없는 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
@@ -43,7 +92,7 @@ const CancelMembershipScreen = ({ navigation }) => {
             <View style={styles.noticeItem}>
               <Text style={styles.noticeItemBullet}>•</Text>
               <Text style={styles.noticeItemText}>
-                탈퇴 즉시 00일 이내에는 동일 계정으로 다시 가입할 수 없습니다.
+                탈퇴 즉시 7일 이내에는 동일 계정으로 다시 가입할 수 없습니다.
               </Text>
             </View>
             <View style={styles.noticeItem}>
@@ -71,11 +120,9 @@ const CancelMembershipScreen = ({ navigation }) => {
         </View>
         <View style={styles.buttonWrapper}>
           <Button
-            title="탈퇴하기"
-            onPress={() => {
-              navigation.goBack();
-            }}
-            disabled={!isChecked}
+            title={isLoading ? '처리 중...' : '탈퇴하기'}
+            onPress={handleWithdraw}
+            disabled={!isChecked || isLoading}
             style={{
               width: '100%',
               height: 50,
@@ -83,7 +130,8 @@ const CancelMembershipScreen = ({ navigation }) => {
               paddingVertical: 15,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.blue[400],
+              backgroundColor:
+                !isChecked || isLoading ? colors.gray[400] : colors.blue[400],
               borderRadius: 10,
             }}
           />

@@ -33,3 +33,33 @@ export async function getUserInfo() {
     return false;
   }
 }
+
+// 유저 탈퇴 (PATCH /auth/withdraw/users)
+export const withdrawUser = async (nickname) => {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+
+    const response = await api.patch(
+      '/auth/withdraw/users',
+      {
+        nickname: nickname,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (response.data.code === 200 || response.data.code === 0) {
+      console.log('회원탈퇴 성공:', response.data);
+      return true;
+    }
+
+    console.error('회원탈퇴 실패:', response.data);
+    return false;
+  } catch (error) {
+    console.error('회원탈퇴 에러:', error);
+    return false;
+  }
+};
