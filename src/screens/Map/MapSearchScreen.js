@@ -117,8 +117,8 @@ const MapSearchScreen = () => {
                 <TouchableOpacity key={cat.id} style={styles.categoryChip}>
                   <View>
                     <cat.IconComponent
-                      width={16}
-                      height={16}
+                      width={20}
+                      height={20}
                       color={theme.colors.textDim}
                     />
                   </View>
