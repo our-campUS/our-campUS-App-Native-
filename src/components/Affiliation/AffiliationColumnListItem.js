@@ -51,6 +51,12 @@ const styles = StyleSheet.create({
     color: colors.gray[700],
     marginTop: -4,
   },
+  detailedLocation: {
+    ...typography.body4Regular,
+    color: colors.gray[700],
+    marginLeft: -4,
+    marginTop: -4,
+  },
   date: {
     ...typography.body4Regular,
     color: colors.gray[700],
@@ -89,6 +95,8 @@ const AffiliationColumnListItem = ({
   const [isLikeIconPressed, setIsLikeIconPressed] = useState(false);
   const [isCouncil, setIsCouncil] = useState(false);
   const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
+  const [startHour, setStartHour] = useState(null);
+  const [startMinute, setStartMinute] = useState(null);
   useEffect(() => {
     if (user?.role === 'COUNCIL') {
       setIsCouncil(true);
@@ -102,6 +110,10 @@ const AffiliationColumnListItem = ({
       setEndMonth(item?.dateTime?.slice(6, 7));
     }
     setEndDay(item?.dateTime?.slice(8, 10));
+    if (item?.category === 'EVENT') {
+      setStartHour(item?.dateTime?.slice(11, 13));
+      setStartMinute(item?.dateTime?.slice(14, 16));
+    }
   }, [item]);
 
   const handleLikePress = () => {
@@ -163,6 +175,11 @@ const AffiliationColumnListItem = ({
           <View style={styles.placeAndDateItem}>
             <PlaceIcon width={16} height={16} color={colors.gray[300]} />
             <Text style={styles.place}>{item?.place}</Text>
+            {item?.category === 'EVENT' && (
+              <Text style={styles.detailedLocation}>
+                {item?.detailedLocation}
+              </Text>
+            )}
           </View>
           <View style={styles.placeAndDateItem}>
             <CalendarIcon
@@ -172,7 +189,9 @@ const AffiliationColumnListItem = ({
               style={{ marginLeft: -2 }}
             />
             <Text style={styles.date}>
-              {endYear}년 {endMonth}월 {endDay}일 까지
+              {item?.category === 'EVENT'
+                ? `${endYear}년 ${endMonth}월 ${endDay}일 ${startHour}시 ${startMinute}분`
+                : `${endYear}년 ${endMonth}월 ${endDay}일 까지`}
             </Text>
           </View>
         </View>

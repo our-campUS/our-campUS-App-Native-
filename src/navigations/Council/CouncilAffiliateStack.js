@@ -7,6 +7,7 @@ import SelectAffiliationLogoScreen from '../../screens/Council/AffiliateCreate/S
 import PostFinishScreen from '../../screens/Council/AffiliateCreate/PostFinishScreen';
 import WriteEventPostScreen from '../../screens/Council/AffiliateCreate/WriteEventPostScreen';
 import AffiliateEditScreen from '../../screens/Council/AffiliateCreate/AffiliateEditScreen';
+import EventEditScreen from '../../screens/Council/AffiliateCreate/EventEditScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,6 +52,11 @@ const CouncilAffiliateStack = () => {
       <Stack.Screen
         name="AffiliateEditScreen"
         component={AffiliateEditScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EventEditScreen"
+        component={EventEditScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

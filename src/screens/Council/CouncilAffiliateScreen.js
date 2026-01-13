@@ -30,6 +30,7 @@ import {
 import {
   getCouncilAffiliatePosts,
   deleteCouncilPost,
+  getCouncilEventPosts,
 } from '../../api/councilAffiliate';
 import EditPostBottomSheet from '../../components/Council/EditPostBottomSheet';
 
@@ -41,6 +42,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
   const [isWriteEventButtonPressed, setIsWriteEventButtonPressed] =
     useState(false);
   const [councilAffiliatePosts, setCouncilAffiliatePosts] = useState([]);
+  const [councilEventPosts, setCouncilEventPosts] = useState([]);
   const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
   const [threeDotIconItem, setThreeDotIconItem] = useState(null);
 
@@ -49,6 +51,9 @@ const CouncilAffiliateScreen = ({ navigation }) => {
     const response = await getCouncilAffiliatePosts(accessToken);
     // console.log('response at fetchCouncilAffiliatePosts', response);
     setCouncilAffiliatePosts(response.data.data.content);
+
+    const responseEvent = await getCouncilEventPosts(accessToken);
+    setCouncilEventPosts(responseEvent.data.data.content);
   }, [accessToken]);
 
   useEffect(() => {
@@ -153,7 +158,8 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingHorizontal: 20 }}
-          data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
+          // data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
+          data={councilEventPosts}
           renderItem={({ item }) => (
             <AffiliationColumnListItem
               item={item}
@@ -221,11 +227,18 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           isVisible={isThreeDotIconPressed}
           onClose={() => setIsThreeDotIconPressed(false)}
           onSelectEdit={() => {
+            if (threeDotIconItem?.category === 'EVENT') {
+              navigation.navigate('EventEditScreen', {
+                type: 'event',
+                item: threeDotIconItem,
+              });
+            } else {
+              navigation.navigate('AffiliateEditScreen', {
+                type: 'affiliate',
+                item: threeDotIconItem,
+              });
+            }
             console.log('onSelectEdit');
-            navigation.navigate('AffiliateEditScreen', {
-              type: 'affiliate',
-              item: threeDotIconItem,
-            });
             setIsThreeDotIconPressed(false);
           }}
           onSelectDelete={async () => {

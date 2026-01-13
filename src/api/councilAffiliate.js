@@ -50,6 +50,33 @@ export const getCouncilAffiliatePosts = async (accessToken) => {
   }
 };
 
+// 학생회 전용 행사 게시글 조회 api
+export const getCouncilEventPosts = async (accessToken) => {
+  console.log('accessToken at getCouncilEventPosts', accessToken);
+  try {
+    const response = await api.get('/student-councils/posts', {
+      params: {
+        category: 'EVENT',
+        size: 100,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.data.code === 200) {
+      console.log('getCouncilEventPosts success');
+      console.log(response.data);
+      return response;
+    } else {
+      console.log('getCouncilEventPosts error');
+      console.log(response.data);
+    }
+  } catch (error) {
+    console.log('getCouncilEventPosts error');
+    console.log(error.response);
+  }
+};
+
 // 학생회 전용 제휴 게시글 상세 조회 api
 export const getCouncilAffiliatePostDetail = async (postId, accessToken) => {
   try {
