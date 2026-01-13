@@ -6,11 +6,37 @@ import typography from '../../style/typography';
 import defaultProfileImage from '../../../assets/defaultProfileImage.png';
 import EditIcon from '../../../assets/EditImage.svg';
 import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '../../components/Button';
+
+import useAuthStore from '../../store/authStore';
+import { getUserInfo } from '../../api/user';
+import { requestLogout } from '../../api/user';
 
 const MyPageProfileEditScreen = ({ navigation }) => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+
+  useEffect(() => {
+    const fetchLatestInfo = async () => {
+      await getUserInfo();
+    };
+    fetchLatestInfo();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      setIsLogoutModalVisible(false);
+
+      await requestLogout();
+    } catch (error) {
+      console.log('로그아웃 처리 중 에러 발생');
+    } finally {
+      logout();
+    }
+  };
+
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -21,12 +47,19 @@ const MyPageProfileEditScreen = ({ navigation }) => {
           onPressBack={() => navigation.goBack()}
         />
         <View style={styles.profileImageWrapper}>
-          <Image source={defaultProfileImage} style={styles.profileImage} />
+          <Image
+            source={
+              user?.profileImage
+                ? { uri: user.profileImage }
+                : defaultProfileImage
+            }
+            style={styles.profileImage}
+          />
           <Pressable style={styles.editIcon}>
             <EditIcon width={24} height={24} />
           </Pressable>
         </View>
-        <Text style={styles.nickname}>닉넴 뭐하지</Text>
+        <Text style={styles.nickname}>{user?.name || '사용자'}</Text>
         <View style={styles.profileInfoWrapper}>
           <Pressable
             style={styles.profileInfoItem}
@@ -81,7 +114,7 @@ const MyPageProfileEditScreen = ({ navigation }) => {
             </Text>
             <Button
               title="로그아웃"
-              onPress={() => setIsLogoutModalVisible(false)}
+              onPress={handleLogout}
               style={{
                 width: '100%',
                 height: 50,

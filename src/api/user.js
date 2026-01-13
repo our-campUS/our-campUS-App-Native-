@@ -34,6 +34,25 @@ export async function getUserInfo() {
   }
 }
 
+// 로그아웃 (POST /jwt/logout)
+export const requestLogout = async () => {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+
+    const response = await api.post('/jwt/logout', null, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    console.log('로그아웃 API 성공:', response.data);
+    return true;
+  } catch (error) {
+    console.error('로그아웃 API 에러 (앱 내 로그아웃 진행):', error);
+    return false;
+  }
+};
+
 // 유저 탈퇴 (PATCH /auth/withdraw/users)
 export const withdrawUser = async (nickname) => {
   try {
