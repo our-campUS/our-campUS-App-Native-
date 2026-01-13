@@ -27,6 +27,7 @@ import useAuthStore from '../../store/authStore';
 import {
   getCouncilAffiliatePostDetail,
   getCouncilAffiliatePosts,
+  getCouncilEventPosts,
 } from '../../api/councilAffiliate';
 
 const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
@@ -38,6 +39,8 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   const [endMonth, setEndMonth] = useState(null);
   const [endDay, setEndDay] = useState(null);
   const [recommendData, setRecommendData] = useState(null);
+  const [startMinute, setStartMinute] = useState(null);
+  const [startHour, setStartHour] = useState(null);
   console.log('user', user);
   console.log('route.params', route.params);
   const postId = route.params?.item?.postId;
@@ -54,12 +57,21 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
       };
       fetchPostDetail();
       const fetchRecommendData = async () => {
-        const response = await getCouncilAffiliatePosts(accessToken);
-        console.log('response', response.data.data?.content);
-        const filteredData = response.data.data?.content.filter(
-          (item) => item.postId !== postId
-        );
-        setRecommendData(filteredData);
+        if (route.params?.item?.category === 'PARTNERSHIP') {
+          const response = await getCouncilAffiliatePosts(accessToken);
+          console.log('response', response.data.data?.content);
+          const filteredData = response.data.data?.content.filter(
+            (item) => item.postId !== postId
+          );
+          setRecommendData(filteredData);
+        } else {
+          const response = await getCouncilEventPosts(accessToken);
+          console.log('response', response.data.data?.content);
+          const filteredData = response.data.data?.content.filter(
+            (item) => item.postId !== postId
+          );
+          setRecommendData(filteredData);
+        }
       };
       fetchRecommendData();
     }
@@ -83,6 +95,13 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
           ? detailData?.endDate?.slice(9, 10)
           : detailData?.endDate?.slice(8, 10)
       );
+      if (detailData?.category === 'EVENT') {
+        setEndYear(detailData?.startDateTime?.slice(0, 4));
+        setEndMonth(detailData?.startDateTime?.slice(5, 7));
+        setEndDay(detailData?.startDateTime?.slice(8, 10));
+        setStartHour(detailData?.startDateTime?.slice(11, 13));
+        setStartMinute(detailData?.startDateTime?.slice(14, 16));
+      }
     }
   }, [detailData]);
   const { width } = useWindowDimensions();
@@ -107,7 +126,10 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LabelTitle
-        title={detailData?.writerName + ' 제휴'}
+        title={
+          detailData?.writerName +
+          (detailData?.category === 'PARTNERSHIP' ? ' 제휴' : ' 행사')
+        }
         navigation={navigation}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
@@ -175,14 +197,26 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
             <View style={styles.placeWrapper}>
               <PlaceIcon width={20} height={20} color={colors.gray[300]} />
               <Text style={styles.place}>{route.params?.item?.place}</Text>
+              {detailData?.category === 'EVENT' && (
+                <Text style={styles.detailLocation}>
+                  {detailData?.detailedLocation}
+                </Text>
+              )}
               {/* <Text style={styles.distance}>0.0km</Text> */}
             </View>
           </View>
           <View style={styles.dateWrapper}>
             <DateIcon width={24} height={24} color={colors.gray[300]} />
-            <Text style={styles.date}>
-              {endYear}년 {endMonth}월 {endDay}일 까지
-            </Text>
+            {detailData?.category === 'PARTNERSHIP' ? (
+              <Text style={styles.date}>
+                {endYear}년 {endMonth}월 {endDay}일 까지
+              </Text>
+            ) : (
+              <Text style={styles.date}>
+                {endYear}년 {endMonth}월 {endDay}일 {startHour}시 {startMinute}
+                분
+              </Text>
+            )}
             {/* <Text style={styles.time}>D-1</Text> */}
           </View>
         </View>
@@ -324,6 +358,13 @@ const styles = StyleSheet.create({
   },
   place: {
     marginLeft: 10,
+    ...typography.body3Regular,
+    color: colors.gray[700],
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  detailLocation: {
+    marginLeft: 4,
     ...typography.body3Regular,
     color: colors.gray[700],
     flexDirection: 'row',

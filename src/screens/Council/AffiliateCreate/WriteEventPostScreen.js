@@ -234,6 +234,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
       thumbnailIcon: 'EVENT',
       startDateTime: startDateTime,
       imageUrls: finalImages,
+      thumbnailImageUrl: finalImages[0],
     };
     console.log('finalSubmitEventData', finalSubmitEventData);
     let response = await createCouncilPost(finalSubmitEventData, accessToken);
