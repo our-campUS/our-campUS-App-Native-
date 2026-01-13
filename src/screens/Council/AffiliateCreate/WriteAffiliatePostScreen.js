@@ -106,6 +106,9 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
         {
           text: '취소',
           style: 'cancel',
+          onPress: () => {
+            navigation.goBack();
+          },
         },
       ],
       { cancelable: true }
