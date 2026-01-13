@@ -63,12 +63,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray[500],
   },
   detailInfoContainer: {
+    position: 'relative',
     paddingHorizontal: 20,
     paddingVertical: 28,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[200],
   },
   topLayer: {
+    maxWidth: 247,
+    // width: 247,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -79,6 +82,9 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     flexDirection: 'row',
     gap: 8,
+    position: 'absolute',
+    top: 28,
+    right: 20,
   },
   button: {
     width: 32,
@@ -264,22 +270,29 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
         </View>
         <View style={styles.detailInfoContainer}>
           <View style={styles.topLayer}>
-            <Text style={styles.title}>{route.params?.item?.title}</Text>
-            <View style={styles.buttonWrapper}>
-              <Pressable
-                style={styles.button}
-                onPress={() => setIsLiked(!isLiked)}
-              >
-                <LikeIcon
-                  width={18}
-                  height={18}
-                  color={isLiked ? colors.orange[500] : colors.gray[300]}
-                />
-              </Pressable>
-              <Pressable style={styles.button}>
-                <ShareIcon width={18} height={18} />
-              </Pressable>
-            </View>
+            <Text
+              style={styles.title}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              textBreakStrategy="balanced"
+            >
+              {route.params?.item?.title}
+            </Text>
+          </View>
+          <View style={styles.buttonWrapper}>
+            <Pressable
+              style={styles.button}
+              onPress={() => setIsLiked(!isLiked)}
+            >
+              <LikeIcon
+                width={18}
+                height={18}
+                color={isLiked ? colors.orange[500] : colors.gray[300]}
+              />
+            </Pressable>
+            <Pressable style={styles.button}>
+              <ShareIcon width={18} height={18} />
+            </Pressable>
           </View>
           <View style={styles.placeAndDate}>
             <View style={styles.placeWrapper}>

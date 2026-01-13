@@ -6,7 +6,7 @@ import BackIcon from '../../assets/back.svg';
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'red',
+    // backgroundColor: 'red',
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',

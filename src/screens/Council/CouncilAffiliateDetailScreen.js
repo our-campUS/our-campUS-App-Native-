@@ -177,8 +177,9 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
         <View style={styles.detailInfoContainer}>
           <View style={styles.topLayer}>
             <Text style={styles.title}>{route.params?.item?.title}</Text>
-            <View style={styles.buttonWrapper}>
-              {/* <Pressable
+          </View>
+          <View style={styles.buttonWrapper}>
+            {/* <Pressable
                 style={styles.button}
                 onPress={() => setIsLiked(!isLiked)}
               >
@@ -188,10 +189,9 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
                   color={isLiked ? colors.orange[500] : colors.gray[300]}
                 />
               </Pressable> */}
-              <Pressable style={styles.button}>
-                <ShareIcon width={18} height={18} />
-              </Pressable>
-            </View>
+            <Pressable style={styles.button}>
+              <ShareIcon width={18} height={18} />
+            </Pressable>
           </View>
           <View style={styles.placeAndDate}>
             <View style={styles.placeWrapper}>
@@ -322,12 +322,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray[500],
   },
   detailInfoContainer: {
+    position: 'relative',
     paddingHorizontal: 20,
     paddingVertical: 28,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[200],
   },
   topLayer: {
+    // backgroundColor: 'red',
+    maxWidth: 247,
+    // width: 247,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -336,6 +340,9 @@ const styles = StyleSheet.create({
     ...typography.heading4,
   },
   buttonWrapper: {
+    position: 'absolute',
+    top: 28,
+    right: 20,
     flexDirection: 'row',
     gap: 8,
   },

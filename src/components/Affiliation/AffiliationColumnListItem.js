@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     // position: 'relative',
     // backgroundColor: 'red',
+    maxWidth: 240,
   },
   threeDotIconContainer: {
     position: 'absolute',
@@ -170,7 +171,14 @@ const AffiliationColumnListItem = ({
         </View>
       )}
       <View style={styles.content}>
-        <Text style={styles.title}>{item?.title}</Text>
+        <Text
+          style={styles.title}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+          textBreakStrategy="balanced"
+        >
+          {item?.title}
+        </Text>
         <View style={styles.placeAndDate}>
           <View style={styles.placeAndDateItem}>
             <PlaceIcon width={16} height={16} color={colors.gray[300]} />
