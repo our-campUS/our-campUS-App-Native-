@@ -261,21 +261,21 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
                       <CouponIcon width={15} height={15} />
                       <Text style={styles.detailExplain}>{item?.title}</Text>
                     </View>
-                    {/* <View style={styles.detailDistanceWrapper}>
+                    <View style={styles.detailDistanceWrapper}>
                       <PlaceIcon
                         width={12}
                         height={12}
                         color={colors.gray[300]}
                       />
                       <Text style={styles.detailDistance}>
-                        {item?.distance}
+                        {item?.distance ? item?.distance + 'km' : '0.0km'}
                       </Text>
-                    </View> */}
+                    </View>
                   </View>
                 </View>
               </View>
             )}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.postId}
           />
         </View>
       </ScrollView>
