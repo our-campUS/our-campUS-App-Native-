@@ -10,15 +10,27 @@ import colors from '../../style/colors';
 import typography from '../../style/typography';
 import LabelTitle from '../../components/LabelTitle';
 import Input from '../../components/Input';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { editNickname } from '../../api/profile';
 import Button from '../../components/Button';
 import CheckIcon from '../../../assets/check.svg';
+
+import useAuthStore from '../../store/authStore';
+import { getUserInfo } from '../../api/user';
 
 const EditNicknameScreen = ({ navigation }) => {
   const [nickname, setNickname] = useState('');
   const [nicknameError, setNicknameError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    const fetchLatestInfo = async () => {
+      await getUserInfo();
+    };
+    fetchLatestInfo();
+  }, []);
 
   const handleSave = async () => {
     const response = await editNickname(nickname);
@@ -47,7 +59,7 @@ const EditNicknameScreen = ({ navigation }) => {
         />
         <View style={styles.inputWrapper}>
           <Input
-            placeholder="닉넴 뭐하지"
+            placeholder={user?.name || '사용자'}
             value={nickname}
             onChangeText={(text) => {
               setNickname(text);
