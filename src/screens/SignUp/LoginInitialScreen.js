@@ -17,6 +17,12 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     marginBottom: 3,
     // backgroundColor: 'red',
+    ...(Platform.OS === 'ios' && {
+      marginBottom: 3,
+    }),
+    ...(Platform.OS === 'android' && {
+      marginBottom: 25,
+    }),
   },
   button: {
     width: '100%',

@@ -244,7 +244,7 @@ const AffiliateEditScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         navigation={navigation}
         title="제휴 수정"
@@ -260,7 +260,7 @@ const AffiliateEditScreen = ({ navigation, route }) => {
         }}
         rightButtonText="이미지 변경"
       />
-      <View style={{ height: 20 }} />
+      {/* <View style={{ height: 20 }} /> */}
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 40 }}

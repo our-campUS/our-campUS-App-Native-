@@ -6,7 +6,7 @@ import colors from '../../style/colors';
 
 const AnnouncementDetailScreen = ({ route, navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="공지사항"
         useBackButton={true}
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    marginTop: 20,
+    // marginTop: 20,
     paddingHorizontal: 20,
   },
   topLayer: {

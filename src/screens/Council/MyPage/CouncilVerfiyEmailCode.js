@@ -138,7 +138,7 @@ const CouncilVerfiyEmailCode = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <StatusBar style="auto" />
       <LabelTitle
         title="본인 인증"
@@ -150,7 +150,7 @@ const CouncilVerfiyEmailCode = ({ navigation, route }) => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View style={{ width: '100%', height: 20 }}></View>
+        {/* <View style={{ width: '100%', height: 20 }}></View> */}
         <View style={styles.contents}>
           <View style={styles.inputWrapper}>
             <Input

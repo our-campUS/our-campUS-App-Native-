@@ -138,7 +138,7 @@ const CouncilChangePasswordVerifyCode = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <StatusBar style="auto" />
       <LabelTitle
         title="비밀번호 변경"
@@ -150,7 +150,7 @@ const CouncilChangePasswordVerifyCode = ({ navigation, route }) => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View style={{ width: '100%', height: 20 }}></View>
+        {/* <View style={{ width: '100%', height: 20 }}></View> */}
         <View style={styles.contents}>
           <View style={styles.inputWrapper}>
             <Input
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   contents: {
     width: '100%',
     paddingHorizontal: 20,
-    marginTop: 24,
+    paddingVertical: 28,
     gap: 8,
     flex: 1,
   },

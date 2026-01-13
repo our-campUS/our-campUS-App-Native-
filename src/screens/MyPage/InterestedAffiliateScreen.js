@@ -15,7 +15,7 @@ const InterestedAffiliateScreen = ({ navigation }) => {
   const [isOrange, setIsOrange] = useState(false);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="관심 게시글"
         useBackButton={true}
@@ -104,10 +104,11 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 20,
     flex: 1,
     backgroundColor: colors.common.white,
+    // backgroundColor: 'green',
   },
   activityTypeSelector: {
     paddingHorizontal: 20,
-    marginTop: 38.5,
+    marginTop: 18,
     flexDirection: 'row',
     gap: 9,
   },

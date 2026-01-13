@@ -215,14 +215,14 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
   }).current;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="총학생회 제휴"
         navigation={navigation}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
-      <View style={{ height: 20 }} />
+      {/* <View style={{ height: 20 }} /> */}
       <ScrollView style={{ flex: 1 }}>
         <View style={{ width: '100%' }}>
           <FlatList

@@ -54,13 +54,15 @@ const AnnouncementTypeSelector = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 36,
+    // height: 36,
     backgroundColor: colors.common.white,
+    // backgroundColor: 'green',
     flexDirection: 'row',
   },
   button: {
     flex: 1,
-    height: 36,
+    // height: 36,
+    paddingVertical: 12,
     backgroundColor: colors.common.white,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[250],

@@ -25,6 +25,10 @@ const MyPageProfileEditScreen = ({ navigation }) => {
     fetchLatestInfo();
   }, []);
 
+  useEffect(() => {
+    console.log('user', user);
+  }, [user]);
+
   const handleLogout = async () => {
     try {
       setIsLogoutModalVisible(false);
@@ -39,7 +43,10 @@ const MyPageProfileEditScreen = ({ navigation }) => {
 
   return (
     <>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={styles.container}
+        edges={['left', 'right', 'bottom']}
+      >
         <LabelTitle
           title="프로필 설정"
           navigation={navigation}
@@ -48,12 +55,14 @@ const MyPageProfileEditScreen = ({ navigation }) => {
         />
         <View style={styles.profileImageWrapper}>
           <Image
-            source={
-              user?.profileImage
-                ? { uri: user.profileImage }
-                : defaultProfileImage
-            }
+            // source={
+            //   user?.profileImage
+            //     ? { uri: user.profileImage }
+            //     : defaultProfileImage
+            // }
+            source={defaultProfileImage}
             style={styles.profileImage}
+            // resizeMode="contain"
           />
           <Pressable style={styles.editIcon}>
             <EditIcon width={24} height={24} />
@@ -149,7 +158,7 @@ const styles = StyleSheet.create({
   },
   profileImageWrapper: {
     alignSelf: 'center',
-    marginTop: 56,
+    marginTop: 30,
     position: 'relative',
   },
   profileImage: {

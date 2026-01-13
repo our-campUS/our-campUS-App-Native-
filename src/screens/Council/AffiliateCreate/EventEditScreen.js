@@ -346,7 +346,7 @@ const EventEditScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         navigation={navigation}
         title="행사 수정"
@@ -362,7 +362,7 @@ const EventEditScreen = ({ navigation, route }) => {
         }}
         rightButtonText="이미지 변경"
       />
-      <View style={{ height: 20 }} />
+      {/* <View style={{ height: 20 }} /> */}
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 40 }}

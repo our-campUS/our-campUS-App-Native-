@@ -124,7 +124,7 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   }).current;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title={
           detailData?.writerName +
@@ -134,7 +134,7 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
-      <View style={{ height: 20 }} />
+      {/* <View style={{ height: 20 }} /> */}
       <ScrollView style={{ flex: 1 }}>
         <View style={{ width: '100%' }}>
           <FlatList

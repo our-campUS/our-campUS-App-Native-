@@ -8,7 +8,7 @@ import { SEARCH_RESULTS } from '../../constants/MapData';
 import { INTERESTED_PLACE_DATA } from '../../constants/DummyData';
 const InterestedPlaceScreen = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="관심 장소"
         useBackButton={true}
@@ -19,7 +19,7 @@ const InterestedPlaceScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <StoreListItem item={item} />}
         scrollEnabled={true}
-        style={{ marginVertical: 20 }}
+        // style={{ marginVertical: 20 }}
       />
     </SafeAreaView>
   );

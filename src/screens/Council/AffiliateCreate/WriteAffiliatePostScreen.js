@@ -169,7 +169,7 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         navigation={navigation}
         title="제휴 글쓰기"
@@ -180,7 +180,7 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
           resetFormDraft();
         }}
       />
-      <View style={{ height: 20 }} />
+      {/* <View style={{ height: 20 }} /> */}
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 40 }}

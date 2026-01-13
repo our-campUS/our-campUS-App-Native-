@@ -49,7 +49,7 @@ const EditNicknameScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <LabelTitle
           title="닉네임"
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     paddingHorizontal: 20,
     paddingVertical: 28,
-    marginTop: 20.5,
+    // marginTop: 20.5,
   },
   errorMessage: {
     ...typography.caption1Regular,

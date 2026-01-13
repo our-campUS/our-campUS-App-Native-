@@ -130,17 +130,17 @@ const CouncilResetPassword = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="비밀번호 변경"
         useBackButton={true}
         onPressBack={() => navigation?.goBack()}
       />
-      <View style={styles.statusBar}>
+      {/* <View style={styles.statusBar}>
         <View
           style={{ backgroundColor: colors.gray[100], width: '100%' }}
         ></View>
-      </View>
+      </View> */}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.contents}>
           <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
   contents: {
     width: '100%',
     paddingHorizontal: 20,
-    marginTop: 28,
+    paddingVertical: 28,
     flex: 1,
   },
   inputWrapper: {

@@ -161,7 +161,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
@@ -174,7 +174,7 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
           onPressBack={() => navigation?.goBack()}
           navigation={navigation}
         />
-        <View style={{ width: '100%', height: 20 }}></View>
+        {/* <View style={{ width: '100%', height: 20 }}></View> */}
         <View style={[styles.statusBar]}>
           <View
             style={{ backgroundColor: colors.orange[400], width: '16.67%' }}

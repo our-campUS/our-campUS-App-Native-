@@ -258,7 +258,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title={route.params?.isEdit ? '제휴 글 수정하기' : '제휴 글쓰기'}
         useBackButton={true}
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
   },
   content: {
-    marginTop: 20,
+    // marginTop: 20,
     flex: 1,
     padding: 20,
   },

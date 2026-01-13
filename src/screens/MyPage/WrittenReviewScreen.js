@@ -8,7 +8,7 @@ import typography from '../../style/typography';
 
 const WrittenReviewScreen = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="내가 쓴 리뷰"
         useBackButton={true}
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },
   reviewListWrapper: {
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    // paddingVertical: 20,
   },
 });
 
