@@ -22,6 +22,14 @@ import Button from '../../../components/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import useFormDraftStore from '../../../store/formDraftStore';
 import { Appearance } from 'react-native';
+import { createCouncilPost } from '../../../api/councilAffiliate';
+import useAuthStore from '../../../store/authStore';
+import {
+  convertToPng,
+  getCouncilImagePresignedUrl,
+  uploadImageToPresignedUrl,
+} from '../../../api/uploadImage';
+import Toast from 'react-native-toast-message';
 
 const WriteEventPostScreen = ({ navigation, route }) => {
   const colorScheme = Appearance.getColorScheme();
@@ -32,18 +40,22 @@ const WriteEventPostScreen = ({ navigation, route }) => {
   const { width } = useWindowDimensions();
   const [title, setTitle] = useState('');
   const [place, setPlace] = useState('');
+  const [detailPlace, setDetailPlace] = useState('');
   const [startDate, setStartDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
+  const [placeInfo, setPlaceInfo] = useState(null);
+  const { accessToken } = useAuthStore();
 
   useEffect(() => {
     handleImagePicker();
   }, []);
   useEffect(() => {
-    if (formDraft?.place) {
-      setPlace(formDraft.place);
+    if (formDraft?.placeInfo) {
+      setPlace(formDraft?.placeInfo?.placeName);
+      setPlaceInfo(formDraft?.placeInfo);
     }
-  }, [formDraft?.place]);
+  }, [formDraft?.placeInfo]);
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
@@ -104,10 +116,56 @@ const WriteEventPostScreen = ({ navigation, route }) => {
         {
           text: '취소',
           style: 'cancel',
+          onPress: () => {
+            navigation.goBack();
+          },
         },
       ],
       { cancelable: true }
     );
+  };
+
+  const handleImagesBeforeSubmit = async () => {
+    console.log('handleImagesBeforeSubmit');
+    // const images = route.params?.images || [];
+    const images = selectedImages || [];
+    if (images.length === 0) {
+      return [];
+    }
+    console.log('images', images);
+    const pngConvertedImages = await Promise.all(
+      images.map(async (image) => {
+        const convertedResult = convertToPng(image);
+        console.log('convertedResult', convertedResult);
+        return convertedResult;
+      })
+    );
+    console.log('pngConvertedImages', pngConvertedImages);
+    const presignedUrls = await Promise.all(
+      pngConvertedImages.map(async (image) => {
+        const { uploadUrl, imageUrl } = await getCouncilImagePresignedUrl(
+          image,
+          accessToken
+        );
+        return { uploadUrl, imageUrl, image: image };
+      })
+    );
+    console.log('presignedUrls', presignedUrls);
+    await Promise.all(
+      presignedUrls.map(async (presignedUrl) => {
+        await uploadImageToPresignedUrl(
+          presignedUrl.uploadUrl,
+          presignedUrl.image
+        );
+      })
+    );
+    if (
+      presignedUrls.some((presignedUrl) => presignedUrl.isSuccess === false)
+    ) {
+      Alert.alert('이미지 업로드에 실패했습니다.', '다시 시도해주세요.');
+      return;
+    }
+    return presignedUrls.map((presignedUrl) => presignedUrl.imageUrl);
   };
 
   const formatDate = (date) => {
@@ -125,26 +183,83 @@ const WriteEventPostScreen = ({ navigation, route }) => {
     return `${hh}:${mm}`;
   };
 
+  // 날짜만 사용하는 Date 객체 생성 (시간을 자정으로 설정하여 시간대 변환 문제 방지)
+  const createDateOnly = (date) => {
+    if (!date) return null;
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    return new Date(year, month, day, 0, 0, 0, 0);
+  };
+
+  // 시간만 사용하는 Date 객체 생성 (날짜는 2000-01-01로 설정하여 시간만 추출)
+  const createTimeOnly = (date) => {
+    if (!date) return null;
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    // 날짜는 고정값으로 설정하여 시간만 저장 (시간대 변환 방지)
+    return new Date(2000, 0, 1, hours, minutes, 0, 0);
+  };
+
   useEffect(() => {
-    if (title && place && startDate && startTime) {
+    if (title && place && startDate && startTime && detailPlace) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
-  }, [title, place, startDate, startTime]);
+  }, [title, place, startDate, startTime, detailPlace]);
 
-  const handleSubmit = () => {
-    if (eventType === 'affiliate') {
-      navigation.navigate('SelectAffiliationLogoScreen', {
-        type: 'affiliate',
-        title: title,
-        place: place,
-        startDate: startDate ? startDate.toISOString() : null,
-        startTime: startTime ? startTime.toISOString() : null,
-        images: selectedImages,
+  const handleSubmitEvent = async () => {
+    // 날짜와 시간을 'YYYY-MM-DDTHH:mm' 형식으로 직접 조합 (시간대 변환 없이)
+    const formatDateTimeToISO = (date, time) => {
+      if (!date || !time) return null;
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(time.getHours()).padStart(2, '0');
+      const minutes = String(time.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
+    const startDateTime = formatDateTimeToISO(startDate, startTime);
+    console.log('startDate', startDate);
+    console.log('startTime', startTime);
+    console.log('startDateTime', startDateTime);
+
+    const finalImages = await handleImagesBeforeSubmit();
+
+    let finalSubmitEventData = {
+      title: title,
+      category: 'EVENT',
+      content: '행사',
+      place: placeInfo,
+      detailedLocation: detailPlace,
+      thumbnailIcon: 'EVENT',
+      startDateTime: startDateTime,
+      imageUrls: finalImages,
+      thumbnailImageUrl: finalImages[0],
+    };
+    console.log('finalSubmitEventData', finalSubmitEventData);
+    let response = await createCouncilPost(finalSubmitEventData, accessToken);
+    console.log('response at handleSubmit', response);
+    if (response.data.code === 201) {
+      Toast.show({
+        type: 'success',
+        text1: '행사 글쓰기 성공',
+        text2: '행사 글이 성공적으로 등록되었습니다.',
+        position: 'top',
+        topOffset: 100,
+        visibilityTime: 1000,
+        autoHide: true,
       });
+      setTimeout(() => {
+        navigation?.reset({
+          index: 0,
+          routes: [{ name: 'CouncilAffiliateScreen' }],
+        });
+      }, 1000);
     } else {
-      // navigation.navigate('PostFinishScreen', { type: 'affiliate' , title, place, startDate, startTime });
+      Alert.alert('행사 글 등록에 실패했습니다.', response.data.message);
     }
   };
 
@@ -223,6 +338,15 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             }
             style={styles.placeInput}
           />
+          <Input
+            isOrange={true}
+            useTitle={true}
+            title="세부 장소"
+            placeholder="세부 장소"
+            value={detailPlace}
+            onChangeText={setDetailPlace}
+            style={styles.placeInput}
+          />
           <Text
             style={{
               ...typography.body3Bold,
@@ -274,7 +398,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             disabled={isButtonDisabled}
             isOrange={true}
             title="게시하기"
-            onPress={() => handleSubmit()}
+            onPress={() => handleSubmitEvent()}
             style={{
               width: '100%',
               height: 50,
@@ -288,6 +412,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
           />
         </View>
       </ScrollView>
+      <Toast />
       {showStartPicker && Platform.OS === 'ios' && (
         <View style={styles.datePickerContainer}>
           <DateTimePicker
@@ -304,7 +429,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             onChange={(event, selectedDate) => {
               setShowStartPicker(false);
               if (event.type === 'dismissed') return;
-              if (selectedDate) setStartDate(selectedDate);
+              if (selectedDate) setStartDate(createDateOnly(selectedDate));
             }}
           />
         </View>
@@ -352,7 +477,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
               <Text
                 style={styles.confirmText}
                 onPress={() => {
-                  setStartDate(tempStartDate);
+                  setStartDate(createDateOnly(tempStartDate));
                   setShowStartPicker(false);
                 }}
               >
@@ -417,7 +542,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
               <Text
                 style={styles.confirmText}
                 onPress={() => {
-                  setStartTime(tempStartTime);
+                  setStartTime(createTimeOnly(tempStartTime));
                   setShowStartTimePicker(false);
                 }}
               >
@@ -453,7 +578,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             setShowStartPicker(false);
             if (event.type === 'dismissed') return;
             if (!selectedDate) return;
-            setStartDate(selectedDate);
+            setStartDate(createDateOnly(selectedDate));
           }}
         />
       )}
@@ -466,7 +591,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             setShowStartTimePicker(false);
             if (event.type === 'dismissed') return;
             if (!selectedTime) return;
-            setStartTime(selectedTime);
+            setStartTime(createTimeOnly(selectedTime));
           }}
         />
       )}

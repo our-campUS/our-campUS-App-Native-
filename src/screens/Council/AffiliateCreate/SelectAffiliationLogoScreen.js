@@ -1,20 +1,108 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Alert } from 'react-native';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../../../components/LabelTitle';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Button from '../../../components/Button';
 import ChooseLogoBottomSheet from '../../../components/Council/ChooseLogoBottomSheet';
 import useImagePicker from '../../../hooks/useImagePicker';
+import {
+  convertToPng,
+  getCouncilImagePresignedUrl,
+  uploadImageToPresignedUrl,
+} from '../../../api/uploadImage';
+import useAuthStore from '../../../store/authStore';
+import {
+  createCouncilPost,
+  EditCouncilPost,
+} from '../../../api/councilAffiliate';
+import Toast from 'react-native-toast-message';
+
+const LOGO_CATEGORIES = [
+  {
+    id: 1,
+    name: '직접 등록',
+    image: require('../../../../assets/addLogo.png'),
+    type: 'CUSTOM',
+  },
+  {
+    id: 2,
+    name: '음식점',
+    image: require('../../../../assets/foodLogo.png'),
+    type: 'FOOD',
+  },
+  {
+    id: 3,
+    name: '카페',
+    image: require('../../../../assets/cafeLogo.png'),
+    type: 'CAFE',
+  },
+  {
+    id: 4,
+    name: '술집',
+    image: require('../../../../assets/alcoholLogo.png'),
+    type: 'BAR',
+  },
+  {
+    id: 5,
+    name: '편의시설',
+    image: require('../../../../assets/convenientLogo.png'),
+    type: 'CONVENIENCE',
+  },
+  {
+    id: 6,
+    name: '운동시설',
+    image: require('../../../../assets/gymLogo.png'),
+    type: 'SPORTS',
+  },
+  {
+    id: 7,
+    name: '교육시설',
+    image: require('../../../../assets/studyLogo.png'),
+    type: 'EDUCATION',
+  },
+  {
+    id: 8,
+    name: '병원',
+    image: require('../../../../assets/hospitalLogo.png'),
+    type: 'HOSPITAL',
+  },
+];
 
 const SelectAffiliationLogoScreen = ({ navigation, route }) => {
+  const accessToken = useAuthStore((state) => state?.accessToken);
   const [selectedLogo, setSelectedLogo] = useState(null);
   const [selectedLogoType, setSelectedLogoType] = useState(null);
   const isButtonDisabled = !selectedLogo;
   const [isChooseLogoBottomSheetVisible, setIsChooseLogoBottomSheetVisible] =
     useState(false);
   console.log(route.params);
+  const [dataFromPreviousScreen, setDataFromPreviousScreen] = useState(null);
+
+  // route.params가 변경될 때마다 즉시 로고를 찾기
+  const initialLogo = useMemo(() => {
+    if (route.params?.thumbnailIcon) {
+      return LOGO_CATEGORIES.find(
+        (logo) => logo.type === route.params.thumbnailIcon
+      );
+    }
+    return null;
+  }, [route.params?.thumbnailIcon]);
+
+  useEffect(() => {
+    if (route.params) {
+      setDataFromPreviousScreen(route.params);
+      console.log('dataFromPreviousScreen', route.params);
+    }
+  }, [route.params]);
+
+  useEffect(() => {
+    if (initialLogo) {
+      setSelectedLogoType(initialLogo.type);
+      setSelectedLogo(initialLogo);
+    }
+  }, [initialLogo]);
 
   const { pickImage } = useImagePicker({
     onSelectImages: (images) => {
@@ -37,10 +125,142 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     }
   };
 
+  const handleImagesBeforeSubmit = async () => {
+    console.log('handleImagesBeforeSubmit');
+    const images = route.params?.images || [];
+    if (images.length === 0) {
+      return [];
+    }
+    console.log('images', images);
+    const pngConvertedImages = await Promise.all(
+      images.map(async (image) => {
+        const convertedResult = convertToPng(image);
+        console.log('convertedResult', convertedResult);
+        return convertedResult;
+      })
+    );
+    console.log('pngConvertedImages', pngConvertedImages);
+    const presignedUrls = await Promise.all(
+      pngConvertedImages.map(async (image) => {
+        const { uploadUrl, imageUrl } = await getCouncilImagePresignedUrl(
+          image,
+          accessToken
+        );
+        return { uploadUrl, imageUrl, image: image };
+      })
+    );
+    console.log('presignedUrls', presignedUrls);
+    await Promise.all(
+      presignedUrls.map(async (presignedUrl) => {
+        await uploadImageToPresignedUrl(
+          presignedUrl.uploadUrl,
+          presignedUrl.image
+        );
+      })
+    );
+    if (
+      presignedUrls.some((presignedUrl) => presignedUrl.isSuccess === false)
+    ) {
+      Alert.alert('이미지 업로드에 실패했습니다.', '다시 시도해주세요.');
+      return;
+    }
+    return presignedUrls.map((presignedUrl) => presignedUrl.imageUrl);
+  };
+
+  const handleSubmit = async () => {
+    console.log('accessToken', accessToken);
+    console.log('handleSubmit');
+    console.log('dataFromPreviousScreen', dataFromPreviousScreen);
+    const finalImages = await handleImagesBeforeSubmit();
+    let finalData = {
+      category:
+        dataFromPreviousScreen.type === 'affiliate' ? 'PARTNERSHIP' : 'EVENT',
+      place: dataFromPreviousScreen.placeInfo,
+      title: dataFromPreviousScreen.title,
+      content: dataFromPreviousScreen.content || '내용없음',
+      startDateTime: dataFromPreviousScreen.startDate.slice(0, 10) + 'T00:00',
+      endDateTime: dataFromPreviousScreen.endDate.slice(0, 10) + 'T00:00',
+      thumbnailIcon: selectedLogo.type,
+      imageUrls: finalImages,
+      thumbnailImageUrl: finalImages[0],
+    };
+    console.log('finalData', finalData);
+    let response = await createCouncilPost(finalData, accessToken);
+    console.log('response at handleSubmit', response);
+    if (response.data.code === 201) {
+      Toast.show({
+        type: 'success',
+        text1: '제휴 글쓰기 성공',
+        text2: '제휴 글이 성공적으로 등록되었습니다.',
+        position: 'top',
+        topOffset: 100,
+        visibilityTime: 1000,
+        autoHide: true,
+      });
+      setTimeout(() => {
+        navigation?.reset({
+          index: 0,
+          routes: [{ name: 'CouncilAffiliateScreen' }],
+        });
+      }, 1000);
+    } else {
+      Alert.alert('제휴 글 등록에 실패했습니다.', response.data.message);
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    console.log('handleEditSubmit');
+    console.log('dataFromPreviousScreen', dataFromPreviousScreen);
+    let finalImages = null;
+    if (dataFromPreviousScreen?.isImageUnChanged) {
+      finalImages = dataFromPreviousScreen?.images;
+    } else {
+      finalImages = await handleImagesBeforeSubmit();
+    }
+    let finalData = {
+      category:
+        dataFromPreviousScreen.type === 'affiliate' ? 'PARTNERSHIP' : 'EVENT',
+      place: dataFromPreviousScreen.placeInfo,
+      title: dataFromPreviousScreen.title,
+      content: dataFromPreviousScreen.content || '내용없음',
+      startDateTime: dataFromPreviousScreen.startDate.slice(0, 10) + 'T00:00',
+      endDateTime: dataFromPreviousScreen.endDate.slice(0, 10) + 'T00:00',
+      thumbnailIcon: selectedLogo.type,
+      imageUrls: finalImages,
+      thumbnailImageUrl: finalImages[0],
+    };
+    console.log('finalDataEdit', finalData);
+    let response = await EditCouncilPost(
+      finalData,
+      accessToken,
+      dataFromPreviousScreen?.postId
+    );
+    console.log('response at handleEditSubmit', response);
+    if (response.data.code === 200) {
+      Toast.show({
+        type: 'success',
+        text1: '제휴 글 수정 성공',
+        text2: '제휴 글이 성공적으로 수정되었습니다.',
+        position: 'top',
+        topOffset: 100,
+        visibilityTime: 1000,
+        autoHide: true,
+      });
+      setTimeout(() => {
+        navigation?.reset({
+          index: 0,
+          routes: [{ name: 'CouncilAffiliateScreen' }],
+        });
+      }, 1000);
+    } else {
+      Alert.alert('제휴 글 수정에 실패했습니다.', response.data.message);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
-        title="제휴 글쓰기"
+        title={route.params?.isEdit ? '제휴 글 수정하기' : '제휴 글쓰기'}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
@@ -64,7 +284,9 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
             />
           </View>
           <View style={styles.previewInfoContainer}>
-            <Text style={styles.previewPlaceName}>{route.params.place}</Text>
+            <Text style={styles.previewPlaceName}>
+              {route.params.placeInfo?.placeName}
+            </Text>
             <Text style={styles.previewTitle}>{route.params.title}</Text>
           </View>
         </View>
@@ -75,7 +297,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
           로고 이미지 등록하기
         </Text>
         <Button
-          title="게시하기"
+          title={route.params?.isEdit ? '수정하기' : '게시하기'}
           isOrange={true}
           disabled={isButtonDisabled}
           style={{
@@ -89,9 +311,12 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
             borderRadius: 10,
             marginTop: 'auto',
           }}
-          // onPress={() => navigation.navigate('SelectAffiliationLogoScreen')}
+          onPress={() =>
+            route.params?.isEdit ? handleEditSubmit() : handleSubmit()
+          }
         />
       </View>
+      <Toast />
       <ChooseLogoBottomSheet
         isVisible={isChooseLogoBottomSheetVisible}
         onClose={() => setIsChooseLogoBottomSheetVisible(false)}

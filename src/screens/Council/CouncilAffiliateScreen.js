@@ -16,7 +16,8 @@ import AffiliationCarousel from '../../components/Affiliation/AffiliationCarouse
 import AffiliationColumnList from '../../components/Affiliation/AffiliationColumnList';
 import WriteEventButton from '../../../assets/WriteEvent.svg';
 import CancelButton from '../../../assets/cancelButton.svg';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import EventSelectIcon from '../../../assets/mdi_event.svg';
 import AffiliateSelectIcon from '../../../assets/supportIcon.svg';
 import CouncilDefaultImage from '../../../assets/councilDefaultImage.png';
@@ -26,13 +27,57 @@ import {
   AFFILIATION_COLUMN_LIST_DATA_AFFILIATION,
   AFFILIATION_COLUMN_LIST_DATA_EVENT,
 } from '../../constants/DummyData';
+import {
+  getCouncilAffiliatePosts,
+  deleteCouncilPost,
+  getCouncilEventPosts,
+  getAvailableEvents,
+} from '../../api/councilAffiliate';
+import EditPostBottomSheet from '../../components/Council/EditPostBottomSheet';
+import useFormDraftStore from '../../store/formDraftStore';
 
 const CouncilAffiliateScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
-  const { user } = useAuthStore();
-  console.log(user);
+  const { user, accessToken } = useAuthStore();
+  // console.log(user);
+  // console.log('accessToken', accessToken);
   const [isWriteEventButtonPressed, setIsWriteEventButtonPressed] =
     useState(false);
+  const [councilAffiliatePosts, setCouncilAffiliatePosts] = useState([]);
+  const [councilEventPosts, setCouncilEventPosts] = useState([]);
+  const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
+  const [threeDotIconItem, setThreeDotIconItem] = useState(null);
+  const [availabeEvents, setAvailabeEvents] = useState([]);
+  const { formDraft, resetFormDraft } = useFormDraftStore();
+  // 데이터를 불러오는 함수
+  const fetchCouncilAffiliatePosts = useCallback(async () => {
+    const response = await getCouncilAffiliatePosts(accessToken);
+    // console.log('response at fetchCouncilAffiliatePosts', response);
+    setCouncilAffiliatePosts(response.data.data.content);
+
+    const responseEvent = await getCouncilEventPosts(accessToken);
+    setCouncilEventPosts(responseEvent.data.data.content);
+
+    const responseAvailableEvents = await getAvailableEvents(accessToken);
+    setAvailabeEvents(responseAvailableEvents.data.data.content);
+  }, [accessToken]);
+
+  useEffect(() => {
+    fetchCouncilAffiliatePosts();
+  }, [fetchCouncilAffiliatePosts]);
+
+  // 화면이 포커스될 때마다 데이터를 다시 불러오기
+  useFocusEffect(
+    useCallback(() => {
+      fetchCouncilAffiliatePosts();
+    }, [fetchCouncilAffiliatePosts])
+  );
+
+  const handleThreeDotIconPress = (item) => {
+    setThreeDotIconItem(item);
+    setIsThreeDotIconPressed(true);
+    console.log('item', item);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ marginTop: 9.5, width: '100%' }}>
@@ -55,7 +100,13 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           </View>
         </View>
       </View>
-      <AffiliationCarousel isOrange={true} />
+      {availabeEvents.length > 0 && (
+        <AffiliationCarousel
+          isOrange={true}
+          data={availabeEvents}
+          navigation={navigation}
+        />
+      )}
 
       <View style={styles.activityTypeSelector}>
         <Pressable
@@ -101,24 +152,34 @@ const CouncilAffiliateScreen = ({ navigation }) => {
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          // data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
+          data={councilAffiliatePosts}
+          keyExtractor={(item) => item.postId}
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <AffiliationColumnListItem
+              item={item}
+              navigation={navigation}
+              handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
+            />
           )}
-          keyExtractor={(item) => item.id}
         />
       )}
       {selectedActivityType === '행사' && (
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          // data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
+          data={councilEventPosts}
+          keyExtractor={(item) => item.postId}
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <AffiliationColumnListItem
+              item={item}
+              navigation={navigation}
+              handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
+            />
           )}
-          keyExtractor={(item) => item.id}
         />
       )}
 
@@ -129,6 +190,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
             style={styles.writeEventTypeSelectorItem}
             onPress={() => {
               setIsWriteEventButtonPressed(false);
+              resetFormDraft();
               navigation.navigate('WriteAffiliatePostScreen', {
                 type: 'affiliate',
               });
@@ -145,6 +207,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
             style={styles.writeEventTypeSelectorItem}
             onPress={() => {
               setIsWriteEventButtonPressed(false);
+              resetFormDraft();
               navigation.navigate('WriteEventPostScreen', {
                 type: 'event',
               });
@@ -172,6 +235,38 @@ const CouncilAffiliateScreen = ({ navigation }) => {
       </Pressable>
       {isWriteEventButtonPressed && (
         <View style={styles.writeEventTypeSelectorBackground} />
+      )}
+      {isThreeDotIconPressed && (
+        <EditPostBottomSheet
+          isVisible={isThreeDotIconPressed}
+          onClose={() => setIsThreeDotIconPressed(false)}
+          onSelectEdit={() => {
+            if (threeDotIconItem?.category === 'EVENT') {
+              navigation.navigate('EventEditScreen', {
+                type: 'event',
+                item: threeDotIconItem,
+              });
+            } else {
+              navigation.navigate('AffiliateEditScreen', {
+                type: 'affiliate',
+                item: threeDotIconItem,
+              });
+            }
+            console.log('onSelectEdit');
+            setIsThreeDotIconPressed(false);
+          }}
+          onSelectDelete={async () => {
+            console.log('onSelectDelete');
+            setIsThreeDotIconPressed(false);
+            const response = await deleteCouncilPost(
+              threeDotIconItem.postId,
+              accessToken
+            );
+            console.log('response at onSelectDelete', response);
+            // 데이터를 다시 불러오기
+            await fetchCouncilAffiliatePosts();
+          }}
+        />
       )}
     </SafeAreaView>
   );

@@ -11,61 +11,16 @@ import {
 import { useRef, useEffect, useState } from 'react';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-
-const LOGO_CATEGORIES = [
-  {
-    id: 1,
-    name: '직접 등록',
-    image: require('../../../assets/addLogo.png'),
-    type: 'CUSTOM',
-  },
-  {
-    id: 2,
-    name: '음식점',
-    image: require('../../../assets/foodLogo.png'),
-    type: 'FOOD',
-  },
-  {
-    id: 3,
-    name: '카페',
-    image: require('../../../assets/cafeLogo.png'),
-    type: 'CAFE',
-  },
-  {
-    id: 4,
-    name: '술집',
-    image: require('../../../assets/alcoholLogo.png'),
-    type: 'BAR',
-  },
-  {
-    id: 5,
-    name: '편의시설',
-    image: require('../../../assets/convenientLogo.png'),
-    type: 'CONVENIENCE',
-  },
-  {
-    id: 6,
-    name: '운동시설',
-    image: require('../../../assets/gymLogo.png'),
-    type: 'SPORTS',
-  },
-  {
-    id: 7,
-    name: '교육시설',
-    image: require('../../../assets/studyLogo.png'),
-    type: 'EDUCATION',
-  },
-  {
-    id: 8,
-    name: '병원',
-    image: require('../../../assets/hospitalLogo.png'),
-    type: 'HOSPITAL',
-  },
-];
-
+import EditIcon from '../../../assets/darkPencilIcon.svg';
+import DeleteIcon from '../../../assets/trashIcon.svg';
 const DRAG_THRESHOLD = 200; // 드래그 임계값
 
-const ChooseLogoBottomSheet = ({ isVisible, onClose, onSelectCategory }) => {
+const EditPostBottomSheet = ({
+  isVisible,
+  onClose,
+  onSelectEdit,
+  onSelectDelete,
+}) => {
   const translateY = useRef(new Animated.Value(0)).current;
   const overlayOpacity = useRef(new Animated.Value(1)).current;
   const startY = useRef(0);
@@ -172,31 +127,14 @@ const ChooseLogoBottomSheet = ({ isVisible, onClose, onSelectCategory }) => {
             <View style={styles.handleBar} />
           </View>
           <View style={styles.content}>
-            {/* <Text style={styles.title}>문의 유형</Text> */}
-            {/* <View style={styles.categoryList}>
-              {LOGO_CATEGORIES.map((category) => (
-                <Pressable
-                  key={category.id}
-                  style={styles.categoryItem}
-                  onPress={() => handleSelect(category)}
-                >
-                  <Text style={styles.categoryText}>{category.name}</Text>
-                </Pressable>
-              ))}
-            </View> */}
-            <View style={styles.logoContainer}>
-              {LOGO_CATEGORIES.map((category) => (
-                <View style={styles.logoItemContainer} key={category.id}>
-                  <Pressable
-                    style={styles.logoItem}
-                    onPress={() => handleSelect(category)}
-                  >
-                    <Image source={category.image} style={styles.logoImage} />
-                  </Pressable>
-                  <Text style={styles.logoText}>{category.name}</Text>
-                </View>
-              ))}
-            </View>
+            <Pressable style={styles.editPostItem} onPress={onSelectEdit}>
+              <EditIcon width={20} height={20} />
+              <Text style={styles.editPostText}>게시글 수정하기</Text>
+            </Pressable>
+            <Pressable style={styles.editPostItem} onPress={onSelectDelete}>
+              <DeleteIcon width={20} height={20} />
+              <Text style={styles.deletePostText}>삭제하기</Text>
+            </Pressable>
           </View>
         </Animated.View>
       </View>
@@ -243,6 +181,10 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 20,
     paddingTop: 16,
+    flexDirection: 'column',
+    gap: 32,
+    width: '100%',
+    // backgroundColor: 'red',
   },
   title: {
     ...typography.heading5,
@@ -283,6 +225,19 @@ const styles = StyleSheet.create({
     color: colors.gray[800],
     marginTop: 12,
   },
+  editPostText: {
+    ...typography.heading5,
+    color: colors.gray[800],
+  },
+  deletePostText: {
+    ...typography.heading5,
+    color: colors.common.error,
+  },
+  editPostItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
 });
 
-export default ChooseLogoBottomSheet;
+export default EditPostBottomSheet;

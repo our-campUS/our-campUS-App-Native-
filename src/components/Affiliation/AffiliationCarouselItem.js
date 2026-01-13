@@ -1,15 +1,17 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import Vector2 from '../../../assets/Vector2.svg';
 import CalendarIcon from '../../../assets/calendar.svg';
+import { useState, useEffect } from 'react';
 
 const styles = StyleSheet.create({
   container: {
     width: '255px',
     height: 147,
     backgroundColor: colors.common.white,
-    padding: 30,
+    paddingHorizontal: 30,
+    paddingVertical: 20,
     borderRadius: 20,
   },
   activityTypeContainer: {
@@ -38,13 +40,15 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   bottomContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+    // backgroundColor: 'red',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    // gap: 4,
     marginTop: 8,
   },
   placeContainer: {
-    flex: 1,
+    // backgroundColor: 'blue',
+    // flex: 1,
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
@@ -54,20 +58,46 @@ const styles = StyleSheet.create({
     color: colors.gray[700],
   },
   dateContainer: {
-    flex: 1,
+    // backgroundColor: 'blue',
+    // flex: 1,
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
+    marginLeft: -4,
   },
   date: {
     ...typography.body4Regular,
     color: colors.gray[700],
+    marginLeft: -4,
   },
 });
 
-const AffiliationCarouselItem = ({ item, isOrange = false }) => {
+const AffiliationCarouselItem = ({
+  item,
+  isOrange = false,
+  navigation = null,
+}) => {
+  const [startYear, setStartYear] = useState(null);
+  const [startMonth, setStartMonth] = useState(null);
+  const [startDay, setStartDay] = useState(null);
+  const [startHour, setStartHour] = useState(null);
+  const [startMinute, setStartMinute] = useState(null);
+
+  useEffect(() => {
+    setStartYear(item.dateTime.slice(0, 4));
+    setStartMonth(item.dateTime.slice(5, 7));
+    setStartDay(item.dateTime.slice(8, 10));
+    setStartHour(item.dateTime.slice(11, 13));
+    setStartMinute(item.dateTime.slice(14, 16));
+  }, [item]);
+
   return (
-    <View style={styles.container}>
+    <Pressable
+      style={styles.container}
+      onPress={() =>
+        navigation?.navigate('CouncilAffiliateDetailScreen', { item })
+      }
+    >
       <View
         style={[
           styles.activityTypeContainer,
@@ -80,7 +110,7 @@ const AffiliationCarouselItem = ({ item, isOrange = false }) => {
             isOrange && styles.activeOrangeActivityType,
           ]}
         >
-          {item.activityType}
+          {item.activityType || '행사'}
         </Text>
         <Text
           style={[
@@ -98,17 +128,17 @@ const AffiliationCarouselItem = ({ item, isOrange = false }) => {
         <View style={styles.placeContainer}>
           <Vector2 width={9.6} height={12.4} color={colors.gray[300]} />
           <Text style={styles.place} numberOfLines={1} ellipsizeMode="tail">
-            {item.place}
+            {item.place} {item.detailedLocation}
           </Text>
         </View>
         <View style={styles.dateContainer}>
-          <CalendarIcon width={20} height={20} color={colors.gray[300]} />
+          <CalendarIcon width={18} height={18} color={colors.gray[300]} />
           <Text style={styles.date} numberOfLines={1} ellipsizeMode="tail">
-            {item.date}
+            {startYear}.{startMonth}.{startDay} {startHour}:{startMinute}
           </Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

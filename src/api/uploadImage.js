@@ -1,7 +1,7 @@
 import api from './axiosInstance';
 import ImageResizer from 'react-native-image-resizer';
 
-// 이미지 업로드를 위한 url 발급 api
+// 이미지 업로드를 위한 url 발급 api (회원가입 전용)
 export const getCommonImagePresignedUrl = async (image) => {
   console.log('image', image);
   console.log('imageType', image.type);
@@ -23,8 +23,40 @@ export const getCommonImagePresignedUrl = async (image) => {
   }
 };
 
+// 이미지 업로드를 위한 url 발급 api (학생회 전용)
+export const getCouncilImagePresignedUrl = async (image, accessToken) => {
+  console.log('image', image);
+  console.log('imageType', image.type);
+  try {
+    const response = await api.post(
+      'storage/posts/images/presigned',
+      {
+        contentType: image.type,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    console.log('response', response.data.data);
+    return response.data.data;
+  } catch (error) {
+    console.log('❌ Upload Council Image Error:', error);
+    console.log('error', error.response);
+    return {
+      isSuccess: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        '이미지 업로드에 실패했습니다.',
+    };
+  }
+};
 // png 변환
 export const convertToPng = async (asset) => {
+  console.log('asset input for convertToPng', asset);
   const result = await ImageResizer.createResizedImage(
     asset.uri,
     asset.width || 1000,

@@ -65,6 +65,7 @@ const CouncilMainTab = () => {
                 paddingHorizontal: 20,
                 marginBottom: 10,
                 backgroundColor: colors.common.white,
+                // backgroundColor: 'red',
               }
             : {
                 height: 91,
