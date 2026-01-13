@@ -1,37 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Image,
 } from 'react-native';
 import theme from '../../style';
-import { CATEGORIES, BENEFITS_DATA } from '../../constants/DummyData';
+// import { BENEFITS_DATA } from '../../constants/DummyData';
+import useAuthStore from '../../store/authStore';
+import { getActivePartnerships } from '../../api/partnership';
+
+const COUNCIL_TYPE_MAP = {
+  SCHOOL: 'SCHOOL_COUNCIL',
+  COLLEGE: 'COLLEGE_COUNCIL',
+  MAJOR: 'MAJOR_COUNCIL',
+};
 
 const AffiliateSection = () => {
-  const [selectedCategory, setSelectedCategory] = useState('중앙대');
+  const user = useAuthStore((state) => state.user);
+  const TABS = [
+    { id: 'SCHOOL', label: '총학생회' || '학교' },
+    { id: 'COLLEGE', label: user?.collegeName || '단과대' },
+    { id: 'MAJOR', label: user?.majorName || '학과' },
+  ];
+  const [selectedTabId, setSelectedTabId] = useState(TABS[0].id);
+  const [partnerships, setPartnerships] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const apiParam = COUNCIL_TYPE_MAP[selectedTabId];
+      if (apiParam) {
+        const data = await getActivePartnerships(apiParam);
+        setPartnerships(data);
+      }
+    };
+
+    fetchData();
+  }, [selectedTabId]);
 
   return (
     <View>
       {/* 탭 메뉴 */}
       <View style={styles.tabContainer}>
-        {CATEGORIES.map((cat) => (
+        {TABS.map((tab) => (
           <TouchableOpacity
-            key={cat}
-            onPress={() => setSelectedCategory(cat)}
+            key={tab.id}
+            onPress={() => setSelectedTabId(tab.id)}
             style={[
               styles.tabButton,
-              selectedCategory === cat && styles.activeTab,
+              selectedTabId === tab.id && styles.activeTab,
             ]}
           >
             <Text
               style={[
                 styles.tabText,
-                selectedCategory === cat && styles.activeTabText,
+                selectedTabId === tab.id && styles.activeTabText,
               ]}
+              numberOfLines={1}
             >
-              {cat}
+              {tab.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -39,19 +68,39 @@ const AffiliateSection = () => {
 
       {/* 제휴 리스트 */}
       <FlatList
-        data={BENEFITS_DATA}
-        keyExtractor={(item) => String(item.id)}
+        data={partnerships}
+        keyExtractor={(item) => String(item.postId)}
         scrollEnabled={false}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>진행 중인 제휴가 없어요 😭</Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <View style={styles.benefitItem}>
-            <View style={styles.benefitImage} />
+            {item.thumbnailImageUrl ? (
+              <Image
+                source={{ uri: item.thumbnailImageUrl }}
+                style={styles.benefitImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <View
+                style={[
+                  styles.benefitImage,
+                  { backgroundColor: theme.colors.background },
+                ]}
+              />
+            )}
+
             <View style={{ flex: 1 }}>
-              <Text style={styles.brandName}>{item.name}</Text>
-              <Text style={styles.benefitDesc}>{item.desc}</Text>
+              <Text style={styles.brandName}>{item.place}</Text>
+              <Text style={styles.benefitDesc}>{item.title}</Text>
             </View>
-            <View style={styles.tagBox}>
-              <Text style={styles.tagText}>{item.tag}</Text>
-            </View>
+
+            {/* <View style={styles.tagBox}>
+              <Text style={styles.tagText}>인기</Text>
+            </View> */}
           </View>
         )}
       />
@@ -69,11 +118,10 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     marginBottom: 12,
-    paddingTop: 4,
   },
   tabButton: {
     flex: 1,
-    paddingBottom: 12,
+    paddingVertical: 15,
     borderBottomWidth: 2,
     borderBottomColor: theme.colors.border,
   },
@@ -88,6 +136,15 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: theme.colors.primary1,
     ...theme.typography.heading5,
+  },
+
+  emptyContainer: {
+    paddingVertical: 30,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: theme.colors.textDim,
+    ...theme.typography.body3Regular,
   },
 
   benefitItem: {

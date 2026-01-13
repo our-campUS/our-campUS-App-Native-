@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect } from 'react';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import defaultProfileImage from '../../../assets/defaultProfileImage.png';
@@ -9,7 +10,19 @@ import InterestedPlaceIcon from '../../../assets/Vector2.svg';
 import WrittenReviewIcon from '../../../assets/ReviewIcon.svg';
 import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
 
+import useAuthStore from '../../store/authStore';
+import { getUserInfo } from '../../api/user';
+
 const MyPageDefaultScreen = ({ navigation }) => {
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    const fetchLatestInfo = async () => {
+      await getUserInfo();
+    };
+    fetchLatestInfo();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mainProfileWrapper}>
@@ -20,7 +33,7 @@ const MyPageDefaultScreen = ({ navigation }) => {
               style={styles.mainProfileImage}
             />
           </View>
-          <Text style={styles.nickname}>닉넴 뭐하지</Text>
+          <Text style={styles.nickname}>{user?.name || '사용자'}</Text>
           <Pressable
             onPress={() => navigation.navigate('MyPageProfileEditScreen')}
           >
