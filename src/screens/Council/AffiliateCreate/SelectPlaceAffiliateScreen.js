@@ -94,20 +94,70 @@ const styles = StyleSheet.create({
     height: 48,
     marginTop: 10,
   },
+  // searchBar: {
+  //   flex: 1,
+  //   ...typography.body3Regular,
+  //   color: colors.gray[850],
+  //   ...(Platform.OS === 'ios' && {
+  //     lineHeight: typography.body3Regular.fontSize * 1.4,
+  //   }),
+  // },
+  // searchBar: {
+  //   flex: 1,
+  //   ...typography.body3Regular,
+  //   color: colors.gray[850],
+  //   ...(Platform.OS === 'ios'
+  //     ? {
+  //         lineHeight: typography.body3Regular.fontSize * 1.4,
+  //       }
+  //     : {
+  //         textAlignVertical: 'center',
+  //       }),
+  // },
+  // searchBar: {
+  //   flex: 1,
+  //   ...typography.body3Regular,
+  //   color: colors.gray[850],
+
+  //   ...(Platform.OS === 'ios'
+  //     ? {
+  //         lineHeight: typography.body3Regular.fontSize * 1.4,
+  //       }
+  //     : {
+  //         textAlignVertical: 'center',
+  //         includeFontPadding: false, // 🔥 이게 핵심
+  //         paddingVertical: 0, // 🔥 이거 없으면 또 안 보임
+  //       }),
+  // },
   searchBar: {
     flex: 1,
+    paddingVertical: Platform.OS === 'ios' ? 10 : 0, // 🔥
     ...typography.body3Regular,
     color: colors.gray[850],
-    ...(Platform.OS === 'ios' && {
-      lineHeight: typography.body3Regular.fontSize * 1.4,
-    }),
+    ...(Platform.OS === 'ios'
+      ? {
+          lineHeight: typography.body3Regular.fontSize * 1.25,
+        }
+      : {
+          textAlignVertical: 'center', // 🔥
+          includeFontPadding: false, // 🔥
+        }),
   },
+  // searchBarContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   borderRadius: 10,
+  //   paddingVertical: 12,
+  //   paddingHorizontal: 16,
+  //   boxShadow: '0 0 6px 0 rgba(225, 228, 230, 0.70)',
+  // },
   searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center', // 🔥 핵심
+    height: 48, // 🔥 핵심
     borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 16, // vertical padding 제거
     boxShadow: '0 0 6px 0 rgba(225, 228, 230, 0.70)',
   },
   placeholderText: {
