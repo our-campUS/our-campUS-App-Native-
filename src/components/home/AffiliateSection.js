@@ -12,6 +12,12 @@ import theme from '../../style';
 import useAuthStore from '../../store/authStore';
 import { getActivePartnerships } from '../../api/partnership';
 
+const COUNCIL_TYPE_MAP = {
+  SCHOOL: 'SCHOOL_COUNCIL',
+  COLLEGE: 'COLLEGE_COUNCIL',
+  MAJOR: 'MAJOR_COUNCIL',
+};
+
 const AffiliateSection = () => {
   const user = useAuthStore((state) => state.user);
   const TABS = [
@@ -21,12 +27,6 @@ const AffiliateSection = () => {
   ];
   const [selectedTabId, setSelectedTabId] = useState(TABS[0].id);
   const [partnerships, setPartnerships] = useState([]);
-
-  const COUNCIL_TYPE_MAP = {
-    SCHOOL: 'SCHOOL_COUNCIL',
-    COLLEGE: 'COLLEGE_COUNCIL',
-    MAJOR: 'MAJOR_COUNCIL',
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +38,7 @@ const AffiliateSection = () => {
     };
 
     fetchData();
-  });
+  }, [selectedTabId]);
 
   return (
     <View>

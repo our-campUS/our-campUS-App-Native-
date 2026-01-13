@@ -18,6 +18,7 @@ export const getActivePartnerships = async (councilType) => {
     );
 
     if (response.data.code === 200 || response.data.code === 0) {
+      console.log('Get User Info Response:', response.data);
       return response.data.data;
     }
     return [];
