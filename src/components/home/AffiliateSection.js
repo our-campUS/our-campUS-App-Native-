@@ -118,11 +118,10 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     marginBottom: 12,
-    paddingTop: 4,
   },
   tabButton: {
     flex: 1,
-    paddingBottom: 12,
+    paddingVertical: 15,
     borderBottomWidth: 2,
     borderBottomColor: theme.colors.border,
   },
