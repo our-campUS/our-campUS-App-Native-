@@ -187,7 +187,7 @@ const MapScreen = ({ route }) => {
           styles.overlay,
           {
             paddingTop:
-              Platform.OS === 'android' ? insets.top + 10 : insets.top,
+              Platform.OS === 'android' ? insets.top + 20 : insets.top + 10,
           },
         ]}
       >
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 999,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingBottom: 10,
   },
   myLocationButtonWrapper: {
