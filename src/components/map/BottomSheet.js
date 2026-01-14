@@ -6,6 +6,7 @@ import {
   Dimensions,
   Animated,
   PanResponder,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import StoreListItem from '../common/StoreListItem';
@@ -22,6 +23,8 @@ const BottomSheet = ({
   onItemPress,
   maxHeight,
   sheetHeightAnimated,
+  onEndReached,
+  isLoading,
 }) => {
   const navigation = useNavigation();
   const HEIGHT_MAX = maxHeight * 0.85;
@@ -100,17 +103,25 @@ const BottomSheet = ({
 
       <FlatList
         data={displayedMarkers}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.placeId.toString()}
         renderItem={({ item }) => (
           <StoreListItem
             item={item}
             onPress={() => {
-              onItemPress(item.id);
-
+              onItemPress(item.placeId);
               navigation.navigate('StoreDetailScreen', { store: item });
             }}
           />
         )}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isLoading ? (
+            <View style={styles.loaderStyle}>
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            </View>
+          ) : null
+        }
         scrollEnabled={true}
       />
     </Animated.View>
@@ -138,6 +149,10 @@ const styles = StyleSheet.create({
     height: 3,
     backgroundColor: colors.gray[300],
     borderRadius: 48,
+  },
+  loaderStyle: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
 });
 

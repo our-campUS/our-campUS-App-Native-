@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
 import theme from '../../style';
 import typography from '../../style/typography';
@@ -23,15 +24,17 @@ const StoreListItem = ({
   showDiscountDetail = false,
 }) => {
   const [isLiked, setIsLiked] = useState(false);
+  useEffect(() => {
+    setIsLiked(item.isLiked);
+  }, [item.isLiked]);
+
   const categoryLabel =
     CATEGORIES.find((cat) => cat.id === item.category)?.label || item.category;
 
-  const tags =
-    item.partnerTags && item.partnerTags.length > 0
-      ? item.partnerTags
-      : item.partnership
-      ? [item.partnership]
-      : [];
+  const tags = [];
+  if (item.tag) tags.push(item.tag);
+
+  const images = item.imgUrls || [];
 
   return (
     <View style={styles.container}>
@@ -58,7 +61,7 @@ const StoreListItem = ({
           <View style={styles.tagRow}>
             {tags.map((tag, index) => (
               <View key={index} style={styles.badge}>
-                <Text style={styles.badgeText}>{tag}</Text>
+                <Text style={styles.badgeText}>{item.tag}</Text>
               </View>
             ))}
           </View>
@@ -66,27 +69,27 @@ const StoreListItem = ({
 
         <View style={[styles.infoRow, !showImages && { marginBottom: 0 }]}>
           <View style={styles.infoItem}>
-            <StarIcon width={16} height={16} style={{ marginRight: 4 }} />
-            <Text style={styles.infoText}>{item.rating}</Text>
+            <StarIcon width={20} height={20} style={{ marginRight: 4 }} />
+            <Text style={styles.infoText}>{item.star}</Text>
           </View>
 
           {showDiscountDetail ? (
-            item.discount && (
+            item.partnerTitle && (
               <View style={styles.infoItem}>
                 <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
-                <Text style={styles.infoText}>{item.discount}</Text>
+                <Text style={styles.infoText}>{item.partnerTitle}</Text>
               </View>
             )
           ) : (
             <>
-              {item.discount && (
+              {item.partnerTitle && (
                 <View style={styles.infoItem}>
                   <TicketIcon
                     width={20}
                     height={20}
                     style={{ marginRight: 4 }}
                   />
-                  <Text style={styles.infoText}>{item.discount}</Text>
+                  <Text style={styles.infoText}>{item.partnerTitle}</Text>
                 </View>
               )}
               <View style={styles.infoItem}>
@@ -100,14 +103,19 @@ const StoreListItem = ({
         </View>
       </TouchableOpacity>
 
-      {showImages && (
+      {showImages && images.length > 0 && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.imageScroll}
         >
-          {[1, 2, 3, 4].map((img, index) => (
-            <View key={index} style={styles.imagePlaceholder} />
+          {images.map((imgUrl, index) => (
+            <Image
+              key={index}
+              source={{ uri: imgUrl }}
+              style={styles.storeImage}
+              resizeMode="cover"
+            />
           ))}
         </ScrollView>
       )}
@@ -187,7 +195,7 @@ const styles = StyleSheet.create({
   imageScroll: {
     flexDirection: 'row',
   },
-  imagePlaceholder: {
+  storeImage: {
     width: 88,
     height: 88,
     borderRadius: 8,

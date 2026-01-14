@@ -24,6 +24,7 @@ import theme from '../../style';
 
 import CategoryList from '../../components/map/CategoryList';
 import LocationIcon from '../../../assets/icons/location.svg';
+import { getAddressFromCoords, getPartnerships } from '../../api/place';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
@@ -37,6 +38,11 @@ const MapScreen = ({ route }) => {
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState(null);
+  const [currentAddress, setCurrentAddress] = useState('');
+  const [partnerships, setPartnerships] = useState([]);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isListEnd, setIsListEnd] = useState(false);
 
   const isCategoryVisible = !searchKeyword && !selectedCategory;
   const categoryBarHeight = isCategoryVisible ? 60 : 0;
@@ -81,29 +87,77 @@ const MapScreen = ({ route }) => {
     }
   }, [route.params]);
 
+  const fetchPartnershipList = async (isLoadMore = false) => {
+    if (loading) return;
+    if (isLoadMore && isListEnd) return;
+
+    setLoading(true);
+
+    const currentLat = 37.5665;
+    const currentLng = 126.978;
+
+    const cursorToSend = isLoadMore ? nextCursor : null;
+
+    const response = await getPartnerships({
+      lat: currentLat,
+      lng: currentLng,
+      cursor: cursorToSend,
+      size: 5,
+    });
+
+    if (response && response.code === 200) {
+      const newData = response.data;
+
+      if (newData.length === 0) {
+        setIsListEnd(true);
+      } else {
+        const lastItem = newData[newData.length - 1];
+        const newCursor = lastItem.placeId;
+
+        setNextCursor(newCursor);
+
+        if (isLoadMore) {
+          setPartnerships((prev) => [...prev, ...newData]);
+        } else {
+          setPartnerships(newData);
+          setIsListEnd(false);
+        }
+      }
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchPartnershipList(false);
+  }, []);
+
   const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
 
   const displayedMarkers = useMemo(() => {
+    let sourceData = partnerships;
+
     if (selectedMarkerId) {
-      return SEARCH_RESULTS.filter((item) => item.id === selectedMarkerId);
+      return sourceData.filter((item) => item.placeId === selectedMarkerId);
     }
 
     if (searchKeyword) {
-      return SEARCH_RESULTS.filter(
+      return sourceData.filter(
         (item) =>
           item.name.includes(searchKeyword) ||
-          item.address.includes(searchKeyword)
+          (item.address && item.address.includes(searchKeyword))
       );
     }
 
     if (selectedCategory) {
-      return SEARCH_RESULTS.filter(
-        (item) => item.category === selectedCategory.id
+      return sourceData.filter(
+        (item) =>
+          item.category && item.category.includes(selectedCategory.label)
       );
     }
 
-    return SEARCH_RESULTS;
-  }, [selectedMarkerId, selectedCategory, searchKeyword]);
+    return sourceData;
+  }, [selectedMarkerId, selectedCategory, searchKeyword, partnerships]);
 
   const handleReset = () => {
     setSelectedMarkerId(null);
@@ -132,6 +186,17 @@ const MapScreen = ({ route }) => {
     }
   };
 
+  const handleCameraIdle = async (e) => {
+    const { latitude, longitude } = e;
+
+    const addressData = await getAddressFromCoords(latitude, longitude);
+
+    if (addressData) {
+      setCurrentAddress(addressData.text);
+      console.log('현재 주소:', addressData.text);
+    }
+  };
+
   const buttonOpacity = sheetHeightAnimated.interpolate({
     inputRange: [HEIGHT_LIST, HEIGHT_LIST + 100],
     outputRange: [1, 0],
@@ -149,30 +214,31 @@ const MapScreen = ({ route }) => {
       <NaverMapView
         ref={mapRef}
         style={{ flex: 1 }}
+        onCameraIdle={handleCameraIdle}
         initialCamera={{ latitude: 37.5665, longitude: 126.978, zoom: 16 }}
         isShowLocationButton={false}
         isShowZoomControls={false}
         onTapMap={handleReset}
       >
-        {SEARCH_RESULTS.map((item) => {
+        {displayedMarkers.map((item) => {
           const isVisible = displayedMarkers.some(
             (marker) => marker.id === item.id
           );
           let pinType = 'DEFAULT';
-          if (item.id === selectedMarkerId) pinType = 'SELECTED';
+          if (item.placeId === selectedMarkerId) pinType = 'SELECTED';
           else if (item.type === 'PARTNER') pinType = 'PARTNER';
 
           const pinSize = getPinSize(pinType);
 
           return (
             <NaverMapMarkerOverlay
-              key={item.id}
+              key={item.placeId}
               latitude={item.latitude}
               longitude={item.longitude}
               width={pinSize}
               height={pinSize}
               anchor={{ x: 0.5, y: pinType === 'SELECTED' ? 1 : 0.5 }}
-              onTap={() => setSelectedMarkerId(item.id)}
+              onTap={() => setSelectedMarkerId(item.placeId)}
               caption={{ text: item.name }}
               isHidden={!isVisible}
             >
@@ -195,7 +261,7 @@ const MapScreen = ({ route }) => {
           <SearchBar
             value={searchKeyword}
             onPress={() => navigation.navigate('MapSearchScreen')}
-            placeholder="원하는 제휴를 검색하세요"
+            placeholder={currentAddress || '원하는 제휴를 검색하세요'}
             onBackPress={handleReset}
             onClearPress={handleReset}
             showSoftInputOnFocus={false}
@@ -203,7 +269,7 @@ const MapScreen = ({ route }) => {
         ) : selectedCategory ? (
           <SearchBar
             value={selectedCategory.label}
-            placeholder="원하는 제휴를 검색하세요"
+            placeholder={currentAddress || '원하는 제휴를 검색하세요'}
             onBackPress={handleReset}
             onClearPress={handleReset}
           />
@@ -255,6 +321,8 @@ const MapScreen = ({ route }) => {
         onItemPress={(id) => setSelectedMarkerId(id)}
         maxHeight={sheetMaxHeight}
         sheetHeightAnimated={sheetHeightAnimated}
+        onEndReached={() => fetchPartnershipList(true)}
+        isLoading={loading}
       />
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   SafeAreaView,
   Platform,
   Image,
+  Dimensions,
+  FlatList,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -32,6 +34,8 @@ import ShareIcon from '../../../assets/share.svg';
 import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
 import CloseIcon from '../../../assets/icons/common/close.svg';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -52,6 +56,7 @@ const StoreDetailScreen = () => {
     ...DUMMY_STORE,
     ...paramStore,
 
+    imgUrls: paramStore.imgUrls || [],
     hours: paramStore.hours || DUMMY_STORE.hours,
     reviews: paramStore.reviews || DUMMY_STORE.reviews,
     category:
@@ -72,6 +77,14 @@ const StoreDetailScreen = () => {
     address: paramStore.address || DUMMY_STORE.address,
   };
 
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    if (viewableItems.length > 0) {
+      setActiveImageIndex(viewableItems[0].index);
+    }
+  }).current;
+
   const [isLiked, setIsLiked] = useState(false);
 
   return (
@@ -88,8 +101,41 @@ const StoreDetailScreen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 50 }}
         >
-          <View style={styles.topImagePlaceholder}>
-            <Ionicons name="image-outline" size={48} color={colors.gray[300]} />
+          <View style={styles.bannerContainer}>
+            {storeData.imgUrls && storeData.imgUrls.length > 0 ? (
+              <View>
+                <FlatList
+                  data={storeData.imgUrls}
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => index.toString()}
+                  onViewableItemsChanged={onViewableItemsChanged}
+                  viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
+                  renderItem={({ item }) => (
+                    <Image
+                      source={{ uri: item }}
+                      style={{ width: SCREEN_WIDTH, height: 250 }}
+                      resizeMode="cover"
+                    />
+                  )}
+                />
+
+                <View style={styles.pageIndicator}>
+                  <Text style={styles.pageIndicatorText}>
+                    {activeImageIndex + 1} / {storeData.imgUrls.length}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.emptyBanner}>
+                <Ionicons
+                  name="image-outline"
+                  size={48}
+                  color={colors.gray[300]}
+                />
+              </View>
+            )}
           </View>
 
           <View style={styles.infoSection}>
@@ -513,6 +559,30 @@ const styles = StyleSheet.create({
   customButtonText: {
     ...typography.heading6,
     colors: colors.gray['000'],
+  },
+  bannerContainer: {
+    height: 250,
+    position: 'relative',
+  },
+  emptyBanner: {
+    height: 250,
+    backgroundColor: colors.gray[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pageIndicator: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  pageIndicatorText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
 
