@@ -8,6 +8,7 @@ import {
   Dimensions,
   Alert,
   PermissionsAndroid,
+  Keyboard, // 키보드 내리기용
 } from 'react-native';
 import {
   NaverMapView,
@@ -24,11 +25,16 @@ import theme from '../../style';
 
 import CategoryList from '../../components/map/CategoryList';
 import LocationIcon from '../../../assets/icons/location.svg';
-import { getAddressFromCoords, getPartnerships } from '../../api/place';
+import {
+  getAddressFromCoords,
+  getPartnerships,
+  getMapMarkers,
+} from '../../api/place';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
 const HEIGHT_ITEM = 280;
+const HEIGHT_HIDDEN = 0;
 
 const MapScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -39,18 +45,20 @@ const MapScreen = ({ route }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState(null);
   const [currentAddress, setCurrentAddress] = useState('');
+
   const [partnerships, setPartnerships] = useState([]);
+  const [mapMarkers, setMapMarkers] = useState([]);
+
   const [nextCursor, setNextCursor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
 
   const isCategoryVisible = !searchKeyword && !selectedCategory;
-  const categoryBarHeight = isCategoryVisible ? 60 : 0;
 
+  const sheetHeightAnimated = useRef(new Animated.Value(HEIGHT_HIDDEN)).current;
   const screenHeight = Dimensions.get('window').height;
   const topHeaderHeight = insets.top + 60 + 20;
-  const sheetMaxHeight = screenHeight - topHeaderHeight - categoryBarHeight;
-  const sheetHeightAnimated = useRef(new Animated.Value(HEIGHT_LIST)).current;
+  const sheetMaxHeight = screenHeight - topHeaderHeight;
 
   useEffect(() => {
     if (route.params) {
@@ -60,22 +68,9 @@ const MapScreen = ({ route }) => {
         setSearchKeyword(keyword);
         setSelectedCategory(null);
         setSelectedMarkerId(null);
-        const firstResult = SEARCH_RESULTS.find(
-          (item) =>
-            item.name.includes(keyword) || item.address.includes(keyword)
-        );
-        if (firstResult) {
-          mapRef.current?.animateCameraTo({
-            latitude: firstResult.latitude,
-            longitude: firstResult.longitude,
-            zoom: 15,
-            duration: 500,
-          });
-        }
       } else if (searchType === 'LOCATION' && selectedLocation) {
         setSearchKeyword(selectedLocation.name);
-        setSelectedCategory(null);
-        setSelectedMarkerId(selectedLocation.id);
+        setSelectedMarkerId(selectedLocation.placeId);
 
         mapRef.current?.animateCameraTo({
           latitude: selectedLocation.latitude,
@@ -87,7 +82,56 @@ const MapScreen = ({ route }) => {
     }
   }, [route.params]);
 
+  const displayedMarkers = useMemo(() => {
+    if (searchKeyword || selectedCategory) {
+      return partnerships;
+    }
+
+    if (selectedMarkerId) {
+      const foundInMap = mapMarkers.find(
+        (item) => item.placeId === selectedMarkerId
+      );
+      if (foundInMap) return [foundInMap];
+
+      const foundInList = partnerships.find(
+        (item) => item.placeId === selectedMarkerId
+      );
+      if (foundInList) return [foundInList];
+
+      return [];
+    }
+
+    return [];
+  }, [
+    searchKeyword,
+    selectedCategory,
+    selectedMarkerId,
+    partnerships,
+    mapMarkers,
+  ]);
+
+  useEffect(() => {
+    let targetHeight = HEIGHT_HIDDEN;
+
+    if (selectedMarkerId) {
+      targetHeight = HEIGHT_ITEM;
+    } else if (searchKeyword || selectedCategory) {
+      targetHeight = HEIGHT_LIST;
+    } else {
+      targetHeight = HEIGHT_HIDDEN;
+    }
+
+    Animated.spring(sheetHeightAnimated, {
+      toValue: targetHeight,
+      useNativeDriver: false,
+      friction: 8,
+      tension: 40,
+    }).start();
+  }, [selectedMarkerId, searchKeyword, selectedCategory]);
+
   const fetchPartnershipList = async (isLoadMore = false) => {
+    if (!searchKeyword && !selectedCategory) return;
+
     if (loading) return;
     if (isLoadMore && isListEnd) return;
 
@@ -95,7 +139,6 @@ const MapScreen = ({ route }) => {
 
     const currentLat = 37.5665;
     const currentLng = 126.978;
-
     const cursorToSend = isLoadMore ? nextCursor : null;
 
     const response = await getPartnerships({
@@ -107,14 +150,11 @@ const MapScreen = ({ route }) => {
 
     if (response && response.code === 200) {
       const newData = response.data;
-
       if (newData.length === 0) {
         setIsListEnd(true);
       } else {
         const lastItem = newData[newData.length - 1];
-        const newCursor = lastItem.placeId;
-
-        setNextCursor(newCursor);
+        setNextCursor(lastItem.placeId);
 
         if (isLoadMore) {
           setPartnerships((prev) => [...prev, ...newData]);
@@ -124,42 +164,61 @@ const MapScreen = ({ route }) => {
         }
       }
     }
-
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchPartnershipList(false);
-  }, []);
-
-  const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
-
-  const displayedMarkers = useMemo(() => {
-    let sourceData = partnerships;
-
-    if (selectedMarkerId) {
-      return sourceData.filter((item) => item.placeId === selectedMarkerId);
+    if (searchKeyword || selectedCategory) {
+      fetchPartnershipList(false);
+    } else {
+      setPartnerships([]);
     }
+  }, [searchKeyword, selectedCategory]);
 
-    if (searchKeyword) {
-      return sourceData.filter(
-        (item) =>
-          item.name.includes(searchKeyword) ||
-          (item.address && item.address.includes(searchKeyword))
-      );
+  const getDeltas = (zoom) => {
+    const zoomFactor = Math.pow(2, 16 - zoom);
+
+    return {
+      latitudeDelta: 0.01 * zoomFactor,
+      longitudeDelta: 0.01 * zoomFactor,
+    };
+  };
+
+  const handleCameraIdle = async (e) => {
+    const { latitude, longitude, zoom } = e;
+
+    const addressData = await getAddressFromCoords(latitude, longitude);
+    if (addressData) setCurrentAddress(addressData.text);
+
+    if (mapRef.current) {
+      try {
+        let minLat, maxLat, minLng, maxLng;
+
+        const currentZoom = zoom || 16;
+        const { latitudeDelta, longitudeDelta } = getDeltas(currentZoom);
+
+        minLat = latitude - latitudeDelta;
+        maxLat = latitude + latitudeDelta;
+        minLng = longitude - longitudeDelta;
+        maxLng = longitude + longitudeDelta;
+
+        console.log(`lat: ${minLat} ~ ${maxLat}, lng: ${minLng} ~ ${maxLng}`);
+
+        if (minLat && maxLat && minLng && maxLng) {
+          const markers = await getMapMarkers(minLat, maxLat, minLng, maxLng);
+          if (markers) {
+            setMapMarkers(markers);
+            console.log(`${markers.length}개의 핀 로드 완료`);
+          }
+        }
+      } catch (err) {
+        console.error('영역 계산 로직 에러:', err);
+      }
     }
-
-    if (selectedCategory) {
-      return sourceData.filter(
-        (item) =>
-          item.category && item.category.includes(selectedCategory.label)
-      );
-    }
-
-    return sourceData;
-  }, [selectedMarkerId, selectedCategory, searchKeyword, partnerships]);
+  };
 
   const handleReset = () => {
+    Keyboard.dismiss();
     setSelectedMarkerId(null);
     setSelectedCategory(null);
     setSearchKeyword(null);
@@ -171,41 +230,19 @@ const MapScreen = ({ route }) => {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
         );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert(
-            '권한 거부',
-            '위치 권한을 허용해야 현재 위치를 찾을 수 있습니다.'
-          );
-          return;
-        }
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
       }
       mapRef.current?.setLocationTrackingMode('Follow');
     } catch (e) {
       console.error(e);
-      Alert.alert('오류', '현위치로 이동할 수 없습니다.');
     }
   };
 
-  const handleCameraIdle = async (e) => {
-    const { latitude, longitude } = e;
-
-    const addressData = await getAddressFromCoords(latitude, longitude);
-
-    if (addressData) {
-      setCurrentAddress(addressData.text);
-      console.log('현재 주소:', addressData.text);
-    }
-  };
-
-  const buttonOpacity = sheetHeightAnimated.interpolate({
-    inputRange: [HEIGHT_LIST, HEIGHT_LIST + 100],
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
+  const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
 
   const buttonTranslateY = sheetHeightAnimated.interpolate({
-    inputRange: [HEIGHT_LIST, sheetMaxHeight],
-    outputRange: [0, 100],
+    inputRange: [HEIGHT_HIDDEN, HEIGHT_ITEM, HEIGHT_LIST],
+    outputRange: [0, -20, -20],
     extrapolate: 'clamp',
   });
 
@@ -220,14 +257,9 @@ const MapScreen = ({ route }) => {
         isShowZoomControls={false}
         onTapMap={handleReset}
       >
-        {displayedMarkers.map((item) => {
-          const isVisible = displayedMarkers.some(
-            (marker) => marker.id === item.id
-          );
-          let pinType = 'DEFAULT';
-          if (item.placeId === selectedMarkerId) pinType = 'SELECTED';
-          else if (item.type === 'PARTNER') pinType = 'PARTNER';
-
+        {mapMarkers.map((item) => {
+          const isSelected = item.placeId === selectedMarkerId;
+          const pinType = isSelected ? 'SELECTED' : 'PARTNER';
           const pinSize = getPinSize(pinType);
 
           return (
@@ -237,10 +269,11 @@ const MapScreen = ({ route }) => {
               longitude={item.longitude}
               width={pinSize}
               height={pinSize}
-              anchor={{ x: 0.5, y: pinType === 'SELECTED' ? 1 : 0.5 }}
-              onTap={() => setSelectedMarkerId(item.placeId)}
-              caption={{ text: item.name }}
-              isHidden={!isVisible}
+              anchor={{ x: 0.5, y: isSelected ? 1 : 0.5 }}
+              onTap={() => {
+                setSelectedMarkerId(item.placeId);
+              }}
+              caption={{ text: item.placeName }}
             >
               <MapPin type={pinType} category={item.category} />
             </NaverMapMarkerOverlay>
@@ -248,6 +281,7 @@ const MapScreen = ({ route }) => {
         })}
       </NaverMapView>
 
+      {/* 상단 검색바 영역 */}
       <View
         style={[
           styles.overlay,
@@ -257,34 +291,36 @@ const MapScreen = ({ route }) => {
           },
         ]}
       >
-        {searchKeyword ? (
-          <SearchBar
-            value={searchKeyword}
-            onPress={() => navigation.navigate('MapSearchScreen')}
-            placeholder={currentAddress || '원하는 제휴를 검색하세요'}
-            onBackPress={handleReset}
-            onClearPress={handleReset}
-            showSoftInputOnFocus={false}
-          />
-        ) : selectedCategory ? (
-          <SearchBar
-            value={selectedCategory.label}
-            placeholder={currentAddress || '원하는 제휴를 검색하세요'}
-            onBackPress={handleReset}
-            onClearPress={handleReset}
-          />
-        ) : (
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {
-              navigation.navigate('MapSearchScreen');
-            }}
-          >
-            <View pointerEvents="none">
-              <SearchBar placeholder="원하는 제휴를 검색하세요" />
-            </View>
-          </TouchableOpacity>
-        )}
+        <View>
+          {searchKeyword ? (
+            <SearchBar
+              value={searchKeyword}
+              onPress={() => navigation.navigate('MapSearchScreen')}
+              placeholder={currentAddress || '원하는 제휴를 검색하세요'}
+              onBackPress={handleReset}
+              onClearPress={handleReset}
+              showSoftInputOnFocus={false}
+            />
+          ) : selectedCategory ? (
+            <SearchBar
+              value={selectedCategory.label}
+              placeholder={currentAddress || '원하는 제휴를 검색하세요'}
+              onBackPress={handleReset}
+              onClearPress={handleReset}
+            />
+          ) : (
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => navigation.navigate('MapSearchScreen')}
+            >
+              <View pointerEvents="none">
+                <SearchBar
+                  placeholder={currentAddress || '원하는 제휴를 검색하세요'}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {!selectedCategory && !searchKeyword && (
           <CategoryList
@@ -299,10 +335,7 @@ const MapScreen = ({ route }) => {
       <Animated.View
         style={[
           styles.myLocationButtonWrapper,
-          {
-            opacity: buttonOpacity,
-            transform: [{ translateY: buttonTranslateY }],
-          },
+          { transform: [{ translateY: buttonTranslateY }] },
         ]}
         pointerEvents="box-none"
       >
@@ -342,8 +375,7 @@ const styles = StyleSheet.create({
   },
   myLocationButtonWrapper: {
     position: 'absolute',
-    top: '50%',
-    marginTop: -24,
+    bottom: 30,
     right: 20,
     zIndex: 2,
   },
