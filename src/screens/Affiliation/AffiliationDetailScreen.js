@@ -323,11 +323,12 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
           <View style={styles.recommendContainer}>
             {detailData?.category === 'PARTNERSHIP' ? (
               <Text style={styles.recommendTitle}>
-                총학생회에서 진행하는 {'\n'}다른 제휴 매장 둘러보기
+                {detailData?.writerName}에서 진행하는 {'\n'}다른 제휴 매장
+                둘러보기
               </Text>
             ) : (
               <Text style={styles.recommendTitle}>
-                총학생회의 다가오는 행사
+                {detailData?.writerName}의 다가오는 행사
               </Text>
             )}
             <FlatList
