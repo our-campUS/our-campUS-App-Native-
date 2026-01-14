@@ -29,7 +29,7 @@ const BottomSheet = ({
   isLoading,
 }) => {
   const navigation = useNavigation();
-  const HEIGHT_MAX = maxHeight * 0.85;
+  const HEIGHT_MAX = maxHeight * 0.75;
   const sheetHeight = sheetHeightAnimated;
 
   const startHeight = useRef(0);

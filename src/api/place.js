@@ -89,3 +89,28 @@ export const getMapMarkers = async (minLat, maxLat, minLng, maxLng) => {
     return [];
   }
 };
+
+export const getPartnershipDetail = async (postId, lat, lng) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const response = await api.get('/places/partnership/detail', {
+      params: {
+        postId: postId,
+        lat: lat,
+        lng: lng,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error('상세 정보 조회 실패:', error);
+    return null;
+  }
+};

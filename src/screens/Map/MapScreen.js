@@ -29,6 +29,7 @@ import {
   getAddressFromCoords,
   getPartnerships,
   getMapMarkers,
+  getPartnershipDetail,
 } from '../../api/place';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -48,6 +49,7 @@ const MapScreen = ({ route }) => {
 
   const [partnerships, setPartnerships] = useState([]);
   const [mapMarkers, setMapMarkers] = useState([]);
+  const [selectedStoreDetail, setSelectedStoreDetail] = useState(null);
 
   const [nextCursor, setNextCursor] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -83,29 +85,25 @@ const MapScreen = ({ route }) => {
   }, [route.params]);
 
   const displayedMarkers = useMemo(() => {
+    if (selectedStoreDetail && selectedMarkerId) {
+      return [selectedStoreDetail];
+    }
+
     if (searchKeyword || selectedCategory) {
       return partnerships;
     }
 
     if (selectedMarkerId) {
-      const foundInMap = mapMarkers.find(
-        (item) => item.placeId === selectedMarkerId
-      );
-      if (foundInMap) return [foundInMap];
-
-      const foundInList = partnerships.find(
-        (item) => item.placeId === selectedMarkerId
-      );
-      if (foundInList) return [foundInList];
-
-      return [];
+      const found = mapMarkers.find((m) => m.placeId === selectedMarkerId);
+      return found ? [found] : [];
     }
 
     return [];
   }, [
+    selectedStoreDetail,
+    selectedMarkerId,
     searchKeyword,
     selectedCategory,
-    selectedMarkerId,
     partnerships,
     mapMarkers,
   ]);
@@ -217,11 +215,38 @@ const MapScreen = ({ route }) => {
     }
   };
 
+  const handlePinPress = async (item) => {
+    setSelectedMarkerId(item.placeId);
+
+    setSearchKeyword(null);
+    setSelectedCategory(null);
+    setPartnerships([]);
+
+    // TODO 현재 위치 좌표 (실제로는 state나 geolocation 값 사용)
+    const currentLat = 37.50415;
+    const currentLng = 126.957;
+
+    if (item.postId) {
+      const detailData = await getPartnershipDetail(
+        item.postId,
+        currentLat,
+        currentLng
+      );
+
+      if (detailData) {
+        setSelectedStoreDetail(detailData);
+      }
+    } else {
+      setSelectedStoreDetail(item);
+    }
+  };
+
   const handleReset = () => {
     Keyboard.dismiss();
     setSelectedMarkerId(null);
     setSelectedCategory(null);
     setSearchKeyword(null);
+    setSelectedStoreDetail(null);
   };
 
   const handleCurrentLocation = async () => {
@@ -270,9 +295,7 @@ const MapScreen = ({ route }) => {
               width={pinSize}
               height={pinSize}
               anchor={{ x: 0.5, y: isSelected ? 1 : 0.5 }}
-              onTap={() => {
-                setSelectedMarkerId(item.placeId);
-              }}
+              onTap={() => handlePinPress(item)}
               caption={{ text: item.placeName }}
             >
               <MapPin type={pinType} category={item.category} />
