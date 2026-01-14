@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
   searchBarWrapper: {
     paddingBottom: 10,
     paddingTop: Platform.OS === 'android' ? 20 : 10,
-    paddingHorizontal: 10,
   },
   categoryWrapper: {
     paddingVertical: 12,

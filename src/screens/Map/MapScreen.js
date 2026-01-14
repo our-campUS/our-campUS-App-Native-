@@ -270,7 +270,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 999,
-    paddingHorizontal: 10,
     paddingBottom: 10,
   },
   myLocationButtonWrapper: {
