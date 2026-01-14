@@ -17,7 +17,12 @@ const styles = StyleSheet.create({
   },
 });
 
-const AffiliationCarousel = ({ isOrange = false, data, navigation = null }) => {
+const AffiliationCarousel = ({
+  isOrange = false,
+  councilType = null,
+  data,
+  navigation = null,
+}) => {
   return (
     <View style={[styles.container, isOrange && styles.activeOrangeContainer]}>
       <FlatList
@@ -34,11 +39,12 @@ const AffiliationCarousel = ({ isOrange = false, data, navigation = null }) => {
             <AffiliationCarouselItem
               item={item}
               isOrange={isOrange}
+              councilType={councilType}
               navigation={navigation}
             />
           </View>
         )}
-        keyExtractor={(item) => item.postId}
+        keyExtractor={(item) => item.postId || item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 12 }}

@@ -26,6 +26,9 @@ import {
   getStudentMajorEventList,
   getStudentCollegeAffiliateList,
   getStudentCollegeEventList,
+  getStudentSchoolUpcomingEventList,
+  getStudentMajorUpcomingEventList,
+  getStudentCollegeUpcomingEventList,
 } from '../../api/studentAffiliate';
 import useAuthStore from '../../store/authStore';
 
@@ -82,6 +85,10 @@ const AffiliationMainScreen = ({ navigation }) => {
   const [collegeAffiliatePosts, setCollegeAffiliatePosts] = useState([]);
   const [collegeEventPosts, setCollegeEventPosts] = useState([]);
   const [selectedTab, setSelectedTab] = useState('school');
+  const [upcomingSchoolEvents, setUpcomingSchoolEvents] = useState([]);
+  const [upcomingMajorEvents, setUpcomingMajorEvents] = useState([]);
+  const [upcomingCollegeEvents, setUpcomingCollegeEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
 
   const fetchAllPosts = async () => {
     const schoolAffiliatePosts = await getStudentSchoolAffiliateList(
@@ -100,12 +107,24 @@ const AffiliationMainScreen = ({ navigation }) => {
     setCollegeAffiliatePosts(collegeAffiliatePosts);
     const collegeEventPosts = await getStudentCollegeEventList(accessToken);
     setCollegeEventPosts(collegeEventPosts);
+    const upcomingSchoolEvents = await getStudentSchoolUpcomingEventList(
+      accessToken
+    );
+    setUpcomingSchoolEvents(upcomingSchoolEvents);
+    const upcomingMajorEvents = await getStudentMajorUpcomingEventList(
+      accessToken
+    );
+    setUpcomingMajorEvents(upcomingMajorEvents);
+    const upcomingCollegeEvents = await getStudentCollegeUpcomingEventList(
+      accessToken
+    );
+    setUpcomingCollegeEvents(upcomingCollegeEvents);
+    // 초기 로드 시 school을 기본값으로 설정
+    setUpcomingEvents(upcomingSchoolEvents);
   };
 
   useEffect(() => {
     fetchAllPosts();
-    setAffiliatePosts(schoolAffiliatePosts);
-    setEventPosts(schoolEventPosts);
   }, [accessToken]);
 
   const handleSelectTab = (tab) => {
@@ -114,13 +133,17 @@ const AffiliationMainScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+    // selectedTab 변경 시 이미 로드된 데이터만 사용 (불필요한 API 재호출 방지)
     if (selectedTab === 'school') {
       setAffiliatePosts(schoolAffiliatePosts);
       setEventPosts(schoolEventPosts);
+      setUpcomingEvents(upcomingSchoolEvents);
     } else if (selectedTab === 'major') {
       setAffiliatePosts(majorAffiliatePosts);
       setEventPosts(majorEventPosts);
+      setUpcomingEvents(upcomingMajorEvents);
     } else if (selectedTab === 'college') {
+      setUpcomingEvents(upcomingCollegeEvents);
       setAffiliatePosts(collegeAffiliatePosts);
       setEventPosts(collegeEventPosts);
     }
@@ -136,7 +159,15 @@ const AffiliationMainScreen = ({ navigation }) => {
           onSelectTab={handleSelectTab}
         />
       </View>
-      <AffiliationCarousel />
+      {upcomingEvents.length > 0 && (
+        <AffiliationCarousel
+          isOrange={false}
+          councilType={selectedTab}
+          data={upcomingEvents}
+          navigation={navigation}
+        />
+      )}
+      {/* <AffiliationCarousel /> */}
       {/* <AffiliationColumnList navigation={navigation} /> */}
       <View style={styles.activityTypeSelector}>
         <Pressable

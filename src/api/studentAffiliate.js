@@ -176,3 +176,72 @@ export const getStudentAffiliateRecommendList = async (
     return [];
   }
 };
+
+// 총학생회 72시간 이내 행사 목록 조회
+export const getStudentSchoolUpcomingEventList = async (accessToken) => {
+  try {
+    const response = await api.get(
+      '/users/student-council/posts/school/events/upcoming',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          page: 0,
+          size: 3,
+        },
+      }
+    );
+    console.log('getStudentSchoolUpcomingEventList response', response);
+    return response?.data?.data?.content || [];
+  } catch (error) {
+    console.error('getStudentSchoolUpcomingEventList error', error.response);
+    return [];
+  }
+};
+
+// 전공 학생회 72시간 이내 행사 목록 조회
+export const getStudentMajorUpcomingEventList = async (accessToken) => {
+  try {
+    const response = await api.get(
+      '/users/student-council/posts/major/events/upcoming',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          page: 0,
+          size: 3,
+        },
+      }
+    );
+    console.log('getStudentMajorUpcomingEventList response', response);
+    return response?.data?.data?.content || [];
+  } catch (error) {
+    console.error('getStudentMajorUpcomingEventList error', error.response);
+    return [];
+  }
+};
+
+// 단과대 72시간 이내 행사 목록 조회
+export const getStudentCollegeUpcomingEventList = async (accessToken) => {
+  try {
+    const response = await api.get(
+      '/users/student-council/posts/college/events/upcoming',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          page: 0,
+          size: 3,
+        },
+      }
+    );
+    console.log('getStudentCollegeUpcomingEventList response', response);
+    return response?.data?.data?.content || [];
+  } catch (error) {
+    console.error('getStudentCollegeUpcomingEventList error', error.response);
+    return [];
+  }
+};
