@@ -8,7 +8,7 @@ import {
   Dimensions,
   Alert,
   PermissionsAndroid,
-  Keyboard, // 키보드 내리기용
+  Keyboard,
 } from 'react-native';
 import {
   NaverMapView,
@@ -30,6 +30,7 @@ import {
   getPartnerships,
   getMapMarkers,
   getPartnershipDetail,
+  getPlacesByKeyword,
 } from '../../api/place';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -83,7 +84,6 @@ const MapScreen = ({ route }) => {
       }
     }
   }, [route.params]);
-
   const displayedMarkers = useMemo(() => {
     if (selectedStoreDetail && selectedMarkerId) {
       return [selectedStoreDetail];
@@ -135,20 +135,71 @@ const MapScreen = ({ route }) => {
 
     setLoading(true);
 
-    const currentLat = 37.5665;
-    const currentLng = 126.978;
-    const cursorToSend = isLoadMore ? nextCursor : null;
+    try {
+      let newData = [];
 
-    const response = await getPartnerships({
-      lat: currentLat,
-      lng: currentLng,
-      cursor: cursorToSend,
-      size: 5,
-    });
+      if (selectedCategory) {
+        if (isLoadMore) {
+          setLoading(false);
+          return;
+        }
 
-    if (response && response.code === 200) {
-      const newData = response.data;
+        const rawData = await getPlacesByKeyword(selectedCategory.label);
+
+        if (rawData) {
+          newData = rawData.map((item) => {
+            const targetId = item.placeKey;
+            const existingPartner = mapMarkers.find(
+              (m) => m.placeId == targetId
+            );
+
+            return {
+              ...item,
+              placeId: targetId || item.id || `temp_${Math.random()}`,
+              name: item.placeName,
+              latitude: item.coordinate?.latitude || 0,
+              longitude: item.coordinate?.longitude || 0,
+
+              type:
+                existingPartner || item.partnerTitle ? 'PARTNER' : 'DEFAULT',
+
+              ...existingPartner,
+            };
+          });
+        }
+
+        setMapMarkers(newData);
+
+        if (newData.length > 0) {
+          mapRef.current?.animateCameraTo({
+            latitude: newData[0].latitude,
+            longitude: newData[0].longitude,
+            zoom: 15,
+            duration: 500,
+          });
+        }
+      } else {
+        const currentLat = 37.5665;
+        const currentLng = 126.978;
+        const cursorToSend = isLoadMore ? nextCursor : null;
+
+        const response = await getPartnerships({
+          lat: currentLat,
+          lng: currentLng,
+          cursor: cursorToSend,
+          size: 5,
+        });
+
+        if (response && response.code === 200) {
+          newData = response.data.map((item) => ({
+            ...item,
+            type: 'PARTNER',
+          }));
+        }
+      }
+
       if (newData.length === 0) {
+        if (!isLoadMore) setPartnerships([]);
         setIsListEnd(true);
       } else {
         const lastItem = newData[newData.length - 1];
@@ -161,8 +212,11 @@ const MapScreen = ({ route }) => {
           setIsListEnd(false);
         }
       }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -183,6 +237,8 @@ const MapScreen = ({ route }) => {
   };
 
   const handleCameraIdle = async (e) => {
+    if (searchKeyword || selectedCategory) return;
+
     const { latitude, longitude, zoom } = e;
 
     const addressData = await getAddressFromCoords(latitude, longitude);
@@ -205,7 +261,12 @@ const MapScreen = ({ route }) => {
         if (minLat && maxLat && minLng && maxLng) {
           const markers = await getMapMarkers(minLat, maxLat, minLng, maxLng);
           if (markers) {
-            setMapMarkers(markers);
+            const partnersWithType = markers.map((item) => ({
+              ...item,
+              type: 'PARTNER',
+            }));
+
+            setMapMarkers(partnersWithType);
             console.log(`${markers.length}개의 핀 로드 완료`);
           }
         }
@@ -284,7 +345,14 @@ const MapScreen = ({ route }) => {
       >
         {mapMarkers.map((item) => {
           const isSelected = item.placeId === selectedMarkerId;
-          const pinType = isSelected ? 'SELECTED' : 'PARTNER';
+          let pinType = 'DEFAULT';
+          if (isSelected) {
+            pinType = 'SELECTED';
+          } else if (item.partnerTitle || item.type === 'PARTNER') {
+            pinType = 'PARTNER';
+          } else {
+            pinType = 'DEFAULT';
+          }
           const pinSize = getPinSize(pinType);
 
           return (

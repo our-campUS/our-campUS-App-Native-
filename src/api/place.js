@@ -114,3 +114,27 @@ export const getPartnershipDetail = async (postId, lat, lng) => {
     return null;
   }
 };
+
+export const getPlacesByKeyword = async (keyword) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const response = await api.get('/places/search/keyword', {
+      params: {
+        keyword: keyword,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200) {
+      console.log(response.data.data);
+      return response.data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('키워드 검색 실패:', error);
+    return [];
+  }
+};
