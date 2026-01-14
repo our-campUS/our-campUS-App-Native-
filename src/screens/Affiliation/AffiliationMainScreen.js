@@ -11,6 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import HostByTab from '../../components/Affiliation/HostByTab';
 import AffiliationCarousel from '../../components/Affiliation/AffiliationCarousel';
 import AffiliationColumnList from '../../components/Affiliation/AffiliationColumnList';
@@ -29,6 +31,7 @@ import {
   getStudentSchoolUpcomingEventList,
   getStudentMajorUpcomingEventList,
   getStudentCollegeUpcomingEventList,
+  toggleStudentAffiliateLike,
 } from '../../api/studentAffiliate';
 import useAuthStore from '../../store/authStore';
 
@@ -89,42 +92,66 @@ const AffiliationMainScreen = ({ navigation }) => {
   const [upcomingMajorEvents, setUpcomingMajorEvents] = useState([]);
   const [upcomingCollegeEvents, setUpcomingCollegeEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [loadedTabs, setLoadedTabs] = useState(new Set()); // 이미 로드된 탭 추적
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchAllPosts = async () => {
-    const schoolAffiliatePosts = await getStudentSchoolAffiliateList(
-      accessToken
-    );
-    setSchoolAffiliatePosts(schoolAffiliatePosts);
-    const schoolEventPosts = await getStudentSchoolEventList(accessToken);
-    setSchoolEventPosts(schoolEventPosts);
-    const majorAffiliatePosts = await getStudentMajorAffiliateList(accessToken);
-    setMajorAffiliatePosts(majorAffiliatePosts);
-    const majorEventPosts = await getStudentMajorEventList(accessToken);
-    setMajorEventPosts(majorEventPosts);
-    const collegeAffiliatePosts = await getStudentCollegeAffiliateList(
-      accessToken
-    );
-    setCollegeAffiliatePosts(collegeAffiliatePosts);
-    const collegeEventPosts = await getStudentCollegeEventList(accessToken);
-    setCollegeEventPosts(collegeEventPosts);
-    const upcomingSchoolEvents = await getStudentSchoolUpcomingEventList(
-      accessToken
-    );
-    setUpcomingSchoolEvents(upcomingSchoolEvents);
-    const upcomingMajorEvents = await getStudentMajorUpcomingEventList(
-      accessToken
-    );
-    setUpcomingMajorEvents(upcomingMajorEvents);
-    const upcomingCollegeEvents = await getStudentCollegeUpcomingEventList(
-      accessToken
-    );
-    setUpcomingCollegeEvents(upcomingCollegeEvents);
-    // 초기 로드 시 school을 기본값으로 설정
-    setUpcomingEvents(upcomingSchoolEvents);
+  // 특정 탭의 데이터를 fetch하는 함수
+  const fetchTabData = async (tab) => {
+    if (!accessToken) return;
+
+    setIsLoading(true);
+    try {
+      if (tab === 'school') {
+        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+          getStudentSchoolAffiliateList(accessToken),
+          getStudentSchoolEventList(accessToken),
+          getStudentSchoolUpcomingEventList(accessToken),
+        ]);
+        setSchoolAffiliatePosts(affiliatePosts);
+        setSchoolEventPosts(eventPosts);
+        setUpcomingSchoolEvents(upcomingEvents);
+        setAffiliatePosts(affiliatePosts);
+        setEventPosts(eventPosts);
+        setUpcomingEvents(upcomingEvents);
+      } else if (tab === 'major') {
+        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+          getStudentMajorAffiliateList(accessToken),
+          getStudentMajorEventList(accessToken),
+          getStudentMajorUpcomingEventList(accessToken),
+        ]);
+        setMajorAffiliatePosts(affiliatePosts);
+        setMajorEventPosts(eventPosts);
+        setUpcomingMajorEvents(upcomingEvents);
+        setAffiliatePosts(affiliatePosts);
+        setEventPosts(eventPosts);
+        setUpcomingEvents(upcomingEvents);
+      } else if (tab === 'college') {
+        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+          getStudentCollegeAffiliateList(accessToken),
+          getStudentCollegeEventList(accessToken),
+          getStudentCollegeUpcomingEventList(accessToken),
+        ]);
+        setCollegeAffiliatePosts(affiliatePosts);
+        setCollegeEventPosts(eventPosts);
+        setUpcomingCollegeEvents(upcomingEvents);
+        setAffiliatePosts(affiliatePosts);
+        setEventPosts(eventPosts);
+        setUpcomingEvents(upcomingEvents);
+      }
+      // 로드된 탭 추가
+      setLoadedTabs((prev) => new Set([...prev, tab]));
+    } catch (error) {
+      console.error(`fetchTabData error for ${tab}:`, error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // 초기 로드 시 기본 탭(school) 데이터만 fetch
   useEffect(() => {
-    fetchAllPosts();
+    if (accessToken) {
+      fetchTabData('school');
+    }
   }, [accessToken]);
 
   const handleSelectTab = (tab) => {
@@ -132,22 +159,76 @@ const AffiliationMainScreen = ({ navigation }) => {
     setSelectedTab(tab);
   };
 
+  // 탭 변경 시 해당 탭의 데이터 fetch (이미 로드된 경우는 재사용)
   useEffect(() => {
-    // selectedTab 변경 시 이미 로드된 데이터만 사용 (불필요한 API 재호출 방지)
-    if (selectedTab === 'school') {
-      setAffiliatePosts(schoolAffiliatePosts);
-      setEventPosts(schoolEventPosts);
-      setUpcomingEvents(upcomingSchoolEvents);
-    } else if (selectedTab === 'major') {
-      setAffiliatePosts(majorAffiliatePosts);
-      setEventPosts(majorEventPosts);
-      setUpcomingEvents(upcomingMajorEvents);
-    } else if (selectedTab === 'college') {
-      setUpcomingEvents(upcomingCollegeEvents);
-      setAffiliatePosts(collegeAffiliatePosts);
-      setEventPosts(collegeEventPosts);
+    if (!accessToken) return;
+
+    // 이미 로드된 탭이면 캐시된 데이터 사용
+    if (loadedTabs.has(selectedTab)) {
+      if (selectedTab === 'school') {
+        setAffiliatePosts(schoolAffiliatePosts);
+        setEventPosts(schoolEventPosts);
+        setUpcomingEvents(upcomingSchoolEvents);
+      } else if (selectedTab === 'major') {
+        setAffiliatePosts(majorAffiliatePosts);
+        setEventPosts(majorEventPosts);
+        setUpcomingEvents(upcomingMajorEvents);
+      } else if (selectedTab === 'college') {
+        setAffiliatePosts(collegeAffiliatePosts);
+        setEventPosts(collegeEventPosts);
+        setUpcomingEvents(upcomingCollegeEvents);
+      }
+    } else {
+      // 아직 로드되지 않은 탭이면 fetch
+      fetchTabData(selectedTab);
     }
   }, [selectedTab]);
+
+  // 화면이 포커스될 때마다 현재 탭의 데이터를 새로고침 (DetailScreen에서 좋아요 변경 반영)
+  useFocusEffect(
+    useCallback(() => {
+      if (!accessToken) return;
+
+      // 현재 탭의 데이터를 다시 fetch하여 최신 상태 유지
+      fetchTabData(selectedTab);
+    }, [selectedTab, accessToken])
+  );
+
+  const handleLike = async (postId) => {
+    try {
+      const response = await toggleStudentAffiliateLike(accessToken, postId);
+      console.log('handleLike response', response);
+
+      // 좋아요 상태 업데이트 함수
+      const updateLikeStatus = (posts, setPosts) => {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId || post.postId === postId
+              ? { ...post, liked: !post.liked }
+              : post
+          )
+        );
+      };
+
+      // 현재 선택된 탭의 데이터 업데이트
+      updateLikeStatus(affiliatePosts, setAffiliatePosts);
+      updateLikeStatus(eventPosts, setEventPosts);
+
+      // 캐시된 데이터도 업데이트
+      if (selectedTab === 'school') {
+        updateLikeStatus(schoolAffiliatePosts, setSchoolAffiliatePosts);
+        updateLikeStatus(schoolEventPosts, setSchoolEventPosts);
+      } else if (selectedTab === 'major') {
+        updateLikeStatus(majorAffiliatePosts, setMajorAffiliatePosts);
+        updateLikeStatus(majorEventPosts, setMajorEventPosts);
+      } else if (selectedTab === 'college') {
+        updateLikeStatus(collegeAffiliatePosts, setCollegeAffiliatePosts);
+        updateLikeStatus(collegeEventPosts, setCollegeEventPosts);
+      }
+    } catch (error) {
+      console.error('handleLike error', error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -217,6 +298,7 @@ const AffiliationMainScreen = ({ navigation }) => {
           data={affiliatePosts}
           renderItem={({ item }) => (
             <AffiliationColumnListItem
+              handleLike={handleLike}
               item={item}
               navigation={navigation}
               councilType={selectedTab}
@@ -233,6 +315,7 @@ const AffiliationMainScreen = ({ navigation }) => {
           data={eventPosts}
           renderItem={({ item }) => (
             <AffiliationColumnListItem
+              handleLike={handleLike}
               item={item}
               navigation={navigation}
               councilType={selectedTab}

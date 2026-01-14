@@ -7,6 +7,7 @@ import {
   Image,
   useWindowDimensions,
   Pressable,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useRef, useEffect } from 'react';
@@ -26,11 +27,12 @@ import CouponIcon from '../../../assets/couponIcon.svg';
 import {
   getStudentAffiliateDetail,
   getStudentAffiliateRecommendList,
+  toggleStudentAffiliateLike,
 } from '../../api/studentAffiliate';
 import useAuthStore from '../../store/authStore';
 
 const AffiliationDetailScreen = ({ navigation, route }) => {
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(route.params?.item?.liked || false);
   const { accessToken } = useAuthStore();
   const [item, setItem] = useState(route.params?.item);
   const [councilType, setCouncilType] = useState(route.params?.councilType);
@@ -43,6 +45,27 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
   const [detailImages, setDetailImages] = useState();
   const [isEmpty, setIsEmpty] = useState(true);
   const [recommendData, setRecommendData] = useState([]);
+  const [imagesLoaded, setImagesLoaded] = useState({}); // 각 이미지의 로딩 상태 추적
+  const [isFirstImageLoaded, setIsFirstImageLoaded] = useState(false); // 첫 번째 이미지 로딩 상태
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
+
+  // 스켈레톤 shimmer 애니메이션
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmerAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnim, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [shimmerAnim]);
 
   useEffect(() => {
     console.log('route.params?.item', route.params?.item);
@@ -52,7 +75,12 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
         route.params?.item?.id
       );
       console.log('fetchStudentAffiliateDetail response', response);
-      setDetailData(response.data.data);
+      const data = response.data.data;
+      setDetailData(data);
+      // detailData에서 liked 상태 업데이트
+      if (data?.liked !== undefined) {
+        setIsLiked(data.liked);
+      }
     };
     fetchStudentAffiliateDetail();
   }, [route.params?.item]);
@@ -75,9 +103,22 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     console.log('detailData', detailData);
-    setDetailImages(detailData?.images || []);
-    setIsEmpty(detailData?.images?.length === 0);
-  }, [detailData]);
+    const images = detailData?.images || [];
+    const prevImages = detailImages || [];
+
+    // images 배열이 실제로 변경되었는지 확인
+    const imagesChanged =
+      images.length !== prevImages.length ||
+      images.some((img, idx) => img !== prevImages[idx]);
+
+    if (imagesChanged) {
+      setDetailImages(images);
+      setIsEmpty(images.length === 0);
+      // 이미지가 변경될 때만 로딩 상태 리셋
+      setImagesLoaded({});
+      setIsFirstImageLoaded(false);
+    }
+  }, [detailData?.images]);
 
   useEffect(() => {
     const fetchStudentAffiliateRecommendList = async () => {
@@ -137,22 +178,65 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
             // style={{ marginTop: 20 }}
             contentContainerStyle={{ paddingHorizontal: 0 }}
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <View style={[styles.imageContainer, { width }]}>
-                {isEmpty ? (
-                  <PlaceHolderImage
-                    width={width}
-                    height={375}
-                    preserveAspectRatio="none"
-                  />
-                ) : (
-                  <Image
-                    source={{ uri: item }}
-                    style={[styles.detailImage, { width }]}
-                  />
-                )}
-              </View>
-            )}
+            renderItem={({ item, index }) => {
+              const isImageLoaded = imagesLoaded[index] || false;
+              const isFirstImage = index === 0;
+
+              return (
+                <View style={[styles.imageContainer, { width }]}>
+                  {isEmpty ? (
+                    <PlaceHolderImage
+                      width={width}
+                      height={375}
+                      preserveAspectRatio="none"
+                    />
+                  ) : (
+                    <>
+                      {!isImageLoaded && (
+                        <Animated.View
+                          style={[
+                            styles.skeletonImage,
+                            { width },
+                            {
+                              opacity: shimmerAnim.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [0.3, 0.7],
+                              }),
+                            },
+                          ]}
+                        />
+                      )}
+                      <Image
+                        source={{ uri: item }}
+                        style={[
+                          styles.detailImage,
+                          { width },
+                          !isImageLoaded && styles.hiddenImage,
+                        ]}
+                        onLoad={() => {
+                          setImagesLoaded((prev) => ({
+                            ...prev,
+                            [index]: true,
+                          }));
+                          if (isFirstImage) {
+                            setIsFirstImageLoaded(true);
+                          }
+                        }}
+                        onError={() => {
+                          setImagesLoaded((prev) => ({
+                            ...prev,
+                            [index]: true,
+                          }));
+                          if (isFirstImage) {
+                            setIsFirstImageLoaded(true);
+                          }
+                        }}
+                      />
+                    </>
+                  )}
+                </View>
+              );
+            }}
             keyExtractor={(item, index) => index.toString()}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
@@ -166,117 +250,143 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
             />
           ))}
         </View>
-        <View style={styles.detailInfoContainer}>
-          <View style={styles.topLayer}>
-            <Text
-              style={styles.title}
-              numberOfLines={2}
-              ellipsizeMode="tail"
-              textBreakStrategy="balanced"
-            >
-              {route.params?.item?.title}
-            </Text>
-          </View>
-          <View style={styles.buttonWrapper}>
-            <Pressable
-              style={styles.button}
-              onPress={() => setIsLiked(!isLiked)}
-            >
-              <LikeIcon
-                width={18}
-                height={18}
-                color={isLiked ? colors.orange[500] : colors.gray[300]}
-              />
-            </Pressable>
-            <Pressable style={styles.button}>
-              <ShareIcon width={18} height={18} />
-            </Pressable>
-          </View>
-          <View style={styles.placeAndDate}>
-            <View style={styles.placeWrapper}>
-              <PlaceIcon width={20} height={20} color={colors.gray[300]} />
-              <Text style={styles.place}>{route.params?.item?.placeName}</Text>
-              {/* <Text style={styles.distance}>0.0km</Text> */}
+        {!isEmpty && !isFirstImageLoaded ? null : (
+          <View style={styles.detailInfoContainer}>
+            <View style={styles.topLayer}>
+              <Text
+                style={styles.title}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+                textBreakStrategy="balanced"
+              >
+                {route.params?.item?.title}
+              </Text>
+            </View>
+            <View style={styles.buttonWrapper}>
+              <Pressable
+                style={styles.button}
+                onPress={async () => {
+                  const newLikedState = !isLiked;
+                  // 낙관적 업데이트 (즉시 UI 업데이트)
+                  setIsLiked(newLikedState);
+                  try {
+                    const postId = item?.id || item?.postId || detailData?.id;
+                    await toggleStudentAffiliateLike(accessToken, postId);
+                    // 성공 시 detailData도 업데이트
+                    if (detailData) {
+                      setDetailData({ ...detailData, liked: newLikedState });
+                    }
+                  } catch (error) {
+                    // 실패 시 롤백
+                    setIsLiked(!newLikedState);
+                    console.error('handleLike error', error);
+                  }
+                }}
+              >
+                {isLiked ? (
+                  <LikeIcon width={18} height={18} color={colors.orange[500]} />
+                ) : (
+                  <UnLikeIcon width={18} height={18} color={colors.gray[300]} />
+                )}
+              </Pressable>
+              <Pressable style={styles.button}>
+                <ShareIcon width={18} height={18} />
+              </Pressable>
+            </View>
+            <View style={styles.placeAndDate}>
+              <View style={styles.placeWrapper}>
+                <PlaceIcon width={20} height={20} color={colors.gray[300]} />
+                <Text style={styles.place}>
+                  {route.params?.item?.placeName}
+                </Text>
+                {/* <Text style={styles.distance}>0.0km</Text> */}
+              </View>
+            </View>
+            <View style={styles.dateWrapper}>
+              <DateIcon width={24} height={24} color={colors.gray[300]} />
+              {/* <Text style={styles.date}>{route.params?.item?.date}</Text> */}
+              {item?.category === 'PARTNERSHIP' ? (
+                <Text style={styles.date}>
+                  {dateYear}년 {dateMonth}월 {dateDay}일 까지
+                </Text>
+              ) : (
+                <Text style={styles.date}>
+                  {dateYear}년 {dateMonth}월 {dateDay}일 {dateHour}시{' '}
+                  {dateMinute}분
+                </Text>
+              )}
+              {/* <Text style={styles.time}>D-1</Text> */}
             </View>
           </View>
-          <View style={styles.dateWrapper}>
-            <DateIcon width={24} height={24} color={colors.gray[300]} />
-            {/* <Text style={styles.date}>{route.params?.item?.date}</Text> */}
-            {item?.category === 'PARTNERSHIP' ? (
-              <Text style={styles.date}>
-                {dateYear}년 {dateMonth}월 {dateDay}일 까지
+        )}
+        {!isEmpty && !isFirstImageLoaded ? null : (
+          <View style={styles.recommendContainer}>
+            {detailData?.category === 'PARTNERSHIP' ? (
+              <Text style={styles.recommendTitle}>
+                총학생회에서 진행하는 {'\n'}다른 제휴 매장 둘러보기
               </Text>
             ) : (
-              <Text style={styles.date}>
-                {dateYear}년 {dateMonth}월 {dateDay}일 {dateHour}시 {dateMinute}
-                분
+              <Text style={styles.recommendTitle}>
+                총학생회의 다가오는 행사
               </Text>
             )}
-            {/* <Text style={styles.time}>D-1</Text> */}
-          </View>
-        </View>
-        <View style={styles.recommendContainer}>
-          {detailData?.category === 'PARTNERSHIP' ? (
-            <Text style={styles.recommendTitle}>
-              총학생회에서 진행하는 {'\n'}다른 제휴 매장 둘러보기
-            </Text>
-          ) : (
-            <Text style={styles.recommendTitle}>총학생회의 다가오는 행사</Text>
-          )}
-          <FlatList
-            data={recommendData}
-            horizontal
-            contentContainerStyle={{ gap: 10 }}
-            style={{ marginTop: 20 }}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View style={styles.recommendItemContainer}>
-                <View style={styles.imageWrapper}>
-                  {item?.thumbnailImageUrl ? (
-                    <Image
-                      source={{ uri: item?.thumbnailImageUrl }}
-                      style={{ width: 56, height: 56, borderRadius: 8 }}
-                    />
-                  ) : (
-                    <PlaceHolderRepresentativeImage width={56} height={56} />
-                  )}
-                </View>
-                <View style={styles.infoWrapper}>
-                  <View style={styles.titleWrapper}>
-                    {item?.approved && <BadgeIcon width={20} height={20} />}
-                    <Text style={styles.recommendTitle}>{item?.placeName}</Text>
-                    <Text style={styles.placeType}>{item?.placeType}</Text>
-                  </View>
-                  <View style={styles.detailWrapper}>
-                    <View style={styles.detailExplainWrapper}>
-                      <CouponIcon width={15} height={15} />
-                      <Text
-                        numberOfLines={2}
-                        ellipsizeMode="tail"
-                        textBreakStrategy="balanced"
-                        style={styles.detailExplain}
-                      >
-                        {item?.title}
-                      </Text>
-                    </View>
-                    <View style={styles.detailDistanceWrapper}>
-                      <PlaceIcon
-                        width={12}
-                        height={12}
-                        color={colors.gray[300]}
+            <FlatList
+              data={recommendData}
+              horizontal
+              contentContainerStyle={{ gap: 10 }}
+              style={{ marginTop: 20 }}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <View style={styles.recommendItemContainer}>
+                  <View style={styles.imageWrapper}>
+                    {item?.thumbnailImageUrl ? (
+                      <Image
+                        source={{ uri: item?.thumbnailImageUrl }}
+                        style={{ width: 56, height: 56, borderRadius: 8 }}
                       />
-                      <Text style={styles.detailDistance}>
-                        {/* {item?.distance} */}
-                        0.0km
+                    ) : (
+                      <PlaceHolderRepresentativeImage width={56} height={56} />
+                    )}
+                  </View>
+                  <View style={styles.infoWrapper}>
+                    <View style={styles.titleWrapper}>
+                      {item?.approved && <BadgeIcon width={20} height={20} />}
+                      <Text style={styles.recommendTitle}>
+                        {item?.placeName}
                       </Text>
+                      <Text style={styles.placeType}>{item?.placeType}</Text>
+                    </View>
+                    <View style={styles.detailWrapper}>
+                      <View style={styles.detailExplainWrapper}>
+                        <CouponIcon width={15} height={15} />
+                        <Text
+                          numberOfLines={2}
+                          ellipsizeMode="tail"
+                          textBreakStrategy="balanced"
+                          style={styles.detailExplain}
+                        >
+                          {item?.title}
+                        </Text>
+                      </View>
+                      <View style={styles.detailDistanceWrapper}>
+                        <PlaceIcon
+                          width={12}
+                          height={12}
+                          color={colors.gray[300]}
+                        />
+                        <Text style={styles.detailDistance}>
+                          {/* {item?.distance} */}
+                          0.0km
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
+              )}
+              keyExtractor={(item) => item.id}
+            />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -298,6 +408,23 @@ const styles = StyleSheet.create({
     height: 375,
     resizeMode: 'cover',
     borderRadius: 0,
+  },
+  hiddenImage: {
+    position: 'absolute',
+    opacity: 0,
+  },
+  skeletonImage: {
+    height: 375,
+    backgroundColor: colors.gray[200],
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    width: '100%',
+  },
+  skeletonShimmer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: colors.gray[200],
   },
   placeholderWrapper: {
     width: '100%',

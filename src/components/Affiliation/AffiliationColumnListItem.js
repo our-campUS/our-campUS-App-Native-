@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
 });
 
 const AffiliationColumnListItem = ({
+  handleLike = null,
   item,
   navigation,
   handleThreeDotIconPress = null,
@@ -107,6 +108,11 @@ const AffiliationColumnListItem = ({
       setIsCouncil(true);
     }
   }, [user]);
+
+  // item.liked가 변경될 때 liked state 동기화
+  useEffect(() => {
+    setLiked(item.liked || false);
+  }, [item.liked]);
 
   useEffect(() => {
     // item이 변경되면 이미지 로드 상태 리셋
@@ -148,9 +154,21 @@ const AffiliationColumnListItem = ({
   //   }
   // }, [item]);
 
-  const handleLikePress = () => {
+  const handleLikePress = async () => {
     setIsLikeIconPressed(true);
-    setLiked(!liked);
+    // 낙관적 업데이트 (즉시 UI 업데이트)
+    const newLikedState = !liked;
+    setLiked(newLikedState);
+
+    try {
+      await handleLike?.(item?.id || item?.postId);
+      // 성공 시 item의 liked 상태도 업데이트 (부모에서 업데이트되면 자동 반영됨)
+    } catch (error) {
+      // 실패 시 롤백
+      setLiked(!newLikedState);
+      console.error('handleLikePress error', error);
+    }
+
     // 다음 프레임에서 플래그 리셋
     setTimeout(() => setIsLikeIconPressed(false), 100);
   };

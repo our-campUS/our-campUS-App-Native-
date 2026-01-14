@@ -245,3 +245,25 @@ export const getStudentCollegeUpcomingEventList = async (accessToken) => {
     return [];
   }
 };
+
+// 제휴 / 행사 게시글 좋아요 토글
+export const toggleStudentAffiliateLike = async (accessToken, postId) => {
+  console.log('toggleStudentAffiliateLike postId', postId);
+  console.log('toggleStudentAffiliateLike accessToken', accessToken);
+  try {
+    const response = await api.post(
+      `/users/student-council/posts/${postId}/like`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    console.log('toggleStudentAffiliateLike response', response);
+    return response;
+  } catch (error) {
+    console.error('toggleStudentAffiliateLike error', error.response);
+    throw error;
+  }
+};
