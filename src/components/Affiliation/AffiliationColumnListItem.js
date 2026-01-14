@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
   },
   unlikedIcon: {
     position: 'absolute',
-    top: 18.75,
-    left: 18.75,
+    top: 8.5,
+    left: 8.5,
     width: 18,
     height: 18,
   },
@@ -105,15 +105,25 @@ const AffiliationColumnListItem = ({
   }, [user]);
 
   useEffect(() => {
-    setEndYear(item?.dateTime?.slice(0, 4));
-    setEndMonth(item?.dateTime?.slice(5, 7));
-    if (item?.dateTime?.slice(5, 7).startsWith('0')) {
-      setEndMonth(item?.dateTime?.slice(6, 7));
-    }
-    setEndDay(item?.dateTime?.slice(8, 10));
-    if (item?.category === 'EVENT') {
-      setStartHour(item?.dateTime?.slice(11, 13));
-      setStartMinute(item?.dateTime?.slice(14, 16));
+    if (!isCouncil) {
+      setEndYear(item?.endDateTime?.slice(0, 4));
+      setEndMonth(item?.endDateTime?.slice(5, 7));
+      setEndDay(item?.endDateTime?.slice(8, 10));
+      if (item?.category === 'EVENT') {
+        setStartHour(item?.endDateTime?.slice(11, 13));
+        setStartMinute(item?.endDateTime?.slice(14, 16));
+      }
+    } else {
+      setEndYear(item?.dateTime?.slice(0, 4));
+      setEndMonth(item?.dateTime?.slice(5, 7));
+      if (item?.dateTime?.slice(5, 7).startsWith('0')) {
+        setEndMonth(item?.dateTime?.slice(6, 7));
+      }
+      setEndDay(item?.dateTime?.slice(8, 10));
+      if (item?.category === 'EVENT') {
+        setStartHour(item?.dateTime?.slice(11, 13));
+        setStartMinute(item?.dateTime?.slice(14, 16));
+      }
     }
   }, [item]);
 
@@ -150,13 +160,13 @@ const AffiliationColumnListItem = ({
             source={{ uri: item?.thumbnailImageUrl }}
             style={styles.image}
           />
-          {/* <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
+          <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
             {liked ? (
               <LikedIcon width={18} height={18} color={colors.orange[500]} />
             ) : (
               <UnlikedIcon width={18} height={18} />
             )}
-          </Pressable> */}
+          </Pressable>
         </View>
       ) : (
         <View style={styles.imageContainer}>
@@ -182,7 +192,7 @@ const AffiliationColumnListItem = ({
         <View style={styles.placeAndDate}>
           <View style={styles.placeAndDateItem}>
             <PlaceIcon width={16} height={16} color={colors.gray[300]} />
-            <Text style={styles.place}>{item?.place}</Text>
+            <Text style={styles.place}>{item?.place || item?.placeName}</Text>
             {item?.category === 'EVENT' && (
               <Text style={styles.detailedLocation}>
                 {item?.detailedLocation}

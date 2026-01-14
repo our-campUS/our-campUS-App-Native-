@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import HostByTab from '../../components/Affiliation/HostByTab';
 import AffiliationCarousel from '../../components/Affiliation/AffiliationCarousel';
 import AffiliationColumnList from '../../components/Affiliation/AffiliationColumnList';
@@ -19,6 +19,15 @@ import {
   AFFILIATION_COLUMN_LIST_DATA_EVENT,
 } from '../../constants/DummyData';
 import AffiliationColumnListItem from '../../components/Affiliation/AffiliationColumnListItem';
+import {
+  getStudentSchoolAffiliateList,
+  getStudentSchoolEventList,
+  getStudentMajorAffiliateList,
+  getStudentMajorEventList,
+  getStudentCollegeAffiliateList,
+  getStudentCollegeEventList,
+} from '../../api/studentAffiliate';
+import useAuthStore from '../../store/authStore';
 
 const styles = StyleSheet.create({
   container: {
@@ -63,13 +72,68 @@ const styles = StyleSheet.create({
 
 const AffiliationMainScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
+  const { accessToken } = useAuthStore();
+  const [affiliatePosts, setAffiliatePosts] = useState([]);
+  const [eventPosts, setEventPosts] = useState([]);
+  const [majorAffiliatePosts, setMajorAffiliatePosts] = useState([]);
+  const [majorEventPosts, setMajorEventPosts] = useState([]);
+  const [schoolAffiliatePosts, setSchoolAffiliatePosts] = useState([]);
+  const [schoolEventPosts, setSchoolEventPosts] = useState([]);
+  const [collegeAffiliatePosts, setCollegeAffiliatePosts] = useState([]);
+  const [collegeEventPosts, setCollegeEventPosts] = useState([]);
+  const [selectedTab, setSelectedTab] = useState('school');
+
+  const fetchAllPosts = async () => {
+    const schoolAffiliatePosts = await getStudentSchoolAffiliateList(
+      accessToken
+    );
+    setSchoolAffiliatePosts(schoolAffiliatePosts);
+    const schoolEventPosts = await getStudentSchoolEventList(accessToken);
+    setSchoolEventPosts(schoolEventPosts);
+    const majorAffiliatePosts = await getStudentMajorAffiliateList(accessToken);
+    setMajorAffiliatePosts(majorAffiliatePosts);
+    const majorEventPosts = await getStudentMajorEventList(accessToken);
+    setMajorEventPosts(majorEventPosts);
+    const collegeAffiliatePosts = await getStudentCollegeAffiliateList(
+      accessToken
+    );
+    setCollegeAffiliatePosts(collegeAffiliatePosts);
+    const collegeEventPosts = await getStudentCollegeEventList(accessToken);
+    setCollegeEventPosts(collegeEventPosts);
+  };
+
+  useEffect(() => {
+    fetchAllPosts();
+    setAffiliatePosts(schoolAffiliatePosts);
+    setEventPosts(schoolEventPosts);
+  }, [accessToken]);
+
+  const handleSelectTab = (tab) => {
+    console.log('tab', tab);
+    setSelectedTab(tab);
+  };
+
+  useEffect(() => {
+    if (selectedTab === 'school') {
+      setAffiliatePosts(schoolAffiliatePosts);
+      setEventPosts(schoolEventPosts);
+    } else if (selectedTab === 'major') {
+      setAffiliatePosts(majorAffiliatePosts);
+      setEventPosts(majorEventPosts);
+    } else if (selectedTab === 'college') {
+      setAffiliatePosts(collegeAffiliatePosts);
+      setEventPosts(collegeEventPosts);
+    }
+  }, [selectedTab]);
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={{ marginTop: 9.5 }}>
         <HostByTab
-          university={'중앙대학교'}
-          college={'사회과학대'}
-          department={'정치국제'}
+          // school={'중앙대학교'}
+          // college={'사회과학대'}
+          // major={'정치국제'}
+          onSelectTab={handleSelectTab}
         />
       </View>
       <AffiliationCarousel />
@@ -118,8 +182,8 @@ const AffiliationMainScreen = ({ navigation }) => {
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          data={affiliatePosts}
           renderItem={({ item }) => (
             <AffiliationColumnListItem item={item} navigation={navigation} />
           )}
@@ -130,8 +194,8 @@ const AffiliationMainScreen = ({ navigation }) => {
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          data={eventPosts}
           renderItem={({ item }) => (
             <AffiliationColumnListItem item={item} navigation={navigation} />
           )}

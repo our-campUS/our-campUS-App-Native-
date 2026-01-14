@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import { useState, useEffect } from 'react';
+import useAuthStore from '../../store/authStore';
 
 const styles = StyleSheet.create({
   container: {
@@ -11,6 +12,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   button: {
+    // maxWidth: 125,
     flex: 1,
     height: 36,
     backgroundColor: colors.common.white,
@@ -38,33 +40,41 @@ const styles = StyleSheet.create({
 
 const HostByTab = ({
   navigation,
-  university,
-  college,
-  department,
+  // school,
+  // college,
+  // major,
   isOrange = false,
+  onSelectTab = null,
+  selectedTab = 'school',
 }) => {
-  const [activeTab, setActiveTab] = useState('university');
-
+  const [activeTab, setActiveTab] = useState(selectedTab);
+  const user = useAuthStore((state) => state.user);
   return (
     <View style={styles.container}>
       <Pressable
         style={[
           styles.button,
-          activeTab === 'university' &&
+          activeTab === 'school' &&
             (isOrange ? styles.activeOrangeButton : styles.activeButton),
         ]}
-        onPress={() => setActiveTab('university')}
+        onPress={() => {
+          setActiveTab('school');
+          onSelectTab('school');
+        }}
       >
         <Text
+          numberOfLines={1}
+          maxWidth={125}
+          ellipsizeMode="tail"
           style={[
             styles.buttonText,
-            activeTab === 'university' &&
+            activeTab === 'school' &&
               (isOrange
                 ? styles.activeOrangeButtonText
                 : styles.activeButtonText),
           ]}
         >
-          {university}
+          {'총학생회' || '학교'}
         </Text>
       </Pressable>
       <Pressable
@@ -73,9 +83,15 @@ const HostByTab = ({
           activeTab === 'college' &&
             (isOrange ? styles.activeOrangeButton : styles.activeButton),
         ]}
-        onPress={() => setActiveTab('college')}
+        onPress={() => {
+          setActiveTab('college');
+          onSelectTab('college');
+        }}
       >
         <Text
+          numberOfLines={1}
+          maxWidth={125}
+          ellipsizeMode="tail"
           style={[
             styles.buttonText,
             activeTab === 'college' &&
@@ -84,27 +100,33 @@ const HostByTab = ({
                 : styles.activeButtonText),
           ]}
         >
-          {college}
+          {user?.collegeName || '단과대'}
         </Text>
       </Pressable>
       <Pressable
         style={[
           styles.button,
-          activeTab === 'department' &&
+          activeTab === 'major' &&
             (isOrange ? styles.activeOrangeButton : styles.activeButton),
         ]}
-        onPress={() => setActiveTab('department')}
+        onPress={() => {
+          setActiveTab('major');
+          onSelectTab('major');
+        }}
       >
         <Text
+          ellipsizeMode="tail"
+          numberOfLines={1}
+          maxWidth={125}
           style={[
             styles.buttonText,
-            activeTab === 'department' &&
+            activeTab === 'major' &&
               (isOrange
                 ? styles.activeOrangeButtonText
                 : styles.activeButtonText),
           ]}
         >
-          {department}
+          {user?.majorName || '학과'}
         </Text>
       </Pressable>
     </View>
