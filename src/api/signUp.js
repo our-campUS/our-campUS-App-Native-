@@ -58,7 +58,7 @@ export async function onKakaoLogin() {
 
     return { isValid: false, isProfileNotCompleted: false };
   } catch (error) {
-    console.error('❌ Kakao Login Error:', error);
+    console.error('❌ Kakao Login Error:', error.response);
     return false;
   }
 }

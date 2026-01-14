@@ -84,12 +84,10 @@ const styles = StyleSheet.create({
   },
 });
 
-const AffiliationColumnListItem = ({
-  handleLike = null,
+const AffiliationCouncilColumnListItem = ({
   item,
   navigation,
   handleThreeDotIconPress = null,
-  councilType = null,
 }) => {
   const [endYear, setEndYear] = useState(null);
   const [endMonth, setEndMonth] = useState(null);
@@ -109,11 +107,6 @@ const AffiliationColumnListItem = ({
     }
   }, [user]);
 
-  // item.liked가 변경될 때 liked state 동기화
-  useEffect(() => {
-    setLiked(item.liked || false);
-  }, [item.liked]);
-
   useEffect(() => {
     // item이 변경되면 이미지 로드 상태 리셋
     if (item?.thumbnailImageUrl) {
@@ -125,17 +118,15 @@ const AffiliationColumnListItem = ({
   }, [item?.thumbnailImageUrl]);
 
   useEffect(() => {
-    {
-      setEndYear(item?.endDateTime?.slice(0, 4));
-      setEndMonth(item?.endDateTime?.slice(5, 7));
-      if (item?.endDateTime?.slice(5, 7).startsWith('0')) {
-        setEndMonth(item?.endDateTime?.slice(6, 7));
-      }
-      setEndDay(item?.endDateTime?.slice(8, 10));
-      if (item?.category === 'EVENT') {
-        setStartHour(item?.endDateTime?.slice(11, 13));
-        setStartMinute(item?.endDateTime?.slice(14, 16));
-      }
+    setEndYear(item?.dateTime?.slice(0, 4));
+    setEndMonth(item?.dateTime?.slice(5, 7));
+    if (item?.dateTime?.slice(5, 7).startsWith('0')) {
+      setEndMonth(item?.dateTime?.slice(6, 7));
+    }
+    setEndDay(item?.dateTime?.slice(8, 10));
+    if (item?.category === 'EVENT') {
+      setStartHour(item?.dateTime?.slice(11, 13));
+      setStartMinute(item?.dateTime?.slice(14, 16));
     }
   }, [item]);
 
@@ -154,21 +145,9 @@ const AffiliationColumnListItem = ({
   //   }
   // }, [item]);
 
-  const handleLikePress = async () => {
+  const handleLikePress = () => {
     setIsLikeIconPressed(true);
-    // 낙관적 업데이트 (즉시 UI 업데이트)
-    const newLikedState = !liked;
-    setLiked(newLikedState);
-
-    try {
-      await handleLike?.(item?.id || item?.postId);
-      // 성공 시 item의 liked 상태도 업데이트 (부모에서 업데이트되면 자동 반영됨)
-    } catch (error) {
-      // 실패 시 롤백
-      setLiked(!newLikedState);
-      console.error('handleLikePress error', error);
-    }
-
+    setLiked(!liked);
     // 다음 프레임에서 플래그 리셋
     setTimeout(() => setIsLikeIconPressed(false), 100);
   };
@@ -178,7 +157,7 @@ const AffiliationColumnListItem = ({
       if (user?.role === 'COUNCIL') {
         navigation?.navigate('CouncilAffiliateDetailScreen', { item });
       } else {
-        navigation?.navigate('AffiliationDetailScreen', { item, councilType });
+        navigation?.navigate('AffiliationDetailScreen', { item });
       }
     }
   };
@@ -225,13 +204,13 @@ const AffiliationColumnListItem = ({
               onLoad={() => setIsImageLoaded(true)}
               onError={() => setIsImageLoaded(true)} // 에러가 나도 스켈레톤을 계속 보여주지 않음
             />
-            <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
-              {liked ? (
-                <LikedIcon width={18} height={18} color={colors.orange[500]} />
-              ) : (
-                <UnlikedIcon width={18} height={18} />
-              )}
-            </Pressable>
+            {/* <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
+            {liked ? (
+              <LikedIcon width={18} height={18} color={colors.orange[500]} />
+            ) : (
+              <UnlikedIcon width={18} height={18} />
+            )}
+          </Pressable> */}
           </View>
         ) : (
           <View style={styles.imageContainer}>
@@ -274,11 +253,7 @@ const AffiliationColumnListItem = ({
               {endYear && endMonth && endDay ? (
                 <Text style={styles.date}>
                   {item?.category === 'EVENT'
-                    ? `${endYear}년 ${endMonth}월 ${endDay}일 ${
-                        startHour || ''
-                      }${startHour ? '시' : ''} ${startMinute || ''}${
-                        startMinute ? '분' : ''
-                      }`
+                    ? `${endYear}년 ${endMonth}월 ${endDay}일 ${startHour}시 ${startMinute}분`
                     : `${endYear}년 ${endMonth}월 ${endDay}일 까지`}
                 </Text>
               ) : null}
@@ -290,4 +265,4 @@ const AffiliationColumnListItem = ({
   );
 };
 
-export default AffiliationColumnListItem;
+export default AffiliationCouncilColumnListItem;

@@ -4,10 +4,11 @@ import typography from '../../style/typography';
 import Vector2 from '../../../assets/Vector2.svg';
 import CalendarIcon from '../../../assets/calendar.svg';
 import { useState, useEffect } from 'react';
+import useAuthStore from '../../store/authStore';
 
 const styles = StyleSheet.create({
   container: {
-    width: '255px',
+    minWidth: 255,
     height: 147,
     backgroundColor: colors.common.white,
     paddingHorizontal: 30,
@@ -76,7 +77,9 @@ const AffiliationCarouselItem = ({
   item,
   isOrange = false,
   navigation = null,
+  councilType = null,
 }) => {
+  const { user } = useAuthStore();
   const [startYear, setStartYear] = useState(null);
   const [startMonth, setStartMonth] = useState(null);
   const [startDay, setStartDay] = useState(null);
@@ -84,18 +87,37 @@ const AffiliationCarouselItem = ({
   const [startMinute, setStartMinute] = useState(null);
 
   useEffect(() => {
-    setStartYear(item.dateTime.slice(0, 4));
-    setStartMonth(item.dateTime.slice(5, 7));
-    setStartDay(item.dateTime.slice(8, 10));
-    setStartHour(item.dateTime.slice(11, 13));
-    setStartMinute(item.dateTime.slice(14, 16));
+    console.log('user', user);
+  }, [user]);
+
+  useEffect(() => {
+    setStartYear(item?.dateTime?.slice(0, 4) || item?.endDateTime?.slice(0, 4));
+    setStartMonth(
+      item?.dateTime?.slice(5, 7) || item?.endDateTime?.slice(5, 7)
+    );
+    setStartDay(
+      item?.dateTime?.slice(8, 10) || item?.endDateTime?.slice(8, 10)
+    );
+    setStartHour(
+      item?.dateTime?.slice(11, 13) || item?.endDateTime?.slice(11, 13)
+    );
+    setStartMinute(
+      item?.dateTime?.slice(14, 16) || item?.endDateTime?.slice(14, 16)
+    );
   }, [item]);
 
   return (
     <Pressable
       style={styles.container}
       onPress={() =>
-        navigation?.navigate('CouncilAffiliateDetailScreen', { item })
+        user?.role === 'COUNCIL'
+          ? navigation?.navigate('CouncilAffiliateDetailScreen', {
+              item,
+            })
+          : navigation?.navigate('AffiliationDetailScreen', {
+              item,
+              councilType,
+            })
       }
     >
       <View
@@ -128,7 +150,7 @@ const AffiliationCarouselItem = ({
         <View style={styles.placeContainer}>
           <Vector2 width={9.6} height={12.4} color={colors.gray[300]} />
           <Text style={styles.place} numberOfLines={1} ellipsizeMode="tail">
-            {item.place} {item.detailedLocation}
+            {item.place || item.placeName} {item.detailedLocation}
           </Text>
         </View>
         <View style={styles.dateContainer}>
