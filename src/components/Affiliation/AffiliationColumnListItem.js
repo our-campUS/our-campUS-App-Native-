@@ -88,6 +88,7 @@ const AffiliationColumnListItem = ({
   item,
   navigation,
   handleThreeDotIconPress = null,
+  councilType = null,
 }) => {
   const [endYear, setEndYear] = useState(null);
   const [endMonth, setEndMonth] = useState(null);
@@ -159,7 +160,7 @@ const AffiliationColumnListItem = ({
       if (user?.role === 'COUNCIL') {
         navigation?.navigate('CouncilAffiliateDetailScreen', { item });
       } else {
-        navigation?.navigate('AffiliationDetailScreen', { item });
+        navigation?.navigate('AffiliationDetailScreen', { item, councilType });
       }
     }
   };

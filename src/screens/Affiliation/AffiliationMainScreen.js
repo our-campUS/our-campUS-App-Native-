@@ -185,7 +185,11 @@ const AffiliationMainScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           data={affiliatePosts}
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <AffiliationColumnListItem
+              item={item}
+              navigation={navigation}
+              councilType={selectedTab}
+            />
           )}
           keyExtractor={(item) => item.id}
         />
@@ -197,7 +201,11 @@ const AffiliationMainScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           data={eventPosts}
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <AffiliationColumnListItem
+              item={item}
+              navigation={navigation}
+              councilType={selectedTab}
+            />
           )}
           keyExtractor={(item) => item.id}
         />

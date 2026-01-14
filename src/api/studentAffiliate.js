@@ -125,3 +125,54 @@ export const getStudentCollegeEventList = async (accessToken) => {
     return [];
   }
 };
+
+// 제휴 / 행사 게시글 상세 조회
+export const getStudentAffiliateDetail = async (accessToken, postId) => {
+  console.log('getStudentAffiliateDetail postId', postId);
+  console.log('getStudentAffiliateDetail accessToken', accessToken);
+  try {
+    const response = await api.get(`/users/student-council/posts/${postId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log('getStudentAffiliateDetail response', response);
+    return response;
+  } catch (error) {
+    console.error('getStudentAffiliateDetail error', error.response);
+    return [];
+  }
+};
+
+// 제휴 / 행사 추천 게시글 목록 조회
+export const getStudentAffiliateRecommendList = async (
+  accessToken,
+  councilType,
+  excludeId,
+  category
+) => {
+  console.log('getStudentAffiliateRecommendList councilType', councilType);
+  console.log('getStudentAffiliateRecommendList excludeId', excludeId);
+  console.log('getStudentAffiliateRecommendList category', category);
+  try {
+    const response = await api.get(
+      `/users/student-council/posts/${councilType}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          excludePostId: excludeId,
+          category: category,
+          page: 0,
+          size: 10,
+        },
+      }
+    );
+    console.log('getStudentAffiliateRecommendList response', response);
+    return response;
+  } catch (error) {
+    console.error('getStudentAffiliateRecommendList error', error.response);
+    return [];
+  }
+};
