@@ -9,13 +9,13 @@ import NewDot from '../../../assets/RedDot.svg';
 
 const AnnouncementScreen = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="공지사항"
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
-      <View style={{ width: '100%', height: 20 }} />
+      {/* <View style={{ width: '100%', height: 20 }} /> */}
       <AnnouncementTypeSelector />
       <View style={{ width: '100%', height: 10 }} />
       <FlatList

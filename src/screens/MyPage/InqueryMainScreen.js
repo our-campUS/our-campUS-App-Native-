@@ -17,13 +17,13 @@ const InqueryMainScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="1:1 문의계시판"
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
-      <View style={{ width: '100%', height: 20 }} />
+      {/* <View style={{ width: '100%', height: 20 }} /> */}
       <InquerySelectTab activeTab={activeTab} setActiveTab={setActiveTab} />
       {activeTab === 'pastInquery' ? (
         <PastQueryView />

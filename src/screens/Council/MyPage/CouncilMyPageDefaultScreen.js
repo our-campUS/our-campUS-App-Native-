@@ -14,7 +14,7 @@ import useAuthStore from '../../../store/authStore';
 const CouncilMyPageDefaultScreen = ({ navigation }) => {
   const { user } = useAuthStore();
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <View style={styles.councilIdentityContainer}>
         <View style={styles.councilIdentityImageWrapper}>
           <Image
@@ -132,9 +132,15 @@ const styles = StyleSheet.create({
   },
   councilIdentityContainer: {
     width: '100%',
+    // paddingHorizontal: 41,
+    // paddingVertical: 32,
     paddingHorizontal: 41,
     paddingVertical: 32,
     flexDirection: 'row',
+    // backgroundColor: 'green',
+    ...(Platform.OS === 'ios' && {
+      marginTop: 58,
+    }),
   },
   textInfoContainer: {
     flexDirection: 'column',

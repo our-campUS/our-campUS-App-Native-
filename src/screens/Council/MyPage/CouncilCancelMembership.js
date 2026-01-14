@@ -10,7 +10,7 @@ import Button from '../../../components/Button';
 const CouncilCancelMembershipScreen = ({ navigation }) => {
   const [isChecked, setIsChecked] = useState(false);
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="회원 탈퇴"
         useBackButton={true}
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    marginTop: 20,
+    // paddingVertical: 28,
   },
   contentContainer: {
     flexGrow: 1,

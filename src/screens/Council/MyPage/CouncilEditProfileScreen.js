@@ -19,7 +19,7 @@ const CouncilEditProfileScreen = ({ navigation }) => {
   const [nickname, setNickname] = useState('');
   const [councilInfo, setCouncilInfo] = useState('');
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <LabelTitle
           title="프로필 수정"
@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
   inputWrapper: {
     paddingHorizontal: 20,
     paddingVertical: 28,
-    marginTop: 20.5,
     gap: 24,
   },
   errorMessage: {

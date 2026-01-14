@@ -117,14 +117,14 @@ const CouncilSendProof = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="학생회 인증하기"
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
         navigation={navigation}
       />
-      <View style={{ width: '100%', height: 20 }}></View>
+      {/* <View style={{ width: '100%', height: 20 }}></View> */}
       <View style={styles.contentContainer}>
         <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>
           학생회 구성원을 인증하는 단계에요

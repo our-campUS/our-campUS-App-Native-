@@ -36,7 +36,10 @@ const CouncilProfileScreen = ({ navigation, route }) => {
 
   return (
     <>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={styles.container}
+        edges={['left', 'right', 'bottom']}
+      >
         <LabelTitle
           title="내 계정"
           navigation={navigation}
@@ -159,7 +162,7 @@ const styles = StyleSheet.create({
   },
   profileImageWrapper: {
     alignSelf: 'center',
-    marginTop: 56,
+    marginTop: 36,
     position: 'relative',
   },
   profileImage: {

@@ -60,7 +60,7 @@ const CancelMembershipScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="회원 탈퇴"
         useBackButton={true}
@@ -149,13 +149,13 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    marginTop: 20,
+    // marginTop: 20,
   },
   contentContainer: {
     flexGrow: 1,
   },
   mainContentWrapper: {
-    marginTop: 20,
+    // marginTop: 20,
   },
   mainContentTitle: {
     ...typography.body3Regular,

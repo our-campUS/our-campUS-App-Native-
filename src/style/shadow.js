@@ -15,13 +15,17 @@ const shadows = {
 
   level2: {
     // iOS
-    shadowColor: '#888', //임의 수정
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
+    // shadowColor: '#888', //임의 수정
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 0,
+    // },
+    // shadowOpacity: 0.7,
+    // shadowRadius: 3,
+    shadowColor: 'rgb(225, 228, 230)',
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.7,
-    shadowRadius: 3,
+    shadowRadius: 6,
 
     // Android
     elevation: 20,

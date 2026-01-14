@@ -40,7 +40,7 @@ const CouncilSendEmailCode = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="프로필 수정"
         useBackButton={true}
@@ -48,7 +48,7 @@ const CouncilSendEmailCode = ({ navigation }) => {
       />
       <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
         <ScrollView>
-          <View style={{ marginTop: 48 }}></View>
+          {/* <View style={{ marginTop: 48 }}></View> */}
           <Input
             useEmail={true}
             isOrange={true}
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    marginTop: 28,
+    paddingVertical: 28,
     flex: 1,
   },
   buttonContainer: {

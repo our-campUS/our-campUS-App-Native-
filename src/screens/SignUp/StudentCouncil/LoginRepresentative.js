@@ -91,7 +91,10 @@ const LoginRepresentative = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.common.white }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.common.white }}
+      edges={['left', 'right', 'bottom']}
+    >
       <KeyboardAvoidingView
         style={{ flex: 1, backgroundColor: colors.common.white }}
       >
@@ -100,7 +103,7 @@ const LoginRepresentative = ({ navigation }) => {
           useBackButton={true}
           onPressBack={() => navigation.goBack()}
         />
-        <View style={{ width: '100%', height: 20 }}></View>
+        {/* <View style={{ width: '100%', height: 20 }}></View> */}
         <View style={styles.statusBar}>
           <View
             style={{ backgroundColor: colors.gray[100], width: '100%' }}

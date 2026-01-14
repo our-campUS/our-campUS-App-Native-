@@ -12,10 +12,17 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     gap: 10,
-    height: 138,
+    // height: 138,
     alignItems: 'center',
     marginTop: 'auto',
     marginBottom: 3,
+    // backgroundColor: 'red',
+    ...(Platform.OS === 'ios' && {
+      marginBottom: 3,
+    }),
+    ...(Platform.OS === 'android' && {
+      marginBottom: 25,
+    }),
   },
   button: {
     width: '100%',
@@ -105,6 +112,7 @@ const LoginInitialScreen = ({ navigation }) => {
             justifyContent: 'center',
             backgroundColor: '#FEE500',
             borderRadius: 10,
+            marginBottom: 26,
           }}
           textStyle={{
             color: colors.gray[850],

@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
 import colors from '../../style/colors';
@@ -24,7 +31,7 @@ const MyPageDefaultScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <View style={styles.mainProfileWrapper}>
         <View style={styles.mainProfileInfoWrapper}>
           <View style={styles.mainProfileImageWrapper}>
@@ -105,6 +112,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
   },
   mainProfileWrapper: {
+    ...(Platform.OS === 'ios' && {
+      marginTop: 58,
+    }),
     width: '100%',
     paddingVertical: 32,
     paddingHorizontal: 20,

@@ -258,7 +258,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title={route.params?.isEdit ? '제휴 글 수정하기' : '제휴 글쓰기'}
         useBackButton={true}
@@ -287,7 +287,14 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
             <Text style={styles.previewPlaceName}>
               {route.params.placeInfo?.placeName}
             </Text>
-            <Text style={styles.previewTitle}>{route.params.title}</Text>
+            <Text
+              style={styles.previewTitle}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              textBreakStrategy="balanced"
+            >
+              {route.params.title}
+            </Text>
           </View>
         </View>
         <Text
@@ -332,7 +339,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
   },
   content: {
-    marginTop: 20,
+    // marginTop: 20,
     flex: 1,
     padding: 20,
   },
@@ -364,6 +371,7 @@ const styles = StyleSheet.create({
     height: 76,
   },
   previewInfoContainer: {
+    maxWidth: 198,
     flexDirection: 'column',
     justifyContent: 'center',
     gap: 4,
@@ -373,6 +381,7 @@ const styles = StyleSheet.create({
     color: colors.common.black,
   },
   previewTitle: {
+    maxWidth: '100%',
     ...typography.body3Regular,
     color: colors.common.black,
   },

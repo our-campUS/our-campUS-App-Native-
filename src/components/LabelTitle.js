@@ -6,13 +6,18 @@ import BackIcon from '../../assets/back.svg';
 
 const styles = StyleSheet.create({
   container: {
+    // backgroundColor: 'red',
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
     // backgroundColor: 'red',
     paddingHorizontal: 20,
+    paddingVertical: 20,
     // justifyContent: 'center',
-    marginTop: 45,
+    // marginTop: 45,
+    ...(Platform.OS === 'ios' && {
+      marginTop: 70,
+    }),
     position: 'relative',
   },
   title: {

@@ -7,6 +7,7 @@ import {
   Pressable,
   Image,
   FlatList,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../style/colors';
@@ -79,8 +80,8 @@ const CouncilAffiliateScreen = ({ navigation }) => {
     console.log('item', item);
   };
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={{ marginTop: 9.5, width: '100%' }}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+      <View style={{ width: '100%' }}>
         {/* <HostByTab
           university={'중앙대학교'}
           college={'사회과학대'}
@@ -318,9 +319,13 @@ const styles = StyleSheet.create({
     color: colors.gray[850],
   },
   councilIdentityContainer: {
+    // backgroundColor: 'green',
     width: '100%',
     padding: 20,
     flexDirection: 'row',
+    ...(Platform.OS === 'ios' && {
+      marginTop: 58,
+    }),
   },
   textInfoContainer: {
     gap: 10,
