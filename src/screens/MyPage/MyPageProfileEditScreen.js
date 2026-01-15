@@ -77,10 +77,13 @@ const MyPageProfileEditScreen = ({ navigation }) => {
             <Text style={styles.profileInfoItemTitle}>닉네임</Text>
             <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
-          <View style={styles.profileInfoItem}>
+          <Pressable
+            style={styles.profileInfoItem}
+            onPress={() => navigation.navigate('ChangeScholarInfoScreen')}
+          >
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </View>
+          </Pressable>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <View style={styles.profileInfoItemRightWrapper}>

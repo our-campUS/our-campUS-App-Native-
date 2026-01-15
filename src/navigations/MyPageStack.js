@@ -10,6 +10,7 @@ import AnnouncementScreen from '../screens/MyPage/AnnouncementScreen';
 import AnnouncementDetailScreen from '../screens/MyPage/AnnouncementDetailScreen';
 import InqueryMainScreen from '../screens/MyPage/InqueryMainScreen';
 import CancelMembershipScreen from '../screens/MyPage/CancelMembershipScreen';
+import ChangeScholarInfoScreen from '../screens/MyPage/ChangeScholarInfoScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -69,6 +70,11 @@ const MyPageStack = () => {
       <Stack.Screen
         name="CancelMembershipScreen"
         component={CancelMembershipScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ChangeScholarInfoScreen"
+        component={ChangeScholarInfoScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
