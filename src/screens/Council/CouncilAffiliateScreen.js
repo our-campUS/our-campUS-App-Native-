@@ -97,7 +97,15 @@ const CouncilAffiliateScreen = ({ navigation }) => {
             />
           </View>
           <View style={styles.textInfoContainer}>
-            <Text style={styles.councilIdentityNickname}>일타</Text>
+            {user.councilNickname ? (
+              <Text style={styles.councilIdentityNickname}>
+                {user.councilNickname}
+              </Text>
+            ) : (
+              <Text style={styles.councilIdentityNoNickname}>
+                미지정(등록필요)
+              </Text>
+            )}
             <Text style={styles.councilIdentityText}>{user.councilName}</Text>
           </View>
         </View>
@@ -335,6 +343,10 @@ const styles = StyleSheet.create({
   councilIdentityNickname: {
     ...typography.heading4,
     color: colors.gray[850],
+  },
+  councilIdentityNoNickname: {
+    ...typography.heading4,
+    color: colors.gray[500],
   },
   councilIdentityText: {
     ...typography.body4Bold,

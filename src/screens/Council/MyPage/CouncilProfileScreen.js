@@ -1,20 +1,23 @@
 import { View, Text, StyleSheet, Image, Pressable, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import colors from '../../../style/colors';
 import LabelTitle from '../../../components/LabelTitle';
 import typography from '../../../style/typography';
 import CouncilDefaultImage from '../../../../assets/councilDefaultImage.png';
-import EditIcon from '../../../../assets/EditImage.svg';
+import EditIcon from '../../../../assets/editIcon.svg';
 import CouncilEditIcon from '../../../../assets/CouncilEditIcon.svg';
 import ArrowRightIcon from '../../../../assets/ArrowRightIcon.svg';
 import { useState } from 'react';
 import Button from '../../../components/Button';
 import CustomToast from '../../../components/CustomToast';
 import useToastStore from '../../../store/toastStore';
+import useAuthStore from '../../../store/authStore';
+import { onFocusEffect } from '@react-navigation/native';
 
 const CouncilProfileScreen = ({ navigation, route }) => {
+  const { user } = useAuthStore();
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const {
@@ -59,7 +62,18 @@ const CouncilProfileScreen = ({ navigation, route }) => {
             />
           </Pressable>
         </View>
-        <Text style={styles.nickname}>일타</Text>
+        <View style={styles.nicknameWrapper}>
+          {user?.councilNickname ? (
+            <Text style={styles.nickname}>{user.councilNickname}</Text>
+          ) : (
+            <Text style={styles.noNickname}>미지정(등록필요)</Text>
+          )}
+          <Pressable
+            onPress={() => navigation.navigate('CouncilEditProfileScreen')}
+          >
+            <EditIcon width={18} height={18} />
+          </Pressable>
+        </View>
         <View style={styles.profileInfoWrapper}>
           <Text style={{ ...typography.body4Bold, color: colors.gray[400] }}>
             회원 정보
@@ -67,21 +81,24 @@ const CouncilProfileScreen = ({ navigation, route }) => {
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>인증자 성함</Text>
             <View style={styles.profileInfoItemRightWrapper}>
-              <Text style={styles.profileInfoItemRightText}>최서연</Text>
+              <Text style={styles.profileInfoItemRightText}>
+                {' '}
+                {user?.authName || '미인증'}
+              </Text>
             </View>
           </View>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>아이디</Text>
             <View style={styles.profileInfoItemRightWrapper}>
-              <Text style={styles.profileInfoItemRightText}>qwer1234</Text>
+              <Text style={styles.profileInfoItemRightText}>
+                {user.loginId}
+              </Text>
             </View>
           </View>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>이메일</Text>
             <View style={styles.profileInfoItemRightWrapper}>
-              <Text style={styles.profileInfoItemRightText}>
-                qwer1234@cau.ac.kr
-              </Text>
+              <Text style={styles.profileInfoItemRightText}>{user.email}</Text>
             </View>
           </View>
         </View>
@@ -179,6 +196,18 @@ const styles = StyleSheet.create({
   nickname: {
     ...typography.heading4,
     color: colors.gray[850],
+    textAlign: 'center',
+    marginTop: 18,
+  },
+  nicknameWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    gap: 5,
+  },
+  noNickname: {
+    ...typography.heading4,
+    color: colors.gray[400],
     textAlign: 'center',
     marginTop: 18,
   },
