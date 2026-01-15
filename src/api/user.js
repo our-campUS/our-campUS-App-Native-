@@ -165,3 +165,38 @@ export const getUserInterestedEventPosts = async () => {
     return false;
   }
 };
+
+// 유저 프로필 이미지 변경 (PATCH /users/change/profile/image)
+
+export const editProfileImage = async (image) => {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+
+    const response = await api.patch(
+      '/users/change/profile/image',
+      {
+        newProfileImage: image,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    if (response.code === 200 || response.data.code === 200) {
+      console.log('유저 프로필 이미지 변경 성공 api:', response.data);
+      console.log(
+        '유저 프로필 이미지 변경 성공 response:',
+        response.data.data.newProfileImage
+      );
+      useAuthStore.getState().updateUser({
+        profileImage: response.data.data.newProfileImage,
+      });
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('유저 프로필 이미지 변경 에러:', error.response);
+    return false;
+  }
+};
