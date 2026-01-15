@@ -31,3 +31,33 @@ export async function changeCouncilNickname(nickname) {
     return false;
   }
 }
+
+// 학생회 프로필 이미지 수정 ( patch council/change/image )
+export async function changeCouncilProfileImage(image) {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    console.log('accessToken', accessToken);
+    console.log('image', image);
+    const response = await api.patch(
+      '/council/change/image',
+      {
+        councilProfileImageUrl: image,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    if (response.data.code === 200 || response.data.code === 0) {
+      useAuthStore.getState().updateUser({
+        councilProfileImageUrl: image,
+      });
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.log('changeCouncilProfileImage error', error.response);
+    return false;
+  }
+}

@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, Image, Pressable, Modal } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  Modal,
+  Alert,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect } from 'react';
@@ -15,9 +23,19 @@ import CustomToast from '../../../components/CustomToast';
 import useToastStore from '../../../store/toastStore';
 import useAuthStore from '../../../store/authStore';
 import { onFocusEffect } from '@react-navigation/native';
+import { changeCouncilProfileImage } from '../../../api/councilMyPage';
+import {
+  convertToPng,
+  getCommonImagePresignedUrl,
+  uploadImageToPresignedUrl,
+} from '../../../api/uploadImage';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { launchCamera } from 'react-native-image-picker';
 
 const CouncilProfileScreen = ({ navigation, route }) => {
   const { user } = useAuthStore();
+  const [iosProfileImage, setIosProfileImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const {
@@ -25,6 +43,10 @@ const CouncilProfileScreen = ({ navigation, route }) => {
     toastMessage,
     toastType,
   } = route.params || {};
+
+  useEffect(() => {
+    console.log('user', user);
+  }, [user]);
 
   useFocusEffect(
     useCallback(() => {
@@ -36,6 +58,124 @@ const CouncilProfileScreen = ({ navigation, route }) => {
       }
     }, [shouldShowToast, toastMessage, toastType, showToast])
   );
+
+  useEffect(() => {
+    if (
+      user?.councilProfileImageUrl &&
+      user.councilProfileImageUrl.includes('http://')
+    ) {
+      setIosProfileImage(user.councilProfileImageUrl.replace('http', 'https'));
+    } else if (
+      user?.councilProfileImageUrl &&
+      user.councilProfileImageUrl.includes('https://')
+    ) {
+      setIosProfileImage(user.councilProfileImageUrl);
+    }
+  }, [user?.councilProfileImageUrl]);
+
+  // selectedImage가 변경될 때 이미지 업로드 처리
+  useEffect(() => {
+    const uploadProfileImage = async () => {
+      if (!selectedImage) return;
+
+      try {
+        console.log('selectedImage detected, starting upload process');
+        let convertedImage = await convertToPng(selectedImage);
+        console.log('convertedImage', convertedImage);
+        let { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
+          convertedImage
+        );
+        console.log('imageUrl', imageUrl);
+        console.log('uploadUrl', uploadUrl);
+        await uploadImageToPresignedUrl(uploadUrl, convertedImage);
+        console.log('Image uploaded to presigned URL');
+        const result = await changeCouncilProfileImage(imageUrl);
+        console.log('editProfileImage result', result);
+        if (result) {
+          // await getUserInfo();
+          console.log('Profile image updated successfully');
+          setSelectedImage(null); // 업로드 완료 후 초기화
+        } else {
+          Alert.alert('프로필 이미지 변경 실패', '다시 시도해주세요');
+          setSelectedImage(null); // 실패 시에도 초기화
+        }
+      } catch (error) {
+        console.error('Profile image upload error:', error);
+        Alert.alert('프로필 이미지 변경 실패', '다시 시도해주세요');
+        setSelectedImage(null); // 에러 시에도 초기화
+      }
+    };
+
+    uploadProfileImage();
+  }, [selectedImage]);
+
+  const handleEditProfileImage = () => {
+    console.log('handleEditProfileImage');
+    Alert.alert(
+      '이미지 선택',
+      '이미지를 선택하는 방법을 선택해주세요',
+      [
+        {
+          text: '갤러리에서 선택',
+          onPress: () => {
+            launchImageLibrary(
+              {
+                mediaType: 'photo',
+                quality: 0.8,
+                maxWidth: 1000,
+                maxHeight: 1000,
+              },
+              (response) => {
+                if (response.didCancel) {
+                  return;
+                }
+                if (response.errorMessage) {
+                  Alert.alert('오류', response.errorMessage);
+                  return;
+                }
+                if (response.assets && response.assets[0]) {
+                  setSelectedImage(response.assets[0]);
+                }
+              }
+            );
+          },
+        },
+        {
+          text: '카메라로 촬영',
+          onPress: () => {
+            launchCamera(
+              {
+                mediaType: 'photo',
+                saveToPhotos: true,
+                quality: 0.8,
+                maxWidth: 1000,
+                maxHeight: 1000,
+                includeBase64: false,
+                cameraType: 'back',
+              },
+              (response) => {
+                if (response.didCancel) {
+                  return;
+                }
+                if (response.errorMessage) {
+                  Alert.alert('오류', response.errorMessage);
+                  return;
+                }
+                if (response.assets && response.assets[0]) {
+                  setSelectedImage(response.assets[0]);
+                }
+              }
+            );
+          },
+        },
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <>
@@ -50,11 +190,15 @@ const CouncilProfileScreen = ({ navigation, route }) => {
           onPressBack={() => navigation.goBack()}
         />
         <View style={styles.profileImageWrapper}>
-          <Image source={CouncilDefaultImage} style={styles.profileImage} />
-          <Pressable
-            style={styles.editIcon}
-            onPress={() => navigation.navigate('CouncilEditProfileScreen')}
-          >
+          <Image
+            source={
+              user?.councilProfileImageUrl
+                ? { uri: user.councilProfileImageUrl }
+                : CouncilDefaultImage
+            }
+            style={styles.profileImage}
+          />
+          <Pressable style={styles.editIcon} onPress={handleEditProfileImage}>
             <CouncilEditIcon
               width={24}
               height={24}

@@ -20,6 +20,7 @@ export async function councilLogin(data) {
         loginId: response.data.data.loginId,
         email: response.data.data.email,
         councilNickname: response.data.data.councilNickname,
+        councilProfileImageUrl: response.data.data.councilProfileImageUrl,
       };
       useAuthStore.getState().loginCouncil({ user, accessToken, refreshToken });
       return response.data;

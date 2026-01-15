@@ -18,7 +18,11 @@ const CouncilMyPageDefaultScreen = ({ navigation }) => {
       <View style={styles.councilIdentityContainer}>
         <View style={styles.councilIdentityImageWrapper}>
           <Image
-            source={CouncilDefaultImage}
+            source={
+              user?.councilProfileImageUrl
+                ? { uri: user.councilProfileImageUrl }
+                : CouncilDefaultImage
+            }
             style={styles.councilIdentityImage}
           />
         </View>
