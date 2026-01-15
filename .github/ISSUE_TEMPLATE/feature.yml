@@ -1,0 +1,33 @@
+name: '✨ Feature'
+description: '새로운 기능 추가를 위한 이슈 템플릿'
+title: '[Feature]: '
+labels: ['feature']
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ✨ 새로운 기능 추가
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: 구현하려는 기능에 대한 구체적인 설명을 작성해 주세요.
+      placeholder: ex) 로그인 화면 UI 및 기능 구현
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: ✅ 작업할 내용
+      description: 해야 할 작업을 체크리스트 형태로 작성해 주세요.
+      placeholder: |
+        - [ ] 로그인 화면 UI 구성
+        - [ ] 로그인 로직 추가
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 🙋🏻 참고 자료
+      description: 관련 문서, 디자인 링크, 참고한 레포 등 있다면 작성해 주세요.
+      placeholder: ex) 참고 문서 URL
