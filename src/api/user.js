@@ -111,3 +111,57 @@ export const editNickname = async (nickname, accessToken) => {
     return false;
   }
 };
+
+// 유저 관심 제휴글 조회 ( GET /users/student-council/posts/likes)
+
+export const getUserInterestedAffiliatePosts = async () => {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+
+    const response = await api.get('/users/student-council/posts/likes', {
+      params: {
+        page: 1,
+        size: 10,
+        category: 'PARTNERSHIP',
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.data.code === 200 || response.data.code === 0) {
+      console.log('유저 관심 제휴글 조회 성공:', response.data);
+      return response.data.data.content;
+    }
+    return false;
+  } catch (error) {
+    console.error('유저 관심 제휴글 조회 에러:', error.response);
+    return false;
+  }
+};
+
+// 유저 관심 행사글 조회 ( GET /users/student-council/posts/likes)
+
+export const getUserInterestedEventPosts = async () => {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+
+    const response = await api.get('/users/student-council/posts/likes', {
+      params: {
+        page: 1,
+        size: 10,
+        category: 'EVENT',
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.data.code === 200 || response.data.code === 0) {
+      console.log('유저 관심 행사글 조회 성공:', response.data);
+      return response.data.data.content;
+    }
+    return false;
+  } catch (error) {
+    console.error('유저 관심 행사글 조회 에러:', error.response);
+    return false;
+  }
+};

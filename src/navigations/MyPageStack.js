@@ -11,6 +11,7 @@ import AnnouncementDetailScreen from '../screens/MyPage/AnnouncementDetailScreen
 import InqueryMainScreen from '../screens/MyPage/InqueryMainScreen';
 import CancelMembershipScreen from '../screens/MyPage/CancelMembershipScreen';
 import ChangeScholarInfoScreen from '../screens/MyPage/ChangeScholarInfoScreen';
+import AffiliationLikedScreen from '../screens/Affiliation/AffiliationLikedScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +41,11 @@ const MyPageStack = () => {
       <Stack.Screen
         name="AffiliationDetailScreen"
         component={AffiliationDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AffiliationLikedScreen"
+        component={AffiliationLikedScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
