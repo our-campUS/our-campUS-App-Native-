@@ -36,7 +36,12 @@ const MyPageDefaultScreen = ({ navigation }) => {
         <View style={styles.mainProfileInfoWrapper}>
           <View style={styles.mainProfileImageWrapper}>
             <Image
-              source={defaultProfileImage}
+              source={
+                user?.profileImage &&
+                !user.profileImage.includes('default_profile')
+                  ? { uri: user.profileImage }
+                  : defaultProfileImage
+              }
               style={styles.mainProfileImage}
             />
           </View>

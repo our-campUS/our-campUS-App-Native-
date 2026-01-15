@@ -55,12 +55,12 @@ const MyPageProfileEditScreen = ({ navigation }) => {
         />
         <View style={styles.profileImageWrapper}>
           <Image
-            // source={
-            //   user?.profileImage
-            //     ? { uri: user.profileImage }
-            //     : defaultProfileImage
-            // }
-            source={defaultProfileImage}
+            source={
+              user?.profileImage &&
+              !user.profileImage.includes('default_profile')
+                ? { uri: user.profileImage }
+                : defaultProfileImage
+            }
             style={styles.profileImage}
             // resizeMode="contain"
           />
