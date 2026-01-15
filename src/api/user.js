@@ -82,3 +82,32 @@ export const withdrawUser = async (nickname) => {
     return false;
   }
 };
+
+// 유저 닉네임 수정 (patch /users/change/nickname)
+
+export const editNickname = async (nickname, accessToken) => {
+  try {
+    const response = await api.patch(
+      '/users/change/nickname',
+      {
+        campusNickname: nickname,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (response.data.code === 200) {
+      console.log('유저 닉네임 수정 성공:', response.data);
+      return true;
+    }
+
+    console.error('유저 닉네임 수정 실패:', response.data);
+    return false;
+  } catch (error) {
+    console.error('유저 닉네임 수정 에러:', error.response);
+    return false;
+  }
+};
