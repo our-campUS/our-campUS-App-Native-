@@ -23,6 +23,7 @@ import CustomToast from '../../../components/CustomToast';
 import useToastStore from '../../../store/toastStore';
 import useAuthStore from '../../../store/authStore';
 import { onFocusEffect } from '@react-navigation/native';
+import { requestLogout } from '../../../api/user';
 import { changeCouncilProfileImage } from '../../../api/councilMyPage';
 import {
   convertToPng,
@@ -38,6 +39,7 @@ const CouncilProfileScreen = ({ navigation, route }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
+  const logout = useAuthStore((state) => state.logout);
   const {
     showToast: shouldShowToast,
     toastMessage,
@@ -177,6 +179,18 @@ const CouncilProfileScreen = ({ navigation, route }) => {
     );
   };
 
+  const handleLogout = async () => {
+    try {
+      setIsLogoutModalVisible(false);
+
+      await requestLogout();
+    } catch (error) {
+      console.log('로그아웃 처리 중 에러 발생');
+    } finally {
+      logout();
+    }
+  };
+
   return (
     <>
       <SafeAreaView
@@ -287,7 +301,7 @@ const CouncilProfileScreen = ({ navigation, route }) => {
             <Button
               isOrange={true}
               title="로그아웃"
-              onPress={() => setIsLogoutModalVisible(false)}
+              onPress={handleLogout}
               style={{
                 width: '100%',
                 height: 50,
