@@ -7,6 +7,7 @@ import CouncilMainTab from '../components/CouncilMainTab';
 import StoreDetailScreen from '../screens/Store/StoreDetailScreen';
 import ReviewListScreen from '../screens/Store/ReviewListScreen';
 import CameraScanScreen from '../screens/Store/ScanScreen';
+import CameraScanScreenTest from '../screens/Store/ScanScreenTest';
 import ScanConfirmScreen from '../screens/Store/ScanConfirmScreen';
 import WriteReviewScreen from '../screens/Store/WriteReviewScreen';
 import ReviewResultScreen from '../screens/Store/ReviewResultScreen';
@@ -35,6 +36,11 @@ const MainStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="SelectStoreScreen" component={SelectStoreScreen} />
+      <Stack.Screen
+        name="CameraScanScreenTest"
+        component={CameraScanScreenTest}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="CameraScanScreen"
         component={CameraScanScreen}
