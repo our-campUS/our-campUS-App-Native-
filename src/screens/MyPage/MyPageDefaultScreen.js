@@ -36,7 +36,12 @@ const MyPageDefaultScreen = ({ navigation }) => {
         <View style={styles.mainProfileInfoWrapper}>
           <View style={styles.mainProfileImageWrapper}>
             <Image
-              source={defaultProfileImage}
+              source={
+                user?.profileImage &&
+                !user.profileImage.includes('default_profile')
+                  ? { uri: user.profileImage }
+                  : defaultProfileImage
+              }
               style={styles.mainProfileImage}
             />
           </View>
@@ -59,7 +64,7 @@ const MyPageDefaultScreen = ({ navigation }) => {
               height={20}
               color={colors.blue[250]}
             />
-            <Text style={styles.interestedItemText}>관심 제휴글</Text>
+            <Text style={styles.interestedItemText}>관심 게시글</Text>
           </Pressable>
           <Pressable
             onPress={() => navigation.navigate('InterestedPlaceScreen')}

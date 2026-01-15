@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
-    marginRight: -10,
+    // marginRight: -10,
   },
   backButton: {
     width: 14,

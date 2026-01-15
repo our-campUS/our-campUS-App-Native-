@@ -11,12 +11,10 @@ import typography from '../../style/typography';
 import LabelTitle from '../../components/LabelTitle';
 import Input from '../../components/Input';
 import { useState, useEffect } from 'react';
-import { editNickname } from '../../api/profile';
 import Button from '../../components/Button';
 import CheckIcon from '../../../assets/check.svg';
-
 import useAuthStore from '../../store/authStore';
-import { getUserInfo } from '../../api/user';
+import { getUserInfo, editNickname } from '../../api/user';
 
 const EditNicknameScreen = ({ navigation }) => {
   const [nickname, setNickname] = useState('');
@@ -24,7 +22,7 @@ const EditNicknameScreen = ({ navigation }) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const user = useAuthStore((state) => state.user);
-
+  const { accessToken } = useAuthStore();
   useEffect(() => {
     const fetchLatestInfo = async () => {
       await getUserInfo();
@@ -32,19 +30,30 @@ const EditNicknameScreen = ({ navigation }) => {
     fetchLatestInfo();
   }, []);
 
+  // const handleSave = async () => {
+  //   const response = await editNickname(nickname);
+  //   if (response.isValid) {
+  //     navigation.goBack();
+  //   } else {
+  //     if (response.errorType === 'NICKNAME_ALREADY_EXISTS') {
+  //       setNicknameError(true);
+  //       setErrorMessage('이미 존재하는 닉네임입니다.');
+  //     }
+  //     if (response.errorType === 'NICKNAME_LENGTH_INVALID') {
+  //       setNicknameError(true);
+  //       setErrorMessage('닉네임은 2~15자 이내로 작성해주세요.');
+  //     }
+  //   }
+  // };
+
   const handleSave = async () => {
-    const response = await editNickname(nickname);
-    if (response.isValid) {
+    const response = await editNickname(nickname, accessToken);
+    if (response) {
+      await getUserInfo();
       navigation.goBack();
     } else {
-      if (response.errorType === 'NICKNAME_ALREADY_EXISTS') {
-        setNicknameError(true);
-        setErrorMessage('이미 존재하는 닉네임입니다.');
-      }
-      if (response.errorType === 'NICKNAME_LENGTH_INVALID') {
-        setNicknameError(true);
-        setErrorMessage('닉네임은 2~15자 이내로 작성해주세요.');
-      }
+      setNicknameError(true);
+      setErrorMessage('닉네임 수정 실패');
     }
   };
 

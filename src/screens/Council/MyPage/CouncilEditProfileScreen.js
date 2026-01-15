@@ -14,10 +14,38 @@ import { useState } from 'react';
 import { editNickname } from '../../../api/profile';
 import Button from '../../../components/Button';
 import CheckIcon from '../../../../assets/check.svg';
+import useAuthStore from '../../../store/authStore';
+import { changeCouncilNickname } from '../../../api/councilMyPage';
+import { getUserInfo } from '../../../api/user';
 
 const CouncilEditProfileScreen = ({ navigation }) => {
+  const { user } = useAuthStore();
   const [nickname, setNickname] = useState('');
   const [councilInfo, setCouncilInfo] = useState('');
+  const [nicknameError, setNicknameError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  // const handleSave = async () => {
+  //   const response = await editNickname(nickname, accessToken);
+  //   if (response) {
+  //     await getUserInfo();
+  //     navigation.goBack();
+  //   } else {
+  //     setNicknameError(true);
+  //     setErrorMessage('닉네임 수정 실패');
+  //   }
+  // };
+
+  const handleChangeNickname = async () => {
+    const result = await changeCouncilNickname(nickname);
+    if (result) {
+      // await getUserInfo();
+      navigation.goBack();
+    } else {
+      setNicknameError(true);
+      setErrorMessage('학생회 이름 수정 실패');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -30,7 +58,7 @@ const CouncilEditProfileScreen = ({ navigation }) => {
         <View style={styles.inputWrapper}>
           <Input
             isOrange={true}
-            placeholder="일타"
+            placeholder={user?.councilNickname || '미지정(등록필요)'}
             value={nickname}
             onChangeText={(text) => {
               setNickname(text);
@@ -38,23 +66,21 @@ const CouncilEditProfileScreen = ({ navigation }) => {
             useTitle={true}
             title="학생회 이름"
           />
-          <Input
+          {/* <Input
+            disabled={true}
             isOrange={true}
-            placeholder="중앙대학교 경영경제대학 제12대 학생회"
-            value={councilInfo}
-            onChangeText={(text) => {
-              setCouncilInfo(text);
-            }}
+            placeholder={user?.councilName || '미지정(등록필요)'}
+            value={user?.councilName}
             useTitle={true}
             title="학생회 정보"
-          />
+          /> */}
         </View>
       </KeyboardAvoidingView>
       <View style={styles.buttonWrapper}>
         <Button
           isOrange={true}
           title="다음"
-          disabled={!nickname || !councilInfo}
+          disabled={!nickname}
           style={{
             width: '100%',
             height: 50,
@@ -65,7 +91,7 @@ const CouncilEditProfileScreen = ({ navigation }) => {
             backgroundColor: colors.orange[500],
             borderRadius: 10,
           }}
-          onPress={() => navigation.navigate('CouncilSendEmailCode')}
+          onPress={() => handleChangeNickname()}
         />
       </View>
     </SafeAreaView>

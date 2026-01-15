@@ -18,12 +18,22 @@ const CouncilMyPageDefaultScreen = ({ navigation }) => {
       <View style={styles.councilIdentityContainer}>
         <View style={styles.councilIdentityImageWrapper}>
           <Image
-            source={CouncilDefaultImage}
+            source={
+              user?.councilProfileImageUrl
+                ? { uri: user.councilProfileImageUrl }
+                : CouncilDefaultImage
+            }
             style={styles.councilIdentityImage}
           />
         </View>
         <View style={styles.textInfoContainer}>
-          <Text style={styles.councilIdentityNickname}>일타</Text>
+          {user?.councilNickname ? (
+            <Text style={styles.councilIdentityNickname}>
+              {user.councilNickname}
+            </Text>
+          ) : (
+            <Text style={styles.noNickname}>미지정(등록필요)</Text>
+          )}
           <Text style={styles.councilIdentityText}>{user.councilName}</Text>
         </View>
       </View>
@@ -149,6 +159,10 @@ const styles = StyleSheet.create({
   councilIdentityNickname: {
     ...typography.heading4,
     color: colors.gray[850],
+  },
+  noNickname: {
+    ...typography.heading4,
+    color: colors.gray[400],
   },
   councilIdentityText: {
     ...typography.body4Bold,

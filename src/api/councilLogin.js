@@ -17,6 +17,10 @@ export async function councilLogin(data) {
         schoolName: response.data.data.schoolName,
         majorName: response.data.data.majorName,
         collegeName: response.data.data.collegeName,
+        loginId: response.data.data.loginId,
+        email: response.data.data.email,
+        councilNickname: response.data.data.councilNickname,
+        councilProfileImageUrl: response.data.data.councilProfileImageUrl,
       };
       useAuthStore.getState().loginCouncil({ user, accessToken, refreshToken });
       return response.data;

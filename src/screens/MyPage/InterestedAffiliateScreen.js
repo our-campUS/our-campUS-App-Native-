@@ -3,16 +3,47 @@ import LabelTitle from '../../components/LabelTitle';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import AffiliationColumnListItem from '../../components/Affiliation/AffiliationColumnListItem';
+import LikedColumnListItem from '../../components/Affiliation/LikedColumnListItem';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import {
   AFFILIATION_COLUMN_LIST_DATA_AFFILIATION,
   AFFILIATION_COLUMN_LIST_DATA_EVENT,
 } from '../../constants/DummyData';
+import {
+  getUserInterestedAffiliatePosts,
+  getUserInterestedEventPosts,
+} from '../../api/user';
 const InterestedAffiliateScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
   const [isOrange, setIsOrange] = useState(false);
+  const [interestedAffiliatePosts, setInterestedAffiliatePosts] = useState([]);
+  const [interestedEventPosts, setInterestedEventPosts] = useState([]);
+
+  // 데이터를 다시 fetch하는 함수
+  const fetchInterestedPosts = useCallback(() => {
+    getUserInterestedAffiliatePosts().then((data) => {
+      setInterestedAffiliatePosts(data || []);
+    });
+    getUserInterestedEventPosts().then((data) => {
+      setInterestedEventPosts(data || []);
+    });
+  }, []);
+
+  // 초기 로드
+  useEffect(() => {
+    fetchInterestedPosts();
+  }, [fetchInterestedPosts]);
+
+  // 화면이 포커스될 때마다 데이터를 다시 fetch (좋아요 상태 변경 반영)
+  useFocusEffect(
+    useCallback(() => {
+      fetchInterestedPosts();
+    }, [fetchInterestedPosts])
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
@@ -75,24 +106,32 @@ const InterestedAffiliateScreen = ({ navigation }) => {
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          data={interestedAffiliatePosts}
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <LikedColumnListItem
+              item={item}
+              navigation={navigation}
+              isLikedScreen={true}
+            />
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item?.id || item?.postId}
         />
       )}
       {selectedActivityType === '행사' && (
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          data={interestedEventPosts}
           renderItem={({ item }) => (
-            <AffiliationColumnListItem item={item} navigation={navigation} />
+            <LikedColumnListItem
+              item={item}
+              navigation={navigation}
+              isLikedScreen={true}
+            />
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item?.id || item?.postId}
         />
       )}
     </SafeAreaView>

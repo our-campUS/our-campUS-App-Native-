@@ -10,6 +10,8 @@ import AnnouncementScreen from '../screens/MyPage/AnnouncementScreen';
 import AnnouncementDetailScreen from '../screens/MyPage/AnnouncementDetailScreen';
 import InqueryMainScreen from '../screens/MyPage/InqueryMainScreen';
 import CancelMembershipScreen from '../screens/MyPage/CancelMembershipScreen';
+import ChangeScholarInfoScreen from '../screens/MyPage/ChangeScholarInfoScreen';
+import AffiliationLikedScreen from '../screens/Affiliation/AffiliationLikedScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +44,11 @@ const MyPageStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="AffiliationLikedScreen"
+        component={AffiliationLikedScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="InterestedPlaceScreen"
         component={InterestedPlaceScreen}
         options={{ headerShown: false }}
@@ -69,6 +76,11 @@ const MyPageStack = () => {
       <Stack.Screen
         name="CancelMembershipScreen"
         component={CancelMembershipScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ChangeScholarInfoScreen"
+        component={ChangeScholarInfoScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

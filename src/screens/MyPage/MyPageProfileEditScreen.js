@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, Image, Pressable, Modal } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  Modal,
+  Alert,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../style/colors';
 import LabelTitle from '../../components/LabelTitle';
@@ -8,15 +16,23 @@ import EditIcon from '../../../assets/EditImage.svg';
 import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
 import { useState, useEffect } from 'react';
 import Button from '../../components/Button';
-
+import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import useAuthStore from '../../store/authStore';
-import { getUserInfo } from '../../api/user';
+import { getUserInfo, editProfileImage } from '../../api/user';
 import { requestLogout } from '../../api/user';
+
+import {
+  getCommonImagePresignedUrl,
+  convertToPng,
+  uploadImageToPresignedUrl,
+} from '../../api/uploadImage';
 
 const MyPageProfileEditScreen = ({ navigation }) => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const [iosProfileImage, setIosProfileImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const fetchLatestInfo = async () => {
@@ -29,6 +45,50 @@ const MyPageProfileEditScreen = ({ navigation }) => {
     console.log('user', user);
   }, [user]);
 
+  useEffect(() => {
+    if (user?.profileImage && user.profileImage.includes('http://')) {
+      setIosProfileImage(user.profileImage.replace('http', 'https'));
+    } else if (user?.profileImage && user.profileImage.includes('https://')) {
+      setIosProfileImage(user.profileImage);
+    }
+  }, [user?.profileImage]);
+
+  // selectedImage가 변경될 때 이미지 업로드 처리
+  useEffect(() => {
+    const uploadProfileImage = async () => {
+      if (!selectedImage) return;
+
+      try {
+        console.log('selectedImage detected, starting upload process');
+        let convertedImage = await convertToPng(selectedImage);
+        console.log('convertedImage', convertedImage);
+        let { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
+          convertedImage
+        );
+        console.log('imageUrl', imageUrl);
+        console.log('uploadUrl', uploadUrl);
+        await uploadImageToPresignedUrl(uploadUrl, convertedImage);
+        console.log('Image uploaded to presigned URL');
+        const result = await editProfileImage(imageUrl);
+        console.log('editProfileImage result', result);
+        if (result) {
+          await getUserInfo();
+          console.log('Profile image updated successfully');
+          setSelectedImage(null); // 업로드 완료 후 초기화
+        } else {
+          Alert.alert('프로필 이미지 변경 실패', '다시 시도해주세요');
+          setSelectedImage(null); // 실패 시에도 초기화
+        }
+      } catch (error) {
+        console.error('Profile image upload error:', error);
+        Alert.alert('프로필 이미지 변경 실패', '다시 시도해주세요');
+        setSelectedImage(null); // 에러 시에도 초기화
+      }
+    };
+
+    uploadProfileImage();
+  }, [selectedImage]);
+
   const handleLogout = async () => {
     try {
       setIsLogoutModalVisible(false);
@@ -39,6 +99,74 @@ const MyPageProfileEditScreen = ({ navigation }) => {
     } finally {
       logout();
     }
+  };
+
+  const handleEditProfileImage = () => {
+    console.log('handleEditProfileImage');
+    Alert.alert(
+      '이미지 선택',
+      '이미지를 선택하는 방법을 선택해주세요',
+      [
+        {
+          text: '갤러리에서 선택',
+          onPress: () => {
+            launchImageLibrary(
+              {
+                mediaType: 'photo',
+                quality: 0.8,
+                maxWidth: 1000,
+                maxHeight: 1000,
+              },
+              (response) => {
+                if (response.didCancel) {
+                  return;
+                }
+                if (response.errorMessage) {
+                  Alert.alert('오류', response.errorMessage);
+                  return;
+                }
+                if (response.assets && response.assets[0]) {
+                  setSelectedImage(response.assets[0]);
+                }
+              }
+            );
+          },
+        },
+        {
+          text: '카메라로 촬영',
+          onPress: () => {
+            launchCamera(
+              {
+                mediaType: 'photo',
+                saveToPhotos: true,
+                quality: 0.8,
+                maxWidth: 1000,
+                maxHeight: 1000,
+                includeBase64: false,
+                cameraType: 'back',
+              },
+              (response) => {
+                if (response.didCancel) {
+                  return;
+                }
+                if (response.errorMessage) {
+                  Alert.alert('오류', response.errorMessage);
+                  return;
+                }
+                if (response.assets && response.assets[0]) {
+                  setSelectedImage(response.assets[0]);
+                }
+              }
+            );
+          },
+        },
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
@@ -55,16 +183,18 @@ const MyPageProfileEditScreen = ({ navigation }) => {
         />
         <View style={styles.profileImageWrapper}>
           <Image
-            // source={
-            //   user?.profileImage
-            //     ? { uri: user.profileImage }
-            //     : defaultProfileImage
-            // }
-            source={defaultProfileImage}
+            source={
+              user?.profileImage
+                ? { uri: iosProfileImage }
+                : defaultProfileImage
+            }
             style={styles.profileImage}
             // resizeMode="contain"
           />
-          <Pressable style={styles.editIcon}>
+          <Pressable
+            style={styles.editIcon}
+            onPress={() => handleEditProfileImage()}
+          >
             <EditIcon width={24} height={24} />
           </Pressable>
         </View>
@@ -77,10 +207,13 @@ const MyPageProfileEditScreen = ({ navigation }) => {
             <Text style={styles.profileInfoItemTitle}>닉네임</Text>
             <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
           </Pressable>
-          <View style={styles.profileInfoItem}>
+          <Pressable
+            style={styles.profileInfoItem}
+            onPress={() => navigation.navigate('ChangeScholarInfoScreen')}
+          >
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </View>
+          </Pressable>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <View style={styles.profileInfoItemRightWrapper}>

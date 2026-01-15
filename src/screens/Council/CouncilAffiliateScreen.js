@@ -51,28 +51,85 @@ const CouncilAffiliateScreen = ({ navigation }) => {
   const [threeDotIconItem, setThreeDotIconItem] = useState(null);
   const [availabeEvents, setAvailabeEvents] = useState([]);
   const { formDraft, resetFormDraft } = useFormDraftStore();
-  // 데이터를 불러오는 함수
-  const fetchCouncilAffiliatePosts = useCallback(async () => {
-    const response = await getCouncilAffiliatePosts(accessToken);
-    // console.log('response at fetchCouncilAffiliatePosts', response);
-    setCouncilAffiliatePosts(response.data.data.content);
+  const [loadedActivityTypes, setLoadedActivityTypes] = useState(new Set()); // 이미 로드된 활동 타입 추적
+  const [isLoading, setIsLoading] = useState(false);
 
-    const responseEvent = await getCouncilEventPosts(accessToken);
-    setCouncilEventPosts(responseEvent.data.data.content);
+  // 특정 활동 타입의 데이터를 fetch하는 함수
+  const fetchActivityTypeData = useCallback(
+    async (activityType) => {
+      if (!accessToken) return;
 
-    const responseAvailableEvents = await getAvailableEvents(accessToken);
-    setAvailabeEvents(responseAvailableEvents.data.data.content);
+      setIsLoading(true);
+      try {
+        if (activityType === '제휴') {
+          const response = await getCouncilAffiliatePosts(accessToken);
+          setCouncilAffiliatePosts(response.data.data.content);
+        } else if (activityType === '행사') {
+          const responseEvent = await getCouncilEventPosts(accessToken);
+          setCouncilEventPosts(responseEvent.data.data.content);
+        }
+        // 로드된 활동 타입 추가
+        setLoadedActivityTypes((prev) => new Set([...prev, activityType]));
+      } catch (error) {
+        console.error(
+          `fetchActivityTypeData error for ${activityType}:`,
+          error
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [accessToken]
+  );
+
+  // Available Events를 fetch하는 함수 (초기 로드 시에만)
+  const fetchAvailableEvents = useCallback(async () => {
+    if (!accessToken) return;
+    try {
+      const responseAvailableEvents = await getAvailableEvents(accessToken);
+      setAvailabeEvents(responseAvailableEvents.data.data.content);
+    } catch (error) {
+      console.error('fetchAvailableEvents error:', error);
+    }
   }, [accessToken]);
 
+  // 초기 로드 시 기본 활동 타입('제휴')과 available events만 fetch
   useEffect(() => {
-    fetchCouncilAffiliatePosts();
-  }, [fetchCouncilAffiliatePosts]);
+    if (accessToken) {
+      fetchActivityTypeData('제휴');
+      fetchAvailableEvents();
+    }
+  }, [accessToken, fetchActivityTypeData, fetchAvailableEvents]);
 
-  // 화면이 포커스될 때마다 데이터를 다시 불러오기
+  // 활동 타입 변경 시 해당 타입의 데이터 fetch (이미 로드된 경우는 재사용)
+  useEffect(() => {
+    if (!accessToken) return;
+
+    // 이미 로드된 활동 타입이면 fetch하지 않음 (데이터는 이미 state에 있음)
+    if (!loadedActivityTypes.has(selectedActivityType)) {
+      fetchActivityTypeData(selectedActivityType);
+    }
+  }, [
+    selectedActivityType,
+    accessToken,
+    loadedActivityTypes,
+    fetchActivityTypeData,
+  ]);
+
+  // 화면이 포커스될 때마다 현재 활동 타입의 데이터를 새로고침
   useFocusEffect(
     useCallback(() => {
-      fetchCouncilAffiliatePosts();
-    }, [fetchCouncilAffiliatePosts])
+      if (!accessToken) return;
+
+      // 현재 활동 타입의 데이터를 다시 fetch하여 최신 상태 유지
+      fetchActivityTypeData(selectedActivityType);
+      fetchAvailableEvents();
+    }, [
+      selectedActivityType,
+      accessToken,
+      fetchActivityTypeData,
+      fetchAvailableEvents,
+    ])
   );
 
   const handleThreeDotIconPress = (item) => {
@@ -92,12 +149,24 @@ const CouncilAffiliateScreen = ({ navigation }) => {
         <View style={styles.councilIdentityContainer}>
           <View style={styles.councilIdentityImageWrapper}>
             <Image
-              source={CouncilDefaultImage}
+              source={
+                user?.councilProfileImageUrl
+                  ? { uri: user.councilProfileImageUrl }
+                  : CouncilDefaultImage
+              }
               style={styles.councilIdentityImage}
             />
           </View>
           <View style={styles.textInfoContainer}>
-            <Text style={styles.councilIdentityNickname}>일타</Text>
+            {user.councilNickname ? (
+              <Text style={styles.councilIdentityNickname}>
+                {user.councilNickname}
+              </Text>
+            ) : (
+              <Text style={styles.councilIdentityNoNickname}>
+                미지정(등록필요)
+              </Text>
+            )}
             <Text style={styles.councilIdentityText}>{user.councilName}</Text>
           </View>
         </View>
@@ -157,7 +226,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           // data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
           data={councilAffiliatePosts}
-          keyExtractor={(item) => item.postId}
+          keyExtractor={(item) => `affiliate-${item.postId}`}
           renderItem={({ item }) => (
             <AffiliationCouncilColumnListItem
               item={item}
@@ -165,6 +234,9 @@ const CouncilAffiliateScreen = ({ navigation }) => {
               handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
             />
           )}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
         />
       )}
       {selectedActivityType === '행사' && (
@@ -174,7 +246,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           // data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
           data={councilEventPosts}
-          keyExtractor={(item) => item.postId}
+          keyExtractor={(item) => `event-${item.postId}`}
           renderItem={({ item }) => (
             <AffiliationCouncilColumnListItem
               item={item}
@@ -182,6 +254,9 @@ const CouncilAffiliateScreen = ({ navigation }) => {
               handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
             />
           )}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
         />
       )}
 
@@ -265,8 +340,8 @@ const CouncilAffiliateScreen = ({ navigation }) => {
               accessToken
             );
             console.log('response at onSelectDelete', response);
-            // 데이터를 다시 불러오기
-            await fetchCouncilAffiliatePosts();
+            // 현재 선택된 활동 타입의 데이터를 다시 불러오기
+            await fetchActivityTypeData(selectedActivityType);
           }}
         />
       )}
@@ -335,6 +410,10 @@ const styles = StyleSheet.create({
   councilIdentityNickname: {
     ...typography.heading4,
     color: colors.gray[850],
+  },
+  councilIdentityNoNickname: {
+    ...typography.heading4,
+    color: colors.gray[500],
   },
   councilIdentityText: {
     ...typography.body4Bold,
