@@ -138,3 +138,28 @@ export const getPlacesByKeyword = async (keyword) => {
     return [];
   }
 };
+
+export const getPlacesSearch = async (keyword, lat, lng) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const response = await api.get('/places/search', {
+      params: {
+        keyword: keyword,
+        lat: lat,
+        lng: lng,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200) {
+      return response.data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('장소 검색 실패:', error);
+    return [];
+  }
+};

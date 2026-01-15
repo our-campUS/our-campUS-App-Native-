@@ -18,7 +18,7 @@ import Geolocation from '@react-native-community/geolocation';
 import SearchBar from '../../components/SearchBar';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SEARCH_RESULTS } from '../../constants/MapData';
+// import { SEARCH_RESULTS } from '../../constants/MapData'; // (안쓰면 삭제)
 import BottomSheet from '../../components/map/BottomSheet';
 import MapPin from '../../components/common/MapPin';
 import theme from '../../style';
@@ -31,6 +31,7 @@ import {
   getMapMarkers,
   getPartnershipDetail,
   getPlacesByKeyword,
+  getPlacesSearch,
 } from '../../api/place';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -56,6 +57,9 @@ const MapScreen = ({ route }) => {
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
 
+  // 초기값: 서울시청 (에러 방지용)
+  const lastCameraRef = useRef({ latitude: 37.5665, longitude: 126.978 });
+
   const isCategoryVisible = !searchKeyword && !selectedCategory;
 
   const sheetHeightAnimated = useRef(new Animated.Value(HEIGHT_HIDDEN)).current;
@@ -63,6 +67,7 @@ const MapScreen = ({ route }) => {
   const topHeaderHeight = insets.top + 60 + 20;
   const sheetMaxHeight = screenHeight - topHeaderHeight;
 
+  // 초기 파라미터 진입 처리
   useEffect(() => {
     if (route.params) {
       const { searchType, keyword, selectedLocation } = route.params;
@@ -84,20 +89,19 @@ const MapScreen = ({ route }) => {
       }
     }
   }, [route.params]);
+
+  // 바텀시트 데이터 계산
   const displayedMarkers = useMemo(() => {
     if (selectedStoreDetail && selectedMarkerId) {
       return [selectedStoreDetail];
     }
-
     if (searchKeyword || selectedCategory) {
       return partnerships;
     }
-
     if (selectedMarkerId) {
       const found = mapMarkers.find((m) => m.placeId === selectedMarkerId);
       return found ? [found] : [];
     }
-
     return [];
   }, [
     selectedStoreDetail,
@@ -108,6 +112,7 @@ const MapScreen = ({ route }) => {
     mapMarkers,
   ]);
 
+  // 바텀시트 애니메이션
   useEffect(() => {
     let targetHeight = HEIGHT_HIDDEN;
 
@@ -127,7 +132,34 @@ const MapScreen = ({ route }) => {
     }).start();
   }, [selectedMarkerId, searchKeyword, selectedCategory]);
 
+  // 데이터 가공 헬퍼 함수 (중복 제거)
+  const processSearchData = (rawData) => {
+    if (!rawData) return [];
+    return rawData.map((item) => {
+      const targetId = item.placeKey || item.placeId || item.id;
+      const existingPartner = mapMarkers.find((m) => m.placeId == targetId);
+
+      return {
+        ...item,
+        placeId: targetId || `temp_${Math.random()}`,
+        name: item.placeName || item.name || '이름 없음',
+        address: item.address || '',
+        category: item.category || '기타',
+        imgUrls: item.imgUrls || [],
+
+        latitude: item.coordinate?.latitude || item.latitude || 0,
+        longitude: item.coordinate?.longitude || item.longitude || 0,
+
+        type: existingPartner || item.partnerTitle ? 'PARTNER' : 'DEFAULT',
+
+        ...existingPartner,
+      };
+    });
+  };
+
+  // 데이터 조회 함수
   const fetchPartnershipList = async (isLoadMore = false) => {
+    // 검색어나 카테고리가 없으면 조회하지 않음
     if (!searchKeyword && !selectedCategory) return;
 
     if (loading) return;
@@ -136,49 +168,31 @@ const MapScreen = ({ route }) => {
     setLoading(true);
 
     try {
+      const { latitude: lat, longitude: lng } = lastCameraRef.current;
       let newData = [];
 
+      // 1) 카테고리 검색
       if (selectedCategory) {
         if (isLoadMore) {
           setLoading(false);
           return;
         }
 
-        const rawData = await getPlacesByKeyword(selectedCategory.label);
-
-        if (rawData) {
-          newData = rawData.map((item) => {
-            const targetId = item.placeKey;
-            const existingPartner = mapMarkers.find(
-              (m) => m.placeId == targetId
-            );
-
-            return {
-              ...item,
-              placeId: targetId || item.id || `temp_${Math.random()}`,
-              name: item.placeName,
-              latitude: item.coordinate?.latitude || 0,
-              longitude: item.coordinate?.longitude || 0,
-
-              type:
-                existingPartner || item.partnerTitle ? 'PARTNER' : 'DEFAULT',
-
-              ...existingPartner,
-            };
-          });
+        const rawData = await getPlacesSearch(selectedCategory.label, lat, lng);
+        newData = processSearchData(rawData);
+      }
+      // 2) 키워드 검색
+      else if (searchKeyword) {
+        if (isLoadMore) {
+          setLoading(false);
+          return;
         }
 
-        setMapMarkers(newData);
-
-        if (newData.length > 0) {
-          mapRef.current?.animateCameraTo({
-            latitude: newData[0].latitude,
-            longitude: newData[0].longitude,
-            zoom: 15,
-            duration: 500,
-          });
-        }
-      } else {
+        const rawData = await getPlacesSearch(searchKeyword, lat, lng);
+        newData = processSearchData(rawData);
+      }
+      // 3) (예외) 일반 리스트 조회
+      else {
         const currentLat = 37.5665;
         const currentLng = 126.978;
         const cursorToSend = isLoadMore ? nextCursor : null;
@@ -191,26 +205,46 @@ const MapScreen = ({ route }) => {
         });
 
         if (response && response.code === 200) {
-          newData = response.data.map((item) => ({
-            ...item,
-            type: 'PARTNER',
-          }));
+          newData = response.data.map((item) => ({ ...item, type: 'PARTNER' }));
         }
       }
 
+      // 상태 업데이트 (여기가 빠져서 렌더링이 안 됐던 것!)
+      // 1) 지도 핀 업데이트
+      if (!isLoadMore) {
+        setMapMarkers(newData);
+      }
+
+      // 2) 바텀시트 리스트 업데이트
       if (newData.length === 0) {
         if (!isLoadMore) setPartnerships([]);
         setIsListEnd(true);
       } else {
-        const lastItem = newData[newData.length - 1];
-        setNextCursor(lastItem.placeId);
-
         if (isLoadMore) {
           setPartnerships((prev) => [...prev, ...newData]);
+          if (!selectedCategory && !searchKeyword) {
+            setNextCursor(newData[newData.length - 1].placeId);
+          } else {
+            setIsListEnd(true);
+          }
         } else {
           setPartnerships(newData);
-          setIsListEnd(false);
+          if (selectedCategory || searchKeyword) {
+            setIsListEnd(true);
+          } else {
+            setIsListEnd(false);
+          }
         }
+      }
+
+      // 카메라 이동
+      if (!isLoadMore && newData.length > 0) {
+        mapRef.current?.animateCameraTo({
+          latitude: newData[0].latitude,
+          longitude: newData[0].longitude,
+          zoom: 15,
+          duration: 500,
+        });
       }
     } catch (e) {
       console.error(e);
@@ -219,8 +253,13 @@ const MapScreen = ({ route }) => {
     }
   };
 
+  // 기타 핸들러 및 유틸
   useEffect(() => {
     if (searchKeyword || selectedCategory) {
+      // 검색 조건 변경 시 리스트 초기화 후 새로 조회
+      setPartnerships([]);
+      setIsListEnd(false);
+      setNextCursor(null);
       fetchPartnershipList(false);
     } else {
       setPartnerships([]);
@@ -229,7 +268,6 @@ const MapScreen = ({ route }) => {
 
   const getDeltas = (zoom) => {
     const zoomFactor = Math.pow(2, 16 - zoom);
-
     return {
       latitudeDelta: 0.01 * zoomFactor,
       longitudeDelta: 0.01 * zoomFactor,
@@ -237,26 +275,25 @@ const MapScreen = ({ route }) => {
   };
 
   const handleCameraIdle = async (e) => {
-    if (searchKeyword || selectedCategory) return;
-
     const { latitude, longitude, zoom } = e;
+    lastCameraRef.current = { latitude, longitude }; // 좌표 저장
 
+    // 주소 업데이트
     const addressData = await getAddressFromCoords(latitude, longitude);
     if (addressData) setCurrentAddress(addressData.text);
 
+    // 검색 중이면 자동 핀 로딩 중단
+    if (searchKeyword || selectedCategory) return;
+
     if (mapRef.current) {
       try {
-        let minLat, maxLat, minLng, maxLng;
-
         const currentZoom = zoom || 16;
         const { latitudeDelta, longitudeDelta } = getDeltas(currentZoom);
 
-        minLat = latitude - latitudeDelta;
-        maxLat = latitude + latitudeDelta;
-        minLng = longitude - longitudeDelta;
-        maxLng = longitude + longitudeDelta;
-
-        console.log(`lat: ${minLat} ~ ${maxLat}, lng: ${minLng} ~ ${maxLng}`);
+        const minLat = latitude - latitudeDelta;
+        const maxLat = latitude + latitudeDelta;
+        const minLng = longitude - longitudeDelta;
+        const maxLng = longitude + longitudeDelta;
 
         if (minLat && maxLat && minLng && maxLng) {
           const markers = await getMapMarkers(minLat, maxLat, minLng, maxLng);
@@ -265,7 +302,6 @@ const MapScreen = ({ route }) => {
               ...item,
               type: 'PARTNER',
             }));
-
             setMapMarkers(partnersWithType);
             console.log(`${markers.length}개의 핀 로드 완료`);
           }
@@ -278,22 +314,18 @@ const MapScreen = ({ route }) => {
 
   const handlePinPress = async (item) => {
     setSelectedMarkerId(item.placeId);
-
     setSearchKeyword(null);
     setSelectedCategory(null);
     setPartnerships([]);
 
-    // TODO 현재 위치 좌표 (실제로는 state나 geolocation 값 사용)
-    const currentLat = 37.50415;
-    const currentLng = 126.957;
+    const { latitude, longitude } = lastCameraRef.current;
 
     if (item.postId) {
       const detailData = await getPartnershipDetail(
         item.postId,
-        currentLat,
-        currentLng
+        latitude,
+        longitude
       );
-
       if (detailData) {
         setSelectedStoreDetail(detailData);
       }
@@ -350,8 +382,6 @@ const MapScreen = ({ route }) => {
             pinType = 'SELECTED';
           } else if (item.partnerTitle || item.type === 'PARTNER') {
             pinType = 'PARTNER';
-          } else {
-            pinType = 'DEFAULT';
           }
           const pinSize = getPinSize(pinType);
 
@@ -364,7 +394,7 @@ const MapScreen = ({ route }) => {
               height={pinSize}
               anchor={{ x: 0.5, y: isSelected ? 1 : 0.5 }}
               onTap={() => handlePinPress(item)}
-              caption={{ text: item.placeName }}
+              caption={{ text: item.name }}
             >
               <MapPin type={pinType} category={item.category} />
             </NaverMapMarkerOverlay>
