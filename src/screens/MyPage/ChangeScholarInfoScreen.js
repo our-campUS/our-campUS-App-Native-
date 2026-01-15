@@ -17,10 +17,15 @@ import MajorInputModal from '../../components/majorInputModal';
 import Button from '../../components/Button';
 import UniversityInputModal from '../../components/UniversityInputModal';
 import { searchCollege } from '../../api/signUp';
-import { sendUserProfile } from '../../api/signUp';
+import { editAcademicInfo } from '../../api/user';
 import ScholarChangeConfirmBottomSheet from '../../components/MyPage/ScholarChangeConfirmBottomSheet';
+import useToastStore from '../../store/toastStore';
+import CustomToast from '../../components/CustomToast';
+import useAuthStore from '../../store/authStore';
 
 const ChangeScholarInfoScreen = ({ navigation, route }) => {
+  const { user } = useAuthStore();
+  const { showToast, hideToast } = useToastStore();
   const [isMajorInputModalVisible, setIsMajorInputModalVisible] =
     useState(false);
   const [isUniversityInputModalVisible, setIsUniversityInputModalVisible] =
@@ -62,27 +67,33 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
     console.log('✅ Match College Response:', result);
   };
 
-  const handleFinalSignUpSubmit = async () => {
-    const result = await sendUserProfile(universityId, majorId);
-    console.log('✅ Final Sign Up Submit Response:', result);
-    if (result) {
-      navigation.navigate('SignUpSecondScreen', {
-        userName: route.params?.userName,
-        university: university,
-        department: department,
-        major: major,
-      });
-    } else {
-      Alert.alert('오류', '회원가입에 실패하였습니다.');
-    }
-  };
+  // const handleFinalSignUpSubmit = async () => {
+  //   const result = await editAcademicInfo(universityId, majorId);
+  //   console.log('✅ Final Sign Up Submit Response:', result);
+  //   if (result) {
+  //     showToast('학적정보 변경이 완료되었습니다.', 'success');
+  //     navigation.goBack();
+  //   } else {
+  //     showToast('학적정보 변경에 실패하였습니다.', 'error');
+  //   }
+  // };
 
   const handleChangeScholarInfo = async () => {
-    const result = await sendUserProfile(universityId, majorId);
-    if (result) {
-      navigation.goBack();
+    const result = await editAcademicInfo(universityId, majorId);
+    if (result.success) {
+      showToast('학적정보 변경이 완료되었습니다.', 'success');
+      setTimeout(() => {
+        useAuthStore.getState().updateUser({
+          schoolName: university,
+          collegeName: department,
+          majorName: major,
+          nextUpdateAvailableDate: result.nextUpdateAvailableDate,
+        });
+        hideToast();
+        navigation.goBack();
+      }, 300);
     } else {
-      Alert.alert('오류', '학적정보 변경에 실패하였습니다.');
+      showToast('학적정보 변경에 실패하였습니다.', 'error');
     }
     setIsConfirmBottomSheetVisible(false);
   };
@@ -160,6 +171,17 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
               }
             />
           </View>
+          <View style={styles.noteContainer}>
+            <Text style={styles.noteText}>
+              * 학적정보는 3개월에 1회만 변경 할 수 있어요.
+            </Text>
+            {user.nextUpdateAvailableDate && (
+              <Text style={styles.noteText}>
+                * 다음 변경 가능일 :{' '}
+                {user.nextUpdateAvailableDate?.slice(0, 10)} 이후
+              </Text>
+            )}
+          </View>
           <View
             style={[
               styles.buttonContainer,
@@ -184,6 +206,7 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
             />
           </View>
         </ScrollView>
+        <CustomToast />
       </SafeAreaView>
       {isMajorInputModalVisible && (
         <MajorInputModal
@@ -230,7 +253,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     width: '100%',
     paddingHorizontal: 20,
-    marginTop: 56,
+    marginTop: 28,
     gap: 24,
   },
   greetingContainer: {
@@ -260,6 +283,15 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.blue[400],
     ...typography.heading6,
+  },
+  noteContainer: {
+    paddingHorizontal: 20,
+    width: '100%',
+    marginTop: 24,
+  },
+  noteText: {
+    ...typography.caption2Regular,
+    color: colors.gray[500],
   },
 });
 

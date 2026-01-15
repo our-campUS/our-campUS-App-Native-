@@ -200,3 +200,36 @@ export const editProfileImage = async (image) => {
     return false;
   }
 };
+
+// 유저 학적 정보 변경 (PATCH /users/change/profile/academic)
+
+export const editAcademicInfo = async (schoolId, majorId) => {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+
+    const response = await api.patch(
+      '/users/change/profile/academic',
+      {
+        schoolId: schoolId,
+        majorId: majorId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    if (response.code === 200 || response.data.code === 200) {
+      console.log('유저 학적 정보 변경 성공 api:', response.data);
+      console.log('유저 학적 정보 변경 성공 response:', response.data.data);
+      return {
+        success: true,
+        nextUpdateAvailableDate: response.data.data.nextUpdateAvailableDate,
+      };
+    }
+    return false;
+  } catch (error) {
+    // console.error('유저 학적 정보 변경 에러:', error.response);
+    return false;
+  }
+};
