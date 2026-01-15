@@ -252,7 +252,7 @@ const CouncilProfileScreen = ({ navigation, route }) => {
           </Text>
           <Pressable
             style={styles.profileInfoItem}
-            onPress={() => navigation.navigate('CouncilChangePasswordEmail')}
+            onPress={() => navigation.navigate('CouncilChangePasswordCode')}
           >
             <Text style={styles.profileInfoItemTitle}>비밀번호 변경</Text>
             <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
