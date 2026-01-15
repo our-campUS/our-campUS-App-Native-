@@ -169,7 +169,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           // data={AFFILIATION_COLUMN_LIST_DATA_AFFILIATION}
           data={councilAffiliatePosts}
-          keyExtractor={(item) => item.postId}
+          keyExtractor={(item) => `affiliate-${item.postId}`}
           renderItem={({ item }) => (
             <AffiliationCouncilColumnListItem
               item={item}
@@ -177,6 +177,9 @@ const CouncilAffiliateScreen = ({ navigation }) => {
               handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
             />
           )}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
         />
       )}
       {selectedActivityType === '행사' && (
@@ -186,7 +189,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           // data={AFFILIATION_COLUMN_LIST_DATA_EVENT}
           data={councilEventPosts}
-          keyExtractor={(item) => item.postId}
+          keyExtractor={(item) => `event-${item.postId}`}
           renderItem={({ item }) => (
             <AffiliationCouncilColumnListItem
               item={item}
@@ -194,6 +197,9 @@ const CouncilAffiliateScreen = ({ navigation }) => {
               handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
             />
           )}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
         />
       )}
 

@@ -108,27 +108,38 @@ const AffiliationCouncilColumnListItem = ({
   }, [user]);
 
   useEffect(() => {
-    // item이 변경되면 이미지 로드 상태 리셋
+    // postId가 변경될 때만 이미지 로드 상태 리셋 (같은 아이템의 다른 필드 변경은 무시)
     if (item?.thumbnailImageUrl) {
       setIsImageLoaded(false);
     } else {
       // 이미지가 없으면 바로 로드 완료로 처리
       setIsImageLoaded(true);
     }
-  }, [item?.thumbnailImageUrl]);
+  }, [item?.postId, item?.thumbnailImageUrl]);
 
   useEffect(() => {
-    setEndYear(item?.dateTime?.slice(0, 4));
-    setEndMonth(item?.dateTime?.slice(5, 7));
-    if (item?.dateTime?.slice(5, 7).startsWith('0')) {
-      setEndMonth(item?.dateTime?.slice(6, 7));
+    // endDateTime 우선 사용, 없으면 dateTime 사용 (AffiliationColumnListItem과 동일하게)
+    const dateTime = item?.endDateTime || item?.dateTime;
+    if (dateTime) {
+      setEndYear(dateTime.slice(0, 4));
+      setEndMonth(dateTime.slice(5, 7));
+      if (dateTime.slice(5, 7).startsWith('0')) {
+        setEndMonth(dateTime.slice(6, 7));
+      }
+      setEndDay(dateTime.slice(8, 10));
+      if (item?.category === 'EVENT') {
+        setStartHour(dateTime.slice(11, 13));
+        setStartMinute(dateTime.slice(14, 16));
+      }
+    } else {
+      // dateTime이 없으면 초기화 (skeleton 방지)
+      setEndYear(null);
+      setEndMonth(null);
+      setEndDay(null);
+      setStartHour(null);
+      setStartMinute(null);
     }
-    setEndDay(item?.dateTime?.slice(8, 10));
-    if (item?.category === 'EVENT') {
-      setStartHour(item?.dateTime?.slice(11, 13));
-      setStartMinute(item?.dateTime?.slice(14, 16));
-    }
-  }, [item]);
+  }, [item?.endDateTime, item?.dateTime, item?.category]);
 
   // useEffect(() => {
   //   if (user?.role === 'COUNCIL') {
