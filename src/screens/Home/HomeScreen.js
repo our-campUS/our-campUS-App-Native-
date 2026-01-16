@@ -18,6 +18,7 @@ import { CAROUSEL_DATA } from '../../constants/DummyData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
+import { useNavigation } from '@react-navigation/native';
 
 const HomeSection = ({
   title,
@@ -46,6 +47,7 @@ const HomeScreen = () => {
   const [hasNewNotification, setHasNewNotification] = useState(true);
 
   const user = useAuthStore((state) => state.user);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -141,7 +143,7 @@ const HomeScreen = () => {
               title="제휴 이용하고 스탬프 받아가세요!"
               subtitle="제휴만 이용해도 혜택이 팡팡"
               imageSource={require('../../../assets/images/home/banner_04.png')}
-              onPress={() => console.log('스탬프 클릭')}
+              onPress={() => navigation.navigate('Stamp')}
             />
           </View>
         </HomeSection>

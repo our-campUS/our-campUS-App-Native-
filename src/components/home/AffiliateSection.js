@@ -11,6 +11,7 @@ import theme from '../../style';
 // import { BENEFITS_DATA } from '../../constants/DummyData';
 import useAuthStore from '../../store/authStore';
 import { getActivePartnerships } from '../../api/partnership';
+import { useNavigation } from '@react-navigation/native';
 
 const COUNCIL_TYPE_MAP = {
   SCHOOL: 'SCHOOL_COUNCIL',
@@ -20,6 +21,7 @@ const COUNCIL_TYPE_MAP = {
 
 const AffiliateSection = () => {
   const user = useAuthStore((state) => state.user);
+  const navigation = useNavigation();
   const TABS = [
     { id: 'SCHOOL', label: '총학생회' || '학교' },
     { id: 'COLLEGE', label: user?.collegeName || '단과대' },
@@ -106,7 +108,10 @@ const AffiliateSection = () => {
       />
 
       {/* 더보기 버튼 */}
-      <TouchableOpacity style={styles.moreButton}>
+      <TouchableOpacity
+        style={styles.moreButton}
+        onPress={() => navigation.navigate('Partnership')}
+      >
         <Text style={styles.moreText}>이용 가능한 제휴 더보기</Text>
       </TouchableOpacity>
     </View>
