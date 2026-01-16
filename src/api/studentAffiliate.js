@@ -267,3 +267,21 @@ export const toggleStudentAffiliateLike = async (accessToken, postId) => {
     throw error;
   }
 };
+
+export const getTodayEvent = async (accessToken) => {
+  try {
+    const response = await api.get(
+      '/users/student-council/posts/events/today',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    console.log('오늘의 행사 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('오늘의 행사 조회 실패:', error);
+    return null;
+  }
+};
