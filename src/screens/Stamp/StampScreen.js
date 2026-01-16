@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   Platform,
@@ -11,6 +10,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import theme from '../../style';
 import colors from '../../style/colors';
@@ -25,6 +26,7 @@ import BulletText from '../../components/common/BulletText';
 import RewardItem from '../../components/Stamp/RewardItem';
 import ImageDetailModal from '../../components/common/ImageDetailModal';
 import ReviewActionModal from '../../components/review/ReviewActionModal';
+import { getStamp } from '../../api/stamp';
 import {
   HISTORY_DATA,
   NOTICE_DATA,
@@ -41,6 +43,23 @@ const StampScreen = () => {
   const [selectedReward, setSelectedReward] = useState(null);
   const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
   const [reviewModalStartStep, setReviewModalStartStep] = useState(1);
+  const [stampCount, setStampCount] = useState(0);
+  const [reviewList, setReviewList] = useState([]);
+
+  useEffect(() => {
+    const fetchStamp = async () => {
+      const response = await getStamp();
+      console.log('fetchStamp response', response);
+      setStampCount(response.data.data.stampCount);
+      setReviewList(response.data.data.reviews);
+    };
+    fetchStamp();
+  }, []);
+
+  useEffect(() => {
+    console.log('stampCount', stampCount);
+    console.log('reviewList', reviewList);
+  }, [stampCount, reviewList]);
 
   const handleRewardClick = (item) => {
     setSelectedReward(item);
@@ -93,7 +112,10 @@ const StampScreen = () => {
         </Text>
       </View>
 
-      <StampBoard onPressReview={handleReviewButtonPress} />
+      <StampBoard
+        onPressReview={handleReviewButtonPress}
+        stampCount={stampCount}
+      />
     </View>
   );
 
@@ -129,13 +151,15 @@ const StampScreen = () => {
 
       {isHistoryOpen && (
         <View style={styles.historyContainer}>
-          {HISTORY_DATA.map((item) => (
-            <View key={item.id} style={styles.historyItem}>
+          {reviewList?.map((item) => (
+            <View key={item.reviewId} style={styles.historyItem}>
               <View>
-                <Text style={styles.historyLabel}>{item.label}</Text>
-                <Text style={styles.historyDate}>{item.date}</Text>
+                <Text style={styles.historyLabel}>{item.placeName}</Text>
+                <Text style={styles.historyDate}>
+                  {item.reviewCreatedAt.slice(0, 10)}
+                </Text>
               </View>
-              <Text style={styles.historyAmount}>{item.amount}</Text>
+              <Text style={styles.historyAmount}>{'+1개'}</Text>
             </View>
           ))}
         </View>
@@ -191,7 +215,7 @@ const StampScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       {renderTopTabs()}
 
       <ScrollView
@@ -202,7 +226,7 @@ const StampScreen = () => {
         {activeTab === 'stamp' ? (
           <>
             {renderStampBoard()}
-            {renderInviteEvent()}
+            {/* {renderInviteEvent()} */}
             <View style={styles.divider} />
             {renderHistory()}
             <View style={styles.dividerThin} />
@@ -253,9 +277,10 @@ const StampScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.backgroundColor,
+    backgroundColor: colors.common.white,
   },
   tabContainer: {
+    marginTop: 58,
     flexDirection: 'row',
     backgroundColor: theme.colors.background,
   },
