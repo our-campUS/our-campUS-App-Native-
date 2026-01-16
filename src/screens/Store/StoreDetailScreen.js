@@ -62,17 +62,16 @@ const StoreDetailScreen = () => {
 
     imgUrls: paramStore.imgUrls || [],
 
-    rating: paramStore.rating || 0,
-    // TODO 리뷰 관련 수정 필요 (reviews, reviewCount)
+    rating: paramStore.star || 0,
     reviews:
       paramStore.reviews && paramStore.reviews.length > 0
         ? paramStore.reviews
-        : DUMMY_STORE.reviews,
+        : [],
 
-    reviewCount:
+    reviewSize:
       paramStore.reviews && paramStore.reviews.length > 0
-        ? paramStore.reviewCount
-        : DUMMY_STORE.reviews.length,
+        ? paramStore.reviewSize
+        : 0,
 
     phone: paramStore.telephone || paramStore.phone || '',
     hours: paramStore.hours || [],
@@ -311,11 +310,9 @@ const StoreDetailScreen = () => {
                 onPress={() =>
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
-                    rating: storeData.rating,
                     star: storeData.star,
                     placeId: storeData.placeId,
                     reviewSize: storeData.reviewSize,
-                    storeData: storeData,
                   })
                 }
               >
@@ -340,7 +337,7 @@ const StoreDetailScreen = () => {
                           width={16}
                           height={16}
                           color={
-                            i < review.rating
+                            i < review.star
                               ? theme.colors.primary2
                               : colors.gray[200]
                           }
@@ -350,11 +347,10 @@ const StoreDetailScreen = () => {
                     </View>
                     <Text style={styles.reviewContent}>{review.content}</Text>
                     <View style={styles.reviewMeta}>
-                      <Text style={styles.reviewUser}>{review.user}</Text>
-                      <Text style={styles.reviewUser}>{review.date}</Text>
+                      <Text style={styles.reviewUser}>{review.writerName}</Text>
+                      <Text style={styles.reviewUser}>{review.createdAt}</Text>
                     </View>
                   </View>
-
                   {review.thumbnailImgUrl ? (
                     <Image
                       source={{ uri: review.thumbnailImgUrl }}
