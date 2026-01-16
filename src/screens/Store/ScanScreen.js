@@ -20,12 +20,17 @@ import FlipCameraIcon from '../../../assets/icons/flip_camera.png';
 const { width } = Dimensions.get('window');
 const SCAN_AREA_SIZE = width * 0.7;
 
-const CameraScanScreen = () => {
+const CameraScanScreen = ({ route }) => {
   const navigation = useNavigation();
+  const { storeData } = route.params;
+
+  useEffect(() => {
+    console.log('storeData', storeData);
+  }, [storeData]);
 
   useEffect(() => {
     setTimeout(() => {
-      navigation.navigate('CameraScanScreenTest');
+      navigation.navigate('CameraScanScreenTest', { storeData: storeData });
     }, 1500);
   }, [navigation]);
 

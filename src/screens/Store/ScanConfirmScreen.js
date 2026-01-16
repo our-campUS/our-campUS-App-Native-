@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,18 +18,31 @@ import colors from '../../style/colors';
 import DUMMY_STORE from '../../constants/StoreData';
 import { StatusBar } from 'react-native/types_generated/index';
 
-const ScanConfirmScreen = () => {
+const ScanConfirmScreen = ({ route }) => {
   const navigation = useNavigation();
-  const route = useRoute();
+  const [dateYear, setDateYear] = useState(null);
+  const [dateMonth, setDateMonth] = useState(null);
+  const [dateDay, setDateDay] = useState(null);
+
+  const { storeData, ocrResult } = route.params;
+
+  useEffect(() => {
+    console.log('ocrResult', ocrResult);
+    setDateYear(ocrResult?.paymentDate.slice(0, 4));
+    setDateMonth(ocrResult?.paymentDate.slice(5, 7));
+    setDateDay(ocrResult?.paymentDate.slice(8, 10));
+  }, [ocrResult]);
 
   const IS_ALREADY_REGISTERED = false;
 
-  const storeData = DUMMY_STORE;
+  // const storeData = DUMMY_STORE;
 
   const renderSuccessView = () => (
     <View style={styles.contentContainer}>
-      <Text style={styles.yearText}>2025년</Text>
-      <Text style={styles.dateText}>12월 00일</Text>
+      <Text style={styles.yearText}>{dateYear}년</Text>
+      <Text style={styles.dateText}>
+        {dateMonth}월 {dateDay}일
+      </Text>
 
       <View style={styles.cardWrapper}>
         <StoreListItem

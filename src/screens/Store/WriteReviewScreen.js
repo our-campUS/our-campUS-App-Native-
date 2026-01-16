@@ -47,6 +47,10 @@ const WriteReviewScreen = () => {
   const route = useRoute();
   const storeName = route.params?.store?.name || '스타벅스 상도역점';
 
+  useEffect(() => {
+    console.log('route.params', route.params);
+  }, [route.params]);
+
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [photos, setPhotos] = useState([]);
@@ -144,10 +148,13 @@ const WriteReviewScreen = () => {
       star: rating,
       content: reviewText,
       imageUrls: finalImages,
-      place: DUMMY_PLACE,
+      isVerified: true,
     };
     console.log('finalSubmitReviewData', finalSubmitReviewData);
-    const reviewResult = await createReview(finalSubmitReviewData);
+    const reviewResult = await createReview(
+      route.params?.store?.placeId,
+      finalSubmitReviewData
+    );
     if (reviewResult) {
       useToastStore.getState().showToast('리뷰 작성 완료', 'blue');
       setTimeout(() => {

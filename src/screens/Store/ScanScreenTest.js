@@ -24,6 +24,9 @@ import {
 } from 'react-native-vision-camera';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import typography from '../../style/typography';
+import { requestOcr } from '../../api/review';
+import useToastStore from '../../store/toastStore';
+import CustomToast from '../../components/CustomToast';
 
 const { width, height } = Dimensions.get('window');
 // const SCAN_AREA_SIZE = width * 0.7;
@@ -33,7 +36,8 @@ const SCAN_HEIGHT = SCAN_WIDTH * 1.4;
 const GRADIENT_HEIGHT = 188;
 const VISIBLE_START = 40; // 처음에 보이고 싶은 높이 (px)
 
-const CameraScanScreenTest = () => {
+const CameraScanScreenTest = ({ route }) => {
+  const { storeData } = route.params;
   const scanAnim = useRef(new Animated.Value(0)).current;
   const [cameraReady, setCameraReady] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
@@ -50,10 +54,35 @@ const CameraScanScreenTest = () => {
   }, [navigation]);
 
   useEffect(() => {
-    if (mode === 'PREVIEW') {
+    console.log('photoPath', photoPath);
+  }, [photoPath]);
+
+  const sendOcrRequest = async () => {
+    const ocrResult = await requestOcr(photoPath, storeData.placeId);
+    console.log('ocrResult', ocrResult);
+    if (ocrResult.success) {
+      // 성공한 경우 애니메이션 멈추기
+      scanAnim.stopAnimation();
+      scanAnim.setValue(0);
+      navigation.navigate('ScanConfirmScreen', {
+        storeData: storeData,
+        ocrResult: ocrResult.data,
+      });
+    } else {
+      scanAnim.stopAnimation();
+      scanAnim.setValue(0);
+      useToastStore.getState().showToast('OCR 요청 실패', 'error');
       setTimeout(() => {
-        navigation.navigate('ScanConfirmScreen');
-      }, 3000);
+        useToastStore.getState().hideToast();
+        setMode('CAMERA');
+        setPhotoPath(null);
+      }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    if (mode === 'PREVIEW' && photoPath) {
+      sendOcrRequest();
     }
   }, [mode]);
 
@@ -214,6 +243,7 @@ const CameraScanScreenTest = () => {
           )}
         </SafeAreaView>
       </View>
+      <CustomToast />
     </View>
   );
 };

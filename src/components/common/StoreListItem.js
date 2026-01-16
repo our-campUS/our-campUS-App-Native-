@@ -44,7 +44,7 @@ const StoreListItem = ({
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.category}>{categoryLabel}</Text>
           </View>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.likeButton}
             onPress={() => setIsLiked(!isLiked)}
             activeOpacity={0.7}
@@ -54,7 +54,7 @@ const StoreListItem = ({
             ) : (
               <UnlikedIcon width={16} height={15} />
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {tags.length > 0 && (
