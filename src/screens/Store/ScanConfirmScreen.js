@@ -3,20 +3,20 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   Image,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../../components/LabelTitle';
 import StoreListItem from '../../components/common/StoreListItem';
 import theme from '../../style';
 import typography from '../../style/typography';
 import colors from '../../style/colors';
 import DUMMY_STORE from '../../constants/StoreData';
+import { StatusBar } from 'react-native/types_generated/index';
 
 const ScanConfirmScreen = () => {
   const navigation = useNavigation();
@@ -120,7 +120,7 @@ const ScanConfirmScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="리뷰 작성"
         useBackButton={true}
