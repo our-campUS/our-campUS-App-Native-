@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { togglePlaceLike } from '../../api/place';
 
 import LabelTitle from '../../components/LabelTitle';
 import Button from '../../components/Button';
@@ -97,7 +98,19 @@ const StoreDetailScreen = () => {
     }
   }).current;
 
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(paramStore.isLiked || false);
+
+  const handleLikePress = async () => {
+    const previousState = isLiked;
+    setIsLiked(!isLiked);
+
+    try {
+      await togglePlaceLike(storeData);
+    } catch (error) {
+      console.error('상세화면 좋아요 실패:', error);
+      setIsLiked(previousState);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -158,10 +171,7 @@ const StoreDetailScreen = () => {
               </View>
 
               <View style={styles.actionButtons}>
-                <TouchableOpacity
-                  onPress={() => setIsLiked(!isLiked)}
-                  activeOpacity={0.7}
-                >
+                <TouchableOpacity onPress={handleLikePress} activeOpacity={0.7}>
                   <View
                     style={[
                       styles.iconCircleButton,
