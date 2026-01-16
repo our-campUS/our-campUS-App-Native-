@@ -5,11 +5,11 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  SafeAreaView,
   Image,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import LabelTitle from '../../components/LabelTitle';
 import ReviewActionModal from '../../components/review/ReviewActionModal';
@@ -53,7 +53,7 @@ const REVIEWS = [
 const ReviewListScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { storeName, rating } = route.params;
+  const { storeName, rating, storeData } = route.params;
 
   const [modalVisible, setModalVisible] = useState(false);
   const [filter, setFilter] = useState('LATEST');
@@ -146,7 +146,7 @@ const ReviewListScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <LabelTitle
         title={storeName}
         useBackButton={true}
@@ -166,7 +166,17 @@ const ReviewListScreen = () => {
       <View style={styles.floatingButtonContainer}>
         <TouchableOpacity
           style={styles.writeButton}
-          onPress={() => setModalVisible(true)}
+          onPress={() => {
+            if (storeData.isPartner) {
+              setModalVisible(true);
+            } else {
+              navigation.navigate('WriteReviewScreen', {
+                placeId: storeData.placeId,
+                store: storeData,
+                isNoPartner: true,
+              });
+            }
+          }}
         >
           <Ionicons
             name="pencil"
@@ -181,11 +191,24 @@ const ReviewListScreen = () => {
       <ReviewActionModal
         isVisible={modalVisible}
         storeName={storeName}
+        writeWithoutPartner={() => {
+          console.log('writeWithoutPartner');
+          navigation.navigate('WriteReviewScreen', {
+            placeId: storeData.placeId,
+            store: storeData,
+            isStrange: true,
+          });
+        }}
         onClose={() => setModalVisible(false)}
+        // onConfirmScan={() => {
+        //   console.log('카메라 스캔 화면으로 이동!');
+        //   navigation.navigate('CameraScanScreen');
+        //   // navigation.navigate('CameraScanScreenTest');
+        // }}
         onConfirmScan={() => {
           console.log('카메라 스캔 화면으로 이동!');
-          navigation.navigate('CameraScanScreen');
           // navigation.navigate('CameraScanScreenTest');
+          navigation.navigate('CameraScanScreen', { storeData: storeData });
         }}
       />
     </SafeAreaView>

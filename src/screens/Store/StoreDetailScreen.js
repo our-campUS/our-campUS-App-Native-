@@ -312,6 +312,7 @@ const StoreDetailScreen = () => {
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
                     rating: storeData.rating,
+                    storeData: storeData,
                   })
                 }
               >
