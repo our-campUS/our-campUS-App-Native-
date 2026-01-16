@@ -77,8 +77,29 @@ export const useMapLogic = (mapRef) => {
           setLoading(false);
           return;
         }
-        const rawData = await getPlacesSearch(selectedCategory.label, lat, lng);
-        newData = processSearchData(rawData);
+
+        if (selectedCategory.id === 'PARTNER') {
+          const response = await getPartnerships({
+            lat,
+            lng,
+            cursor: isLoadMore ? nextCursor : null,
+            size: 20,
+          });
+
+          if (response?.code === 200) {
+            newData = processSearchData(response.data).map((item) => ({
+              ...item,
+              type: 'PARTNER',
+            }));
+          }
+        } else {
+          const rawData = await getPlacesSearch(
+            selectedCategory.label,
+            lat,
+            lng
+          );
+          newData = processSearchData(rawData);
+        }
       }
       // B. 키워드 검색
       else if (searchKeyword) {

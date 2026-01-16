@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -25,17 +25,50 @@ import typography from '../../style/typography';
 import SearchingPinIcon from '../../../assets/icons/common/pin.svg';
 import SearchingShakeIcon from '../../../assets/icons/search-list/searchingShake.svg';
 import WarningIcon from '../../../assets/icons/warning-line.svg';
+import filterDropdownItems from '../../utils/searchLogic';
+
+import { getPlacesByKeyword } from '../../api/place';
 
 const MapSearchScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [keyword, setKeyword] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const filteredData = useMemo(() => {
-    if (!keyword) return [];
-    return SEARCH_RESULTS.filter(
-      (item) => item.name.includes(keyword) || item.address.includes(keyword)
-    );
+    return filterDropdownItems(SEARCH_RESULTS, keyword, 'name');
+  }, [keyword]);
+
+  useEffect(() => {
+    // 키워드가 비어있으면 초기화
+    if (!keyword.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const lat = 37.5665;
+        const lng = 126.978;
+
+        const data = await getPlacesByKeyword(keyword, lat, lng);
+
+        if (data) {
+          setSearchResults(data);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (error) {
+        console.error('검색 실패:', error);
+        setSearchResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, [keyword]);
 
   const renderEmptyComponent = () => (
@@ -70,8 +103,13 @@ const MapSearchScreen = () => {
   };
 
   const renderResultItem = ({ item }) => {
-    const IconComponent =
-      item.type === 'PARTNER' ? SearchingShakeIcon : SearchingPinIcon;
+    const categoryName = item.category
+      ? item.category.split('>').pop()
+      : '장소';
+
+    const IconComponent = categoryName.includes('제휴')
+      ? SearchingShakeIcon
+      : SearchingPinIcon;
 
     return (
       <TouchableOpacity
@@ -79,7 +117,13 @@ const MapSearchScreen = () => {
         onPress={() =>
           navigation.navigate('MapScreen', {
             searchType: 'LOCATION',
-            selectedLocation: item,
+            selectedLocation: {
+              ...item,
+              name: item.placeName,
+              placeId: item.placeKey,
+              latitude: item.coordinate?.latitude,
+              longitude: item.coordinate?.longitude,
+            },
           })
         }
       >
@@ -88,10 +132,10 @@ const MapSearchScreen = () => {
         </View>
 
         <View style={styles.resultTextWrapper}>
-          <Text style={styles.resultTitle}>{item.name}</Text>
+          <Text style={styles.resultTitle}>{item.placeName}</Text>
           <View style={styles.resultSubRow}>
             <Text style={styles.resultAddress}>{item.address}</Text>
-            <Text style={styles.resultDistance}>{item.distance}</Text>
+            {/* <Text style={styles.resultDistance}>0.0km</Text> */}
           </View>
         </View>
       </TouchableOpacity>
@@ -115,8 +159,10 @@ const MapSearchScreen = () => {
       {/* 조건부 렌더링 */}
       {keyword.length > 0 ? (
         <FlatList
-          data={filteredData}
-          keyExtractor={(item) => item.id.toString()}
+          data={searchResults}
+          keyExtractor={(item, index) =>
+            item.placeKey ? String(item.placeKey) : String(index)
+          }
           renderItem={renderResultItem}
           contentContainerStyle={styles.listContent}
           keyboardShouldPersistTaps="handled"
