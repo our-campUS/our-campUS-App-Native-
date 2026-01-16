@@ -330,31 +330,32 @@ const StoreDetailScreen = () => {
             </View>
 
             {storeData.reviews && storeData.reviews.length > 0 ? (
-              {storeData.reviews.map((review) => (
-              <View key={review.id} style={styles.reviewItem}>
-                <View style={styles.reviewTextWrapper}>
-                  <View style={styles.reviewRating}>
-                    {[...Array(5)].map((_, i) => (
-                      <RatingIcon
-                        key={i}
-                        width={16}
-                        height={16}
-                        color={
-                          i < review.rating
-                            ? theme.colors.primary2
-                            : colors.gray[200]
-                        }
-                        style={{ marginRight: 1 }}
-                      />
-                    ))}
+              storeData.reviews.map((review) => (
+                <View key={review.id} style={styles.reviewItem}>
+                  <View style={styles.reviewTextWrapper}>
+                    <View style={styles.reviewRating}>
+                      {[...Array(5)].map((_, i) => (
+                        <RatingIcon
+                          key={i}
+                          width={16}
+                          height={16}
+                          color={
+                            i < review.rating
+                              ? theme.colors.primary2
+                              : colors.gray[200]
+                          }
+                          style={{ marginRight: 1 }}
+                        />
+                      ))}
+                    </View>
+                    <Text style={styles.reviewContent}>{review.content}</Text>
+                    <View style={styles.reviewMeta}>
+                      <Text style={styles.reviewUser}>{review.user}</Text>
+                      <Text style={styles.reviewUser}>{review.date}</Text>
+                    </View>
                   </View>
-                  <Text style={styles.reviewContent}>{review.content}</Text>
-                  <View style={styles.reviewMeta}>
-                    <Text style={styles.reviewUser}>{review.user}</Text>
-                    <Text style={styles.reviewUser}>{review.date}</Text>
-                  </View>
-                </View>
-                               {review.thumbnailImgUrl ? (
+
+                  {review.thumbnailImgUrl ? (
                     <Image
                       source={{ uri: review.thumbnailImgUrl }}
                       style={styles.reviewImagePlaceholder}
@@ -362,8 +363,18 @@ const StoreDetailScreen = () => {
                   ) : (
                     <View style={styles.reviewImagePlaceholder} />
                   )}
+                </View>
+              ))
+            ) : (
+              <View style={styles.emptyReviewContainer}>
+                <Text style={styles.emptyReviewText}>
+                  아직 작성된 리뷰가 없어요.
+                </Text>
+                <Text style={styles.emptyReviewSubText}>
+                  첫 리뷰의 주인공이 되어보세요!
+                </Text>
               </View>
-            ))}
+            )}
           </View>
         </ScrollView>
 
@@ -656,7 +667,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-emptyReviewContainer: {
+  emptyReviewContainer: {
     paddingVertical: 40,
     alignItems: 'center',
     justifyContent: 'center',
@@ -672,6 +683,7 @@ emptyReviewContainer: {
   emptyReviewSubText: {
     ...typography.caption1Regular,
     color: colors.gray[300],
-  },});
+  },
+});
 
 export default StoreDetailScreen;
