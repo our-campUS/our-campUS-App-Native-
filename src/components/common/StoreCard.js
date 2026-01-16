@@ -3,6 +3,9 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../style';
+import StarIcon from '../../../assets/icons/common/star.svg';
+import TicketIcon from '../../../assets/icons/common/ticket.svg';
+import PinIcon from '../../../assets/icons/common/pin.svg';
 
 const StoreCard = ({
   image,
@@ -36,27 +39,17 @@ const StoreCard = ({
         </View>
 
         <View style={styles.infoRow}>
-          <Ionicons name="star" size={14} color="black" style={styles.icon} />
+          <StarIcon width={20} height={20} style={{ marginRight: 4 }} />
           <Text style={styles.infoText}>{rating}</Text>
         </View>
 
         <View style={styles.infoRow}>
-          <MaterialCommunityIcons
-            name="ticket-percent"
-            size={14}
-            color="black"
-            style={styles.icon}
-          />
+          <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
           <Text style={styles.infoText}>{discount}</Text>
         </View>
 
         <View style={styles.infoRow}>
-          <Ionicons
-            name="location-sharp"
-            size={14}
-            color="black"
-            style={styles.icon}
-          />
+          <PinIcon width={20} height={20} style={{ marginRight: 4 }} />
           <Text style={styles.infoText}>{distance}</Text>
         </View>
       </View>
