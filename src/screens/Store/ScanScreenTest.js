@@ -50,6 +50,14 @@ const CameraScanScreenTest = () => {
   }, [navigation]);
 
   useEffect(() => {
+    if (mode === 'PREVIEW') {
+      setTimeout(() => {
+        navigation.navigate('ScanConfirmScreen');
+      }, 3000);
+    }
+  }, [mode]);
+
+  useEffect(() => {
     console.log('📷 device:', device);
   }, [device]);
 

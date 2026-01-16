@@ -184,7 +184,7 @@ const ReviewListScreen = () => {
         onClose={() => setModalVisible(false)}
         onConfirmScan={() => {
           console.log('카메라 스캔 화면으로 이동!');
-          // navigation.navigate('CameraScanScreen');
+          navigation.navigate('CameraScanScreen');
           // navigation.navigate('CameraScanScreenTest');
         }}
       />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,12 @@ const SCAN_AREA_SIZE = width * 0.7;
 
 const CameraScanScreen = () => {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    setTimeout(() => {
+      navigation.navigate('CameraScanScreenTest');
+    }, 1500);
+  }, [navigation]);
 
   const handleClose = () => {
     navigation.goBack();

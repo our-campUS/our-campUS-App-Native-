@@ -380,8 +380,8 @@ const StoreDetailScreen = () => {
         onClose={() => setModalVisible(false)}
         onConfirmScan={() => {
           console.log('카메라 스캔 화면으로 이동!');
-          navigation.navigate('CameraScanScreenTest');
-          // navigation.navigate('CameraScanScreen');
+          // navigation.navigate('CameraScanScreenTest');
+          navigation.navigate('CameraScanScreen');
         }}
       />
     </View>
