@@ -226,18 +226,46 @@ export const useMapLogic = (mapRef) => {
     setSelectedStoreDetail(null);
   };
 
-  const handleCurrentLocation = async () => {
-    try {
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
-      }
-      mapRef.current?.setLocationTrackingMode('Follow');
-    } catch (e) {
-      console.error(e);
-    }
+  // const handleCurrentLocation = async () => {
+  //   try {
+  //     // 1. [Android] 권한 요청 로직 강화
+  //     if (Platform.OS === 'android') {
+  //       const granted = await PermissionsAndroid.request(
+  //         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  //       );
+  //       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+  //         Alert.alert('알림', '위치 권한을 허용해주세요.');
+  //         return;
+  //       }
+  //     }
+
+  //     // 2. [iOS/Android 공통] MapRef 유효성 체크
+  //     if (!mapRef.current) {
+  //         console.log("Map ref is not ready");
+  //         return;
+  //     }
+
+  //     // 3. 트래킹 모드 설정 ('Follow'로 설정하면 현위치로 이동하며 따라다님)
+  //     // @mj-studio/react-native-naver-map 라이브러리 방식
+  //     mapRef.current.setLocationTrackingMode('Follow');
+
+  //   } catch (e) {
+  //     console.error('handleCurrentLocation Error:', e);
+  //   }
+  // };
+
+  const handleCurrentLocation = () => {
+    const TARGET_LAT = 37.5570389272802;
+    const TARGET_LNG = 126.960204232592;
+
+    mapRef.current?.animateCameraTo({
+      latitude: TARGET_LAT,
+      longitude: TARGET_LNG,
+      zoom: 16,
+      duration: 500,
+    });
+
+    console.log('📍 임의 설정한 위치로 이동했습니다.');
   };
 
   // --- 5. 계산된 데이터 (Displayed Data) ---
