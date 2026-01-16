@@ -23,34 +23,41 @@ const RecommendSection = () => {
           const itemLng = item.coordinate?.longitude;
 
           return {
+            ...item,
             id: `partner_${item.placeId}`,
+            placeId: item.placeId,
             name: item.placeName,
             category: '제휴 매장',
             discount: item.partnershipTitle,
             tags: ['제휴', item.councilName],
-            image: item.imageUrl || 'https://via.placeholder.com/150',
+            imageUrls: item.imageUrl ? [item.imageUrl] : [],
             rating: 4.8,
             distance:
               calculateDistance(myLat, myLng, itemLat, itemLng) ||
               '거리 정보 없음',
+            type: 'PARTNER',
           };
         });
 
         const nearby = (data.nearbyPlaces || []).map((item, index) => {
           const itemLat = item.coordinate?.latitude;
           const itemLng = item.coordinate?.longitude;
+          const hasImages = item.imgUrls && item.imgUrls.length > 0;
 
           return {
+            ...item,
             id: item.placeKey || `nearby_${index}`,
             name: item.placeName,
             category: item.category ? item.category.split('>').pop() : '기타',
             discount: '일반 매장',
             tags: ['추천'],
-            image:
-              (item.imgUrls && item.imgUrls[0]) ||
-              'https://via.placeholder.com/150',
+            image: hasImages
+              ? item.imgUrls[0]
+              : 'https://via.placeholder.com/150',
+            imgUrls: item.imgUrls || [],
             rating: 4.0,
             distance: calculateDistance(myLat, myLng, itemLat, itemLng),
+            type: 'DEFAULT',
           };
         });
 

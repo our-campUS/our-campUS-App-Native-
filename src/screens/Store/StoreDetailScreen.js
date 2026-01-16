@@ -53,7 +53,6 @@ const StoreDetailScreen = () => {
   };
 
   const storeData = {
-    ...DUMMY_STORE,
     ...paramStore,
 
     imgUrls: paramStore.imgUrls || [],
@@ -76,6 +75,15 @@ const StoreDetailScreen = () => {
 
     address: paramStore.address || DUMMY_STORE.address,
   };
+
+  console.log('================= [StoreDetailScreen Debug] =================');
+  console.log('1. 이전 화면에서 넘겨준 원본 (route.params):', route.params);
+  console.log('-------------------------------------------------------------');
+  console.log(
+    '2. 최종 렌더링 데이터 (storeData):',
+    JSON.stringify(storeData, null, 2)
+  );
+  console.log('=============================================================');
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
