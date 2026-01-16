@@ -27,6 +27,8 @@ import {
   uploadImageToPresignedUrl,
 } from '../../api/uploadImage';
 import { createReview } from '../../api/review';
+import useToastStore from '../../store/toastStore';
+import CustomToast from '../../components/CustomToast';
 
 const StarItem = ({ filled, onPress, size = 28 }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
@@ -145,8 +147,16 @@ const WriteReviewScreen = () => {
       place: DUMMY_PLACE,
     };
     console.log('finalSubmitReviewData', finalSubmitReviewData);
-    const response = await createReview(finalSubmitReviewData);
-    // console.log('response', response);
+    const reviewResult = await createReview(finalSubmitReviewData);
+    if (reviewResult) {
+      useToastStore.getState().showToast('리뷰 작성 완료', 'blue');
+      setTimeout(() => {
+        useToastStore.getState().hideToast();
+        navigation.navigate('ReviewResultScreen');
+      }, 1000);
+    } else {
+      useToastStore.getState().showToast('리뷰 작성 실패', 'error');
+    }
   };
 
   const handleAddPhoto = () => {
@@ -283,6 +293,7 @@ const WriteReviewScreen = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+      <CustomToast />
     </SafeAreaView>
   );
 };

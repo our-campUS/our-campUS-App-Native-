@@ -12,7 +12,9 @@ export const createReview = async (reviewData) => {
     });
     console.log('response', response);
     //   return response.data;
+    return true;
   } catch (error) {
     console.log('error', error.response);
+    return false;
   }
 };

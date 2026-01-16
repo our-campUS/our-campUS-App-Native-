@@ -67,6 +67,8 @@ const CustomToast = () => {
         return colors.blue[500];
       case 'black':
         return 'rgba(89, 95, 99, 0.80)';
+      case 'blue':
+        return colors.blue[500];
       default:
         return colors.orange[500];
     }
