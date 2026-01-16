@@ -182,7 +182,15 @@ export const useMapLogic = (mapRef) => {
       }
 
       // 상태 업데이트
-      if (!isLoadMore) setMapMarkers(newData);
+      if (!isLoadMore) {
+        // 중복 제거
+        const uniqueMarkers = Array.from(
+          new Map(newData.map((item) => [item.placeId, item])).values()
+        );
+
+        console.log('📍 새 마커 설정:', uniqueMarkers.length, '개');
+        setMapMarkers(uniqueMarkers);
+      }
 
       if (newData.length === 0) {
         if (!isLoadMore) setPartnerships([]);
@@ -298,11 +306,14 @@ export const useMapLogic = (mapRef) => {
   useEffect(() => {
     if (searchKeyword || selectedCategory) {
       setPartnerships([]);
+      setMapMarkers([]);
       setIsListEnd(false);
       setNextCursor(null);
+      setSelectedMarkerId(null);
       fetchPartnershipList(false);
     } else {
       setPartnerships([]);
+      setMapMarkers([]);
     }
   }, [searchKeyword, selectedCategory]);
 
@@ -359,6 +370,8 @@ export const useMapLogic = (mapRef) => {
     setSelectedCategory(null);
     setSearchKeyword(null);
     setSelectedStoreDetail(null);
+    setMapMarkers([]);
+    setPartnerships([]);
   };
 
   // const handleCurrentLocation = async () => {
@@ -405,13 +418,20 @@ export const useMapLogic = (mapRef) => {
 
   // --- 5. 계산된 데이터 (Displayed Data) ---
   const displayedMarkers = useMemo(() => {
-    if (selectedStoreDetail && selectedMarkerId) return [selectedStoreDetail];
-    if (searchKeyword || selectedCategory) return partnerships;
-    if (selectedMarkerId) {
+    let markers = [];
+
+    if (selectedStoreDetail && selectedMarkerId) {
+      markers = [selectedStoreDetail];
+    } else if (searchKeyword || selectedCategory) {
+      markers = partnerships;
+    } else if (selectedMarkerId) {
       const found = mapMarkers.find((m) => m.placeId === selectedMarkerId);
-      return found ? [found] : [];
+      markers = found ? [found] : [];
     }
-    return [];
+
+    return Array.from(
+      new Map(markers.map((item) => [item.placeId, item])).values()
+    );
   }, [
     selectedStoreDetail,
     selectedMarkerId,

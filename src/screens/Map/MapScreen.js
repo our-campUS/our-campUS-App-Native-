@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Animated,
@@ -76,6 +76,17 @@ const MapScreen = () => {
 
   const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
 
+  const uniqueMarkers = useMemo(() => {
+    const seen = new Set();
+    return mapMarkers.filter((item) => {
+      if (seen.has(item.placeId)) {
+        return false;
+      }
+      seen.add(item.placeId);
+      return true;
+    });
+  }, [mapMarkers]);
+
   return (
     <View style={styles.container}>
       <NaverMapView
@@ -91,7 +102,7 @@ const MapScreen = () => {
         isShowZoomControls={false}
         onTapMap={handleReset}
       >
-        {mapMarkers.map((item, index) => {
+        {uniqueMarkers.map((item, index) => {
           const isSelected = item.placeId === selectedMarkerId;
           const pinType = isSelected
             ? 'SELECTED'
@@ -99,9 +110,11 @@ const MapScreen = () => {
             ? 'PARTNER'
             : 'DEFAULT';
 
+          const uniqueKey = `marker-${item.placeId}-${item.latitude}-${item.longitude}-${index}`;
+
           return (
             <NaverMapMarkerOverlay
-              key={`marker-${item.placeId}-${index}`}
+              key={uniqueKey}
               latitude={item.latitude}
               longitude={item.longitude}
               width={getPinSize(pinType)}
