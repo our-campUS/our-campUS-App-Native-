@@ -36,8 +36,8 @@ const StampItem = ({ index, currentStampCount }) => {
 
 const HorizontalLine = () => <View style={styles.dottedLineHorizontal} />;
 
-const StampBoard = ({ onPressReview }) => {
-  const currentStampCount = 2;
+const StampBoard = ({ onPressReview, stampCount }) => {
+  const currentStampCount = stampCount % 10;
 
   return (
     <View style={styles.whiteCard}>
