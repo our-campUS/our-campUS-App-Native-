@@ -229,3 +229,42 @@ export const getRandomPlaces = async (lat, lng) => {
     return null;
   }
 };
+
+export const togglePlaceLike = async (placeData) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const body = {
+      placeName: placeData.name || placeData.placeName,
+
+      placeKey: placeData.placeKey || placeData.placeId || placeData.id,
+
+      address: placeData.address || '',
+      category: placeData.category || '기타',
+
+      link: placeData.link || '',
+      telephone: placeData.telephone || placeData.phone || '',
+
+      coordinate: {
+        latitude: placeData.latitude || placeData.coordinate?.latitude || 0,
+        longitude: placeData.longitude || placeData.coordinate?.longitude || 0,
+      },
+
+      imgUrls: placeData.imgUrls || [],
+    };
+
+    console.log('좋아요 요청 데이터 (전체 전송):', body);
+
+    const response = await api.post('/places/like-place', body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('서버 응답:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('좋아요 요청 실패:', error);
+    throw error;
+  }
+};

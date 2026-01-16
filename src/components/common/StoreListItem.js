@@ -17,6 +17,8 @@ import { CATEGORIES } from '../../constants/MapData';
 import LikedIcon from '../../../assets/Liked.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 
+import { togglePlaceLike } from '../../api/place';
+
 const StoreListItem = ({
   item,
   onPress,
@@ -24,9 +26,22 @@ const StoreListItem = ({
   showDiscountDetail = false,
 }) => {
   const [isLiked, setIsLiked] = useState(false);
+
   useEffect(() => {
-    setIsLiked(item.isLiked);
+    setIsLiked(item.isLiked || false);
   }, [item.isLiked]);
+
+  const handleLikePress = async () => {
+    const previousState = isLiked;
+    setIsLiked(!isLiked);
+
+    try {
+      await togglePlaceLike(item);
+    } catch (error) {
+      setIsLiked(previousState);
+      console.error('좋아요 토글 실패, 롤백함');
+    }
+  };
 
   const categoryLabel =
     CATEGORIES.find((cat) => cat.id === item.category)?.label || item.category;
@@ -46,7 +61,7 @@ const StoreListItem = ({
           </View>
           <TouchableOpacity
             style={styles.likeButton}
-            onPress={() => setIsLiked(!isLiked)}
+            onPress={handleLikePress}
             activeOpacity={0.7}
           >
             {isLiked ? (
