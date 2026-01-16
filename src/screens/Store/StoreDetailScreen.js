@@ -362,7 +362,8 @@ const StoreDetailScreen = () => {
               } else {
                 navigation.navigate('WriteReviewScreen', {
                   placeId: storeData.placeId,
-                  storeName: storeData.name,
+                  store: storeData,
+                  isNoPartner: true,
                 });
               }
             }}
@@ -377,6 +378,14 @@ const StoreDetailScreen = () => {
       <ReviewActionModal
         isVisible={modalVisible}
         storeName={storeData.name}
+        writeWithoutPartner={() => {
+          console.log('writeWithoutPartner');
+          navigation.navigate('WriteReviewScreen', {
+            placeId: storeData.placeId,
+            store: storeData,
+            isStrange: true,
+          });
+        }}
         onClose={() => setModalVisible(false)}
         onConfirmScan={() => {
           console.log('카메라 스캔 화면으로 이동!');

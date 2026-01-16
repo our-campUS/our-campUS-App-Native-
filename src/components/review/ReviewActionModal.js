@@ -16,6 +16,7 @@ const ReviewActionModal = ({
   onClose,
   onConfirmScan,
   storeName,
+  writeWithoutPartner = null,
   initialStep = 1,
 }) => {
   const [step, setStep] = useState(initialStep);
@@ -92,10 +93,14 @@ const ReviewActionModal = ({
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={handleClose} style={{ marginTop: 16 }}>
-                <Text style={styles.textLink}>
-                  영수증이 없어요. 다음에 작성할게요.
-                </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  handleClose();
+                  writeWithoutPartner();
+                }}
+                style={{ marginTop: 16 }}
+              >
+                <Text style={styles.textLink}>그냥 리뷰만 작성할게요.</Text>
               </TouchableOpacity>
             </View>
           )}

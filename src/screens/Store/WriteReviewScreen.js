@@ -26,7 +26,7 @@ import {
   getCommonImagePresignedUrl,
   uploadImageToPresignedUrl,
 } from '../../api/uploadImage';
-import { createReview } from '../../api/review';
+import { createReview, createNoPartnerReview } from '../../api/review';
 import useToastStore from '../../store/toastStore';
 import CustomToast from '../../components/CustomToast';
 
@@ -46,6 +46,15 @@ const WriteReviewScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const storeName = route.params?.store?.name || '스타벅스 상도역점';
+  const [isNoPartner, setIsNoPartner] = useState(false);
+
+  useEffect(() => {
+    setIsNoPartner(route.params?.isNoPartner || false);
+  }, [route.params]);
+
+  useEffect(() => {
+    console.log('isNoPartner', isNoPartner);
+  }, [isNoPartner]);
 
   useEffect(() => {
     console.log('route.params', route.params);
@@ -139,6 +148,43 @@ const WriteReviewScreen = () => {
     setSelectedPhotos(selectedPhotos);
   }, [photos, selectedPhotoIndices]);
 
+  const handleSubmitNoPartnerReview = async () => {
+    console.log('handleSubmitNoPartnerReview');
+    const finalImages = await handleImagesBeforeSubmit();
+    let place = {
+      placeName: route.params?.store?.name,
+      placeKey: route.params?.store?.placeKey,
+      address: route.params?.store?.address,
+      category: route.params?.store?.category,
+      link: route.params?.store?.link,
+      coordinate: route.params?.store?.coordinate,
+      imgUrls: route.params?.store?.imgUrls,
+    };
+
+    let finalSubmitReviewData = {
+      star: rating,
+      content: reviewText,
+      imageUrls: finalImages,
+      isVerified: true,
+      place: place,
+    };
+    console.log('finalSubmitReviewData', finalSubmitReviewData);
+    const reviewResult = await createNoPartnerReview(finalSubmitReviewData);
+    if (reviewResult.success) {
+      useToastStore.getState().showToast('리뷰 작성 완료', 'blue');
+      setTimeout(() => {
+        useToastStore.getState().hideToast();
+        navigation.navigate('ReviewResultScreen', {
+          reviewResult: reviewResult.data,
+          reviewPartnerStatus: 2,
+          storeData: route.params?.store,
+        });
+      }, 1000);
+    } else {
+      useToastStore.getState().showToast('리뷰 작성 실패', 'error');
+    }
+  };
+
   const handleSubmit = async () => {
     if (!isValid) return;
     // 선택된 사진들만 필터링 (파란색 토글된 것들)
@@ -148,18 +194,22 @@ const WriteReviewScreen = () => {
       star: rating,
       content: reviewText,
       imageUrls: finalImages,
-      isVerified: true,
+      isVerified: route.params?.isStrange ? false : true,
     };
     console.log('finalSubmitReviewData', finalSubmitReviewData);
     const reviewResult = await createReview(
       route.params?.store?.placeId,
       finalSubmitReviewData
     );
-    if (reviewResult) {
+    if (reviewResult.success) {
       useToastStore.getState().showToast('리뷰 작성 완료', 'blue');
       setTimeout(() => {
         useToastStore.getState().hideToast();
-        navigation.navigate('ReviewResultScreen');
+        navigation.navigate('ReviewResultScreen', {
+          reviewResult: reviewResult.data,
+          reviewPartnerStatus: route.params?.isStrange ? 3 : 1,
+          storeData: route.params?.store,
+        });
       }, 1000);
     } else {
       useToastStore.getState().showToast('리뷰 작성 실패', 'error');
@@ -285,7 +335,7 @@ const WriteReviewScreen = () => {
               isValid ? styles.activeButton : styles.disabledButton,
             ]}
             disabled={!isValid}
-            onPress={handleSubmit}
+            onPress={isNoPartner ? handleSubmitNoPartnerReview : handleSubmit}
           >
             <Text
               style={[

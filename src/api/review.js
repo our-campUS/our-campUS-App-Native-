@@ -18,13 +18,31 @@ export const createReview = async (placeId, reviewData) => {
     );
     console.log('response', response);
     //   return response.data;
-    return true;
+    return { success: true, data: response.data.data };
   } catch (error) {
     console.log('error', error.response);
-    return false;
+    return { success: false, data: null };
   }
 };
 
+// 비제휴 리뷰 작성 ( post /reviews )
+export const createNoPartnerReview = async (reviewData) => {
+  console.log('reviewData', reviewData);
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    console.log('accessToken', accessToken);
+    const response = await api.post('/reviews', reviewData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log('response', response);
+    return { success: true, data: response.data.data };
+  } catch (error) {
+    console.log('error', error.response);
+    return { success: false, data: null };
+  }
+};
 // ocr 요청 (post reviews/receipt-ocr)
 
 // export const requestOcr = async (image, placeId) => {
@@ -93,5 +111,27 @@ export const requestOcr = async (image, placeId) => {
   } catch (error) {
     console.log('error', error.response?.data || error);
     return { success: false, data: null };
+  }
+};
+
+// 제휴 매장 둘러보기  ( get /reviews/partnership-list )
+
+export const getPartnershipList = async ({ lat, lon }) => {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    const response = await api.get('/reviews/partnership-list', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        lat: lat,
+        lng: lon,
+      },
+    });
+    console.log('response', response);
+    return response;
+    // return { success: true, data: response.data.data };
+  } catch (error) {
+    console.log('error', error.response);
   }
 };

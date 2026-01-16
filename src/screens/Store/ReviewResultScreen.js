@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,12 @@ import theme from '../../style';
 import typography from '../../style/typography';
 import colors from '../../style/colors';
 import RankingIcon from '../../../assets/icons/trophy.svg';
+import LocationIcon from '../../../assets/Vector2.svg';
+import CouponIcon from '../../../assets/couponIcon.svg';
+
+// import distance from '../../utils/distance';
+
+import { getPartnershipList } from '../../api/review';
 
 const RECOMMEND_STORES = [
   {
@@ -34,8 +40,47 @@ const RECOMMEND_STORES = [
   { id: 3, name: '투썸플레이스', benefit: '첫방문 10% 할인', dist: '0.2km' },
 ];
 
-const ReviewResultScreen = () => {
+const ReviewResultScreen = ({ route }) => {
+  const [partnershipList, setPartnershipList] = useState(null);
+  const [recommendStores, setRecommendStores] = useState(null);
   const navigation = useNavigation();
+  const [rankings, setRankings] = useState(null);
+  const [reviewResult, setReviewResult] = useState(null);
+  const [reviewData, setReviewData] = useState(null);
+
+  useEffect(() => {
+    console.log('route.params from ReviewResultScreen', route.params);
+    setReviewResult(route.params.reviewResult.result);
+    setReviewData(route.params.reviewResult.review);
+    setRankings(route.params.reviewResult.ranking);
+  }, [route]);
+
+  useEffect(() => {
+    console.log('rankings', rankings);
+    console.log('reviewResult', reviewResult);
+    console.log('reviewData', reviewData);
+  }, [rankings, reviewResult, reviewData]);
+
+  useEffect(() => {
+    const fetchPartnershipList = async () => {
+      const response = await getPartnershipList({
+        lat: 37.5570389272802,
+        lon: 126.960204232592,
+      });
+      setPartnershipList(response.data.data);
+    };
+    fetchPartnershipList();
+  }, []);
+
+  useEffect(() => {
+    if (route.params.reviewPartnerStatus === 1) {
+      setCaseType(1);
+    } else if (route.params.reviewPartnerStatus === 2) {
+      setCaseType(4);
+    } else if (route.params.reviewPartnerStatus === 3) {
+      setCaseType(3);
+    }
+  }, [route.params.reviewPartnerStatus]);
 
   // [개발용 state]
   const [caseType, setCaseType] = useState(1);
@@ -51,7 +96,8 @@ const ReviewResultScreen = () => {
 
     switch (caseType) {
       case 1:
-        title = '3번째 스탬프 적립 완료!';
+        title = `${reviewResult?.numberOfUserStamp || 0}번째 스탬프 적립 완료!`;
+        // title = '스탬프 적립 완료!';
         subTitle = '제휴를 이용하고 스탬프를 모아보세요.';
         showStamp = true;
         break;
@@ -93,47 +139,87 @@ const ReviewResultScreen = () => {
       <View style={styles.reviewSection}>
         <View style={{ alignItems: 'center', marginBottom: 20 }}>
           <Text style={styles.reviewCompleteTitle}>
-            <Text style={{ color: '#6BAAF9' }}>첫번째</Text> 리뷰 작성 완료!
+            <Text style={{ color: '#6BAAF9' }}>
+              {reviewResult?.userReviewCountOfPlace || 0}
+            </Text>
+            번째 리뷰 작성 완료!
           </Text>
           <Text style={styles.reviewCompleteSub}>
-            스타벅스 상도역점의 첫번째 리뷰 작성 완료
+            {route.params.storeData.name}의{' '}
+            {reviewResult?.userReviewCountOfPlace || 0}번째 리뷰 작성 완료
           </Text>
         </View>
 
         {/* [TODO] Review item 컴포넌트화 후 적용 */}
         <View style={styles.cardContainer}>
-          <View style={styles.starRow}>
+          <View style={styles.cardWrapper}>
+            <View style={styles.starRow}>
+              {[...Array(5)].map((_, i) => (
+                <Ionicons key={i} name="star" size={16} color="#FF9805" />
+              ))}
+            </View>
+            <View style={{ flex: 1, marginRight: 10 }}>
+              <Text style={styles.reviewText} numberOfLines={2}>
+                {reviewData?.content}
+              </Text>
+              <Text style={styles.reviewMeta}>
+                {reviewData?.userName} {reviewData?.createDate}
+              </Text>
+            </View>
+          </View>
+          {reviewData?.imageUrl && (
+            <Image
+              source={{ uri: reviewData?.imageUrl }}
+              style={styles.reviewImage}
+            />
+          )}
+          {/* <View style={styles.starRow}>
             {[...Array(5)].map((_, i) => (
               <Ionicons key={i} name="star" size={16} color="#FF9805" />
             ))}
-          </View>
+          </View> */}
           <View style={styles.cardContentRow}>
-            <View style={{ flex: 1, marginRight: 10 }}>
+            {/* <View style={{ flex: 1, marginRight: 10 }}>
               <Text style={styles.reviewText} numberOfLines={2}>
-                떡볶이 정말 양 많아요. 아 근데 스벅이네...
+                {reviewData.content}
               </Text>
-              <Text style={styles.reviewMeta}>최서* 21.10.10</Text>
-            </View>
-            <View style={styles.reviewImage} />
+              <Text style={styles.reviewMeta}>
+                {reviewData.userName} {reviewData.createDate}
+              </Text>
+            </View> */}
           </View>
         </View>
 
         <View style={styles.rankingContainer}>
           <View style={styles.rankingHeader}>
             <RankingIcon width={18} height={18} />
-            <Text style={styles.rankingTitle}>서연님의 리뷰 랭킹</Text>
+            <Text style={styles.rankingTitle}>
+              {reviewData?.userName}님의 리뷰 랭킹
+            </Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>정치국제학과에서</Text>
-            <Text style={styles.rankingValue}>첫번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>
+              {rankings?.school?.scope}에서
+            </Text>
+            <Text style={styles.rankingValue}>
+              {rankings?.school?.rank}번째 리뷰
+            </Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>사회과학대에서</Text>
-            <Text style={styles.rankingValue}>4번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>
+              {rankings?.college?.scope}에서
+            </Text>
+            <Text style={styles.rankingValue}>
+              {rankings?.college?.rank}번째 리뷰
+            </Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>중앙대 전체에서</Text>
-            <Text style={styles.rankingValue}>9번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>
+              {rankings?.major?.scope}에서
+            </Text>
+            <Text style={styles.rankingValue}>
+              {rankings?.major?.rank}번째 리뷰
+            </Text>
           </View>
         </View>
       </View>
@@ -151,7 +237,11 @@ const ReviewResultScreen = () => {
 
           {/* [TODO] main page 배너 컴포넌트 */}
           <View style={styles.guideBox}>
-            <View style={styles.guideIconPlaceholder} />
+            {/* <View style={styles.guideIconPlaceholder} /> */}
+            <Image
+              source={require('../../../assets/images/home/banner_04.png')}
+              style={styles.guideIconPlaceholder}
+            />
             <View>
               <Text style={styles.guideBoxTitle}>
                 제휴 이용하고 스탬프 받아가세요!
@@ -175,7 +265,8 @@ const ReviewResultScreen = () => {
         <View style={styles.middleActionContainer}>
           <View style={styles.requestBoxWrapper}>
             <Text style={styles.middleTitle}>
-              스타벅스 상도점이{'\n'}제휴를 진행하지 않아{'\n'}아쉽다면?
+              {route.params.storeData.name}이{'\n'}제휴를 진행하지 않아{'\n'}
+              아쉽다면?
             </Text>
             <Text style={[styles.middleSubtitle, { marginTop: 8 }]}>
               캠퍼스가 학생회에 의견을 대신 전해드려요!
@@ -216,9 +307,12 @@ const ReviewResultScreen = () => {
           </Text>
         </View>
 
-        {RECOMMEND_STORES.map((store, index) => (
-          <View key={store.id} style={styles.storeRow}>
-            <View style={styles.storeImage} />
+        {partnershipList?.map((store, index) => (
+          <View key={store.placeId} style={styles.storeRow}>
+            <Image
+              source={{ uri: store?.thumbnailUrl }}
+              style={styles.storeImage}
+            />
             <View style={styles.storeInfo}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons
@@ -227,11 +321,24 @@ const ReviewResultScreen = () => {
                   color="#6BAAF9"
                   style={{ marginRight: 4 }}
                 />
-                <Text style={styles.storeName}>{store.name}</Text>
-                <Text style={styles.storeCategory}>카페</Text>
+                <Text style={styles.storeName}>{store.placeName}</Text>
+                <Text style={styles.storeCategory}>{store.category}</Text>
               </View>
-              <Text style={styles.storeBenefit}>{store.benefit}</Text>
-              <Text style={styles.storeDist}>걸어서 4분 {store.dist}</Text>
+              {/* <CouponIcon width={16} height={16} /> */}
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <CouponIcon width={16} height={16} />
+                <Text style={styles.storeBenefit}>{store.partnership}</Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: 3,
+                }}
+              >
+                <LocationIcon width={10} height={10} color={colors.gray[300]} />
+                <Text style={styles.storeDist}>{store.distance}m</Text>
+              </View>
             </View>
             {/* 순위 배지 (1, 2, 3) */}
             <View style={styles.rankBadge}>
@@ -242,7 +349,10 @@ const ReviewResultScreen = () => {
 
         <Button
           title="제휴 더 보러가기"
-          // onPress={() => }
+          onPress={() => {
+            // MainTab의 Partnership 탭으로 이동
+            navigation.navigate('MainTab', { screen: 'Partnership' });
+          }}
           style={styles.blueButton}
           textStyle={styles.blueButtonText}
         />
@@ -263,7 +373,7 @@ const ReviewResultScreen = () => {
       </View>
 
       {/* 개발용 토글 */}
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           justifyContent: 'center',
@@ -286,7 +396,7 @@ const ReviewResultScreen = () => {
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </View> */}
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {renderTopSection()}
@@ -353,19 +463,32 @@ const styles = StyleSheet.create({
     marginBottom: 42,
   },
   cardContainer: {
+    // gap: 20,
+    flexDirection: 'row',
     backgroundColor: 'white',
+    // backgroundColor: 'red',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.gray[200],
-    padding: 16,
+    paddingVertical: 30,
+    paddingHorizontal: 20,
     ...theme.shadows.level1,
   },
   starRow: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 16,
     gap: 2,
   },
+  cardWrapper: {
+    paddingRight: 20,
+    flex: 1,
+    width: '100%',
+    // backgroundColor: 'red',
+    // flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   cardContentRow: {
+    backgroundColor: 'blue',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -373,15 +496,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: theme.colors.text,
     lineHeight: 20,
-    marginBottom: 8,
+    marginBottom: 16,
   },
   reviewMeta: {
     fontSize: 12,
     color: colors.gray[400],
   },
   reviewImage: {
-    width: 60,
-    height: 60,
+    width: 73,
+    height: '100%',
     backgroundColor: colors.gray[200],
     borderRadius: 8,
   },
@@ -549,6 +672,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   storeDist: {
+    marginLeft: 3,
     fontSize: 11,
     color: colors.gray[400],
   },
