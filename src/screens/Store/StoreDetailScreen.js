@@ -311,6 +311,8 @@ const StoreDetailScreen = () => {
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
                     star: storeData.star,
+                    placeId: storeData.placeId,
+                    reviewSize: storeData.reviewSize,
                   })
                 }
               >
@@ -343,7 +345,7 @@ const StoreDetailScreen = () => {
                   <Text style={styles.reviewContent}>{review.content}</Text>
                   <View style={styles.reviewMeta}>
                     <Text style={styles.reviewUser}>{review.writerName}</Text>
-                    <Text style={styles.reviewUser}>{review.date}</Text>
+                    <Text style={styles.reviewUser}>{review.createdAt}</Text>
                   </View>
                 </View>
                 {review.thumbnailImgUrl ? (
@@ -369,6 +371,7 @@ const StoreDetailScreen = () => {
                 navigation.navigate('WriteReviewScreen', {
                   placeId: storeData.placeId,
                   storeName: storeData.name,
+                  rating: storeData.star,
                 });
               }
             }}

@@ -1,44 +1,72 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import StarIcon from '../../../assets/Star.svg';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Image,
+} from 'react-native';
+import RatingIcon from '../../../assets/icons/rating.svg';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-import PlaceHolderImage from '../../../assets/placeHolderImage.svg';
 import ArrowDownIcon from '../../../assets/ArrowDown.svg';
 import ArrowUpIcon from '../../../assets/ArrowUp.svg';
 import { useState } from 'react';
+import theme from '../../style';
 
 const ReviewItem = ({ item }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return dateString.slice(2).replace(/-/g, '.');
+  };
+
+  const renderStars = () => {
+    return [...Array(5)].map((_, index) => (
+      <RatingIcon
+        key={index}
+        width={12}
+        height={12}
+        color={
+          index < Math.floor(item.star)
+            ? theme.colors.primary2
+            : colors.gray[200]
+        }
+      />
+    ));
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.starRatingWrapper}>
-        <StarIcon width={12} height={12} />
-        <StarIcon width={12} height={12} />
-        <StarIcon width={12} height={12} />
-        <StarIcon width={12} height={12} />
-        <StarIcon width={12} height={12} />
-      </View>
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        style={styles.imageScrollWrapper}
-        contentContainerStyle={styles.imageScrollContainer}
-      >
-        {[1, 2, 3, 4].map((img, index, arr) => (
-          <View
-            key={index}
-            style={{
-              marginRight: index === arr.length - 1 ? 0 : -20,
-              width: 138,
-              height: 138,
-              // backgroundColor: 'red',
-              marginLeft: index === 0 ? -13 : 0,
-            }}
-          >
-            <PlaceHolderImage width={138} height={138} />
-          </View>
-        ))}
-      </ScrollView>
+      <View style={styles.starRatingWrapper}>{renderStars()}</View>
+
+      {item.imageUrls && item.imageUrls.length > 0 && (
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          style={styles.imageScrollWrapper}
+          contentContainerStyle={styles.imageScrollContainer}
+          scrollEnabled={true}
+          nestedScrollEnabled={true}
+        >
+          {item.imageUrls.map((imgUrl, index, arr) => (
+            <Image
+              key={index}
+              source={{ uri: imgUrl }}
+              style={[
+                styles.imageItem,
+                {
+                  marginRight: index === arr.length - 1 ? 0 : 8,
+                },
+              ]}
+              resizeMode="cover"
+            />
+          ))}
+        </ScrollView>
+      )}
+
+      {/* ✅ 댓글 텍스트 */}
       <View style={styles.commentTextWrapper}>
         <View style={styles.commentTextContainer}>
           <Text
@@ -57,9 +85,10 @@ const ReviewItem = ({ item }) => {
           )}
         </Pressable>
       </View>
+
       <View style={styles.placeAndDateWrapper}>
-        <Text style={styles.placeText}>{item.place}</Text>
-        <Text style={styles.dateText}>{item.date}</Text>
+        <Text style={styles.placeText}>{item.name || item.place}</Text>
+        <Text style={styles.dateText}>{formatDate(item.date)}</Text>
       </View>
     </View>
   );
@@ -77,18 +106,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
-    // backgroundColor: 'green',
+    marginBottom: 12,
   },
   imageScrollWrapper: {
-    flexDirection: 'row',
-    // gap: 2,
-    height: 138,
+    marginBottom: 12,
   },
   imageScrollContainer: {
-    gap: 2,
-    flexDirection: 'row',
-    flex: 1,
-    // backgroundColor: 'blue',
+    paddingRight: 20,
+  },
+  imageItem: {
+    width: 138,
+    height: 138,
+    borderRadius: 8,
   },
   commentTextContainer: {
     flexShrink: 1,
@@ -100,7 +129,6 @@ const styles = StyleSheet.create({
     color: colors.gray[850],
   },
   commentTextWrapper: {
-    marginTop: 12,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
