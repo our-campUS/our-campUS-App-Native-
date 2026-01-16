@@ -62,16 +62,15 @@ const StoreDetailScreen = () => {
 
     imgUrls: paramStore.imgUrls || [],
 
-    rating: paramStore.rating || 0,
-    // TODO 리뷰 관련 수정 필요 (reviews, reviewCount)
+    rating: paramStore.star || 0,
     reviews:
       paramStore.reviews && paramStore.reviews.length > 0
         ? paramStore.reviews
         : DUMMY_STORE.reviews,
 
-    reviewCount:
+    reviewSize:
       paramStore.reviews && paramStore.reviews.length > 0
-        ? paramStore.reviewCount
+        ? paramStore.reviewSize
         : DUMMY_STORE.reviews.length,
 
     phone: paramStore.telephone || paramStore.phone || '',
@@ -249,11 +248,11 @@ const StoreDetailScreen = () => {
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
                 <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
-                {storeData.reviewCount > 0 ? (
+                {storeData.reviewSize > 0 ? (
                   <>
-                    <Text style={styles.detailText}>{storeData.rating}</Text>
+                    <Text style={styles.detailText}>{storeData.star}</Text>
                     <Text style={styles.detailTextSub}>
-                      ({storeData.reviewCount})
+                      ({storeData.reviewSize})
                     </Text>
                   </>
                 ) : (
@@ -304,14 +303,14 @@ const StoreDetailScreen = () => {
               <Text style={styles.reviewTitle}>
                 리뷰{' '}
                 <Text style={styles.detailTextSub}>
-                  {storeData.reviewCount}개
+                  {storeData.reviewSize}개
                 </Text>
               </Text>
               <TouchableOpacity
                 onPress={() =>
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
-                    rating: storeData.rating,
+                    star: storeData.star,
                   })
                 }
               >
@@ -333,7 +332,7 @@ const StoreDetailScreen = () => {
                         width={16}
                         height={16}
                         color={
-                          i < review.rating
+                          i < review.star
                             ? theme.colors.primary2
                             : colors.gray[200]
                         }
@@ -343,11 +342,18 @@ const StoreDetailScreen = () => {
                   </View>
                   <Text style={styles.reviewContent}>{review.content}</Text>
                   <View style={styles.reviewMeta}>
-                    <Text style={styles.reviewUser}>{review.user}</Text>
+                    <Text style={styles.reviewUser}>{review.writerName}</Text>
                     <Text style={styles.reviewUser}>{review.date}</Text>
                   </View>
                 </View>
-                <View style={styles.reviewImagePlaceholder} />
+                {review.thumbnailImgUrl ? (
+                  <Image
+                    source={{ uri: review.thumbnailImgUrl }}
+                    style={styles.reviewImagePlaceholder}
+                  />
+                ) : (
+                  <View style={styles.reviewImagePlaceholder} />
+                )}
               </View>
             ))}
           </View>
