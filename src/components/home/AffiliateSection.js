@@ -8,18 +8,19 @@ import {
   Image,
 } from 'react-native';
 import theme from '../../style';
-// import { BENEFITS_DATA } from '../../constants/DummyData';
 import useAuthStore from '../../store/authStore';
 import { getActivePartnerships } from '../../api/partnership';
+import { useNavigation } from '@react-navigation/native';
 
 const COUNCIL_TYPE_MAP = {
-  SCHOOL: 'SCHOOL_COUNCIL',
-  COLLEGE: 'COLLEGE_COUNCIL',
-  MAJOR: 'MAJOR_COUNCIL',
+  SCHOOL: 'SCHOOL',
+  COLLEGE: 'COLLEGE',
+  MAJOR: 'MAJOR',
 };
 
 const AffiliateSection = () => {
   const user = useAuthStore((state) => state.user);
+  const navigation = useNavigation();
   const TABS = [
     { id: 'SCHOOL', label: '총학생회' || '학교' },
     { id: 'COLLEGE', label: user?.collegeName || '단과대' },
@@ -30,7 +31,24 @@ const AffiliateSection = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const apiParam = COUNCIL_TYPE_MAP[selectedTabId];
+      // TODO 단과대 제휴 안뜸
+      console.log('👉 [DEBUG] 현재 탭:', selectedTabId);
+
+      console.log('👉 [DEBUG] 유저 정보:', user);
+      if (selectedTabId === 'COLLEGE' && !user?.collegeName) {
+        console.warn(
+          '⚠️ [WARNING] 유저의 단과대 정보(collegeName)가 없습니다!'
+        );
+      }
+
+      const apiParam = {
+        SCHOOL: 'SCHOOL_COUNCIL',
+        COLLEGE: 'COLLEGE_COUNCIL',
+        MAJOR: 'MAJOR_COUNCIL',
+      }[selectedTabId];
+
+      console.log('👉 [DEBUG] API 요청 파라미터:', apiParam);
+
       if (apiParam) {
         const data = await getActivePartnerships(apiParam);
         setPartnerships(data);
@@ -77,7 +95,21 @@ const AffiliateSection = () => {
           </View>
         }
         renderItem={({ item }) => (
-          <View style={styles.benefitItem}>
+          <TouchableOpacity
+            style={styles.benefitItem}
+            activeOpacity={0.7}
+            onPress={() => {
+              navigation.navigate('AffiliationDetailScreen', {
+                councilType: selectedTabId.toLowerCase(),
+
+                item: {
+                  ...item,
+                  id: item.postId,
+                  placeName: item.place,
+                },
+              });
+            }}
+          >
             {item.thumbnailImageUrl ? (
               <Image
                 source={{ uri: item.thumbnailImageUrl }}
@@ -97,16 +129,14 @@ const AffiliateSection = () => {
               <Text style={styles.brandName}>{item.place}</Text>
               <Text style={styles.benefitDesc}>{item.title}</Text>
             </View>
-
-            {/* <View style={styles.tagBox}>
-              <Text style={styles.tagText}>인기</Text>
-            </View> */}
-          </View>
+          </TouchableOpacity>
         )}
       />
 
-      {/* 더보기 버튼 */}
-      <TouchableOpacity style={styles.moreButton}>
+      <TouchableOpacity
+        style={styles.moreButton}
+        onPress={() => navigation.navigate('Partnership')}
+      >
         <Text style={styles.moreText}>이용 가능한 제휴 더보기</Text>
       </TouchableOpacity>
     </View>

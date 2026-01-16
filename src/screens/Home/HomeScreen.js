@@ -18,6 +18,7 @@ import { CAROUSEL_DATA } from '../../constants/DummyData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
+import { useNavigation } from '@react-navigation/native';
 
 const HomeSection = ({
   title,
@@ -46,6 +47,7 @@ const HomeScreen = () => {
   const [hasNewNotification, setHasNewNotification] = useState(true);
 
   const user = useAuthStore((state) => state.user);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -121,25 +123,27 @@ const HomeScreen = () => {
         </HomeSection>
 
         {/* 큐레이션 */}
-        <HomeSection
+        {/* <HomeSection
           title="💕 추천 큐레이션"
           hasDivider={true}
           fullWidthContent={true}
         >
           <CurationCarousel />
-        </HomeSection>
+        </HomeSection> */}
 
         <HomeSection title="💯 캠어스를 100% 이용하는 법" hasDivider={true}>
           <View>
             <BannerCard
               title="좋은 제휴 아이디어 공유해주실래요?"
               subtitle="원하는 제휴 혜택을 학생회에게 직접 제안해요"
+              imageSource={require('../../../assets/images/home/banner_03.png')}
               onPress={() => console.log('제안하기 클릭')}
             />
             <BannerCard
               title="제휴 이용하고 스탬프 받아가세요!"
               subtitle="제휴만 이용해도 혜택이 팡팡"
-              onPress={() => console.log('스탬프 클릭')}
+              imageSource={require('../../../assets/images/home/banner_04.png')}
+              onPress={() => navigation.navigate('Stamp')}
             />
           </View>
         </HomeSection>

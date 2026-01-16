@@ -40,27 +40,11 @@ export const STORE_DATA = [
 export const CAROUSEL_DATA = [
   {
     id: '1',
-    image: require('../../assets/default_image.jpeg'),
+    image: require('../../assets/images/home/banner_01.png'),
   },
   {
     id: '2',
-    image: require('../../assets/default_image.jpeg'),
-  },
-  {
-    id: '3',
-    image: require('../../assets/default_image.jpeg'),
-  },
-  {
-    id: '4',
-    image: 'https://via.placeholder.com/600x400/FF33F5/FFFFFF?text=Banner+4',
-  },
-  {
-    id: '5',
-    image: require('../../assets/default_image.jpeg'),
-  },
-  {
-    id: '6',
-    image: 'https://via.placeholder.com/600x400/33FFFF/FFFFFF?text=Banner+6',
+    image: require('../../assets/images/home/banner_02.png'),
   },
 ];
 

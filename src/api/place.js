@@ -163,3 +163,28 @@ export const getPlacesSearch = async (keyword, lat, lng) => {
     return [];
   }
 };
+
+export const getRandomPlaces = async (lat, lng) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const response = await api.get('/places/random', {
+      params: {
+        lat: lat,
+        lng: lng,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200) {
+      console.log(response.data.data);
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error('랜덤 장소 추천 실패:', error);
+    return null;
+  }
+};

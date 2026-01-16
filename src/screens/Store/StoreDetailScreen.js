@@ -53,29 +53,42 @@ const StoreDetailScreen = () => {
   };
 
   const storeData = {
-    ...DUMMY_STORE,
     ...paramStore,
+    name: paramStore.name || '이름 없음',
+    address: paramStore.address || '',
+
+    category:
+      CATEGORY_MAP[paramStore.category] || paramStore.category || '기타',
 
     imgUrls: paramStore.imgUrls || [],
-    hours: paramStore.hours || DUMMY_STORE.hours,
-    reviews: paramStore.reviews || DUMMY_STORE.reviews,
-    category:
-      CATEGORY_MAP[paramStore.category] ||
-      paramStore.category ||
-      DUMMY_STORE.category,
 
-    isPartner: paramStore.type
-      ? paramStore.type === 'PARTNER'
-      : DUMMY_STORE.isPartner,
+    rating: paramStore.rating || 0,
+    // TODO 리뷰 관련 수정 필요 (reviews, reviewCount)
+    reviews:
+      paramStore.reviews && paramStore.reviews.length > 0
+        ? paramStore.reviews
+        : DUMMY_STORE.reviews,
 
-    partnerTags: paramStore.partnerTags
-      ? paramStore.partnerTags
-      : paramStore.partnership
-      ? [paramStore.partnership]
-      : DUMMY_STORE.partnerTags,
+    reviewCount:
+      paramStore.reviews && paramStore.reviews.length > 0
+        ? paramStore.reviewCount
+        : DUMMY_STORE.reviews.length,
 
-    address: paramStore.address || DUMMY_STORE.address,
+    phone: paramStore.telephone || paramStore.phone || '',
+    hours: paramStore.hours || [],
+
+    isPartner: paramStore.isPartnership,
+    partnerTags: paramStore.tag ? [paramStore.tag] : [],
   };
+
+  console.log('================= [StoreDetailScreen Debug] =================');
+  console.log('1. 이전 화면에서 넘겨준 원본 (route.params):', route.params);
+  console.log('-------------------------------------------------------------');
+  console.log(
+    '2. 최종 렌더링 데이터 (storeData):',
+    JSON.stringify(storeData, null, 2)
+  );
+  console.log('=============================================================');
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -236,29 +249,53 @@ const StoreDetailScreen = () => {
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
                 <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
-                <Text style={styles.detailText}>{storeData.rating}</Text>
-                <Text style={styles.detailTextSub}>
-                  ({storeData.reviewCount})
-                </Text>
-              </View>
-              <View style={styles.detailRow}>
-                <PinIcon width={24} height={24} style={{ marginRight: 4 }} />
-                <Text style={styles.detailText}>{storeData.address}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <PhoneIcon width={24} height={24} style={{ marginRight: 4 }} />
-                <Text style={styles.detailText}>{storeData.phone}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <ClockIcon width={24} height={24} style={{ marginRight: 4 }} />
-                <View>
-                  {storeData.hours.map((time, idx) => (
-                    <Text key={idx} style={styles.detailText}>
-                      {time}
+                {storeData.reviewCount > 0 ? (
+                  <>
+                    <Text style={styles.detailText}>{storeData.rating}</Text>
+                    <Text style={styles.detailTextSub}>
+                      ({storeData.reviewCount})
                     </Text>
-                  ))}
-                </View>
+                  </>
+                ) : (
+                  <Text
+                    style={[styles.detailText, { color: colors.gray[400] }]}
+                  >
+                    첫 리뷰를 작성해보세요!
+                  </Text>
+                )}
               </View>
+              {storeData.address ? (
+                <View style={styles.detailRow}>
+                  <PinIcon width={24} height={24} style={{ marginRight: 4 }} />
+                  <Text style={styles.detailText}>{storeData.address}</Text>
+                </View>
+              ) : null}
+              {storeData.phone ? (
+                <View style={styles.detailRow}>
+                  <PhoneIcon
+                    width={24}
+                    height={24}
+                    style={{ marginRight: 4 }}
+                  />
+                  <Text style={styles.detailText}>{storeData.phone}</Text>
+                </View>
+              ) : null}
+              {storeData.hours && storeData.hours.length > 0 ? (
+                <View style={styles.detailRow}>
+                  <ClockIcon
+                    width={24}
+                    height={24}
+                    style={{ marginRight: 4 }}
+                  />
+                  <View>
+                    {storeData.hours.map((time, idx) => (
+                      <Text key={idx} style={styles.detailText}>
+                        {time}
+                      </Text>
+                    ))}
+                  </View>
+                </View>
+              ) : null}
             </View>
           </View>
 
@@ -319,7 +356,16 @@ const StoreDetailScreen = () => {
         <View style={styles.bottomButtonContainer}>
           <Button
             title="리뷰 작성하기"
-            onPress={() => setModalVisible(true)}
+            onPress={() => {
+              if (storeData.isPartner) {
+                setModalVisible(true);
+              } else {
+                navigation.navigate('WriteReviewScreen', {
+                  placeId: storeData.placeId,
+                  storeName: storeData.name,
+                });
+              }
+            }}
             style={styles.customButtonStyle}
             textStyle={styles.customButtonText}
           >
@@ -396,6 +442,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginVertical: 10,
+    gap: 8,
   },
   partnerTag: {
     paddingVertical: 10,
