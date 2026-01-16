@@ -20,6 +20,13 @@ import shadow from '../../style/shadow';
 import colors from '../../style/colors';
 import RatingIcon from '../../../assets/icons/rating.svg';
 import useImagePicker from '../../hooks/useImagePicker';
+import { DUMMY_PLACE } from '../../constants/DummyPlaceData';
+import {
+  convertToPng,
+  getCommonImagePresignedUrl,
+  uploadImageToPresignedUrl,
+} from '../../api/uploadImage';
+import { createReview } from '../../api/review';
 
 const StarItem = ({ filled, onPress, size = 28 }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
@@ -42,10 +49,51 @@ const WriteReviewScreen = () => {
   const [reviewText, setReviewText] = useState('');
   const [photos, setPhotos] = useState([]);
   const [selectedPhotoIndices, setSelectedPhotoIndices] = useState(new Set());
+  const [selectedPhotos, setSelectedPhotos] = useState([]);
 
   // 기존 배열에 새로운 이미지들을 추가하는 핸들러
   const handleSelectImages = (newImages) => {
     setPhotos((prevPhotos) => [...prevPhotos, ...newImages]);
+  };
+
+  const handleImagesBeforeSubmit = async () => {
+    console.log('handleImagesBeforeSubmit');
+    // const images = route.params?.images || [];
+    const images = selectedPhotos || [];
+    if (images.length === 0) {
+      return [];
+    }
+    console.log('images', images);
+    const pngConvertedImages = await Promise.all(
+      images.map(async (image) => {
+        const convertedResult = convertToPng(image);
+        console.log('convertedResult', convertedResult);
+        return convertedResult;
+      })
+    );
+    console.log('pngConvertedImages', pngConvertedImages);
+    const presignedUrls = await Promise.all(
+      pngConvertedImages.map(async (image) => {
+        const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(image);
+        return { uploadUrl, imageUrl, image: image };
+      })
+    );
+    console.log('presignedUrls', presignedUrls);
+    await Promise.all(
+      presignedUrls.map(async (presignedUrl) => {
+        await uploadImageToPresignedUrl(
+          presignedUrl.uploadUrl,
+          presignedUrl.image
+        );
+      })
+    );
+    if (
+      presignedUrls.some((presignedUrl) => presignedUrl.isSuccess === false)
+    ) {
+      Alert.alert('이미지 업로드에 실패했습니다.', '다시 시도해주세요.');
+      return;
+    }
+    return presignedUrls.map((presignedUrl) => presignedUrl.imageUrl);
   };
 
   // 사진 선택/해제 핸들러
@@ -78,10 +126,27 @@ const WriteReviewScreen = () => {
 
   const isValid = reviewText.length >= 10 && rating > 0;
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    const selectedPhotos = photos.filter((_, index) =>
+      selectedPhotoIndices.has(index)
+    );
+    setSelectedPhotos(selectedPhotos);
+  }, [photos, selectedPhotoIndices]);
+
+  const handleSubmit = async () => {
     if (!isValid) return;
-    console.log('리뷰 등록 완료', { rating, reviewText });
-    navigation.navigate('ReviewResultScreen');
+    // 선택된 사진들만 필터링 (파란색 토글된 것들)
+    console.log('현재 사용자가 선택한 사진들', selectedPhotos);
+    const finalImages = await handleImagesBeforeSubmit();
+    let finalSubmitReviewData = {
+      star: rating,
+      content: reviewText,
+      imageUrls: finalImages,
+      place: DUMMY_PLACE,
+    };
+    console.log('finalSubmitReviewData', finalSubmitReviewData);
+    const response = await createReview(finalSubmitReviewData);
+    // console.log('response', response);
   };
 
   const handleAddPhoto = () => {
