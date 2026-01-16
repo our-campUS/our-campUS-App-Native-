@@ -62,17 +62,16 @@ const StoreDetailScreen = () => {
 
     imgUrls: paramStore.imgUrls || [],
 
-    rating: paramStore.rating || 0,
-    // TODO 리뷰 관련 수정 필요 (reviews, reviewCount)
+    rating: paramStore.star || 0,
     reviews:
       paramStore.reviews && paramStore.reviews.length > 0
         ? paramStore.reviews
-        : DUMMY_STORE.reviews,
+        : [],
 
-    reviewCount:
+    reviewSize:
       paramStore.reviews && paramStore.reviews.length > 0
-        ? paramStore.reviewCount
-        : DUMMY_STORE.reviews.length,
+        ? paramStore.reviewSize
+        : 0,
 
     phone: paramStore.telephone || paramStore.phone || '',
     hours: paramStore.hours || [],
@@ -249,11 +248,11 @@ const StoreDetailScreen = () => {
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
                 <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
-                {storeData.reviewCount > 0 ? (
+                {storeData.reviewSize > 0 ? (
                   <>
-                    <Text style={styles.detailText}>{storeData.rating}</Text>
+                    <Text style={styles.detailText}>{storeData.star}</Text>
                     <Text style={styles.detailTextSub}>
-                      ({storeData.reviewCount})
+                      ({storeData.reviewSize})
                     </Text>
                   </>
                 ) : (
@@ -304,52 +303,75 @@ const StoreDetailScreen = () => {
               <Text style={styles.reviewTitle}>
                 리뷰{' '}
                 <Text style={styles.detailTextSub}>
-                  {storeData.reviewCount}개
+                  {storeData.reviewSize}개
                 </Text>
               </Text>
               <TouchableOpacity
+                disabled={!storeData.reviewSize || storeData.reviewSize === 0}
                 onPress={() =>
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
-                    rating: storeData.rating,
+                    star: storeData.star,
+                    placeId: storeData.placeId,
+                    reviewSize: storeData.reviewSize,
                   })
                 }
               >
-                <Ionicons
-                  name="chevron-forward"
-                  size={20}
-                  color={colors.gray[700]}
-                />
+                {storeData.reviewSize > 0 && (
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color={colors.gray[700]}
+                  />
+                )}
               </TouchableOpacity>
             </View>
 
-            {storeData.reviews.map((review) => (
-              <View key={review.id} style={styles.reviewItem}>
-                <View style={styles.reviewTextWrapper}>
-                  <View style={styles.reviewRating}>
-                    {[...Array(5)].map((_, i) => (
-                      <RatingIcon
-                        key={i}
-                        width={16}
-                        height={16}
-                        color={
-                          i < review.rating
-                            ? theme.colors.primary2
-                            : colors.gray[200]
-                        }
-                        style={{ marginRight: 1 }}
-                      />
-                    ))}
+            {storeData.reviews && storeData.reviews.length > 0 ? (
+              storeData.reviews.map((review) => (
+                <View key={review.id} style={styles.reviewItem}>
+                  <View style={styles.reviewTextWrapper}>
+                    <View style={styles.reviewRating}>
+                      {[...Array(5)].map((_, i) => (
+                        <RatingIcon
+                          key={i}
+                          width={16}
+                          height={16}
+                          color={
+                            i < review.star
+                              ? theme.colors.primary2
+                              : colors.gray[200]
+                          }
+                          style={{ marginRight: 1 }}
+                        />
+                      ))}
+                    </View>
+                    <Text style={styles.reviewContent}>{review.content}</Text>
+                    <View style={styles.reviewMeta}>
+                      <Text style={styles.reviewUser}>{review.writerName}</Text>
+                      <Text style={styles.reviewUser}>{review.createdAt}</Text>
+                    </View>
                   </View>
-                  <Text style={styles.reviewContent}>{review.content}</Text>
-                  <View style={styles.reviewMeta}>
-                    <Text style={styles.reviewUser}>{review.user}</Text>
-                    <Text style={styles.reviewUser}>{review.date}</Text>
-                  </View>
+                  {review.thumbnailImgUrl ? (
+                    <Image
+                      source={{ uri: review.thumbnailImgUrl }}
+                      style={styles.reviewImagePlaceholder}
+                    />
+                  ) : (
+                    <View style={styles.reviewImagePlaceholder} />
+                  )}
                 </View>
-                <View style={styles.reviewImagePlaceholder} />
+              ))
+            ) : (
+              <View style={styles.emptyReviewContainer}>
+                <Text style={styles.emptyReviewText}>
+                  아직 작성된 리뷰가 없어요.
+                </Text>
+                <Text style={styles.emptyReviewSubText}>
+                  첫 리뷰의 주인공이 되어보세요!
+                </Text>
               </View>
-            ))}
+            )}
           </View>
         </ScrollView>
 
@@ -363,6 +385,7 @@ const StoreDetailScreen = () => {
                 navigation.navigate('WriteReviewScreen', {
                   placeId: storeData.placeId,
                   storeName: storeData.name,
+                  rating: storeData.star,
                 });
               }
             }}
@@ -630,6 +653,23 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: '600',
+  },
+  emptyReviewContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    marginTop: 10,
+  },
+  emptyReviewText: {
+    ...typography.body3Regular,
+    color: colors.gray[400],
+    marginBottom: 4,
+  },
+  emptyReviewSubText: {
+    ...typography.caption1Regular,
+    color: colors.gray[300],
   },
 });
 
