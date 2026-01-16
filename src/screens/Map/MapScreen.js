@@ -82,12 +82,16 @@ const MapScreen = () => {
         ref={mapRef}
         style={{ flex: 1 }}
         onCameraIdle={handleCameraIdle}
-        initialCamera={{ latitude: 37.5665, longitude: 126.978, zoom: 16 }}
+        initialCamera={{
+          latitude: 37.5570389272802,
+          longitude: 126.960204232592,
+          zoom: 16,
+        }}
         isShowLocationButton={false}
         isShowZoomControls={false}
         onTapMap={handleReset}
       >
-        {mapMarkers.map((item) => {
+        {mapMarkers.map((item, index) => {
           const isSelected = item.placeId === selectedMarkerId;
           const pinType = isSelected
             ? 'SELECTED'
@@ -97,7 +101,7 @@ const MapScreen = () => {
 
           return (
             <NaverMapMarkerOverlay
-              key={item.placeId}
+              key={`marker-${item.placeId}-${index}`}
               latitude={item.latitude}
               longitude={item.longitude}
               width={getPinSize(pinType)}

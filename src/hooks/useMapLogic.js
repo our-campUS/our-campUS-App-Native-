@@ -34,7 +34,10 @@ export const useMapLogic = (mapRef) => {
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
 
-  const lastCameraRef = useRef({ latitude: 37.5665, longitude: 126.978 });
+  const lastCameraRef = useRef({
+    latitude: 37.5570389272802,
+    longitude: 126.960204232592,
+  });
 
   // --- 데이터 가공 헬퍼 ---
   const processSearchData = (rawData) => {
@@ -113,8 +116,8 @@ export const useMapLogic = (mapRef) => {
       // C. 일반 리스트
       else {
         const response = await getPartnerships({
-          lat: 37.5665,
-          lng: 126.978,
+          lat: 37.5570389272802,
+          lng: 126.960204232592,
           cursor: isLoadMore ? nextCursor : null,
           size: 5,
         });
@@ -168,8 +171,51 @@ export const useMapLogic = (mapRef) => {
         setSelectedCategory(null);
         setSelectedMarkerId(null);
       } else if (searchType === 'LOCATION' && selectedLocation) {
+        const locationData = {
+          placeId: selectedLocation.placeId,
+          name: selectedLocation.name,
+          address: selectedLocation.address || '',
+          category: selectedLocation.category || '기타',
+          imgUrls: selectedLocation.imgUrls || [],
+          latitude: selectedLocation.latitude,
+          longitude: selectedLocation.longitude,
+          type: selectedLocation.isPartner ? 'PARTNER' : 'DEFAULT',
+          partnerTitle: selectedLocation.isPartner
+            ? selectedLocation.partnerTag
+            : undefined,
+
+          partnerships: selectedLocation.partnerships || [],
+          postId: selectedLocation.postId,
+        };
+
+        setMapMarkers((prev) => {
+          const exists = prev.find((m) => m.placeId === locationData.placeId);
+          if (exists) return prev;
+          return [locationData, ...prev];
+        });
         setSearchKeyword(selectedLocation.name);
         setSelectedMarkerId(selectedLocation.placeId);
+        setSelectedStoreDetail(selectedLocation);
+
+        const fetchDetailIfNeeded = async () => {
+          if (selectedLocation.postId) {
+            const detail = await getPartnershipDetail(
+              selectedLocation.postId,
+              selectedLocation.latitude,
+              selectedLocation.longitude
+            );
+            if (detail) {
+              setSelectedStoreDetail(detail);
+            }
+          } else if (selectedLocation.partnerships?.length > 0) {
+            setSelectedStoreDetail(locationData);
+          } else {
+            setSelectedStoreDetail(locationData);
+          }
+        };
+
+        fetchDetailIfNeeded();
+
         mapRef.current?.animateCameraTo({
           latitude: selectedLocation.latitude,
           longitude: selectedLocation.longitude,

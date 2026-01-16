@@ -27,7 +27,7 @@ import SearchingShakeIcon from '../../../assets/icons/search-list/searchingShake
 import WarningIcon from '../../../assets/icons/warning-line.svg';
 import filterDropdownItems from '../../utils/searchLogic';
 
-import { getPlacesByKeyword } from '../../api/place';
+import { getPlacesSearchInfo } from '../../api/place';
 
 const MapSearchScreen = () => {
   const navigation = useNavigation();
@@ -50,10 +50,10 @@ const MapSearchScreen = () => {
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const lat = 37.5665;
-        const lng = 126.978;
+        const lat = 37.55703;
+        const lng = 126.9602;
 
-        const data = await getPlacesByKeyword(keyword, lat, lng);
+        const data = await getPlacesSearchInfo(keyword, lat, lng);
 
         if (data) {
           setSearchResults(data);
@@ -103,13 +103,10 @@ const MapSearchScreen = () => {
   };
 
   const renderResultItem = ({ item }) => {
-    const categoryName = item.category
-      ? item.category.split('>').pop()
-      : '장소';
+    const isPartnership = item.partnerships && item.partnerships.length > 0;
 
-    const IconComponent = categoryName.includes('제휴')
-      ? SearchingShakeIcon
-      : SearchingPinIcon;
+    const IconComponent = isPartnership ? SearchingShakeIcon : SearchingPinIcon;
+    console.log('isPartnership:' + isPartnership);
 
     return (
       <TouchableOpacity
@@ -123,6 +120,14 @@ const MapSearchScreen = () => {
               placeId: item.placeKey,
               latitude: item.coordinate?.latitude,
               longitude: item.coordinate?.longitude,
+
+              isPartner: isPartnership,
+              partnerTag: isPartnership
+                ? item.partnerships[0]?.councilName
+                : undefined,
+              partnerships: item.partnerships || [],
+
+              postId: item.postId,
             },
           })
         }
