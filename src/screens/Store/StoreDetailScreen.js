@@ -356,7 +356,16 @@ const StoreDetailScreen = () => {
         <View style={styles.bottomButtonContainer}>
           <Button
             title="리뷰 작성하기"
-            onPress={() => setModalVisible(true)}
+            onPress={() => {
+              if (storeData.isPartner) {
+                setModalVisible(true);
+              } else {
+                navigation.navigate('WriteReviewScreen', {
+                  placeId: storeData.placeId,
+                  storeName: storeData.name,
+                });
+              }
+            }}
             style={styles.customButtonStyle}
             textStyle={styles.customButtonText}
           >
