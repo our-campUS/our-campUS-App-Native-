@@ -50,8 +50,8 @@ const ReviewActionModal = ({
           {step === 1 ? (
             <View style={styles.content}>
               <Text style={styles.title}>
-                <Text style={{ fontWeight: 'bold' }}>{storeName}</Text>에서 제휴
-                이용 하셨나요?
+                <Text style={{ fontWeight: 'bold' }}>{storeName}</Text>에서
+                {'\n'} 제휴 이용 하셨나요?
               </Text>
               <Text style={styles.subtitle}>
                 제휴 인증 리뷰 작성 시 스탬프를 받을 수 있어요!
