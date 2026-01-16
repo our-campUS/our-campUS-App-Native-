@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Animated,
@@ -76,18 +76,33 @@ const MapScreen = () => {
 
   const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
 
+  const uniqueMarkers = useMemo(() => {
+    const seen = new Set();
+    return mapMarkers.filter((item) => {
+      if (seen.has(item.placeId)) {
+        return false;
+      }
+      seen.add(item.placeId);
+      return true;
+    });
+  }, [mapMarkers]);
+
   return (
     <View style={styles.container}>
       <NaverMapView
         ref={mapRef}
         style={{ flex: 1 }}
         onCameraIdle={handleCameraIdle}
-        initialCamera={{ latitude: 37.5665, longitude: 126.978, zoom: 16 }}
+        initialCamera={{
+          latitude: 37.5570389272802,
+          longitude: 126.960204232592,
+          zoom: 16,
+        }}
         isShowLocationButton={false}
         isShowZoomControls={false}
         onTapMap={handleReset}
       >
-        {mapMarkers.map((item) => {
+        {uniqueMarkers.map((item, index) => {
           const isSelected = item.placeId === selectedMarkerId;
           const pinType = isSelected
             ? 'SELECTED'
@@ -95,9 +110,11 @@ const MapScreen = () => {
             ? 'PARTNER'
             : 'DEFAULT';
 
+          const uniqueKey = `marker-${item.placeId}-${item.latitude}-${item.longitude}-${index}`;
+
           return (
             <NaverMapMarkerOverlay
-              key={item.placeId}
+              key={uniqueKey}
               latitude={item.latitude}
               longitude={item.longitude}
               width={getPinSize(pinType)}

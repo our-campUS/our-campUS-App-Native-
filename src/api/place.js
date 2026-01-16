@@ -29,6 +29,7 @@ export const getAddressFromCoords = async (latitude, longitude) => {
     return null;
   }
 };
+// api/place.js
 
 export const getPartnerships = async ({
   lat,
@@ -39,10 +40,22 @@ export const getPartnerships = async ({
   try {
     const token = useAuthStore.getState().accessToken;
 
-    const params = {
+    console.log('👉 [API 요청] getPartnerships 파라미터:', {
       lat,
       lng,
+      cursor,
       size,
+    });
+
+    if (!lat || !lng) {
+      console.warn('⚠️ 위도/경도 값이 없어 요청을 중단합니다.');
+      return null;
+    }
+
+    const params = {
+      lat: lat,
+      lng: lng,
+      size: size || 5,
     };
 
     if (cursor) {
@@ -56,10 +69,13 @@ export const getPartnerships = async ({
       },
     });
 
-    console.log('제휴 리스트:', response.data);
+    console.log('✅ 제휴 리스트 응답:', response.data);
     return response.data;
   } catch (error) {
-    console.error('제휴 리스트 조회 실패:', error);
+    console.error(
+      '❌ 제휴 리스트 조회 실패:',
+      error.response?.data || error.message
+    );
     return null;
   }
 };
@@ -144,6 +160,31 @@ export const getPlacesSearch = async (keyword, lat, lng) => {
     const token = useAuthStore.getState().accessToken;
 
     const response = await api.get('/places/search', {
+      params: {
+        keyword: keyword,
+        lat: lat,
+        lng: lng,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200) {
+      return response.data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('장소 검색 실패:', error);
+    return [];
+  }
+};
+
+export const getPlacesSearchInfo = async (keyword, lat, lng) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const response = await api.get('/places/search/info', {
       params: {
         keyword: keyword,
         lat: lat,

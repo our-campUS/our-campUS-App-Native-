@@ -14,6 +14,7 @@ import {
   getPartnershipDetail,
   getPlacesByKeyword,
   getPlacesSearch,
+  getPlacesSearchInfo,
 } from '../api/place';
 
 export const useMapLogic = (mapRef) => {
@@ -34,32 +35,76 @@ export const useMapLogic = (mapRef) => {
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
 
-  const lastCameraRef = useRef({ latitude: 37.5665, longitude: 126.978 });
+  const lastCameraRef = useRef({
+    latitude: 37.5570389272802,
+    longitude: 126.960204232592,
+  });
 
   // --- 데이터 가공 헬퍼 ---
-  const processSearchData = (rawData) => {
+  const processSearchData = async (rawData, shouldFetchDetails = false) => {
     if (!rawData) return [];
-    return rawData.map((item) => {
+
+    const processedData = rawData.map((item) => {
       const targetId = item.placeKey || item.placeId || item.id;
       const existingPartner = mapMarkers.find((m) => m.placeId == targetId);
 
+      const hasPartnership = item.partnerships && item.partnerships.length > 0;
+      const extractedPostId = hasPartnership
+        ? item.partnerships[0]?.postId
+        : item.postId;
+
       return {
         ...item,
-        placeId: targetId || `temp_${Math.random()}`,
+        placeId: targetId || `temp_${Date.now()}_${Math.random()}`,
         name: item.placeName || item.name || '이름 없음',
         address: item.address || '',
         category: item.category || '기타',
         imgUrls: item.imgUrls || [],
         latitude: item.coordinate?.latitude || item.latitude || 0,
         longitude: item.coordinate?.longitude || item.longitude || 0,
-
         type: existingPartner || item.partnerTitle ? 'PARTNER' : 'DEFAULT',
+        partnerTitle: item.partnerTitle,
+        postId: extractedPostId,
+        partnerships: item.partnerships || [],
         ...existingPartner,
       };
     });
+    if (shouldFetchDetails) {
+      const detailedData = await Promise.all(
+        processedData.map(async (item) => {
+          if (item.postId) {
+            try {
+              console.log(
+                `🔍 제휴 상세 조회: ${item.name} (postId: ${item.postId})`
+              );
+              const detail = await getPartnershipDetail(
+                item.postId,
+                item.latitude,
+                item.longitude
+              );
+
+              if (detail) {
+                console.log(`✅ 상세 정보 조회 성공: ${item.name}`);
+                return {
+                  ...item,
+                  ...detail,
+                  placeId: item.placeId,
+                };
+              }
+            } catch (error) {
+              console.error(`상세 정보 조회 실패: ${item.name}`, error);
+            }
+          }
+          return item;
+        })
+      );
+      return detailedData;
+    }
+
+    return processedData;
   };
 
-  // --- API 호출 로직 ---
+  // --- API 호출 로직 수정 ---
   const fetchPartnershipList = async (isLoadMore = false) => {
     if (!searchKeyword && !selectedCategory) return;
     if (loading) return;
@@ -77,8 +122,30 @@ export const useMapLogic = (mapRef) => {
           setLoading(false);
           return;
         }
-        const rawData = await getPlacesSearch(selectedCategory.label, lat, lng);
-        newData = processSearchData(rawData);
+
+        if (selectedCategory.id === 'PARTNER') {
+          const response = await getPartnerships({
+            lat,
+            lng,
+            cursor: isLoadMore ? nextCursor : null,
+            size: 20,
+          });
+
+          if (response?.code === 200) {
+            newData = await processSearchData(
+              response.data.map((item) => ({ ...item, type: 'PARTNER' })),
+              true
+            );
+          }
+        } else {
+          const rawData = await getPlacesSearch(
+            selectedCategory.label,
+            lat,
+            lng
+          );
+
+          newData = await processSearchData(rawData, true);
+        }
       }
       // B. 키워드 검색
       else if (searchKeyword) {
@@ -86,24 +153,44 @@ export const useMapLogic = (mapRef) => {
           setLoading(false);
           return;
         }
-        const rawData = await getPlacesSearch(searchKeyword, lat, lng);
-        newData = processSearchData(rawData);
+
+        console.log('🔎 키워드 검색 시작:', searchKeyword);
+        const rawData = await getPlacesSearchInfo(searchKeyword, lat, lng);
+
+        console.log('📦 원본 검색 결과:', rawData);
+        console.log('📦 첫 번째 항목:', rawData?.[0]);
+
+        newData = await processSearchData(rawData, true);
+
+        console.log('📦 처리된 결과:', newData);
+        console.log('📦 첫 번째 처리된 항목:', newData?.[0]);
       }
       // C. 일반 리스트
       else {
         const response = await getPartnerships({
-          lat: 37.5665,
-          lng: 126.978,
+          lat: 37.5570389272802,
+          lng: 126.960204232592,
           cursor: isLoadMore ? nextCursor : null,
           size: 5,
         });
         if (response?.code === 200) {
-          newData = response.data.map((item) => ({ ...item, type: 'PARTNER' }));
+          newData = await processSearchData(
+            response.data.map((item) => ({ ...item, type: 'PARTNER' })),
+            true
+          );
         }
       }
 
       // 상태 업데이트
-      if (!isLoadMore) setMapMarkers(newData);
+      if (!isLoadMore) {
+        // 중복 제거
+        const uniqueMarkers = Array.from(
+          new Map(newData.map((item) => [item.placeId, item])).values()
+        );
+
+        console.log('📍 새 마커 설정:', uniqueMarkers.length, '개');
+        setMapMarkers(uniqueMarkers);
+      }
 
       if (newData.length === 0) {
         if (!isLoadMore) setPartnerships([]);
@@ -120,7 +207,6 @@ export const useMapLogic = (mapRef) => {
         }
       }
 
-      // 카메라 이동
       if (!isLoadMore && newData.length > 0) {
         mapRef.current?.animateCameraTo({
           latitude: newData[0].latitude,
@@ -147,8 +233,65 @@ export const useMapLogic = (mapRef) => {
         setSelectedCategory(null);
         setSelectedMarkerId(null);
       } else if (searchType === 'LOCATION' && selectedLocation) {
+        console.log('1️⃣ 이전 화면에서 넘겨온 데이터:', selectedLocation);
+
+        const locationData = {
+          placeId: selectedLocation.placeId,
+          name: selectedLocation.name,
+          address: selectedLocation.address || '',
+          category: selectedLocation.category || '기타',
+          imgUrls: selectedLocation.imgUrls || [],
+          latitude: selectedLocation.latitude,
+          longitude: selectedLocation.longitude,
+          type: selectedLocation.isPartner ? 'PARTNER' : 'DEFAULT',
+          partnerTitle: selectedLocation.partnerTitle,
+          partnerships: selectedLocation.partnerships || [],
+          postId: selectedLocation.postId,
+        };
+
+        console.log('2️⃣ 생성된 locationData:', locationData);
+
+        setMapMarkers((prev) => {
+          const filtered = prev.filter(
+            (m) => m.placeId !== locationData.placeId
+          );
+          return [locationData, ...filtered];
+        });
         setSearchKeyword(selectedLocation.name);
         setSelectedMarkerId(selectedLocation.placeId);
+        setSelectedStoreDetail(selectedLocation);
+
+        const fetchDetailIfNeeded = async () => {
+          if (selectedLocation.postId) {
+            console.log(
+              '📍 제휴글 상세 정보 조회 중...',
+              selectedLocation.postId
+            );
+
+            const detail = await getPartnershipDetail(
+              selectedLocation.postId,
+              selectedLocation.latitude,
+              selectedLocation.longitude
+            );
+
+            if (detail) {
+              console.log('✅ 상세 정보 조회 성공:', detail);
+              setSelectedStoreDetail(detail);
+            } else {
+              console.log('⚠️ 상세 정보 조회 실패, 기본 데이터 사용');
+              setSelectedStoreDetail(locationData);
+            }
+          } else if (selectedLocation.partnerships?.length > 0) {
+            console.log('⚠️ postId 없음, 검색 결과의 기본 이미지 사용');
+            setSelectedStoreDetail(locationData);
+          } else {
+            console.log('📌 일반 장소');
+            setSelectedStoreDetail(locationData);
+          }
+        };
+
+        fetchDetailIfNeeded();
+
         mapRef.current?.animateCameraTo({
           latitude: selectedLocation.latitude,
           longitude: selectedLocation.longitude,
@@ -163,11 +306,14 @@ export const useMapLogic = (mapRef) => {
   useEffect(() => {
     if (searchKeyword || selectedCategory) {
       setPartnerships([]);
+      setMapMarkers([]);
       setIsListEnd(false);
       setNextCursor(null);
+      setSelectedMarkerId(null);
       fetchPartnershipList(false);
     } else {
       setPartnerships([]);
+      setMapMarkers([]);
     }
   }, [searchKeyword, selectedCategory]);
 
@@ -224,31 +370,68 @@ export const useMapLogic = (mapRef) => {
     setSelectedCategory(null);
     setSearchKeyword(null);
     setSelectedStoreDetail(null);
+    setMapMarkers([]);
+    setPartnerships([]);
   };
 
-  const handleCurrentLocation = async () => {
-    try {
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
-      }
-      mapRef.current?.setLocationTrackingMode('Follow');
-    } catch (e) {
-      console.error(e);
-    }
+  // const handleCurrentLocation = async () => {
+  //   try {
+  //     // 1. [Android] 권한 요청 로직 강화
+  //     if (Platform.OS === 'android') {
+  //       const granted = await PermissionsAndroid.request(
+  //         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  //       );
+  //       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+  //         Alert.alert('알림', '위치 권한을 허용해주세요.');
+  //         return;
+  //       }
+  //     }
+
+  //     // 2. [iOS/Android 공통] MapRef 유효성 체크
+  //     if (!mapRef.current) {
+  //         console.log("Map ref is not ready");
+  //         return;
+  //     }
+
+  //     // 3. 트래킹 모드 설정 ('Follow'로 설정하면 현위치로 이동하며 따라다님)
+  //     // @mj-studio/react-native-naver-map 라이브러리 방식
+  //     mapRef.current.setLocationTrackingMode('Follow');
+
+  //   } catch (e) {
+  //     console.error('handleCurrentLocation Error:', e);
+  //   }
+  // };
+
+  const handleCurrentLocation = () => {
+    const TARGET_LAT = 37.5570389272802;
+    const TARGET_LNG = 126.960204232592;
+
+    mapRef.current?.animateCameraTo({
+      latitude: TARGET_LAT,
+      longitude: TARGET_LNG,
+      zoom: 16,
+      duration: 500,
+    });
+
+    console.log('📍 임의 설정한 위치로 이동했습니다.');
   };
 
   // --- 5. 계산된 데이터 (Displayed Data) ---
   const displayedMarkers = useMemo(() => {
-    if (selectedStoreDetail && selectedMarkerId) return [selectedStoreDetail];
-    if (searchKeyword || selectedCategory) return partnerships;
-    if (selectedMarkerId) {
+    let markers = [];
+
+    if (selectedStoreDetail && selectedMarkerId) {
+      markers = [selectedStoreDetail];
+    } else if (searchKeyword || selectedCategory) {
+      markers = partnerships;
+    } else if (selectedMarkerId) {
       const found = mapMarkers.find((m) => m.placeId === selectedMarkerId);
-      return found ? [found] : [];
+      markers = found ? [found] : [];
     }
-    return [];
+
+    return Array.from(
+      new Map(markers.map((item) => [item.placeId, item])).values()
+    );
   }, [
     selectedStoreDetail,
     selectedMarkerId,
