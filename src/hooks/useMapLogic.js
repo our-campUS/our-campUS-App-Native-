@@ -45,7 +45,7 @@ export const useMapLogic = (mapRef) => {
     if (!rawData) return [];
 
     const processedData = rawData.map((item) => {
-      const targetId = item.placeKey || item.placeId || item.id;
+      const targetId = item.placeId || item.placeKey || item.id;
       const existingPartner = mapMarkers.find((m) => m.placeId == targetId);
 
       const hasPartnership = item.partnerships && item.partnerships.length > 0;
@@ -53,8 +53,11 @@ export const useMapLogic = (mapRef) => {
         ? item.partnerships[0]?.postId
         : item.postId;
 
+      console.log('타겟 아이디' + targetId);
+
       return {
         ...item,
+
         placeId: targetId || `temp_${Date.now()}_${Math.random()}`,
         name: item.placeName || item.name || '이름 없음',
         address: item.address || '',
@@ -69,6 +72,7 @@ export const useMapLogic = (mapRef) => {
         ...existingPartner,
       };
     });
+
     if (shouldFetchDetails) {
       const detailedData = await Promise.all(
         processedData.map(async (item) => {
@@ -86,14 +90,20 @@ export const useMapLogic = (mapRef) => {
               if (detail) {
                 console.log(`✅ 상세 정보 조회 성공: ${item.name}`);
                 return {
+                  ...item,
                   ...detail,
                   placeId: detail.placeId,
+                  placeKey: detail.placeKey || item.placeKey,
+
+                  latitude: detail.latitude || item.latitude,
+                  longitude: detail.longitude || item.longitude,
                 };
               }
             } catch (error) {
               console.error(`상세 정보 조회 실패: ${item.name}`, error);
             }
           }
+          // 상세 조회가 없거나 실패하면 기존 1차 가공 데이터 반환
           return item;
         })
       );
@@ -136,6 +146,7 @@ export const useMapLogic = (mapRef) => {
               true
             );
           }
+          console.log('kkkkk: ' + newData);
         } else {
           const rawData = await getPlacesSearch(
             selectedCategory.label,
