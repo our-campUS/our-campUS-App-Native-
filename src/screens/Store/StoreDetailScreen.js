@@ -77,8 +77,8 @@ const StoreDetailScreen = () => {
     phone: paramStore.telephone || paramStore.phone || '',
     hours: paramStore.hours || [],
 
-    isPartner: paramStore.type === 'PARTNER',
-    partnerTags: paramStore.partnerTags || [],
+    isPartner: paramStore.isPartnership,
+    partnerTags: paramStore.tag ? [paramStore.tag] : [],
   };
 
   console.log('================= [StoreDetailScreen Debug] =================');
@@ -442,6 +442,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginVertical: 10,
+    gap: 8,
   },
   partnerTag: {
     paddingVertical: 10,
