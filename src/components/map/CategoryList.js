@@ -28,7 +28,7 @@ const CategoryList = ({ onSelectCategory }) => {
               onPress={() => onSelectCategory(cat)}
               activeOpacity={0.7}
             >
-              <Icon width={20} height={20} color={cat.defaultColor} />
+              <Icon width={25} height={25} color={cat.defaultColor} />
               <Text style={styles.label}>{cat.label}</Text>
             </TouchableOpacity>
           );
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   label: {
-    marginLeft: 6,
+    marginLeft: 3,
     ...typograpy.body3Bold,
     color: theme.colors.textDim,
   },

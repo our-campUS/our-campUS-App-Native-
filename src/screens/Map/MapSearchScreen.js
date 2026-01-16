@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import SearchBar from '../../components/SearchBar';
 import theme from '../../style';
+import colors from '../../style/colors';
 import {
   CATEGORIES,
   RECENT_SEARCHES,
@@ -23,11 +24,26 @@ import {
 import typography from '../../style/typography';
 import SearchingPinIcon from '../../../assets/icons/common/pin.svg';
 import SearchingShakeIcon from '../../../assets/icons/search-list/searchingShake.svg';
+import WarningIcon from '../../../assets/icons/warning-line.svg';
 
 const MapSearchScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [keyword, setKeyword] = useState('');
+
+  const filteredData = useMemo(() => {
+    if (!keyword) return [];
+    return SEARCH_RESULTS.filter(
+      (item) => item.name.includes(keyword) || item.address.includes(keyword)
+    );
+  }, [keyword]);
+
+  const renderEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <WarningIcon width={56} height={56} />
+      <Text style={styles.emptyText}>검색 결과가 존재하지 않습니다</Text>
+    </View>
+  );
   const onSubmit = () => {
     navigation.navigate('MapScreen', {
       searchType: 'KEYWORD',
@@ -99,11 +115,12 @@ const MapSearchScreen = () => {
       {/* 조건부 렌더링 */}
       {keyword.length > 0 ? (
         <FlatList
-          data={SEARCH_RESULTS}
+          data={filteredData}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderResultItem}
           contentContainerStyle={styles.listContent}
           keyboardShouldPersistTaps="handled"
+          ListEmptyComponent={renderEmptyComponent}
         />
       ) : (
         <>
@@ -117,8 +134,8 @@ const MapSearchScreen = () => {
                 <TouchableOpacity key={cat.id} style={styles.categoryChip}>
                   <View>
                     <cat.IconComponent
-                      width={16}
-                      height={16}
+                      width={20}
+                      height={20}
                       color={theme.colors.textDim}
                     />
                   </View>
@@ -150,7 +167,7 @@ const styles = StyleSheet.create({
   },
   searchBarWrapper: {
     paddingBottom: 10,
-    paddingTop: Platform.OS === 'ios' ? 60 : 20,
+    paddingTop: Platform.OS === 'android' ? 20 : 10,
   },
   categoryWrapper: {
     paddingVertical: 12,
@@ -229,6 +246,16 @@ const styles = StyleSheet.create({
   resultDistance: {
     color: theme.colors.textDisabled,
     ...typography.caption2Regular,
+  },
+  emptyContainer: {
+    paddingTop: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    marginTop: 20,
+    color: colors.gray[300],
+    ...typography.body2Bold,
   },
 });
 

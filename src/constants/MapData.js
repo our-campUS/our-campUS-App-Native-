@@ -23,7 +23,7 @@ export const CATEGORIES = [
   },
   {
     id: 'FOOD',
-    label: '음식점',
+    label: '식당',
     IconComponent: RestarauntICon,
     defaultColor: '#B3ED76',
   },
