@@ -14,6 +14,7 @@ import {
   getPartnershipDetail,
   getPlacesByKeyword,
   getPlacesSearch,
+  getPlacesSearchInfo,
 } from '../api/place';
 
 export const useMapLogic = (mapRef) => {
@@ -40,29 +41,70 @@ export const useMapLogic = (mapRef) => {
   });
 
   // --- 데이터 가공 헬퍼 ---
-  const processSearchData = (rawData) => {
+  const processSearchData = async (rawData, shouldFetchDetails = false) => {
     if (!rawData) return [];
-    return rawData.map((item) => {
+
+    const processedData = rawData.map((item) => {
       const targetId = item.placeKey || item.placeId || item.id;
       const existingPartner = mapMarkers.find((m) => m.placeId == targetId);
 
+      const hasPartnership = item.partnerships && item.partnerships.length > 0;
+      const extractedPostId = hasPartnership
+        ? item.partnerships[0]?.postId
+        : item.postId;
+
       return {
         ...item,
-        placeId: targetId || `temp_${Math.random()}`,
+        placeId: targetId || `temp_${Date.now()}_${Math.random()}`,
         name: item.placeName || item.name || '이름 없음',
         address: item.address || '',
         category: item.category || '기타',
         imgUrls: item.imgUrls || [],
         latitude: item.coordinate?.latitude || item.latitude || 0,
         longitude: item.coordinate?.longitude || item.longitude || 0,
-
         type: existingPartner || item.partnerTitle ? 'PARTNER' : 'DEFAULT',
+        partnerTitle: item.partnerTitle,
+        postId: extractedPostId,
+        partnerships: item.partnerships || [],
         ...existingPartner,
       };
     });
+    if (shouldFetchDetails) {
+      const detailedData = await Promise.all(
+        processedData.map(async (item) => {
+          if (item.postId) {
+            try {
+              console.log(
+                `🔍 제휴 상세 조회: ${item.name} (postId: ${item.postId})`
+              );
+              const detail = await getPartnershipDetail(
+                item.postId,
+                item.latitude,
+                item.longitude
+              );
+
+              if (detail) {
+                console.log(`✅ 상세 정보 조회 성공: ${item.name}`);
+                return {
+                  ...item,
+                  ...detail,
+                  placeId: item.placeId,
+                };
+              }
+            } catch (error) {
+              console.error(`상세 정보 조회 실패: ${item.name}`, error);
+            }
+          }
+          return item;
+        })
+      );
+      return detailedData;
+    }
+
+    return processedData;
   };
 
-  // --- API 호출 로직 ---
+  // --- API 호출 로직 수정 ---
   const fetchPartnershipList = async (isLoadMore = false) => {
     if (!searchKeyword && !selectedCategory) return;
     if (loading) return;
@@ -90,10 +132,10 @@ export const useMapLogic = (mapRef) => {
           });
 
           if (response?.code === 200) {
-            newData = processSearchData(response.data).map((item) => ({
-              ...item,
-              type: 'PARTNER',
-            }));
+            newData = await processSearchData(
+              response.data.map((item) => ({ ...item, type: 'PARTNER' })),
+              true
+            );
           }
         } else {
           const rawData = await getPlacesSearch(
@@ -101,7 +143,8 @@ export const useMapLogic = (mapRef) => {
             lat,
             lng
           );
-          newData = processSearchData(rawData);
+
+          newData = await processSearchData(rawData, true);
         }
       }
       // B. 키워드 검색
@@ -110,8 +153,17 @@ export const useMapLogic = (mapRef) => {
           setLoading(false);
           return;
         }
-        const rawData = await getPlacesSearch(searchKeyword, lat, lng);
-        newData = processSearchData(rawData);
+
+        console.log('🔎 키워드 검색 시작:', searchKeyword);
+        const rawData = await getPlacesSearchInfo(searchKeyword, lat, lng);
+
+        console.log('📦 원본 검색 결과:', rawData);
+        console.log('📦 첫 번째 항목:', rawData?.[0]);
+
+        newData = await processSearchData(rawData, true);
+
+        console.log('📦 처리된 결과:', newData);
+        console.log('📦 첫 번째 처리된 항목:', newData?.[0]);
       }
       // C. 일반 리스트
       else {
@@ -122,7 +174,10 @@ export const useMapLogic = (mapRef) => {
           size: 5,
         });
         if (response?.code === 200) {
-          newData = response.data.map((item) => ({ ...item, type: 'PARTNER' }));
+          newData = await processSearchData(
+            response.data.map((item) => ({ ...item, type: 'PARTNER' })),
+            true
+          );
         }
       }
 
@@ -144,7 +199,6 @@ export const useMapLogic = (mapRef) => {
         }
       }
 
-      // 카메라 이동
       if (!isLoadMore && newData.length > 0) {
         mapRef.current?.animateCameraTo({
           latitude: newData[0].latitude,
