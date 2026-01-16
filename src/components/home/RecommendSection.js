@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import StoreCard from '../common/StoreCard';
-import { STORE_DATA } from '../../constants/DummyData';
 import { getRandomPlaces } from '../../api/place';
 import { calculateDistance } from '../../utils/distance';
 
 const RecommendSection = () => {
+  const navigation = useNavigation();
   const [recommendList, setRecommendList] = useState([]);
 
   useEffect(() => {
@@ -60,6 +61,10 @@ const RecommendSection = () => {
     fetchData();
   }, []);
 
+  const handlePressCard = (item) => {
+    navigation.navigate('StoreDetailScreen', { store: item });
+  };
+
   return (
     <View>
       <FlatList
@@ -77,6 +82,7 @@ const RecommendSection = () => {
             rating={item.rating}
             discount={item.discount}
             distance={item.distance}
+            onPress={() => handlePressCard(item)}
           />
         )}
       />

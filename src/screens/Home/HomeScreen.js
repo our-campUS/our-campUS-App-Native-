@@ -121,13 +121,13 @@ const HomeScreen = () => {
         </HomeSection>
 
         {/* 큐레이션 */}
-        <HomeSection
+        {/* <HomeSection
           title="💕 추천 큐레이션"
           hasDivider={true}
           fullWidthContent={true}
         >
           <CurationCarousel />
-        </HomeSection>
+        </HomeSection> */}
 
         <HomeSection title="💯 캠어스를 100% 이용하는 법" hasDivider={true}>
           <View>

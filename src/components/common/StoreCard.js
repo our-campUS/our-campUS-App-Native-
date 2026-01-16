@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../style';
@@ -15,9 +15,10 @@ const StoreCard = ({
   rating,
   discount,
   distance,
+  onPress,
 }) => {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress}>
       {/* 상단 이미지 */}
       <View style={styles.imageContainer}>
         <Image source={{ uri: image }} style={styles.image} />
@@ -53,7 +54,7 @@ const StoreCard = ({
           <Text style={styles.infoText}>{distance}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
