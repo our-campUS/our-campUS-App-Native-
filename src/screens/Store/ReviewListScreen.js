@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,57 +6,89 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import LabelTitle from '../../components/LabelTitle';
+import ReviewItem from '../../components/MyPage/ReviewItem';
 import ReviewActionModal from '../../components/review/ReviewActionModal';
 import theme from '../../style';
 import colors from '../../style/colors';
-
-import RatingIcon from '../../../assets/icons/rating.svg';
 import typography from '../../style/typography';
+import RatingIcon from '../../../assets/icons/rating.svg';
 
-const REVIEWS = [
-  {
-    id: 1,
-    rating: 5,
-    content:
-      '떡볶이 정말 양 많아요. 아 근데 스벅이네... 리뷰는 두 줄 까지만 보이게 노출해요! 오른쪽 더보기 누르면 나머지 내용 더 볼 수 있는 구조입니다!!',
-    date: '21.10.10',
-    user: '최서*',
-    isVerified: true,
-    images: [1, 2],
-  },
-  {
-    id: 2,
-    rating: 5,
-    content: '공부하기 너무 좋아요. 조용하고 쾌적합니다.',
-    date: '21.10.11',
-    user: '김다*',
-    isVerified: true,
-    images: [],
-  },
-  {
-    id: 3,
-    rating: 4,
-    content: '직원분들이 친절해요.',
-    date: '21.10.12',
-    user: '이영*',
-    isVerified: false,
-    images: [1],
-  },
-];
+import { getReviewList } from '../../api/review';
 
 const ReviewListScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { storeName, rating, storeData } = route.params;
+
+  const { storeName, star, placeId, reviewSize, storeData } = route.params;
 
   const [modalVisible, setModalVisible] = useState(false);
   const [filter, setFilter] = useState('LATEST');
+
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [hasNext, setHasNext] = useState(false);
+  const [nextCursorCreatedAt, setNextCursorCreatedAt] = useState(null);
+  const [nextCursorId, setNextCursorId] = useState(null);
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const fetchReviews = async (isLoadMore = false) => {
+    if (loading) return;
+    if (isLoadMore && !hasNext) return;
+
+    try {
+      setLoading(true);
+
+      const response = await getReviewList(
+        placeId,
+        isLoadMore ? nextCursorCreatedAt : null,
+        isLoadMore ? nextCursorId : null,
+        10
+      );
+
+      if (response?.code === 200 || response?.data) {
+        const newReviews = response.data.items || [];
+
+        setReviews((prev) =>
+          isLoadMore ? [...prev, ...newReviews] : newReviews
+        );
+
+        setHasNext(response.data.hasNext || false);
+        setNextCursorCreatedAt(response.data.nextCursorCreatedAt);
+        setNextCursorId(response.data.nextCursorId);
+      }
+    } catch (error) {
+      console.error('리뷰 목록 조회 실패:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setNextCursorCreatedAt(null);
+    setNextCursorId(null);
+    fetchReviews(false);
+  };
+
+  const handleLoadMore = () => {
+    if (hasNext && !loading) {
+      fetchReviews(true);
+    }
+  };
+
   const renderHeader = () => (
     <View style={styles.listHeader}>
       <View style={styles.ratingSummary}>
@@ -67,15 +99,13 @@ const ReviewListScreen = () => {
               width={16}
               height={16}
               color={
-                i < Math.floor(rating)
-                  ? theme.colors.primary2
-                  : colors.gray[200]
+                i < Math.floor(star) ? theme.colors.primary2 : colors.gray[200]
               }
             />
           ))}
         </View>
         <Text style={styles.ratingScore}>
-          {rating} <Text style={styles.ratingMax}>/ 5</Text>
+          {star} <Text style={styles.ratingMax}>/ 5</Text>
         </Text>
       </View>
 
@@ -105,45 +135,43 @@ const ReviewListScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        <Text style={styles.reviewCountLabel}>{REVIEWS.length}개의 리뷰</Text>
+        <Text style={styles.reviewCountLabel}>{reviewSize || 0}개의 리뷰</Text>
       </View>
     </View>
   );
 
-  // [TODO] components/MyPage/ReviewItem 사용 예정
-  const renderItem = ({ item }) => (
-    <View style={styles.reviewItem}>
-      <View style={styles.reviewRatingRow}>
-        {[...Array(5)].map((_, i) => (
-          <RatingIcon
-            key={i}
-            width={12}
-            height={12}
-            color={i < item.rating ? theme.colors.primary2 : colors.gray[200]}
-          />
-        ))}
+  const renderItem = ({ item }) => {
+    const reviewData = {
+      id: item.id,
+      comment: item.content,
+      name: item.userName || '익명',
+      date: item.createDate || '',
+      star: item.star,
+      imageUrls: item.imageUrls || [],
+    };
+
+    return (
+      <View style={styles.reviewItemWrapper}>
+        <ReviewItem item={reviewData} />
       </View>
+    );
+  };
 
-      {item.images.length > 0 && (
-        <View style={styles.reviewImagesScroll}>
-          <View style={styles.reviewImage} />
-          <View style={styles.reviewImage} />
-        </View>
-      )}
-
-      <Text style={styles.reviewContent} numberOfLines={2}>
-        {item.content}
-      </Text>
-      <TouchableOpacity style={styles.moreButton}>
-        <Ionicons name="chevron-down" size={16} color={colors.gray[400]} />
-      </TouchableOpacity>
-
-      <View style={styles.reviewMeta}>
-        <Text style={styles.reviewUser}>{item.user}</Text>
-        <Text style={styles.reviewDate}>{item.date}</Text>
-      </View>
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>아직 작성된 리뷰가 없습니다.</Text>
+      <Text style={styles.emptySubText}>첫 리뷰를 작성해보세요!</Text>
     </View>
   );
+
+  const renderFooter = () => {
+    if (!loading) return null;
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color={theme.colors.primary1} />
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
@@ -155,12 +183,18 @@ const ReviewListScreen = () => {
       />
 
       <FlatList
-        data={REVIEWS}
+        data={reviews}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         ListHeaderComponent={renderHeader}
+        ListEmptyComponent={renderEmpty}
+        ListFooterComponent={renderFooter}
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.3}
       />
 
       <View style={styles.floatingButtonContainer}>
@@ -248,7 +282,6 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     marginBottom: 16,
   },
-
   filterRow: {
     paddingHorizontal: 20,
     flexDirection: 'row',
@@ -272,48 +305,25 @@ const styles = StyleSheet.create({
     ...typography.caption2Regular,
     color: colors.gray[500],
   },
-
-  reviewItem: {
+  reviewItemWrapper: {
     paddingHorizontal: 20,
-    marginBottom: 30,
   },
-  reviewRatingRow: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  reviewImagesScroll: {
-    flexDirection: 'row',
-    marginBottom: 10,
-    gap: 8,
-  },
-  reviewImage: {
-    width: 80,
-    height: 80,
-    backgroundColor: colors.gray[200],
-    borderRadius: 8,
-  },
-  reviewContent: {
-    fontSize: 14,
-    color: theme.colors.text,
-    lineHeight: 22,
-    marginBottom: 4,
-  },
-  moreButton: {
-    alignSelf: 'flex-end',
-    marginBottom: 8,
-  },
-  reviewMeta: {
-    flexDirection: 'row',
+  emptyContainer: {
+    paddingVertical: 60,
     alignItems: 'center',
   },
-  reviewUser: {
-    fontSize: 12,
-    color: colors.gray[500],
-    marginRight: 8,
-  },
-  reviewDate: {
-    fontSize: 12,
+  emptyText: {
+    ...typography.body3Regular,
     color: colors.gray[400],
+    marginBottom: 4,
+  },
+  emptySubText: {
+    ...typography.caption1Regular,
+    color: colors.gray[300],
+  },
+  footerLoader: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
   floatingButtonContainer: {
     position: 'absolute',

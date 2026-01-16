@@ -86,9 +86,8 @@ export const useMapLogic = (mapRef) => {
               if (detail) {
                 console.log(`✅ 상세 정보 조회 성공: ${item.name}`);
                 return {
-                  ...item,
                   ...detail,
-                  placeId: item.placeId,
+                  placeId: detail.placeId,
                 };
               }
             } catch (error) {
@@ -276,7 +275,10 @@ export const useMapLogic = (mapRef) => {
 
             if (detail) {
               console.log('✅ 상세 정보 조회 성공:', detail);
-              setSelectedStoreDetail(detail);
+              setSelectedStoreDetail({
+                ...detail,
+                placeId: locationData.placeId, // 원본 placeId 명시적 유지
+              });
             } else {
               console.log('⚠️ 상세 정보 조회 실패, 기본 데이터 사용');
               setSelectedStoreDetail(locationData);
@@ -358,7 +360,12 @@ export const useMapLogic = (mapRef) => {
         latitude,
         longitude
       );
-      if (detail) setSelectedStoreDetail(detail);
+      if (detail) {
+        setSelectedStoreDetail({
+          ...detail,
+          placeId: item.placeId,
+        });
+      }
     } else {
       setSelectedStoreDetail(item);
     }

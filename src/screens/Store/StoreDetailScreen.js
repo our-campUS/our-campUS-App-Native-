@@ -312,19 +312,25 @@ const StoreDetailScreen = () => {
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
                     rating: storeData.rating,
+                    star: storeData.star,
+                    placeId: storeData.placeId,
+                    reviewSize: storeData.reviewSize,
                     storeData: storeData,
                   })
                 }
               >
-                <Ionicons
-                  name="chevron-forward"
-                  size={20}
-                  color={colors.gray[700]}
-                />
+                {storeData.reviewSize > 0 && (
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color={colors.gray[700]}
+                  />
+                )}
               </TouchableOpacity>
             </View>
 
-            {storeData.reviews.map((review) => (
+            {storeData.reviews && storeData.reviews.length > 0 ? (
+              {storeData.reviews.map((review) => (
               <View key={review.id} style={styles.reviewItem}>
                 <View style={styles.reviewTextWrapper}>
                   <View style={styles.reviewRating}>
@@ -348,7 +354,14 @@ const StoreDetailScreen = () => {
                     <Text style={styles.reviewUser}>{review.date}</Text>
                   </View>
                 </View>
-                <View style={styles.reviewImagePlaceholder} />
+                               {review.thumbnailImgUrl ? (
+                    <Image
+                      source={{ uri: review.thumbnailImgUrl }}
+                      style={styles.reviewImagePlaceholder}
+                    />
+                  ) : (
+                    <View style={styles.reviewImagePlaceholder} />
+                  )}
               </View>
             ))}
           </View>
@@ -365,6 +378,7 @@ const StoreDetailScreen = () => {
                   placeId: storeData.placeId,
                   store: storeData,
                   isNoPartner: true,
+                  rating: storeData.star,
                 });
               }
             }}
@@ -642,6 +656,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-});
+emptyReviewContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    marginTop: 10,
+  },
+  emptyReviewText: {
+    ...typography.body3Regular,
+    color: colors.gray[400],
+    marginBottom: 4,
+  },
+  emptyReviewSubText: {
+    ...typography.caption1Regular,
+    color: colors.gray[300],
+  },});
 
 export default StoreDetailScreen;

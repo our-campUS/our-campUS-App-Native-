@@ -15,33 +15,37 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SearchBar from '../../components/SearchBar';
 import theme from '../../style';
 import colors from '../../style/colors';
-import {
-  CATEGORIES,
-  RECENT_SEARCHES,
-  SEARCH_ICON_CONFIG,
-  SEARCH_RESULTS,
-} from '../../constants/MapData';
+import { CATEGORIES } from '../../constants/MapData';
 import typography from '../../style/typography';
 import SearchingPinIcon from '../../../assets/icons/common/pin.svg';
 import SearchingShakeIcon from '../../../assets/icons/search-list/searchingShake.svg';
 import WarningIcon from '../../../assets/icons/warning-line.svg';
-import filterDropdownItems from '../../utils/searchLogic';
 
 import { getPlacesSearchInfo } from '../../api/place';
+import {
+  addSearchHistory,
+  getSearchHistory,
+  removeSearchHistory,
+} from '../../utils/searchHistoryUtils';
 
 const MapSearchScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [searchHistory, setSearchHistory] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const filteredData = useMemo(() => {
-    return filterDropdownItems(SEARCH_RESULTS, keyword, 'name');
-  }, [keyword]);
+  useEffect(() => {
+    loadSearchHistory();
+  }, []);
+
+  const loadSearchHistory = async () => {
+    const history = await getSearchHistory();
+    setSearchHistory(history);
+  };
 
   useEffect(() => {
-    // 키워드가 비어있으면 초기화
     if (!keyword.trim()) {
       setSearchResults([]);
       return;
@@ -52,7 +56,6 @@ const MapSearchScreen = () => {
       try {
         const lat = 37.55703;
         const lng = 126.9602;
-
         const data = await getPlacesSearchInfo(keyword, lat, lng);
 
         if (data) {
@@ -77,7 +80,16 @@ const MapSearchScreen = () => {
       <Text style={styles.emptyText}>검색 결과가 존재하지 않습니다</Text>
     </View>
   );
-  const onSubmit = () => {
+
+  const onSubmit = async () => {
+    if (!keyword.trim()) return;
+
+    await addSearchHistory({
+      type: 'KEYWORD',
+      text: keyword,
+    });
+    await loadSearchHistory();
+
     navigation.navigate('MapScreen', {
       searchType: 'KEYWORD',
       keyword: keyword,
@@ -85,67 +97,101 @@ const MapSearchScreen = () => {
   };
 
   const renderHistoryItem = ({ item }) => {
-    const config = SEARCH_ICON_CONFIG[item.type];
-    if (!config) return null;
-    const { Component, color } = config;
+    let IconComponent;
+    let iconColor;
+
+    if (item.type === 'KEYWORD') {
+      IconComponent = Ionicons;
+      iconColor = theme.colors.textDim;
+    } else if (item.type === 'LOCATION') {
+      IconComponent = SearchingPinIcon;
+      iconColor = theme.colors.primary;
+    }
 
     return (
-      <TouchableOpacity style={styles.historyItem}>
-        <View style={[styles.iconCircle, { backgroundColor: color + '20' }]}>
-          <Component width={22} height={22} color={color} />
+      <TouchableOpacity
+        style={styles.historyItem}
+        onPress={() => {
+          if (item.type === 'KEYWORD') {
+            setKeyword(item.text);
+            navigation.navigate('MapScreen', {
+              searchType: 'KEYWORD',
+              keyword: item.text,
+            });
+          } else if (item.type === 'LOCATION' && item.data) {
+            navigation.navigate('MapScreen', {
+              searchType: 'LOCATION',
+              selectedLocation: item.data,
+            });
+          }
+        }}
+      >
+        <View
+          style={[styles.iconCircle, { backgroundColor: iconColor + '20' }]}
+        >
+          {item.type === 'KEYWORD' ? (
+            <IconComponent name="search" size={22} color={iconColor} />
+          ) : (
+            <IconComponent width={22} height={22} color={iconColor} />
+          )}
         </View>
         <Text style={styles.historyText}>{item.text}</Text>
-        <TouchableOpacity style={styles.deleteButton}>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={async () => {
+            await removeSearchHistory(item.id);
+            await loadSearchHistory();
+          }}
+        >
           <Ionicons name="close" size={16} color={theme.colors.textDisabled} />
         </TouchableOpacity>
       </TouchableOpacity>
     );
   };
 
-  const renderResultItem = ({ item }) => {
+  const handleResultItemPress = async (item) => {
     const isPartnership = item.partnerships && item.partnerships.length > 0;
-
-    const IconComponent = isPartnership ? SearchingShakeIcon : SearchingPinIcon;
     const postId = isPartnership ? item.partnerships[0]?.postId : undefined;
 
-    console.log('🔍 검색 결과:', {
+    const selectedLocation = {
+      placeId: item.placeKey,
       name: item.placeName,
-      isPartnership,
-      postId,
+      address: item.address,
+      category: item.category || '기타',
+      imgUrls: item.imgUrls || [],
+      latitude: item.coordinate?.latitude,
+      longitude: item.coordinate?.longitude,
+      isPartner: isPartnership,
+      partnerTag: isPartnership ? item.partnerships[0]?.councilName : undefined,
+      partnerTitle: isPartnership
+        ? item.partnerships[0]?.partnershipTitle
+        : undefined,
+      partnerships: item.partnerships || [],
+      postId: postId,
+    };
+
+    await addSearchHistory({
+      type: 'LOCATION',
+      text: item.placeName,
+      placeId: item.placeKey,
+      data: selectedLocation,
     });
+    await loadSearchHistory();
+
+    navigation.navigate('MapScreen', {
+      searchType: 'LOCATION',
+      selectedLocation,
+    });
+  };
+
+  const renderResultItem = ({ item }) => {
+    const isPartnership = item.partnerships && item.partnerships.length > 0;
+    const IconComponent = isPartnership ? SearchingShakeIcon : SearchingPinIcon;
 
     return (
       <TouchableOpacity
         style={styles.resultItem}
-        onPress={() => {
-          const selectedLocation = {
-            placeId: item.placeKey,
-            name: item.placeName,
-            address: item.address,
-            category: item.category || '스터디카페',
-            imgUrls: item.imgUrls || [],
-            latitude: item.coordinate?.latitude,
-            longitude: item.coordinate?.longitude,
-
-            isPartner: isPartnership,
-            partnerTag: isPartnership
-              ? item.partnerships[0]?.councilName
-              : undefined,
-            partnerTitle: isPartnership
-              ? item.partnerships[0]?.partnershipTitle
-              : undefined,
-            partnerships: item.partnerships || [],
-
-            postId: postId,
-          };
-
-          console.log('📍 네비게이션 전달 데이터:', selectedLocation);
-
-          navigation.navigate('MapScreen', {
-            searchType: 'LOCATION',
-            selectedLocation,
-          });
-        }}
+        onPress={() => handleResultItemPress(item)}
       >
         <View style={styles.resultIconWrapper}>
           <IconComponent width={26} height={26} />
@@ -155,7 +201,6 @@ const MapSearchScreen = () => {
           <Text style={styles.resultTitle}>{item.placeName}</Text>
           <View style={styles.resultSubRow}>
             <Text style={styles.resultAddress}>{item.address}</Text>
-            {/* <Text style={styles.resultDistance}>0.0km</Text> */}
           </View>
         </View>
       </TouchableOpacity>
@@ -196,8 +241,11 @@ const MapSearchScreen = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.categoryScroll}
             >
-              {CATEGORIES.map((cat) => (
-                <TouchableOpacity key={cat.id} style={styles.categoryChip}>
+              {CATEGORIES.map((cat, index) => (
+                <TouchableOpacity
+                  key={`${cat.id}-${index}`}
+                  style={styles.categoryChip}
+                >
                   <View>
                     <cat.IconComponent
                       width={20}
@@ -213,13 +261,22 @@ const MapSearchScreen = () => {
 
           <View style={styles.divider} />
 
-          <FlatList
-            data={RECENT_SEARCHES}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderHistoryItem}
-            contentContainerStyle={styles.listContent}
-            keyboardShouldPersistTaps="handled"
-          />
+          {/* ✅ 검색 기록 */}
+          {searchHistory.length > 0 ? (
+            <FlatList
+              data={searchHistory}
+              keyExtractor={(item) => item.id}
+              renderItem={renderHistoryItem}
+              contentContainerStyle={styles.listContent}
+              keyboardShouldPersistTaps="handled"
+            />
+          ) : (
+            <View style={styles.emptyHistoryContainer}>
+              <Text style={styles.emptyHistoryText}>
+                최근 검색 기록이 없습니다
+              </Text>
+            </View>
+          )}
         </>
       )}
     </View>
@@ -309,10 +366,6 @@ const styles = StyleSheet.create({
     ...typography.caption1Regular,
     marginRight: 8,
   },
-  resultDistance: {
-    color: theme.colors.textDisabled,
-    ...typography.caption2Regular,
-  },
   emptyContainer: {
     paddingTop: 200,
     alignItems: 'center',
@@ -322,6 +375,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: colors.gray[300],
     ...typography.body2Bold,
+  },
+  emptyHistoryContainer: {
+    paddingTop: 100,
+    alignItems: 'center',
+  },
+  emptyHistoryText: {
+    color: theme.colors.textDisabled,
+    ...typography.body3Regular,
   },
 });
 
