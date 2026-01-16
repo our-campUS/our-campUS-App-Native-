@@ -19,6 +19,7 @@ import typography from '../../style/typography';
 import shadow from '../../style/shadow';
 import colors from '../../style/colors';
 import RatingIcon from '../../../assets/icons/rating.svg';
+import useImagePicker from '../../hooks/useImagePicker';
 
 const StarItem = ({ filled, onPress, size = 28 }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
@@ -35,19 +36,57 @@ const StarItem = ({ filled, onPress, size = 28 }) => (
 const WriteReviewScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-
   const storeName = route.params?.store?.name || '스타벅스 상도역점';
 
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
-  const [photos, setPhotos] = useState([1, 2, 3]);
+  const [photos, setPhotos] = useState([]);
+  const [selectedPhotoIndices, setSelectedPhotoIndices] = useState(new Set());
 
-  const isValid = reviewText.length >= 20 && rating > 0;
+  // 기존 배열에 새로운 이미지들을 추가하는 핸들러
+  const handleSelectImages = (newImages) => {
+    setPhotos((prevPhotos) => [...prevPhotos, ...newImages]);
+  };
+
+  // 사진 선택/해제 핸들러
+  const handleTogglePhotoSelection = (index) => {
+    setSelectedPhotoIndices((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  // 선택된 사진의 순서 번호 가져오기
+  const getSelectedOrder = (index) => {
+    const sortedIndices = Array.from(selectedPhotoIndices).sort(
+      (a, b) => a - b
+    );
+    const order = sortedIndices.indexOf(index);
+    return order !== -1 ? order + 1 : null;
+  };
+
+  const { pickImage } = useImagePicker({
+    useCamera: true,
+    useGallery: false,
+    onSelectImages: handleSelectImages,
+  });
+
+  const isValid = reviewText.length >= 10 && rating > 0;
 
   const handleSubmit = () => {
     if (!isValid) return;
     console.log('리뷰 등록 완료', { rating, reviewText });
     navigation.navigate('ReviewResultScreen');
+  };
+
+  const handleAddPhoto = () => {
+    console.log('사진 촬영하기');
+    pickImage();
   };
 
   return (
@@ -90,9 +129,9 @@ const WriteReviewScreen = () => {
               maxLength={1000}
             />
 
-            <Text style={[styles.charCount, reviewText.length >= 20]}>
+            <Text style={[styles.charCount, reviewText.length >= 10]}>
               {reviewText.length === 0
-                ? '최소 20자 이상'
+                ? '최소 10자 이상'
                 : `${reviewText.length}/1000`}
             </Text>
           </View>
@@ -103,7 +142,10 @@ const WriteReviewScreen = () => {
             style={styles.photoScroll}
             contentContainerStyle={styles.photoContainer}
           >
-            <TouchableOpacity style={styles.addPhotoButton}>
+            <TouchableOpacity
+              style={styles.addPhotoButton}
+              onPress={handleAddPhoto}
+            >
               <View>
                 <Ionicons
                   name="camera"
@@ -114,13 +156,43 @@ const WriteReviewScreen = () => {
               <Text style={styles.addPhotoText}>사진 촬영하기</Text>
             </TouchableOpacity>
 
-            {photos.map((photo, index) => (
-              <View key={index} style={styles.photoItemPlaceholder}>
-                <Text style={{ color: colors.gray[400], fontSize: 10 }}>
-                  IMG_{index}
-                </Text>
-              </View>
-            ))}
+            {photos.map((photo, index) => {
+              const isSelected = selectedPhotoIndices.has(index);
+              const selectedOrder = getSelectedOrder(index);
+
+              return (
+                <View key={index} style={styles.photoItemWrapper}>
+                  <TouchableOpacity
+                    style={styles.photoItem}
+                    onPress={() => handleTogglePhotoSelection(index)}
+                    activeOpacity={0.8}
+                  >
+                    <Image
+                      source={{ uri: photo.uri }}
+                      style={styles.photoItemPlaceholder}
+                    />
+                    {/* 라디오 버튼 오버레이 */}
+                    <View style={styles.radioButtonOverlay}>
+                      {isSelected ? (
+                        <View style={styles.radioButtonSelected}>
+                          <Text style={styles.radioButtonNumber}>
+                            {selectedOrder}
+                          </Text>
+                        </View>
+                      ) : (
+                        <View style={styles.radioButtonUnselected}>
+                          <Ionicons
+                            name="radio-button-off"
+                            size={32}
+                            color={colors.common.white}
+                          />
+                        </View>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </ScrollView>
         </ScrollView>
 
@@ -215,14 +287,48 @@ const styles = StyleSheet.create({
     ...typography.caption2Regular,
     color: colors.gray[500],
   },
+  photoItemWrapper: {
+    position: 'relative',
+  },
+  photoItem: {
+    position: 'relative',
+  },
   photoItemPlaceholder: {
     width: 100,
     height: 100,
     backgroundColor: colors.gray[200],
     borderRadius: 8,
+    resizeMode: 'cover',
+  },
+  radioButtonOverlay: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    width: 32,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+  },
+  radioButtonUnselected: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioButtonSelected: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.blue[500],
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.common.white,
+  },
+  radioButtonNumber: {
+    ...typography.caption2Bold,
+    color: colors.common.white,
+    fontSize: 14,
   },
 
   bottomButtonWrapper: {
