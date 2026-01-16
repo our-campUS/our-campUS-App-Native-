@@ -106,31 +106,46 @@ const MapSearchScreen = () => {
     const isPartnership = item.partnerships && item.partnerships.length > 0;
 
     const IconComponent = isPartnership ? SearchingShakeIcon : SearchingPinIcon;
-    console.log('isPartnership:' + isPartnership);
+    const postId = isPartnership ? item.partnerships[0]?.postId : undefined;
+
+    console.log('🔍 검색 결과:', {
+      name: item.placeName,
+      isPartnership,
+      postId,
+    });
 
     return (
       <TouchableOpacity
         style={styles.resultItem}
-        onPress={() =>
+        onPress={() => {
+          const selectedLocation = {
+            placeId: item.placeKey,
+            name: item.placeName,
+            address: item.address,
+            category: item.category || '스터디카페',
+            imgUrls: item.imgUrls || [],
+            latitude: item.coordinate?.latitude,
+            longitude: item.coordinate?.longitude,
+
+            isPartner: isPartnership,
+            partnerTag: isPartnership
+              ? item.partnerships[0]?.councilName
+              : undefined,
+            partnerTitle: isPartnership
+              ? item.partnerships[0]?.partnershipTitle
+              : undefined,
+            partnerships: item.partnerships || [],
+
+            postId: postId,
+          };
+
+          console.log('📍 네비게이션 전달 데이터:', selectedLocation);
+
           navigation.navigate('MapScreen', {
             searchType: 'LOCATION',
-            selectedLocation: {
-              ...item,
-              name: item.placeName,
-              placeId: item.placeKey,
-              latitude: item.coordinate?.latitude,
-              longitude: item.coordinate?.longitude,
-
-              isPartner: isPartnership,
-              partnerTag: isPartnership
-                ? item.partnerships[0]?.councilName
-                : undefined,
-              partnerships: item.partnerships || [],
-
-              postId: item.postId,
-            },
-          })
-        }
+            selectedLocation,
+          });
+        }}
       >
         <View style={styles.resultIconWrapper}>
           <IconComponent width={26} height={26} />

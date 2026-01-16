@@ -171,6 +171,8 @@ export const useMapLogic = (mapRef) => {
         setSelectedCategory(null);
         setSelectedMarkerId(null);
       } else if (searchType === 'LOCATION' && selectedLocation) {
+        console.log('1️⃣ 이전 화면에서 넘겨온 데이터:', selectedLocation);
+
         const locationData = {
           placeId: selectedLocation.placeId,
           name: selectedLocation.name,
@@ -180,18 +182,18 @@ export const useMapLogic = (mapRef) => {
           latitude: selectedLocation.latitude,
           longitude: selectedLocation.longitude,
           type: selectedLocation.isPartner ? 'PARTNER' : 'DEFAULT',
-          partnerTitle: selectedLocation.isPartner
-            ? selectedLocation.partnerTag
-            : undefined,
-
+          partnerTitle: selectedLocation.partnerTitle,
           partnerships: selectedLocation.partnerships || [],
           postId: selectedLocation.postId,
         };
 
+        console.log('2️⃣ 생성된 locationData:', locationData);
+
         setMapMarkers((prev) => {
-          const exists = prev.find((m) => m.placeId === locationData.placeId);
-          if (exists) return prev;
-          return [locationData, ...prev];
+          const filtered = prev.filter(
+            (m) => m.placeId !== locationData.placeId
+          );
+          return [locationData, ...filtered];
         });
         setSearchKeyword(selectedLocation.name);
         setSelectedMarkerId(selectedLocation.placeId);
@@ -199,17 +201,29 @@ export const useMapLogic = (mapRef) => {
 
         const fetchDetailIfNeeded = async () => {
           if (selectedLocation.postId) {
+            console.log(
+              '📍 제휴글 상세 정보 조회 중...',
+              selectedLocation.postId
+            );
+
             const detail = await getPartnershipDetail(
               selectedLocation.postId,
               selectedLocation.latitude,
               selectedLocation.longitude
             );
+
             if (detail) {
+              console.log('✅ 상세 정보 조회 성공:', detail);
               setSelectedStoreDetail(detail);
+            } else {
+              console.log('⚠️ 상세 정보 조회 실패, 기본 데이터 사용');
+              setSelectedStoreDetail(locationData);
             }
           } else if (selectedLocation.partnerships?.length > 0) {
+            console.log('⚠️ postId 없음, 검색 결과의 기본 이미지 사용');
             setSelectedStoreDetail(locationData);
           } else {
+            console.log('📌 일반 장소');
             setSelectedStoreDetail(locationData);
           }
         };
