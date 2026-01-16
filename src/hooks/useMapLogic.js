@@ -277,7 +277,7 @@ export const useMapLogic = (mapRef) => {
               console.log('✅ 상세 정보 조회 성공:', detail);
               setSelectedStoreDetail({
                 ...detail,
-                placeId: detail.placeId, // 원본 placeId 명시적 유지
+                placeId: locationData.placeId, // 원본 locationData의 placeId 명시적 유지
               });
             } else {
               console.log('⚠️ 상세 정보 조회 실패, 기본 데이터 사용');
@@ -363,7 +363,7 @@ export const useMapLogic = (mapRef) => {
       if (detail) {
         setSelectedStoreDetail({
           ...detail,
-          placeId: detail.placeId,
+          placeId: item.placeId, // 원본 item의 placeId 명시적 유지
         });
       }
     } else {
