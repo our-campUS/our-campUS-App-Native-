@@ -1,16 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import theme from '../../style';
 import colors from '../../style/colors';
 
-const BannerCard = ({ title, subtitle, onPress }) => {
+const BannerCard = ({ title, subtitle, onPress, imageSource }) => {
   return (
     <TouchableOpacity
       style={styles.container}
       activeOpacity={0.7}
       onPress={onPress}
     >
-      <View style={styles.imagePlaceholder} />
+      <Image source={imageSource} style={styles.image} resizeMode="contain" />
 
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
@@ -34,10 +34,9 @@ const styles = StyleSheet.create({
 
     ...theme.shadows.small,
   },
-  imagePlaceholder: {
+  image: {
     width: 52,
     height: 52,
-    backgroundColor: '#D9D9D9',
     borderRadius: 8,
     marginRight: 16,
   },
