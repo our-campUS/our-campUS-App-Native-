@@ -24,19 +24,33 @@ const StoreListItem = ({
   onPress,
   showImages = true,
   showDiscountDetail = false,
+  onLikeToggle,
 }) => {
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(!!item.placeId && item.isLiked);
 
   useEffect(() => {
-    setIsLiked(item.isLiked || false);
-  }, [item.isLiked]);
+    setIsLiked(!!item.placeId && item.isLiked);
+  }, [item.placeId, item.isLiked]);
 
   const handleLikePress = async () => {
     const previousState = isLiked;
     setIsLiked(!isLiked);
 
     try {
-      await togglePlaceLike(item);
+      // 2. 서버 요청
+      const response = await togglePlaceLike(item);
+
+      console.log('👍 좋아요 응답:', response);
+      const responseData = response.data || response;
+
+      if (responseData && responseData.placeId) {
+        if (onLikeToggle) {
+          onLikeToggle(item.placeId, {
+            placeId: responseData.placeId,
+            isLiked: responseData.liked,
+          });
+        }
+      }
     } catch (error) {
       setIsLiked(previousState);
       console.error('좋아요 토글 실패, 롤백함');

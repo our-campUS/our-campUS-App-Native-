@@ -21,7 +21,7 @@ const StoreCard = ({
     <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress}>
       {/* 상단 이미지 */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: image }} style={styles.image} />
+        <Image source={image} style={styles.image} />
         {/* 태그 */}
         <View style={styles.tagsOverlay}>
           {tags.map((tag, index) => (

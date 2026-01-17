@@ -268,3 +268,22 @@ export const togglePlaceLike = async (placeData) => {
     throw error;
   }
 };
+
+export const getPlaceStatus = async (placeId, latitude, longitude) => {
+  try {
+    let url = `/places/detail?latitude=${latitude}&longitude=${longitude}`;
+    if (placeId) {
+      url += `&placeId=${placeId}`;
+    }
+
+    const response = await api.get(url);
+
+    if (response.data && response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    // console.error('장소 상태 조회 실패:', error);
+    return null;
+  }
+};
