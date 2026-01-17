@@ -28,6 +28,10 @@ const StoreListItem = ({
     setIsLiked(item.isLiked);
   }, [item.isLiked]);
 
+  useEffect(() => {
+    console.log('item', item);
+  }, [item]);
+
   const categoryLabel =
     CATEGORIES.find((cat) => cat.id === item.category)?.label || item.category;
 
@@ -41,8 +45,10 @@ const StoreListItem = ({
       <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
         <View style={styles.headerRow}>
           <View style={styles.titleWrapper}>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.category}>{categoryLabel}</Text>
+            <Text style={styles.name}>{item.name || item.placeName}</Text>
+            <Text style={styles.category}>
+              {categoryLabel || item.placeCategory}
+            </Text>
           </View>
           {/* <TouchableOpacity
             style={styles.likeButton}
@@ -74,10 +80,12 @@ const StoreListItem = ({
           </View>
 
           {showDiscountDetail ? (
-            item.partnerTitle && (
+            (item.partnerTitle || item.title) && (
               <View style={styles.infoItem}>
                 <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
-                <Text style={styles.infoText}>{item.partnerTitle}</Text>
+                <Text style={styles.infoText}>
+                  {item.partnerTitle || item.title}
+                </Text>
               </View>
             )
           ) : (

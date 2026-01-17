@@ -46,7 +46,7 @@ const ScanConfirmScreen = ({ route }) => {
 
       <View style={styles.cardWrapper}>
         <StoreListItem
-          item={storeData}
+          item={ocrResult}
           showImages={false}
           showDiscountDetail={true}
           onPress={() => {}}

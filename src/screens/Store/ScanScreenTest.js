@@ -57,6 +57,10 @@ const CameraScanScreenTest = ({ route }) => {
     console.log('photoPath', photoPath);
   }, [photoPath]);
 
+  useEffect(() => {
+    console.log('storeData at ScanScreenTest', storeData);
+  }, [storeData]);
+
   const sendOcrRequest = async () => {
     const ocrResult = await requestOcr(photoPath, storeData.placeId);
     console.log('ocrResult', ocrResult);

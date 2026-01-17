@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { getPartnershipListStamp } from '../../api/stamp';
 
 import LabelTitle from '../../components/LabelTitle';
 import StoreListItem from '../../components/common/StoreListItem';
@@ -59,15 +61,31 @@ const DUMMY_STORES = [
 const SelectStoreScreen = () => {
   const navigation = useNavigation();
   const [selectedStoreId, setSelectedStoreId] = useState(null);
+  const [partnershipList, setPartnershipList] = useState([]);
+
+  useEffect(() => {
+    const fetchPartnershipList = async () => {
+      const response = await getPartnershipListStamp();
+      setPartnershipList(response.data.data);
+    };
+    fetchPartnershipList();
+  }, []);
+
+  useEffect(() => {
+    console.log('partnershipList', partnershipList);
+  }, [partnershipList]);
 
   const handleNext = () => {
+    console.log('selectedStoreId', selectedStoreId);
     if (selectedStoreId) {
-      navigation.navigate('CameraScanScreen', { storeId: selectedStoreId });
+      navigation.navigate('CameraScanScreen', {
+        storeData: { placeId: selectedStoreId },
+      });
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <View style={{ marginBottom: 20 }}>
         <LabelTitle
           title="리뷰 작성"
@@ -82,13 +100,13 @@ const SelectStoreScreen = () => {
       >
         <Text style={styles.pageTitle}>어떤 매장의 제휴를 이용하셨나요?</Text>
 
-        {DUMMY_STORES.map((store) => {
-          const isSelected = selectedStoreId === store.id;
+        {partnershipList?.map((store) => {
+          const isSelected = selectedStoreId === store.placeId;
 
           return (
             <TouchableOpacity
-              key={store.id}
-              onPress={() => setSelectedStoreId(store.id)}
+              key={store.placeId}
+              onPress={() => setSelectedStoreId(store.placeId)}
               activeOpacity={0.9}
               style={[
                 styles.cardWrapper,

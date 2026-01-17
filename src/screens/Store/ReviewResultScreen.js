@@ -254,7 +254,9 @@ const ReviewResultScreen = ({ route }) => {
 
           <Button
             title="스탬프 채울 수 있는 제휴 보러가기"
-            // onPress={() => }
+            onPress={() => {
+              navigation.navigate('MainTab', { screen: 'Partnership' });
+            }}
             style={styles.blueButton}
             textStyle={styles.blueButtonText}
           />

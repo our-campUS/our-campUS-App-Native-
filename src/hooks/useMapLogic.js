@@ -45,7 +45,7 @@ export const useMapLogic = (mapRef) => {
     if (!rawData) return [];
 
     const processedData = rawData.map((item) => {
-      const targetId = item.placeKey || item.placeId || item.id;
+      const targetId = item.placeId || item.placeKey || item.id;
       const existingPartner = mapMarkers.find((m) => m.placeId == targetId);
 
       const hasPartnership = item.partnerships && item.partnerships.length > 0;
