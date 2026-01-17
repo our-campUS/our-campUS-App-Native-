@@ -166,3 +166,21 @@ export const getReviewList = async (
     throw error;
   }
 };
+
+// 내가 쓴 리뷰 조회  ( get /reviews/mine)
+
+export const getMyReviewList = async () => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+    const response = await api.get('/reviews/mine', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log('response', response);
+    return response;
+  } catch (error) {
+    console.error('내가 쓴 리뷰 조회 실패:', error);
+    throw error;
+  }
+};

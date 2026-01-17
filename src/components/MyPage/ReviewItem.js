@@ -13,8 +13,9 @@ import ArrowDownIcon from '../../../assets/ArrowDown.svg';
 import ArrowUpIcon from '../../../assets/ArrowUp.svg';
 import { useState } from 'react';
 import theme from '../../style';
+import ThreeDotsIcon from '../../../assets/threeDot.svg';
 
-const ReviewItem = ({ item }) => {
+const ReviewItem = ({ item, isMine = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const formatDate = (dateString) => {
@@ -40,6 +41,11 @@ const ReviewItem = ({ item }) => {
   return (
     <View style={styles.container}>
       <View style={styles.starRatingWrapper}>{renderStars()}</View>
+      {isMine && (
+        <Pressable style={styles.editButton}>
+          <ThreeDotsIcon width={24} height={24} />
+        </Pressable>
+      )}
 
       {item.imageUrls && item.imageUrls.length > 0 && (
         <ScrollView
@@ -50,7 +56,7 @@ const ReviewItem = ({ item }) => {
           scrollEnabled={true}
           nestedScrollEnabled={true}
         >
-          {item.imageUrls.map((imgUrl, index, arr) => (
+          {item?.imageUrls?.map((imgUrl, index, arr) => (
             <Image
               key={index}
               source={{ uri: imgUrl }}
@@ -74,7 +80,7 @@ const ReviewItem = ({ item }) => {
             numberOfLines={isExpanded ? undefined : 2}
             ellipsizeMode="tail"
           >
-            {item.comment}
+            {item.comment || item.content}
           </Text>
         </View>
         <Pressable onPress={() => setIsExpanded(!isExpanded)}>
@@ -97,10 +103,17 @@ const ReviewItem = ({ item }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.common.white,
+    // backgroundColor: 'red',
     width: '100%',
     paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[200],
+    position: 'relative',
+  },
+  editButton: {
+    position: 'absolute',
+    right: 0,
+    top: 10,
   },
   starRatingWrapper: {
     flexDirection: 'row',

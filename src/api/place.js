@@ -37,6 +37,7 @@ export const getPartnerships = async ({
   cursor = null,
   size = 5,
 }) => {
+  console.log('aaaaaaaa');
   try {
     const token = useAuthStore.getState().accessToken;
 
@@ -84,6 +85,8 @@ export const getMapMarkers = async (minLat, maxLat, minLng, maxLng) => {
   try {
     const token = useAuthStore.getState().accessToken;
 
+    console.log('bbbbbb');
+
     const response = await api.get('/places/partnership/map', {
       params: {
         minLat,
@@ -109,6 +112,8 @@ export const getMapMarkers = async (minLat, maxLat, minLng, maxLng) => {
 export const getPartnershipDetail = async (postId, lat, lng) => {
   try {
     const token = useAuthStore.getState().accessToken;
+
+    console.log('cccccccc');
 
     const response = await api.get('/places/partnership/detail', {
       params: {
@@ -158,6 +163,7 @@ export const getPlacesByKeyword = async (keyword) => {
 export const getPlacesSearch = async (keyword, lat, lng) => {
   try {
     const token = useAuthStore.getState().accessToken;
+    console.log('dddddd');
 
     const response = await api.get('/places/search', {
       params: {

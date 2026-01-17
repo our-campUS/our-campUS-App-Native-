@@ -5,8 +5,23 @@ import { REVIEW_DATA } from '../../constants/DummyData';
 import ReviewItem from '../../components/MyPage/ReviewItem';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
+import { getMyReviewList } from '../../api/review';
+import { useEffect, useState } from 'react';
 
 const WrittenReviewScreen = ({ navigation }) => {
+  const [reviewList, setReviewList] = useState([]);
+
+  useEffect(() => {
+    const fetchReviewList = async () => {
+      const response = await getMyReviewList();
+      setReviewList(response.data.data.content);
+    };
+    fetchReviewList();
+  }, []);
+
+  useEffect(() => {
+    console.log('reviewList', reviewList);
+  }, [reviewList]);
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
@@ -16,9 +31,9 @@ const WrittenReviewScreen = ({ navigation }) => {
       />
       <View style={styles.reviewListWrapper}>
         <FlatList
-          data={REVIEW_DATA}
-          renderItem={({ item }) => <ReviewItem item={item} />}
-          keyExtractor={(item) => item.id.toString()}
+          data={reviewList}
+          renderItem={({ item }) => <ReviewItem item={item} isMine={true} />}
+          keyExtractor={(item) => item.reviewId}
         />
       </View>
     </SafeAreaView>
