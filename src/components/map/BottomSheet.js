@@ -49,6 +49,10 @@ const BottomSheet = ({
     return () => sheetHeight.removeListener(id);
   }, []);
 
+  useEffect(() => {
+    console.log('displayedMarkers', displayedMarkers);
+  }, [displayedMarkers]);
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,

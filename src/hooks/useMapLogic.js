@@ -428,12 +428,15 @@ export const useMapLogic = (mapRef) => {
     let markers = [];
 
     if (selectedStoreDetail && selectedMarkerId) {
+      console.log('debug 1');
       markers = [selectedStoreDetail];
     } else if (searchKeyword || selectedCategory) {
+      console.log('debug 2');
       markers = partnerships;
     } else if (selectedMarkerId) {
       const found = mapMarkers.find((m) => m.placeId === selectedMarkerId);
       markers = found ? [found] : [];
+      console.log('markers', markers);
     }
 
     return Array.from(

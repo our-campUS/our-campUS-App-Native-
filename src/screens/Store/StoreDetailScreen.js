@@ -36,9 +36,7 @@ import CloseIcon from '../../../assets/icons/common/close.svg';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const StoreDetailScreen = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
+const StoreDetailScreen = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
@@ -102,7 +100,7 @@ const StoreDetailScreen = () => {
   return (
     <View style={styles.container}>
       <LabelTitle
-        title={storeData.name}
+        title={storeData?.name}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
         additionalStyle={styles.headerStyle}
@@ -114,10 +112,10 @@ const StoreDetailScreen = () => {
           contentContainerStyle={{ paddingBottom: 50 }}
         >
           <View style={styles.bannerContainer}>
-            {storeData.imgUrls && storeData.imgUrls.length > 0 ? (
+            {storeData?.imgUrls && storeData?.imgUrls.length > 0 ? (
               <View>
                 <FlatList
-                  data={storeData.imgUrls}
+                  data={storeData?.imgUrls}
                   horizontal
                   pagingEnabled
                   showsHorizontalScrollIndicator={false}
@@ -248,11 +246,15 @@ const StoreDetailScreen = () => {
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
                 <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
-                {storeData.reviewCount > 0 ? (
+                {storeData.reviewCount > 0 || storeData.reviewSize > 0 ? (
                   <>
                     <Text style={styles.detailText}>{storeData.rating}</Text>
                     <Text style={styles.detailTextSub}>
-                      ({storeData.reviewCount})
+                      (
+                      {storeData?.reviewCount ||
+                        storeData?.reviewSize ||
+                        route.params.store.reviewSize}
+                      )
                     </Text>
                   </>
                 ) : (
@@ -303,7 +305,10 @@ const StoreDetailScreen = () => {
               <Text style={styles.reviewTitle}>
                 리뷰{' '}
                 <Text style={styles.detailTextSub}>
-                  {storeData.reviewCount}개
+                  {storeData?.reviewCount ||
+                    storeData?.reviewSize ||
+                    route.params.store.reviewSize}
+                  개
                 </Text>
               </Text>
               <TouchableOpacity
