@@ -21,14 +21,13 @@ import Button from '../../components/Button';
 import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-import DUMMY_STORE from '../../constants/StoreData';
 import ReviewActionModal from '../../components/review/ReviewActionModal';
+import ReviewItemCompact from '../../components/review/ReviewPreviewItem';
 
 import StarIcon from '../../../assets/icons/common/star.svg';
 import PinIcon from '../../../assets/icons/common/pin.svg';
 import PhoneIcon from '../../../assets/icons/common/phone.svg';
 import ClockIcon from '../../../assets/icons/common/clock.svg';
-import RatingIcon from '../../../assets/icons/rating.svg';
 
 import LikedIcon from '../../../assets/Liked.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
@@ -430,38 +429,7 @@ const StoreDetailScreen = () => {
 
             {storeData.reviews && storeData.reviews.length > 0 ? (
               storeData.reviews.map((review) => (
-                <View key={review.id} style={styles.reviewItem}>
-                  <View style={styles.reviewTextWrapper}>
-                    <View style={styles.reviewRating}>
-                      {[...Array(5)].map((_, i) => (
-                        <RatingIcon
-                          key={i}
-                          width={16}
-                          height={16}
-                          color={
-                            i < review.star
-                              ? theme.colors.primary2
-                              : colors.gray[200]
-                          }
-                          style={{ marginRight: 1 }}
-                        />
-                      ))}
-                    </View>
-                    <Text style={styles.reviewContent}>{review.content}</Text>
-                    <View style={styles.reviewMeta}>
-                      <Text style={styles.reviewUser}>{review.writerName}</Text>
-                      <Text style={styles.reviewUser}>{review.createdAt}</Text>
-                    </View>
-                  </View>
-                  {review.thumbnailImgUrl ? (
-                    <Image
-                      source={{ uri: review.thumbnailImgUrl }}
-                      style={styles.reviewImagePlaceholder}
-                    />
-                  ) : (
-                    <View style={styles.reviewImagePlaceholder} />
-                  )}
-                </View>
+                <ReviewItemCompact key={review.id} item={review} />
               ))
             ) : (
               <View style={styles.emptyReviewContainer}>
