@@ -30,13 +30,15 @@ const RecommendSection = () => {
             name: item.placeName,
             category: '제휴 매장',
             discount: item.partnershipTitle,
-            tags: [item.councilName],
+            tag: [item.councilName],
             image: item.imageUrl ? { uri: item.imageUrl } : DEFAULT_STORE_IMAGE,
+            imgUrls: item.imageUrl,
             rating: 4.8,
             distance:
               calculateDistance(myLat, myLng, itemLat, itemLng) ||
               '거리 정보 없음',
             type: 'PARTNER',
+            isPartnership: true,
           };
         });
 
@@ -51,12 +53,13 @@ const RecommendSection = () => {
             name: item.placeName,
             category: item.category ? item.category.split('>').pop() : '기타',
             discount: '일반 매장',
-            tags: ['추천'],
+            tag: ['추천'],
             image: hasImages ? { uri: item.imgUrls[0] } : DEFAULT_STORE_IMAGE,
             imgUrls: item.imgUrls || [],
             rating: 4.0,
             distance: calculateDistance(myLat, myLng, itemLat, itemLng),
             type: 'DEFAULT',
+            isPartner: false,
           };
         });
 
@@ -82,7 +85,7 @@ const RecommendSection = () => {
         renderItem={({ item }) => (
           <StoreCard
             image={item.image}
-            tags={item.tags}
+            tags={item.tag}
             name={item.name}
             category={item.category}
             rating={item.rating}
