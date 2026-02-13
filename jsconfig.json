@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@screens/*": ["src/screens/*"],
+      "@api/*": ["src/api/*"],
+      "@style/*": ["src/style/*"],
+      "@constants/*": ["src/constants/*"],
+      "@assets/*": ["assets/*"]
+    },
+    "jsx": "react-native",
+    "target": "ES6",
+    "module": "commonjs"
+  },
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js"]
+}

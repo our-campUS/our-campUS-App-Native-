@@ -9,6 +9,21 @@ module.exports = {
         safe: false,
       },
     ],
+    [
+      'module-resolver',
+      {
+        root: ['./src'],
+        alias: {
+          '@': './src',
+          '@components': './src/components',
+          '@screens': './src/screens',
+          '@api': './src/api',
+          '@style': './src/style',
+          '@constants': './src/constants',
+          '@assets': './assets',
+        },
+      },
+    ],
     'react-native-reanimated/plugin',
   ],
 };
