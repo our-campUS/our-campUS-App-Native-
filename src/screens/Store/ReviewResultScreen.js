@@ -10,15 +10,14 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import StampImage from '../../../assets/images/stamp.png';
-import Button from '../../components/Button';
-import ReviewItemCompact from '../../components/review/ReviewPreviewItem';
-import DUMMY_STORE from '../../constants/StoreData';
+import StampImage from '@assets/images/stamp.png';
+import Button from '@components/Button';
+import ReviewItemCompact from '@components/review/ReviewPreviewItem';
 
-import theme from '../../style';
-import typography from '../../style/typography';
-import colors from '../../style/colors';
-import RankingIcon from '../../../assets/icons/trophy.svg';
+import theme from '@style';
+import typography from '@style/typography';
+import colors from '@style/colors';
+import RankingIcon from '@assets/icons/trophy.svg';
 
 const RECOMMEND_STORES = [
   {
@@ -35,8 +34,6 @@ const RECOMMEND_STORES = [
   },
   { id: 3, name: '투썸플레이스', benefit: '첫방문 10% 할인', dist: '0.2km' },
 ];
-
-const storeData = DUMMY_STORE;
 
 const ReviewResultScreen = () => {
   const navigation = useNavigation();

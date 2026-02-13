@@ -14,26 +14,26 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { togglePlaceLike, getPlaceStatus } from '../../api/place';
+import { togglePlaceLike, getPlaceStatus } from '@api/place';
 
-import LabelTitle from '../../components/LabelTitle';
-import Button from '../../components/Button';
-import theme from '../../style';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import ReviewActionModal from '../../components/review/ReviewActionModal';
-import ReviewItemCompact from '../../components/review/ReviewPreviewItem';
+import LabelTitle from '@components/LabelTitle';
+import Button from '@components/Button';
+import theme from '@style';
+import colors from '@style/colors';
+import typography from '@style/typography';
+import ReviewActionModal from '@components/review/ReviewActionModal';
+import ReviewItemCompact from '@components/review/ReviewPreviewItem';
 
-import StarIcon from '../../../assets/icons/common/star.svg';
-import PinIcon from '../../../assets/icons/common/pin.svg';
-import PhoneIcon from '../../../assets/icons/common/phone.svg';
-import ClockIcon from '../../../assets/icons/common/clock.svg';
+import StarIcon from '@assets/icons/common/star.svg';
+import PinIcon from '@assets/icons/common/pin.svg';
+import PhoneIcon from '@assets/icons/common/phone.svg';
+import ClockIcon from '@assets/icons/common/clock.svg';
 
-import LikedIcon from '../../../assets/Liked.svg';
-import UnlikedIcon from '../../../assets/Unliked.svg';
-import ShareIcon from '../../../assets/share.svg';
-import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
-import CloseIcon from '../../../assets/icons/common/close.svg';
+import LikedIcon from '@assets/Liked.svg';
+import UnlikedIcon from '@assets/Unliked.svg';
+import ShareIcon from '@assets/share.svg';
+import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
+import CloseIcon from '@assets/icons/common/close.svg';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 

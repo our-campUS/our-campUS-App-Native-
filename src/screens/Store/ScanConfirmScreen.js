@@ -8,13 +8,13 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-import LabelTitle from '../../components/LabelTitle';
-import StoreListItem from '../../components/common/StoreListItem';
-import theme from '../../style';
-import typography from '../../style/typography';
-import colors from '../../style/colors';
-import DUMMY_STORE from '../../constants/StoreData';
-import ReviewItemCompact from '../../components/review/ReviewPreviewItem';
+import LabelTitle from '@components/LabelTitle';
+import StoreListItem from '@components/common/StoreListItem';
+import theme from '@style';
+import typography from '@style/typography';
+import colors from '@style/colors';
+import DUMMY_STORE from '@constants/StoreData';
+import ReviewItemCompact from '@components/review/ReviewPreviewItem';
 
 const ScanConfirmScreen = () => {
   const navigation = useNavigation();
