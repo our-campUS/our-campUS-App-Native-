@@ -206,6 +206,7 @@ const MapScreen = () => {
         sheetHeightAnimated={sheetHeightAnimated}
         onEndReached={() => fetchPartnershipList(true)}
         isLoading={loading}
+        onUpdateStore={actions.updatePlaceState}
       />
     </View>
   );

@@ -12,7 +12,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import LabelTitle from '../../components/LabelTitle';
-import ReviewItem from '../../components/MyPage/ReviewItem';
+import ReviewItem from '../../components/review/ReviewItem';
 import ReviewActionModal from '../../components/review/ReviewActionModal';
 import theme from '../../style';
 import colors from '../../style/colors';

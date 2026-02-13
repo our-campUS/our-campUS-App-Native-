@@ -10,13 +10,14 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import StampImage from '../../../assets/images/stamp.png';
-import Button from '../../components/Button';
+import StampImage from '@assets/images/stamp.png';
+import Button from '@components/Button';
+import ReviewItemCompact from '@components/review/ReviewPreviewItem';
 
-import theme from '../../style';
-import typography from '../../style/typography';
-import colors from '../../style/colors';
-import RankingIcon from '../../../assets/icons/trophy.svg';
+import theme from '@style';
+import typography from '@style/typography';
+import colors from '@style/colors';
+import RankingIcon from '@assets/icons/trophy.svg';
 
 const RECOMMEND_STORES = [
   {
@@ -89,6 +90,18 @@ const ReviewResultScreen = () => {
   const renderReviewCard = () => {
     const showHeader = caseType === 3 || caseType === 4;
 
+    // ReviewItem에 전달할 데이터 포맷
+    const reviewItemData = {
+      star: 5,
+      comment: '떡볶이 정말 양 많아요. 아 근데 스벅이네...',
+      name: '최서*',
+      date: '25.02.14',
+      imageUrls: [
+        'https://via.placeholder.com/138x138?text=Cafe+Photo+1',
+        'https://via.placeholder.com/138x138?text=Cafe+Photo+2',
+      ],
+    };
+
     return (
       <View style={styles.reviewSection}>
         <View style={{ alignItems: 'center', marginBottom: 20 }}>
@@ -100,23 +113,7 @@ const ReviewResultScreen = () => {
           </Text>
         </View>
 
-        {/* [TODO] Review item 컴포넌트화 후 적용 */}
-        <View style={styles.cardContainer}>
-          <View style={styles.starRow}>
-            {[...Array(5)].map((_, i) => (
-              <Ionicons key={i} name="star" size={16} color="#FF9805" />
-            ))}
-          </View>
-          <View style={styles.cardContentRow}>
-            <View style={{ flex: 1, marginRight: 10 }}>
-              <Text style={styles.reviewText} numberOfLines={2}>
-                떡볶이 정말 양 많아요. 아 근데 스벅이네...
-              </Text>
-              <Text style={styles.reviewMeta}>최서* 21.10.10</Text>
-            </View>
-            <View style={styles.reviewImage} />
-          </View>
-        </View>
+        <ReviewItemCompact item={reviewItemData} variant="card" />
 
         <View style={styles.rankingContainer}>
           <View style={styles.rankingHeader}>

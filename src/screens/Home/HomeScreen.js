@@ -19,6 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
 import { useNavigation } from '@react-navigation/native';
+import { getTodayEvent } from '../../api/studentAffiliate';
 
 const HomeSection = ({
   title,
@@ -48,6 +49,23 @@ const HomeScreen = () => {
 
   const user = useAuthStore((state) => state.user);
   const navigation = useNavigation();
+  const [todayEvent, setTodayEvent] = useState(null);
+  const { accessToken } = useAuthStore();
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (!accessToken) return;
+
+      const response = await getTodayEvent(accessToken);
+      if (response?.code === 0 && response?.data) {
+        setTodayEvent(response.data);
+      } else {
+        setTodayEvent(null);
+      }
+    };
+
+    fetchEvent();
+  }, [accessToken]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,6 +75,18 @@ const HomeScreen = () => {
 
     fetchData();
   }, []);
+
+  const formatTime = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    if (minutes === 0) {
+      return `${hours}시`;
+    }
+    return `${hours}시 ${minutes}분`;
+  };
 
   if (!user) {
     return (
@@ -90,16 +120,25 @@ const HomeScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.eventBox}>
-              <Text
-                style={styles.eventText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                <Text style={styles.boldText}>오늘의 행사</Text> 310관 1층
-                ‘경영경제대학 간식행사’가 18시에 있습니다 🎉
-              </Text>
-            </TouchableOpacity>
+            {todayEvent ? (
+              <TouchableOpacity style={styles.eventBox}>
+                <Text
+                  style={styles.eventText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  <Text style={styles.boldText}>오늘의 행사</Text>
+                  {todayEvent.placeName} ‘{todayEvent.title}’가{' '}
+                  {formatTime(todayEvent.startDateTime)}에 있습니다 🎉
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={[styles.eventBox, { backgroundColor: '#F5F5F5' }]}>
+                <Text style={[styles.eventText, { color: '#999' }]}>
+                  오늘은 예정된 행사가 없습니다 😴
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* 캐러셀 */}

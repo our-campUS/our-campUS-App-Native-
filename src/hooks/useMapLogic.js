@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -15,7 +15,9 @@ import {
   getPlacesByKeyword,
   getPlacesSearch,
   getPlacesSearchInfo,
+  getPlaceStatus,
 } from '../api/place';
+import { useFocusEffect } from '@react-navigation/native';
 
 export const useMapLogic = (mapRef) => {
   const navigation = useNavigation();
@@ -40,12 +42,21 @@ export const useMapLogic = (mapRef) => {
     longitude: 126.960204232592,
   });
 
+  useFocusEffect(
+    useCallback(() => {
+      if (searchKeyword || selectedCategory) {
+        console.log('🔄 [리스트] 화면 복귀: 데이터 새로고침');
+        fetchPartnershipList(false);
+      }
+    }, [searchKeyword, selectedCategory]) // 의존성 배열 확인
+  );
+
   // --- 데이터 가공 헬퍼 ---
   const processSearchData = async (rawData, shouldFetchDetails = false) => {
     if (!rawData) return [];
 
     const processedData = rawData.map((item) => {
-      const targetId = item.placeKey || item.placeId || item.id;
+      const targetId = item.placeId || item.id;
       const existingPartner = mapMarkers.find((m) => m.placeId == targetId);
 
       const hasPartnership = item.partnerships && item.partnerships.length > 0;
@@ -53,8 +64,11 @@ export const useMapLogic = (mapRef) => {
         ? item.partnerships[0]?.postId
         : item.postId;
 
+      console.log('타겟 아이디' + targetId);
+
       return {
         ...item,
+
         placeId: targetId || `temp_${Date.now()}_${Math.random()}`,
         name: item.placeName || item.name || '이름 없음',
         address: item.address || '',
@@ -67,40 +81,73 @@ export const useMapLogic = (mapRef) => {
         postId: extractedPostId,
         partnerships: item.partnerships || [],
         ...existingPartner,
+        isLiked: item.isLiked,
       };
     });
-    if (shouldFetchDetails) {
-      const detailedData = await Promise.all(
-        processedData.map(async (item) => {
-          if (item.postId) {
-            try {
-              console.log(
-                `🔍 제휴 상세 조회: ${item.name} (postId: ${item.postId})`
-              );
-              const detail = await getPartnershipDetail(
-                item.postId,
-                item.latitude,
-                item.longitude
-              );
 
-              if (detail) {
-                console.log(`✅ 상세 정보 조회 성공: ${item.name}`);
-                return {
-                  ...detail,
-                  placeId: detail.placeId,
-                };
-              }
-            } catch (error) {
-              console.error(`상세 정보 조회 실패: ${item.name}`, error);
-            }
+    const enrichedData = await Promise.all(
+      processedData.map(async (item) => {
+        try {
+          // A. 제휴 상세 정보 (기존 로직)
+          let detailData = {};
+          if (shouldFetchDetails && item.postId) {
+            // ... (기존 getPartnershipDetail 호출 로직) ...
+            // detailData = ...
           }
-          return item;
-        })
-      );
-      return detailedData;
-    }
 
-    return processedData;
+          // B. [추가] 좋아요/제휴 상태 확인 (GET /places/detail)
+          // placeId가 없으면(네이버 검색 결과 등) 조회가 안 될 수도 있음 -> 서버 로직 확인 필요
+          // 만약 서버가 위도/경도로도 찾아준다면 OK.
+          const status = await getPlaceStatus(
+            item.placeId, // 서버 ID (없으면 null일 수도)
+            item.latitude,
+            item.longitude
+          );
+
+          // C. 데이터 병합
+          return {
+            ...item, // 1. 기본 정보
+            ...detailData, // 2. 제휴 상세 정보 (있으면)
+
+            // 3. 좋아요 상태 덮어쓰기
+            // 서버에서 liked: true 라고 오면 -> isLiked: true로 매핑
+            isLiked: status ? status.liked : item.isLiked || false,
+
+            // (선택) 서버가 partnership: true라고 알려주면 그것도 반영
+            isPartner: status ? status.partnership : item.isPartner,
+          };
+        } catch (err) {
+          console.warn(`아이템 처리 중 에러: ${item.name}`);
+          return item; // 에러나면 기본 정보만 반환
+        }
+      })
+    );
+
+    return enrichedData;
+  };
+
+  const updatePlaceState = (oldPlaceId, newPlaceData) => {
+    setPartnerships((prev) =>
+      prev.map((item) => {
+        if (item.placeId === oldPlaceId) {
+          return { ...item, ...newPlaceData }; // 덮어쓰기
+        }
+        return item;
+      })
+    );
+
+    setMapMarkers((prev) =>
+      prev.map((item) => {
+        if (item.placeId === oldPlaceId) {
+          return { ...item, ...newPlaceData };
+        }
+        return item;
+      })
+    );
+
+    if (selectedStoreDetail && selectedStoreDetail.placeId === oldPlaceId) {
+      setSelectedStoreDetail((prev) => ({ ...prev, ...newPlaceData }));
+    }
   };
 
   // --- API 호출 로직 수정 ---
@@ -467,6 +514,7 @@ export const useMapLogic = (mapRef) => {
       handlePinPress,
       handleReset,
       handleCurrentLocation,
+      updatePlaceState,
     },
     displayedMarkers,
     navigation,

@@ -1,3 +1,4 @@
+import React, { useState, memo } from 'react';
 import {
   View,
   Text,
@@ -7,15 +8,26 @@ import {
   Image,
 } from 'react-native';
 import RatingIcon from '../../../assets/icons/rating.svg';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
 import ArrowDownIcon from '../../../assets/ArrowDown.svg';
 import ArrowUpIcon from '../../../assets/ArrowUp.svg';
-import { useState } from 'react';
+
+import colors from '../../style/colors';
+import typography from '../../style/typography';
 import theme from '../../style';
 
-const ReviewItem = ({ item }) => {
+const ReviewItem = ({ item, variant = 'list' }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  if (!item) return null;
+
+  // ⭐ API 데이터 안전 변환
+  const review = {
+    star: item.star || 0,
+    imageUrls: item.imageUrls || [],
+    comment: item.comment || item.content || '',
+    name: item.name || item.userName || item.place || '',
+    date: item.date || item.createDate || '',
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -29,7 +41,7 @@ const ReviewItem = ({ item }) => {
         width={12}
         height={12}
         color={
-          index < Math.floor(item.star)
+          index < Math.floor(review.star)
             ? theme.colors.primary2
             : colors.gray[200]
         }
@@ -38,27 +50,31 @@ const ReviewItem = ({ item }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.baseContainer,
+        variant === 'list' && styles.listContainer,
+        variant === 'card' && styles.cardContainer,
+      ]}
+    >
+      {/* ⭐ 별점 */}
       <View style={styles.starRatingWrapper}>{renderStars()}</View>
 
-      {item.imageUrls && item.imageUrls.length > 0 && (
+      {/* ⭐ 이미지 */}
+      {review.imageUrls.length > 0 && (
         <ScrollView
-          horizontal={true}
+          horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.imageScrollWrapper}
           contentContainerStyle={styles.imageScrollContainer}
-          scrollEnabled={true}
-          nestedScrollEnabled={true}
         >
-          {item.imageUrls.map((imgUrl, index, arr) => (
+          {review.imageUrls.map((imgUrl, index, arr) => (
             <Image
               key={index}
               source={{ uri: imgUrl }}
               style={[
                 styles.imageItem,
-                {
-                  marginRight: index === arr.length - 1 ? 0 : 8,
-                },
+                { marginRight: index === arr.length - 1 ? 0 : 8 },
               ]}
               resizeMode="cover"
             />
@@ -66,7 +82,7 @@ const ReviewItem = ({ item }) => {
         </ScrollView>
       )}
 
-      {/* ✅ 댓글 텍스트 */}
+      {/* ⭐ 댓글 */}
       <View style={styles.commentTextWrapper}>
         <View style={styles.commentTextContainer}>
           <Text
@@ -74,9 +90,10 @@ const ReviewItem = ({ item }) => {
             numberOfLines={isExpanded ? undefined : 2}
             ellipsizeMode="tail"
           >
-            {item.comment}
+            {review.comment}
           </Text>
         </View>
+
         <Pressable onPress={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? (
             <ArrowUpIcon width={24} height={24} />
@@ -86,67 +103,89 @@ const ReviewItem = ({ item }) => {
         </Pressable>
       </View>
 
+      {/* ⭐ 장소 / 날짜 */}
       <View style={styles.placeAndDateWrapper}>
-        <Text style={styles.placeText}>{item.name || item.place}</Text>
-        <Text style={styles.dateText}>{formatDate(item.date)}</Text>
+        <Text style={styles.placeText}>{review.name}</Text>
+        <Text style={styles.dateText}>{formatDate(review.date)}</Text>
       </View>
     </View>
   );
 };
 
+export default memo(ReviewItem);
+
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.common.white,
+  baseContainer: {
     width: '100%',
+  },
+
+  listContainer: {
+    backgroundColor: colors.common.white,
     paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[200],
   },
+
+  cardContainer: {
+    backgroundColor: colors.common.white,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    ...theme.shadows.level1,
+  },
+
   starRatingWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
     marginBottom: 12,
   },
+
   imageScrollWrapper: {
     marginBottom: 12,
   },
+
   imageScrollContainer: {
     paddingRight: 20,
   },
+
   imageItem: {
     width: 138,
     height: 138,
     borderRadius: 8,
   },
-  commentTextContainer: {
-    flexShrink: 1,
-    minWidth: 0,
-    marginRight: 8,
-  },
-  commentText: {
-    ...typography.body3Regular,
-    color: colors.gray[850],
-  },
+
   commentTextWrapper: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
   },
+
+  commentTextContainer: {
+    flexShrink: 1,
+    minWidth: 0,
+    marginRight: 8,
+  },
+
+  commentText: {
+    ...typography.body3Regular,
+    color: colors.gray[850],
+  },
+
   placeAndDateWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     marginTop: 12,
   },
+
   placeText: {
     ...typography.caption1Regular,
     color: colors.gray[400],
   },
+
   dateText: {
     ...typography.caption1Regular,
     color: colors.gray[400],
   },
 });
-
-export default ReviewItem;

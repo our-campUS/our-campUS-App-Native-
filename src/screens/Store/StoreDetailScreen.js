@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -13,26 +14,26 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { togglePlaceLike, getPlaceStatus } from '@api/place';
 
-import LabelTitle from '../../components/LabelTitle';
-import Button from '../../components/Button';
-import theme from '../../style';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import DUMMY_STORE from '../../constants/StoreData';
-import ReviewActionModal from '../../components/review/ReviewActionModal';
+import LabelTitle from '@components/LabelTitle';
+import Button from '@components/Button';
+import theme from '@style';
+import colors from '@style/colors';
+import typography from '@style/typography';
+import ReviewActionModal from '@components/review/ReviewActionModal';
+import ReviewItemCompact from '@components/review/ReviewPreviewItem';
 
-import StarIcon from '../../../assets/icons/common/star.svg';
-import PinIcon from '../../../assets/icons/common/pin.svg';
-import PhoneIcon from '../../../assets/icons/common/phone.svg';
-import ClockIcon from '../../../assets/icons/common/clock.svg';
-import RatingIcon from '../../../assets/icons/rating.svg';
+import StarIcon from '@assets/icons/common/star.svg';
+import PinIcon from '@assets/icons/common/pin.svg';
+import PhoneIcon from '@assets/icons/common/phone.svg';
+import ClockIcon from '@assets/icons/common/clock.svg';
 
-import LikedIcon from '../../../assets/Liked.svg';
-import UnlikedIcon from '../../../assets/Unliked.svg';
-import ShareIcon from '../../../assets/share.svg';
-import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
-import CloseIcon from '../../../assets/icons/common/close.svg';
+import LikedIcon from '@assets/Liked.svg';
+import UnlikedIcon from '@assets/Unliked.svg';
+import ShareIcon from '@assets/share.svg';
+import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
+import CloseIcon from '@assets/icons/common/close.svg';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -41,6 +42,7 @@ const StoreDetailScreen = () => {
   const route = useRoute();
   const [modalVisible, setModalVisible] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(true);
+  const onUpdatePlace = route.params?.onUpdatePlace;
 
   const paramStore = route.params?.store || {};
 
@@ -78,6 +80,9 @@ const StoreDetailScreen = () => {
 
     isPartner: paramStore.isPartnership,
     partnerTags: paramStore.tag ? [paramStore.tag] : [],
+
+    placeId: paramStore.placeId || null,
+    placeKey: paramStore.placeKey || paramStore.id,
   };
 
   console.log('================= [StoreDetailScreen Debug] =================');
@@ -90,14 +95,112 @@ const StoreDetailScreen = () => {
   console.log('=============================================================');
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
+  const [currentPlaceId, setCurrentPlaceId] = useState(storeData.placeId);
+
+  const handleLikePress = async () => {
+    const previousState = isLiked;
+    const newLikedState = !isLiked; // 바뀔 상태 미리 계산
+    setIsLiked(newLikedState); // 1. 낙관적 업데이트
+
+    try {
+      const requestBody = {
+        ...storeData,
+        placeId: currentPlaceId,
+      };
+
+      const response = await togglePlaceLike(requestBody);
+      const newPlaceId = response?.data?.placeId || response?.placeId;
+
+      if (!currentPlaceId && newPlaceId) {
+        console.log(`🎉 새 장소 등록됨! ID: ${newPlaceId}`);
+        setCurrentPlaceId(newPlaceId);
+      }
+
+      if (onUpdatePlace) {
+        const targetId = currentPlaceId || newPlaceId || storeData.placeKey;
+
+        onUpdatePlace(targetId, {
+          isLiked: newLikedState,
+          placeId: newPlaceId || currentPlaceId,
+        });
+      }
+    } catch (error) {
+      console.error('좋아요 실패:', error);
+      setIsLiked(previousState);
+      if (onUpdatePlace) {
+        const targetId = currentPlaceId || storeData.placeKey;
+        onUpdatePlace(targetId, { isLiked: previousState });
+      }
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true; // 언마운트 시 상태 업데이트 방지
+
+      const fetchLatestStatus = async () => {
+        try {
+          const checkId = currentPlaceId || storeData.placeId;
+          // ID가 없으면 조회 불가 (또는 위도경도로 조회)
+          const status = await getPlaceStatus(
+            checkId,
+            storeData.latitude,
+            storeData.longitude
+          );
+
+          if (isActive && status) {
+            console.log('🔄 [상세] 최신 상태 동기화:', status.liked);
+            setIsLiked(status.liked); // ★ 여기서 서버 데이터로 덮어씌움!
+
+            if (status.placeId && !currentPlaceId) {
+              setCurrentPlaceId(status.placeId);
+            }
+          }
+        } catch (error) {
+          console.error('상태 조회 실패');
+        }
+      };
+
+      fetchLatestStatus();
+
+      return () => {
+        isActive = false;
+      };
+    }, [currentPlaceId]) // 의존성 배열
+  );
+
+  useEffect(() => {
+    const fetchLatestStatus = async () => {
+      try {
+        const status = await getPlaceStatus(
+          currentPlaceId || storeData.placeId,
+          storeData.latitude,
+          storeData.longitude
+        );
+
+        if (status) {
+          console.log('🔄 최신 상태 동기화:', status.liked);
+
+          setIsLiked(status.liked);
+
+          if (status.placeId && !currentPlaceId) {
+            setCurrentPlaceId(status.placeId);
+          }
+        }
+      } catch (error) {
+        console.error('최신 상태 확인 실패');
+      }
+    };
+
+    fetchLatestStatus();
+  }, []);
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       setActiveImageIndex(viewableItems[0].index);
     }
   }).current;
-
-  const [isLiked, setIsLiked] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -158,10 +261,7 @@ const StoreDetailScreen = () => {
               </View>
 
               <View style={styles.actionButtons}>
-                <TouchableOpacity
-                  onPress={() => setIsLiked(!isLiked)}
-                  activeOpacity={0.7}
-                >
+                <TouchableOpacity onPress={handleLikePress} activeOpacity={0.7}>
                   <View
                     style={[
                       styles.iconCircleButton,
@@ -312,7 +412,7 @@ const StoreDetailScreen = () => {
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
                     star: storeData.star,
-                    placeId: storeData.placeId,
+                    placeId: currentPlaceId,
                     reviewSize: storeData.reviewSize,
                   })
                 }
@@ -329,38 +429,7 @@ const StoreDetailScreen = () => {
 
             {storeData.reviews && storeData.reviews.length > 0 ? (
               storeData.reviews.map((review) => (
-                <View key={review.id} style={styles.reviewItem}>
-                  <View style={styles.reviewTextWrapper}>
-                    <View style={styles.reviewRating}>
-                      {[...Array(5)].map((_, i) => (
-                        <RatingIcon
-                          key={i}
-                          width={16}
-                          height={16}
-                          color={
-                            i < review.star
-                              ? theme.colors.primary2
-                              : colors.gray[200]
-                          }
-                          style={{ marginRight: 1 }}
-                        />
-                      ))}
-                    </View>
-                    <Text style={styles.reviewContent}>{review.content}</Text>
-                    <View style={styles.reviewMeta}>
-                      <Text style={styles.reviewUser}>{review.writerName}</Text>
-                      <Text style={styles.reviewUser}>{review.createdAt}</Text>
-                    </View>
-                  </View>
-                  {review.thumbnailImgUrl ? (
-                    <Image
-                      source={{ uri: review.thumbnailImgUrl }}
-                      style={styles.reviewImagePlaceholder}
-                    />
-                  ) : (
-                    <View style={styles.reviewImagePlaceholder} />
-                  )}
-                </View>
+                <ReviewItemCompact key={review.id} item={review} />
               ))
             ) : (
               <View style={styles.emptyReviewContainer}>
@@ -384,6 +453,7 @@ const StoreDetailScreen = () => {
               } else {
                 navigation.navigate('WriteReviewScreen', {
                   placeId: storeData.placeId,
+                  placeKey: storeData.placeKey,
                   storeName: storeData.name,
                   rating: storeData.star,
                 });

@@ -5,18 +5,16 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
-  Image,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import LabelTitle from '../../components/LabelTitle';
-import StoreListItem from '../../components/common/StoreListItem';
-import theme from '../../style';
-import typography from '../../style/typography';
-import colors from '../../style/colors';
-import DUMMY_STORE from '../../constants/StoreData';
+import LabelTitle from '@components/LabelTitle';
+import StoreListItem from '@components/common/StoreListItem';
+import theme from '@style';
+import typography from '@style/typography';
+import colors from '@style/colors';
+import DUMMY_STORE from '@constants/StoreData';
+import ReviewItemCompact from '@components/review/ReviewPreviewItem';
 
 const ScanConfirmScreen = () => {
   const navigation = useNavigation();
@@ -65,59 +63,46 @@ const ScanConfirmScreen = () => {
     </View>
   );
 
-  const renderDuplicateView = () => (
-    <View style={styles.contentContainer}>
-      <Text style={styles.yearText}>2021년 10월 10일</Text>
+  const renderDuplicateView = () => {
+    // ReviewItem에 전달할 데이터 포맷
+    const reviewItemData = {
+      star: 5,
+      comment: '떡볶이 정말 양 많아요. 아 근데 스벅이네...',
+      name: '최서*',
+      date: '21.10.10',
+      imageUrls: ['https://via.placeholder.com/138x138?text=Cafe+Photo'],
+    };
 
-      <Text style={styles.duplicateTitle}>
-        이미 리뷰가 작성된{'\n'}영수증이에요!
-      </Text>
+    return (
+      <View style={styles.contentContainer}>
+        <Text style={styles.yearText}>2021년 10월 10일</Text>
 
-      {/* [TODO] ReviewListScreen 컴포넌트화 후 적용 필요 */}
-      <View style={styles.reviewPreview}>
-        <View style={styles.starRow}>
-          {[...Array(5)].map((_, i) => (
-            <Ionicons
-              key={i}
-              name="star"
-              size={14}
-              color={theme.colors.primary2}
-            />
-          ))}
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{ flex: 1, marginRight: 10 }}>
-            <Text style={styles.reviewContent} numberOfLines={2}>
-              떡볶이 정말 양 많아요. 아 근데 스벅이네...
-            </Text>
-            <Text style={styles.reviewMeta}>
-              {storeData.name}{' '}
-              <Text style={{ color: colors.gray[300] }}>|</Text> 21.10.10
-            </Text>
-          </View>
-          <View style={styles.reviewImagePlaceholder} />
+        <Text style={styles.duplicateTitle}>
+          이미 리뷰가 작성된{'\n'}영수증이에요!
+        </Text>
+
+        <ReviewItemCompact item={reviewItemData} />
+
+        <View style={styles.spacer} />
+
+        <View style={styles.bottomButtons}>
+          <TouchableOpacity
+            style={[styles.fullButton, styles.buttonBlue]}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.buttonTextWhite}>다른 영수증 촬영하기</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.textButton}
+            onPress={() => navigation.popToTop()}
+          >
+            <Text style={styles.textButtonLabel}>다음에 하기</Text>
+          </TouchableOpacity>
         </View>
       </View>
-
-      <View style={styles.spacer} />
-
-      <View style={styles.bottomButtons}>
-        <TouchableOpacity
-          style={[styles.fullButton, styles.buttonBlue]}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.buttonTextWhite}>다른 영수증 촬영하기</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.textButton}
-          onPress={() => navigation.popToTop()}
-        >
-          <Text style={styles.textButtonLabel}>다음에 하기</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
