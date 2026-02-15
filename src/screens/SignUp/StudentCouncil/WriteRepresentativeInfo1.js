@@ -21,9 +21,12 @@ import { Image } from 'react-native';
 import MajorInputModal from '../../../components/majorInputModal';
 import CollegeInputModal from '../../../components/CollegeInputModal';
 import { searchUniversity } from '../../../api/signUp';
-import { searchMajor } from '../../../api/signUp';
-import { searchCollege } from '../../../api/signUp';
-import UniversityInputModal from '../../../components/UniversityInputModal';
+// TODO: 학교 선택 기능 재오픈 시 주석 해제
+// import { searchMajor } from '../../../api/signUp';
+// import { searchCollege } from '../../../api/signUp';
+// import UniversityInputModal from '../../../components/UniversityInputModal';
+
+const FIXED_UNIVERSITY_NAME = '중앙대학교 서울캠퍼스';
 
 const WriteRepresentativeInfo1 = ({ navigation, route }) => {
   const email = route.params?.email;
@@ -37,27 +40,44 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
     useState(false);
   const [isCollegeInputModalVisible, setIsCollegeInputModalVisible] =
     useState(false);
-  const [isUniversityInputModalVisible, setIsUniversityInputModalVisible] =
-    useState(false);
-  const [major, setMajor] = useState(null); // 학과
-  const [majorId, setMajorId] = useState(null); // 학과 ID
-  const [college, setCollege] = useState(null); // 단과대학
-  const [collegeId, setCollegeId] = useState(null); // 단과대학 ID
-  const [university, setUniversity] = useState(null); // 학교명
-  const [universityId, setUniversityId] = useState(null); // 학교 ID
-  const [finalData, setFinalData] = useState(null); // 최종 데이터
+  // TODO: 학교 선택 기능 재오픈 시 주석 해제
+  // const [isUniversityInputModalVisible, setIsUniversityInputModalVisible] =
+  //   useState(false);
+  const [major, setMajor] = useState(null);
+  const [majorId, setMajorId] = useState(null);
+  const [college, setCollege] = useState(null);
+  const [collegeId, setCollegeId] = useState(null);
+  // TODO: 학교 선택 기능 재오픈 시 주석 해제 후 고정값 제거
+  // const [university, setUniversity] = useState(null);
+  const [universityId, setUniversityId] = useState(null);
+  const [finalData, setFinalData] = useState(null);
+
+  // 마운트 시 중앙대학교 schoolId 자동 조회
+  useEffect(() => {
+    const fetchUniversityId = async () => {
+      try {
+        const result = await searchUniversity('중앙대학교');
+        if (result && result.length > 0) {
+          setUniversityId(result[0].schoolId);
+        }
+      } catch (error) {
+        console.error('학교 ID 조회 실패:', error);
+      }
+    };
+    fetchUniversityId();
+  }, []);
 
   useEffect(() => {
-    if (selectedValue == 'total' && university) {
+    if (selectedValue == 'total' && universityId) {
       setIsButtonDisabled(false);
-    } else if (selectedValue == 'college' && college && university) {
+    } else if (selectedValue == 'college' && college && universityId) {
       setIsButtonDisabled(false);
-    } else if (selectedValue == 'major' && major && college && university) {
+    } else if (selectedValue == 'major' && major && universityId) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
-  }, [selectedValue, major, college, university]);
+  }, [selectedValue, major, college, universityId]);
 
   const handleNextButtonPress = () => {
     let councilType = '';
@@ -97,7 +117,7 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
       >
         <StatusBar style="auto" />
         <LabelTitle
-          title="회원가입"
+          title="학교/학과 선택"
           useBackButton={true}
           onPressBack={() => navigation?.goBack()}
           navigation={navigation}
@@ -123,12 +143,14 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
                 title="학교"
                 placeholder="학교 이름을 입력해주세요"
                 useTitle={true}
-                useMagnifyingGlass={true}
-                usePopUPModal={true}
-                value={university || ''}
-                onPressPopUPModal={() => {
-                  setIsUniversityInputModalVisible(true);
-                }}
+                value={FIXED_UNIVERSITY_NAME}
+                onlyRead={true}
+                // TODO: 학교 선택 기능 재오픈 시 아래 주석 해제 + onlyRead 제거 + value={university}
+                // useMagnifyingGlass={true}
+                // usePopUPModal={true}
+                // onPressPopUPModal={() => {
+                //   setIsUniversityInputModalVisible(true);
+                // }}
               />
               <Text style={styles.toggleTitle}>소속 단위</Text>
               <View style={styles.toggleContainer}>
@@ -178,7 +200,7 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
                       <UnselectedRadioButton width={18} height={18} />
                     )}
                   </Pressable>
-                  <Text style={styles.toggleItemText}>단과대학 총학생회</Text>
+                  <Text style={styles.toggleItemText}>단과대학 학생회</Text>
                 </View>
                 <View style={styles.toggleItem}>
                   <Pressable
@@ -292,7 +314,8 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
           }}
         />
       )}
-      {isUniversityInputModalVisible && (
+      {/* TODO: 학교 선택 기능 재오픈 시 주석 해제 */}
+      {/* {isUniversityInputModalVisible && (
         <UniversityInputModal
           isOrange={true}
           onClose={() => setIsUniversityInputModalVisible(false)}
@@ -302,7 +325,7 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
             setIsUniversityInputModalVisible(false);
           }}
         />
-      )}
+      )} */}
     </SafeAreaView>
   );
 };

@@ -8,22 +8,41 @@ import typography from '../../../style/typography';
 import { useState, useEffect } from 'react';
 import MajorInputModal from '../../../components/majorInputModal';
 import Button from '../../../components/Button';
-import UniversityInputModal from '../../../components/UniversityInputModal';
-import { searchCollege } from '../../../api/signUp';
-import { sendUserProfile } from '../../../api/signUp';
+// TODO: 학교 선택 기능 재오픈 시 주석 해제
+// import UniversityInputModal from '../../../components/UniversityInputModal';
+import { searchUniversity, sendUserProfile } from '../../../api/signUp';
+
+const FIXED_UNIVERSITY_NAME = '중앙대학교 서울캠퍼스';
 
 const SignUpFirstScreen = ({ navigation, route }) => {
   const [isMajorInputModalVisible, setIsMajorInputModalVisible] =
     useState(false);
-  const [isUniversityInputModalVisible, setIsUniversityInputModalVisible] =
-    useState(false);
+  // TODO: 학교 선택 기능 재오픈 시 주석 해제
+  // const [isUniversityInputModalVisible, setIsUniversityInputModalVisible] =
+  //   useState(false);
   const [major, setMajor] = useState(null);
   const [majorId, setMajorId] = useState(null);
-  const [university, setUniversity] = useState(null);
+  // TODO: 학교 선택 기능 재오픈 시 주석 해제 후 고정값 제거
+  // const [university, setUniversity] = useState(null);
   const [universityId, setUniversityId] = useState(null);
   const [department, setDepartment] = useState(null);
-  const [departmentId, setDepartmentId] = useState(null);
+  // const [departmentId, setDepartmentId] = useState(null);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  // 마운트 시 중앙대학교 schoolId 자동 조회
+  useEffect(() => {
+    const fetchUniversityId = async () => {
+      try {
+        const result = await searchUniversity('중앙대학교');
+        if (result && result.length > 0) {
+          setUniversityId(result[0].schoolId);
+        }
+      } catch (error) {
+        console.error('학교 ID 조회 실패:', error);
+      }
+    };
+    fetchUniversityId();
+  }, []);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -45,21 +64,13 @@ const SignUpFirstScreen = ({ navigation, route }) => {
     };
   }, []);
 
-  const matchCollege = async (schoolId, majorName) => {
-    console.log('matchCollege called');
-    console.log('schoolId:', schoolId);
-    console.log('majorName:', majorName);
-    const result = await searchCollege(schoolId, majorName);
-    console.log('✅ Match College Response:', result);
-  };
-
   const handleFinalSignUpSubmit = async () => {
     const result = await sendUserProfile(universityId, majorId);
     console.log('✅ Final Sign Up Submit Response:', result);
     if (result) {
       navigation.navigate('SignUpSecondScreen', {
         userName: route.params?.userName,
-        university: university,
+        university: FIXED_UNIVERSITY_NAME,
         department: department,
         major: major,
       });
@@ -107,21 +118,24 @@ const SignUpFirstScreen = ({ navigation, route }) => {
               title="학교"
               useTitle={true}
               placeholder="학교 이름을 입력해주세요"
-              useMagnifyingGlass={true}
-              value={university}
-              usePopUPModal={true}
-              onPressPopUPModal={() => {
-                setIsUniversityInputModalVisible(true);
-              }}
+              value={FIXED_UNIVERSITY_NAME}
+              onlyRead={true}
+            // TODO: 학교 선택 기능 재오픈 시 아래 주석 해제 + onlyRead 제거 + value={university}
+            // useMagnifyingGlass={true}
+            // usePopUPModal={true}
+            // onPressPopUPModal={() => {
+            //   setIsUniversityInputModalVisible(true);
+            // }}
             />
-            <Input
+            {/* TODO: 학교 선택 기능 재오픈 시 단과대 필드 주석 해제 */}
+            {/* <Input
               title="단과 대학"
               useTitle={true}
               placeholder="학과 선택시 자동으로 입력됩니다"
               value={department || ''}
               disabled={true}
               additionalStyle={{ backgroundColor: colors.gray[250] }}
-            />
+            /> */}
             <Input
               title="학과"
               useTitle={true}
@@ -132,9 +146,9 @@ const SignUpFirstScreen = ({ navigation, route }) => {
               onPressPopUPModal={() => {
                 setIsMajorInputModalVisible(true);
               }}
-              disabled={university === '' || universityId === null}
+              disabled={universityId === null}
               additionalStyle={
-                university === '' || universityId === null
+                universityId === null
                   ? { backgroundColor: colors.gray[250] }
                   : {}
               }
@@ -148,18 +162,8 @@ const SignUpFirstScreen = ({ navigation, route }) => {
           >
             <Button
               title="다음"
-              disabled={!university || !major || !department}
-              onPress={
-                () => handleFinalSignUpSubmit()
-                // navigation.navigate('SignUpSecondScreen', {
-                //   userName: route.params?.userName,
-                //   university: university,
-                //   department: department,
-                //   major: major,
-                //   universityId: universityId,
-                //   majorId: majorId,
-                // })
-              }
+              disabled={!major || !universityId}
+              onPress={() => handleFinalSignUpSubmit()}
               style={styles.button}
             />
           </View>
@@ -173,12 +177,13 @@ const SignUpFirstScreen = ({ navigation, route }) => {
             setMajor(selectedMajor.majorName);
             setMajorId(selectedMajor.majorId);
             setDepartment(selectedMajor.collegeName);
-            setDepartmentId(selectedMajor.collegeId);
+            // setDepartmentId(selectedMajor.collegeId);
             setIsMajorInputModalVisible(false);
           }}
         />
       )}
-      {isUniversityInputModalVisible && (
+      {/* TODO: 학교 선택 기능 재오픈 시 주석 해제 */}
+      {/* {isUniversityInputModalVisible && (
         <UniversityInputModal
           onClose={() => setIsUniversityInputModalVisible(false)}
           onSelect={(selectedUniversity) => {
@@ -188,7 +193,7 @@ const SignUpFirstScreen = ({ navigation, route }) => {
             setIsUniversityInputModalVisible(false);
           }}
         />
-      )}
+      )} */}
     </>
   );
 };
