@@ -312,11 +312,15 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
               </View>
             </View>
             <View>
+              <View style={styles.emailTitleRow}>
+                <Text style={styles.emailTitle}>학교 이메일</Text>
+                <Text style={styles.emailCaption}>
+                  *중앙대학교 이메일(@cau.ac.kr)만 입력 가능
+                </Text>
+              </View>
               <Input
                 isOrange={true}
                 ref={emailInputRef}
-                title="학교 이메일"
-                useTitle={true}
                 useEmail={true}
                 placeholder="메일주소를 입력해주세요"
                 useMagnifyingGlass={false}
@@ -431,6 +435,20 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     marginTop: 24,
     marginBottom: 12,
+  },
+  emailTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 4,
+  },
+  emailTitle: {
+    ...typography.body3Bold,
+    color: colors.gray[850],
+  },
+  emailCaption: {
+    ...typography.caption2Regular,
+    color: colors.gray[400],
   },
   userIdStatusText: {
     fontSize: 12,
