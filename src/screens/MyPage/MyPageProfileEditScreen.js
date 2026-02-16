@@ -217,7 +217,8 @@ const MyPageProfileEditScreen = ({ navigation }) => {
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <View style={styles.profileInfoItemRightWrapper}>
-              <Text style={styles.profileInfoItemRightText}>미인증</Text>
+              {/* TODO: 인증 완료 시 표시할 텍스트 분기 처리 필요 */}
+              <Text style={styles.profileInfoItemRightText}>인증 전</Text>
               <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
             </View>
           </View>

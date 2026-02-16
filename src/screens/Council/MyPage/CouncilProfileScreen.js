@@ -241,7 +241,7 @@ const CouncilProfileScreen = ({ navigation, route }) => {
             <View style={styles.profileInfoItemRightWrapper}>
               <Text style={styles.profileInfoItemRightText}>
                 {' '}
-                {user?.authName || '미인증'}
+                {user?.authName || '인증 전'}
               </Text>
             </View>
           </View>
