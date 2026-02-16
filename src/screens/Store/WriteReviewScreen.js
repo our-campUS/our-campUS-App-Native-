@@ -60,6 +60,9 @@ const WriteReviewScreen = () => {
       ? existingReview.imageUrls
       : [1, 2, 3]
   );
+  const [selection, setSelection] = useState(
+    editMode ? { start: 0, end: 0 } : undefined
+  );
 
   const isValid = reviewText.length >= 20 && rating > 0;
 
@@ -129,6 +132,10 @@ const WriteReviewScreen = () => {
               value={reviewText}
               onChangeText={setReviewText}
               maxLength={1000}
+              selection={selection}
+              onSelectionChange={() => {
+                if (selection) setSelection(undefined);
+              }}
             />
 
             <Text style={[styles.charCount, reviewText.length >= 20]}>
