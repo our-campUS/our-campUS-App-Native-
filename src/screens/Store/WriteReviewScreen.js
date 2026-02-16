@@ -14,7 +14,9 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import Toast from 'react-native-toast-message';
 import LabelTitle from '../../components/LabelTitle';
+import { editReview } from '../../api/review';
 import theme from '../../style';
 import typography from '../../style/typography';
 import shadow from '../../style/shadow';
@@ -37,16 +39,54 @@ const WriteReviewScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const storeName = route.params?.store?.name || '스타벅스 상도역점';
+  const editMode = route.params?.editMode || false;
+  const existingReview = route.params?.review || null;
+  const storeName =
+    route.params?.store?.name ||
+    existingReview?.place ||
+    existingReview?.name ||
+    '스타벅스 상도역점';
 
-  const [rating, setRating] = useState(0);
-  const [reviewText, setReviewText] = useState('');
-  const [photos, setPhotos] = useState([1, 2, 3]);
+  const [rating, setRating] = useState(
+    editMode && existingReview ? existingReview.star || existingReview.rating || 0 : 0
+  );
+  const [reviewText, setReviewText] = useState(
+    editMode && existingReview
+      ? existingReview.comment || existingReview.content || ''
+      : ''
+  );
+  const [photos, setPhotos] = useState(
+    editMode && existingReview?.imageUrls?.length
+      ? existingReview.imageUrls
+      : [1, 2, 3]
+  );
 
   const isValid = reviewText.length >= 20 && rating > 0;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isValid) return;
+
+    if (editMode && existingReview) {
+      try {
+        await editReview(existingReview.id, {
+          content: reviewText,
+          star: rating,
+          imageUrls: existingReview.imageUrls || [],
+        });
+        Toast.show({
+          type: 'success',
+          text1: '리뷰가 수정되었습니다.',
+        });
+        navigation.goBack();
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          text1: '리뷰 수정에 실패하였습니다.',
+        });
+      }
+      return;
+    }
+
     console.log('리뷰 등록 완료', { rating, reviewText });
     navigation.navigate('ReviewResultScreen');
   };
@@ -54,7 +94,7 @@ const WriteReviewScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
-        title="리뷰 작성"
+        title={editMode ? '리뷰 수정' : '리뷰 작성'}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
@@ -142,7 +182,7 @@ const WriteReviewScreen = () => {
                   : { color: theme.colors.background },
               ]}
             >
-              작성하기
+              {editMode ? '수정하기' : '작성하기'}
             </Text>
           </TouchableOpacity>
         </View>
