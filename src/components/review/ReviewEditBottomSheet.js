@@ -87,6 +87,7 @@ const ReviewEditBottomSheet = ({
       visible={rendered}
       transparent={true}
       animationType="none"
+      statusBarTranslucent={true}
       onRequestClose={onClose}
     >
       <View style={styles.container}>
