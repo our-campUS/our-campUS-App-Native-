@@ -10,12 +10,13 @@ import {
 import RatingIcon from '../../../assets/icons/rating.svg';
 import ArrowDownIcon from '../../../assets/ArrowDown.svg';
 import ArrowUpIcon from '../../../assets/ArrowUp.svg';
+import ThreeDotIcon from '../../../assets/threeDot.svg';
 
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import theme from '../../style';
 
-const ReviewItem = ({ item, variant = 'list' }) => {
+const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!item) return null;
@@ -58,7 +59,14 @@ const ReviewItem = ({ item, variant = 'list' }) => {
       ]}
     >
       {/* ⭐ 별점 */}
-      <View style={styles.starRatingWrapper}>{renderStars()}</View>
+      <View style={styles.starRatingWrapper}>
+        <View style={styles.starsRow}>{renderStars()}</View>
+        {onMorePress && (
+          <Pressable onPress={() => onMorePress(item)} hitSlop={8}>
+            <ThreeDotIcon width={20} height={20} />
+          </Pressable>
+        )}
+      </View>
 
       {/* ⭐ 이미지 */}
       {review.imageUrls.length > 0 && (
@@ -137,8 +145,14 @@ const styles = StyleSheet.create({
   starRatingWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    justifyContent: 'space-between',
     marginBottom: 12,
+  },
+
+  starsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
 
   imageScrollWrapper: {
