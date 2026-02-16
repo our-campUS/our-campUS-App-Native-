@@ -2,51 +2,40 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import Input from '../../components/Input';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import { useEffect, useState } from 'react';
-import CreateQueryBottomSheet from '../../components/MyPage/CreateQueryBottomSheet';
 import Button from '../../components/Button';
 import useAuthStore from '../../store/authStore';
 
 const CreateNewQueryView = ({ handleCreateQuery }) => {
   const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
-  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [inqueryTitle, setInqueryTitle] = useState('');
   const [inqueryContent, setInqueryContent] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   useEffect(() => {
     setIsButtonDisabled(
-      inqueryContent.length < 20 || selectedCategory === null
+      inqueryContent.length < 10 || inqueryTitle.trim().length === 0
     );
-  }, [inqueryContent, selectedCategory]);
-
-  const handleSelectCategory = (category) => {
-    setSelectedCategory(category);
-  };
+  }, [inqueryContent, inqueryTitle]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        <Pressable
-          onPress={() => setIsBottomSheetVisible(true)}
-          style={styles.inputWrapper}
-        >
-          <Input
-            placeholder="문의 유형을 선택해주세요"
-            useToggleIcon={true}
-            value={selectedCategory?.name || ''}
-            onlyRead={true}
-            additionalStyle={styles.input}
+        <View style={styles.titleInputWrapper}>
+          <TextInput
+            placeholder="문의 제목을 입력해주세요."
+            style={styles.titleInput}
+            value={inqueryTitle}
+            onChangeText={setInqueryTitle}
+            placeholderTextColor={colors.gray[400]}
           />
-        </Pressable>
+        </View>
         <View style={styles.textInputWrapper}>
           <TextInput
             placeholder="문의 내용을 작성해주세요"
@@ -66,7 +55,7 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
           />
           <Text style={styles.inqueryContentLength}>
             {inqueryContent.length === 0
-              ? '최소 20자 이상'
+              ? '최소 10자 이상'
               : `${inqueryContent.length}/1000`}
           </Text>
         </View>
@@ -90,11 +79,6 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
             onPress={handleCreateQuery}
           />
         </View>
-        <CreateQueryBottomSheet
-          isVisible={isBottomSheetVisible}
-          onClose={() => setIsBottomSheetVisible(false)}
-          onSelectCategory={handleSelectCategory}
-        />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -107,8 +91,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: colors.common.white,
   },
-  inputWrapper: {
+  titleInputWrapper: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.gray[300],
     boxShadow: '0 0 6px 0 rgba(225, 228, 230, 0.70)',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  titleInput: {
+    ...typography.body3Regular,
+    color: colors.gray[850],
   },
   inqueryInput: {
     ...typography.body3Regular,
@@ -125,9 +118,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     borderWidth: 1,
     borderColor: colors.gray[300],
-  },
-  input: {
-    backgroundColor: colors.common.white,
   },
   inqueryContentLength: {
     ...typography.body3Regular,
