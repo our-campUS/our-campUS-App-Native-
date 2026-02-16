@@ -74,7 +74,7 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
               backgroundColor: isCouncil
                 ? colors.orange[400]
                 : colors.blue[400],
-              borderRadius: 10,
+              borderRadius: 16,
             }}
             onPress={handleCreateQuery}
           />
@@ -92,12 +92,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
   },
   titleInputWrapper: {
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.gray[300],
+    borderRadius: 14,
     boxShadow: '0 0 6px 0 rgba(225, 228, 230, 0.70)',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 14,
   },
   titleInput: {
     ...typography.body3Regular,
@@ -116,8 +114,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     boxShadow: '0 0 6px 0 rgba(225, 228, 230, 0.70)',
     marginTop: 16,
-    borderWidth: 1,
-    borderColor: colors.gray[300],
   },
   inqueryContentLength: {
     ...typography.body3Regular,
