@@ -57,6 +57,7 @@ const LabelTitle = ({
   useRightButton = false,
   onPressRight = null,
   rightButtonText = null,
+  rightButtonTextStyle = null,
 }) => {
   return (
     <View style={[styles.container, additionalStyle]}>
@@ -81,7 +82,9 @@ const LabelTitle = ({
       </Text>
       {useRightButton && (
         <Pressable onPress={onPressRight} style={styles.rightButton}>
-          <Text style={styles.rightButtonText}>{rightButtonText}</Text>
+          <Text style={[styles.rightButtonText, rightButtonTextStyle]}>
+            {rightButtonText}
+          </Text>
         </Pressable>
       )}
     </View>
