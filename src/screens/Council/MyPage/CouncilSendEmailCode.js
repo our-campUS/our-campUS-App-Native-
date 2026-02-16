@@ -42,7 +42,7 @@ const CouncilSendEmailCode = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
-        title="프로필 수정"
+        title="이메일 수정"
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />

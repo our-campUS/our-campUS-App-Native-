@@ -50,7 +50,7 @@ const CouncilEditProfileScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <LabelTitle
-          title="프로필 수정"
+          title="이메일 수정"
           navigation={navigation}
           useBackButton={true}
           onPressBack={() => navigation.goBack()}
