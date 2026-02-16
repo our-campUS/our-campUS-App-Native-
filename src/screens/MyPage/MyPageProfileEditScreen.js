@@ -16,7 +16,6 @@ import EditIcon from '../../../assets/EditImage.svg';
 import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
 import { useState, useEffect } from 'react';
 import Button from '../../components/Button';
-import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo, editProfileImage } from '../../api/user';
 import { requestLogout } from '../../api/user';
@@ -27,7 +26,7 @@ import {
   uploadImageToPresignedUrl,
 } from '../../api/uploadImage';
 
-const MyPageProfileEditScreen = ({ navigation }) => {
+const MyPageProfileEditScreen = ({ navigation, route }) => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -52,6 +51,15 @@ const MyPageProfileEditScreen = ({ navigation }) => {
       setIosProfileImage(user.profileImage);
     }
   }, [user?.profileImage]);
+
+  // ProfileImageScreen에서 선택한 사진 받기
+  useEffect(() => {
+    if (route.params?.selectedPhoto) {
+      setSelectedImage(route.params.selectedPhoto);
+      // params 초기화 (재진입 시 중복 트리거 방지)
+      navigation.setParams({ selectedPhoto: undefined });
+    }
+  }, [route.params?.selectedPhoto]);
 
   // selectedImage가 변경될 때 이미지 업로드 처리
   useEffect(() => {
@@ -102,71 +110,7 @@ const MyPageProfileEditScreen = ({ navigation }) => {
   };
 
   const handleEditProfileImage = () => {
-    console.log('handleEditProfileImage');
-    Alert.alert(
-      '이미지 선택',
-      '이미지를 선택하는 방법을 선택해주세요',
-      [
-        {
-          text: '갤러리에서 선택',
-          onPress: () => {
-            launchImageLibrary(
-              {
-                mediaType: 'photo',
-                quality: 0.8,
-                maxWidth: 1000,
-                maxHeight: 1000,
-              },
-              (response) => {
-                if (response.didCancel) {
-                  return;
-                }
-                if (response.errorMessage) {
-                  Alert.alert('오류', response.errorMessage);
-                  return;
-                }
-                if (response.assets && response.assets[0]) {
-                  setSelectedImage(response.assets[0]);
-                }
-              }
-            );
-          },
-        },
-        {
-          text: '카메라로 촬영',
-          onPress: () => {
-            launchCamera(
-              {
-                mediaType: 'photo',
-                saveToPhotos: true,
-                quality: 0.8,
-                maxWidth: 1000,
-                maxHeight: 1000,
-                includeBase64: false,
-                cameraType: 'back',
-              },
-              (response) => {
-                if (response.didCancel) {
-                  return;
-                }
-                if (response.errorMessage) {
-                  Alert.alert('오류', response.errorMessage);
-                  return;
-                }
-                if (response.assets && response.assets[0]) {
-                  setSelectedImage(response.assets[0]);
-                }
-              }
-            );
-          },
-        },
-        {
-          text: '취소',
-          style: 'cancel',
-        },
-      ],
-      { cancelable: true }
-    );
+    navigation.navigate('ProfileImageScreen');
   };
 
   return (
@@ -189,7 +133,7 @@ const MyPageProfileEditScreen = ({ navigation }) => {
                 : defaultProfileImage
             }
             style={styles.profileImage}
-            // resizeMode="contain"
+          // resizeMode="contain"
           />
           <Pressable
             style={styles.editIcon}
