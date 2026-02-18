@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import colors from '@style/colors';
 import typography from '@style/typography';
+import shadows from '@style/shadow';
 import { useEffect, useState } from 'react';
 import Button from '@components/Button';
 import useAuthStore from '@store/authStore';
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
   },
   titleInputWrapper: {
     borderRadius: 14,
-    boxShadow: '0 0 6px 0 rgba(225, 228, 230, 0.70)',
+    ...shadows.level2,
     paddingHorizontal: 20,
     paddingVertical: 14,
   },
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     height: 166,
     padding: 20,
     borderRadius: 16,
-    boxShadow: '0 0 6px 0 rgba(225, 228, 230, 0.70)',
+    ...shadows.level2,
     marginTop: 16,
   },
   inqueryContentLength: {
