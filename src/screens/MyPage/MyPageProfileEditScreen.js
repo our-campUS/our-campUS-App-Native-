@@ -156,16 +156,12 @@ const MyPageProfileEditScreen = ({ navigation, route }) => {
             onPress={() => navigation.navigate('ChangeScholarInfoScreen')}
           >
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <View style={styles.profileInfoItem}>
-            <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <View style={styles.profileInfoItemRightWrapper}>
               {/* TODO: 인증 완료 시 표시할 텍스트 분기 처리 필요 */}
               <Text style={styles.profileInfoItemRightText}>인증 전</Text>
-              <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
+              <ArrowRightIcon width={10} height={10} color={colors.gray[400]} />
             </View>
-          </View>
+          </Pressable>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>연결된 계정</Text>
             <Text style={styles.profileInfoItemRightText}>카카오</Text>
