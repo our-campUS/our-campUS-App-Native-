@@ -8,23 +8,23 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../style/colors';
-import LabelTitle from '../../components/LabelTitle';
-import typography from '../../style/typography';
-import defaultProfileImage from '../../../assets/defaultProfileImage.png';
-import EditIcon from '../../../assets/EditImage.svg';
-import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
+import colors from '@style/colors';
+import LabelTitle from '@components/LabelTitle';
+import typography from '@style/typography';
+import defaultProfileImage from '@assets/defaultProfileImage.png';
+import EditIcon from '@assets/EditImage.svg';
+import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { useState, useEffect } from 'react';
-import Button from '../../components/Button';
-import useAuthStore from '../../store/authStore';
-import { getUserInfo, editProfileImage } from '../../api/user';
-import { requestLogout } from '../../api/user';
+import Button from '@components/Button';
+import useAuthStore from '@store/authStore';
+import { getUserInfo, editProfileImage } from '@api/user';
+import { requestLogout } from '@api/user';
 
 import {
   getCommonImagePresignedUrl,
   convertToPng,
   uploadImageToPresignedUrl,
-} from '../../api/uploadImage';
+} from '@api/uploadImage';
 
 const MyPageProfileEditScreen = ({ navigation, route }) => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);

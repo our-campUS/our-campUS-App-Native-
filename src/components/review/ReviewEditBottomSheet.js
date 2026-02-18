@@ -8,10 +8,10 @@ import {
   PanResponder,
 } from 'react-native';
 import { useRef, useEffect, useState } from 'react';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import EditIcon from '../../../assets/darkPencilIcon.svg';
-import DeleteIcon from '../../../assets/trashIcon.svg';
+import colors from '@style/colors';
+import typography from '@style/typography';
+import EditIcon from '@assets/darkPencilIcon.svg';
+import DeleteIcon from '@assets/trashIcon.svg';
 
 const DRAG_THRESHOLD = 100;
 

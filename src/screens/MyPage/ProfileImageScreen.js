@@ -10,9 +10,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import LabelTitle from '../../components/LabelTitle';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
+import LabelTitle from '@components/LabelTitle';
+import colors from '@style/colors';
+import typography from '@style/typography';
 
 const PAGE_SIZE = 60;
 

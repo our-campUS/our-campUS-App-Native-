@@ -7,12 +7,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../../style/colors';
-import typography from '../../../style/typography';
-import LabelTitle from '../../../components/LabelTitle';
-import Input from '../../../components/Input';
+import colors from '@style/colors';
+import typography from '@style/typography';
+import LabelTitle from '@components/LabelTitle';
+import Input from '@components/Input';
 import { useState, useEffect } from 'react';
-import Button from '../../../components/Button';
+import Button from '@components/Button';
 
 const CouncilSendEmailCode = ({ navigation }) => {
   const [email, setEmail] = useState('');

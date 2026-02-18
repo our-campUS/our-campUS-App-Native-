@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import LabelTitle from '../../components/LabelTitle';
-import { REVIEW_DATA } from '../../constants/DummyData';
-import ReviewItem from '../../components/review/ReviewItem';
-import ReviewEditBottomSheet from '../../components/review/ReviewEditBottomSheet';
-import { deleteReview } from '../../api/review';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
+import LabelTitle from '@components/LabelTitle';
+import { REVIEW_DATA } from '@constants/DummyData';
+import ReviewItem from '@components/review/ReviewItem';
+import ReviewEditBottomSheet from '@components/review/ReviewEditBottomSheet';
+import { deleteReview } from '@api/review';
+import colors from '@style/colors';
+import typography from '@style/typography';
 
 const WrittenReviewScreen = ({ navigation }) => {
   const [reviews, setReviews] = useState(REVIEW_DATA);

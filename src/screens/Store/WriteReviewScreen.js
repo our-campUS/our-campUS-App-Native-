@@ -15,13 +15,13 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Toast from 'react-native-toast-message';
-import LabelTitle from '../../components/LabelTitle';
-import { editReview } from '../../api/review';
-import theme from '../../style';
-import typography from '../../style/typography';
-import shadow from '../../style/shadow';
-import colors from '../../style/colors';
-import RatingIcon from '../../../assets/icons/rating.svg';
+import LabelTitle from '@components/LabelTitle';
+import { editReview } from '@api/review';
+import theme from '@style';
+import typography from '@style/typography';
+import shadow from '@style/shadow';
+import colors from '@style/colors';
+import RatingIcon from '@assets/icons/rating.svg';
 
 const StarItem = ({ filled, onPress, size = 28 }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.7}>

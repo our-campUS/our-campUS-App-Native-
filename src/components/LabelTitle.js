@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
-import colors from '../style/colors';
-import typography from '../style/typography';
+import colors from '@style/colors';
+import typography from '@style/typography';
 import { Pressable } from 'react-native';
-import BackIcon from '../../assets/back.svg';
+import BackIcon from '@assets/back.svg';
 
 const styles = StyleSheet.create({
   container: {

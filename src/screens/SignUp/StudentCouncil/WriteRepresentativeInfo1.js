@@ -10,21 +10,21 @@ import {
   Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LabelTitle from '../../../components/LabelTitle';
-import Input from '../../../components/Input';
-import Button from '../../../components/Button';
-import typography from '../../../style/typography';
-import colors from '../../../style/colors';
-import UnselectedRadioButton from '../../../../assets/unselected_Radio_Button.svg';
+import LabelTitle from '@components/LabelTitle';
+import Input from '@components/Input';
+import Button from '@components/Button';
+import typography from '@style/typography';
+import colors from '@style/colors';
+import UnselectedRadioButton from '@assets/unselected_Radio_Button.svg';
 import { useState, useEffect } from 'react';
 import { Image } from 'react-native';
-import MajorInputModal from '../../../components/majorInputModal';
-import CollegeInputModal from '../../../components/CollegeInputModal';
-import { searchUniversity } from '../../../api/signUp';
+import MajorInputModal from '@components/majorInputModal';
+import CollegeInputModal from '@components/CollegeInputModal';
+import { searchUniversity } from '@api/signUp';
 // TODO: 학교 선택 기능 재오픈 시 주석 해제
-// import { searchMajor } from '../../../api/signUp';
-// import { searchCollege } from '../../../api/signUp';
-// import UniversityInputModal from '../../../components/UniversityInputModal';
+// import { searchMajor } from '@api/signUp';
+// import { searchCollege } from '@api/signUp';
+// import UniversityInputModal from '@components/UniversityInputModal';
 
 const FIXED_UNIVERSITY_NAME = '중앙대학교 서울캠퍼스';
 

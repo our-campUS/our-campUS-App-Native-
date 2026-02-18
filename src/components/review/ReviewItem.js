@@ -7,14 +7,14 @@ import {
   Pressable,
   Image,
 } from 'react-native';
-import RatingIcon from '../../../assets/icons/rating.svg';
-import ArrowDownIcon from '../../../assets/ArrowDown.svg';
-import ArrowUpIcon from '../../../assets/ArrowUp.svg';
-import ThreeDotIcon from '../../../assets/threeDot.svg';
+import RatingIcon from '@assets/icons/rating.svg';
+import ArrowDownIcon from '@assets/ArrowDown.svg';
+import ArrowUpIcon from '@assets/ArrowUp.svg';
+import ThreeDotIcon from '@assets/threeDot.svg';
 
-import colors from '../../style/colors';
-import typography from '../../style/typography';
-import theme from '../../style';
+import colors from '@style/colors';
+import typography from '@style/typography';
+import theme from '@style';
 
 const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
   const [isExpanded, setIsExpanded] = useState(false);

@@ -6,11 +6,11 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import colors from '../../style/colors';
-import typography from '../../style/typography';
+import colors from '@style/colors';
+import typography from '@style/typography';
 import { useEffect, useState } from 'react';
-import Button from '../../components/Button';
-import useAuthStore from '../../store/authStore';
+import Button from '@components/Button';
+import useAuthStore from '@store/authStore';
 
 const CreateNewQueryView = ({ handleCreateQuery }) => {
   const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
