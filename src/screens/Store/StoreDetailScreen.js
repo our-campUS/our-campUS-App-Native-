@@ -276,7 +276,7 @@ const StoreDetailScreen = () => {
                         color={theme.colors.primary2}
                       />
                     ) : (
-                      <UnlikedIcon width={16} height={15} />
+                      <UnlikedIcon width={12} height={11.5} />
                     )}
                   </View>
                 </TouchableOpacity>
@@ -284,8 +284,8 @@ const StoreDetailScreen = () => {
                 <TouchableOpacity activeOpacity={0.7}>
                   <View style={styles.iconCircleButton}>
                     <ShareIcon
-                      width={14}
-                      height={16}
+                      width={10.5}
+                      height={12}
                       color={colors.gray[400]}
                     />
                   </View>
@@ -511,12 +511,12 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   storeName: {
-    ...typography.heading3,
+    ...typography.heading4,
     color: theme.colors.text,
     marginRight: 6,
   },
   storeCategory: {
-    ...typography.body3Regular,
+    ...typography.body4Regular,
     color: colors.gray[500],
   },
   actionButtons: {
