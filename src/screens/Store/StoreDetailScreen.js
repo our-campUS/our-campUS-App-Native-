@@ -21,7 +21,7 @@ import Button from '@components/Button';
 import theme from '@style';
 import colors from '@style/colors';
 import typography from '@style/typography';
-import ReviewActionModal from '@components/review/ReviewActionModal';
+// import ReviewActionModal from '@components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
 import ReviewItemCompact from '@components/review/ReviewPreviewItem';
 
 import StarIcon from '@assets/icons/common/star.svg';
@@ -40,7 +40,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false); // TODO: 스캔 플로우 복구 시 주석 해제
   const [isTooltipVisible, setIsTooltipVisible] = useState(true);
   const onUpdatePlace = route.params?.onUpdatePlace;
 
@@ -448,16 +448,23 @@ const StoreDetailScreen = () => {
           <Button
             title="리뷰 작성하기"
             onPress={() => {
-              if (storeData.isPartner) {
-                setModalVisible(true);
-              } else {
-                navigation.navigate('WriteReviewScreen', {
-                  placeId: storeData.placeId,
-                  placeKey: storeData.placeKey,
-                  storeName: storeData.name,
-                  rating: storeData.star,
-                });
-              }
+              // TODO: 스캔 플로우 복구 시 아래 주석 해제
+              // if (storeData.isPartner) {
+              //   setModalVisible(true);
+              // } else {
+              //   navigation.navigate('WriteReviewScreen', {
+              //     placeId: storeData.placeId,
+              //     placeKey: storeData.placeKey,
+              //     storeName: storeData.name,
+              //     rating: storeData.star,
+              //   });
+              // }
+              navigation.navigate('WriteReviewScreen', {
+                placeId: storeData.placeId,
+                placeKey: storeData.placeKey,
+                storeName: storeData.name,
+                rating: storeData.star,
+              });
             }}
             style={styles.customButtonStyle}
             textStyle={styles.customButtonText}
@@ -467,6 +474,7 @@ const StoreDetailScreen = () => {
         </View>
       </View>
 
+      {/* TODO: 스캔 플로우 복구 시 아래 주석 해제
       <ReviewActionModal
         isVisible={modalVisible}
         storeName={storeData.name}
@@ -476,6 +484,7 @@ const StoreDetailScreen = () => {
           navigation.navigate('CameraScanScreen');
         }}
       />
+      */}
     </View>
   );
 };
