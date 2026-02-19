@@ -1,16 +1,16 @@
 import { View, Text, StyleSheet, ScrollView, Keyboard } from 'react-native';
-import colors from '../../../style/colors';
+import colors from '@style/colors';
 import { StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LabelTitle from '../../../components/LabelTitle';
-import Input from '../../../components/Input';
-import typography from '../../../style/typography';
+import LabelTitle from '@components/LabelTitle';
+import Input from '@components/Input';
+import typography from '@style/typography';
 import { useState, useEffect } from 'react';
-import MajorInputModal from '../../../components/majorInputModal';
-import Button from '../../../components/Button';
+import MajorInputModal from '@components/majorInputModal';
+import Button from '@components/Button';
 // TODO: 학교 선택 기능 재오픈 시 주석 해제
-// import UniversityInputModal from '../../../components/UniversityInputModal';
-import { searchUniversity, sendUserProfile } from '../../../api/signUp';
+// import UniversityInputModal from '@components/UniversityInputModal';
+import { searchUniversity, sendUserProfile } from '@api/signUp';
 
 const FIXED_UNIVERSITY_NAME = '중앙대학교 서울캠퍼스';
 

@@ -8,26 +8,25 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../style/colors';
-import LabelTitle from '../../components/LabelTitle';
-import typography from '../../style/typography';
-import defaultProfileImage from '../../../assets/defaultProfileImage.png';
-import EditIcon from '../../../assets/EditImage.svg';
-import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
+import colors from '@style/colors';
+import LabelTitle from '@components/LabelTitle';
+import typography from '@style/typography';
+import defaultProfileImage from '@assets/defaultProfileImage.png';
+import EditIcon from '@assets/EditImage.svg';
+import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { useState, useEffect } from 'react';
-import Button from '../../components/Button';
-import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
-import useAuthStore from '../../store/authStore';
-import { getUserInfo, editProfileImage } from '../../api/user';
-import { requestLogout } from '../../api/user';
+import Button from '@components/Button';
+import useAuthStore from '@store/authStore';
+import { getUserInfo, editProfileImage } from '@api/user';
+import { requestLogout } from '@api/user';
 
 import {
   getCommonImagePresignedUrl,
   convertToPng,
   uploadImageToPresignedUrl,
-} from '../../api/uploadImage';
+} from '@api/uploadImage';
 
-const MyPageProfileEditScreen = ({ navigation }) => {
+const MyPageProfileEditScreen = ({ navigation, route }) => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -52,6 +51,15 @@ const MyPageProfileEditScreen = ({ navigation }) => {
       setIosProfileImage(user.profileImage);
     }
   }, [user?.profileImage]);
+
+  // ProfileImageScreen에서 선택한 사진 받기
+  useEffect(() => {
+    if (route.params?.selectedPhoto) {
+      setSelectedImage(route.params.selectedPhoto);
+      // params 초기화 (재진입 시 중복 트리거 방지)
+      navigation.setParams({ selectedPhoto: undefined });
+    }
+  }, [route.params?.selectedPhoto]);
 
   // selectedImage가 변경될 때 이미지 업로드 처리
   useEffect(() => {
@@ -102,71 +110,7 @@ const MyPageProfileEditScreen = ({ navigation }) => {
   };
 
   const handleEditProfileImage = () => {
-    console.log('handleEditProfileImage');
-    Alert.alert(
-      '이미지 선택',
-      '이미지를 선택하는 방법을 선택해주세요',
-      [
-        {
-          text: '갤러리에서 선택',
-          onPress: () => {
-            launchImageLibrary(
-              {
-                mediaType: 'photo',
-                quality: 0.8,
-                maxWidth: 1000,
-                maxHeight: 1000,
-              },
-              (response) => {
-                if (response.didCancel) {
-                  return;
-                }
-                if (response.errorMessage) {
-                  Alert.alert('오류', response.errorMessage);
-                  return;
-                }
-                if (response.assets && response.assets[0]) {
-                  setSelectedImage(response.assets[0]);
-                }
-              }
-            );
-          },
-        },
-        {
-          text: '카메라로 촬영',
-          onPress: () => {
-            launchCamera(
-              {
-                mediaType: 'photo',
-                saveToPhotos: true,
-                quality: 0.8,
-                maxWidth: 1000,
-                maxHeight: 1000,
-                includeBase64: false,
-                cameraType: 'back',
-              },
-              (response) => {
-                if (response.didCancel) {
-                  return;
-                }
-                if (response.errorMessage) {
-                  Alert.alert('오류', response.errorMessage);
-                  return;
-                }
-                if (response.assets && response.assets[0]) {
-                  setSelectedImage(response.assets[0]);
-                }
-              }
-            );
-          },
-        },
-        {
-          text: '취소',
-          style: 'cancel',
-        },
-      ],
-      { cancelable: true }
-    );
+    navigation.navigate('ProfileImageScreen');
   };
 
   return (
@@ -189,7 +133,7 @@ const MyPageProfileEditScreen = ({ navigation }) => {
                 : defaultProfileImage
             }
             style={styles.profileImage}
-            // resizeMode="contain"
+          // resizeMode="contain"
           />
           <Pressable
             style={styles.editIcon}
@@ -212,15 +156,12 @@ const MyPageProfileEditScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('ChangeScholarInfoScreen')}
           >
             <Text style={styles.profileInfoItemTitle}>학적정보</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <View style={styles.profileInfoItem}>
-            <Text style={styles.profileInfoItemTitle}>학적정보</Text>
             <View style={styles.profileInfoItemRightWrapper}>
-              <Text style={styles.profileInfoItemRightText}>미인증</Text>
-              <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
+              {/* TODO: 인증 완료 시 표시할 텍스트 분기 처리 필요 */}
+              <Text style={styles.profileInfoItemRightText}>인증 전</Text>
+              <ArrowRightIcon width={10} height={10} color={colors.gray[400]} />
             </View>
-          </View>
+          </Pressable>
           <View style={styles.profileInfoItem}>
             <Text style={styles.profileInfoItemTitle}>연결된 계정</Text>
             <Text style={styles.profileInfoItemRightText}>카카오</Text>

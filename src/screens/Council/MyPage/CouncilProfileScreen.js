@@ -10,26 +10,26 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect } from 'react';
-import colors from '../../../style/colors';
-import LabelTitle from '../../../components/LabelTitle';
-import typography from '../../../style/typography';
-import CouncilDefaultImage from '../../../../assets/councilDefaultImage.png';
-import EditIcon from '../../../../assets/editIcon.svg';
-import CouncilEditIcon from '../../../../assets/CouncilEditIcon.svg';
-import ArrowRightIcon from '../../../../assets/ArrowRightIcon.svg';
+import colors from '@style/colors';
+import LabelTitle from '@components/LabelTitle';
+import typography from '@style/typography';
+import CouncilDefaultImage from '@assets/councilDefaultImage.png';
+import EditIcon from '@assets/editIcon.svg';
+import CouncilEditIcon from '@assets/CouncilEditIcon.svg';
+import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { useState } from 'react';
-import Button from '../../../components/Button';
-import CustomToast from '../../../components/CustomToast';
-import useToastStore from '../../../store/toastStore';
-import useAuthStore from '../../../store/authStore';
+import Button from '@components/Button';
+import CustomToast from '@components/CustomToast';
+import useToastStore from '@store/toastStore';
+import useAuthStore from '@store/authStore';
 import { onFocusEffect } from '@react-navigation/native';
-import { requestLogout } from '../../../api/user';
-import { changeCouncilProfileImage } from '../../../api/councilMyPage';
+import { requestLogout } from '@api/user';
+import { changeCouncilProfileImage } from '@api/councilMyPage';
 import {
   convertToPng,
   getCommonImagePresignedUrl,
   uploadImageToPresignedUrl,
-} from '../../../api/uploadImage';
+} from '@api/uploadImage';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { launchCamera } from 'react-native-image-picker';
 
@@ -241,7 +241,7 @@ const CouncilProfileScreen = ({ navigation, route }) => {
             <View style={styles.profileInfoItemRightWrapper}>
               <Text style={styles.profileInfoItemRightText}>
                 {' '}
-                {user?.authName || '미인증'}
+                {user?.authName || '인증 전'}
               </Text>
             </View>
           </View>

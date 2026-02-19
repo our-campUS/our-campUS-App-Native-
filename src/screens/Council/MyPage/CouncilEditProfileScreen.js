@@ -6,17 +6,17 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from '../../../style/colors';
-import typography from '../../../style/typography';
-import LabelTitle from '../../../components/LabelTitle';
-import Input from '../../../components/Input';
+import colors from '@style/colors';
+import typography from '@style/typography';
+import LabelTitle from '@components/LabelTitle';
+import Input from '@components/Input';
 import { useState } from 'react';
-import { editNickname } from '../../../api/profile';
-import Button from '../../../components/Button';
-import CheckIcon from '../../../../assets/check.svg';
-import useAuthStore from '../../../store/authStore';
-import { changeCouncilNickname } from '../../../api/councilMyPage';
-import { getUserInfo } from '../../../api/user';
+import { editNickname } from '@api/profile';
+import Button from '@components/Button';
+import CheckIcon from '@assets/check.svg';
+import useAuthStore from '@store/authStore';
+import { changeCouncilNickname } from '@api/councilMyPage';
+import { getUserInfo } from '@api/user';
 
 const CouncilEditProfileScreen = ({ navigation }) => {
   const { user } = useAuthStore();
@@ -50,7 +50,7 @@ const CouncilEditProfileScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <LabelTitle
-          title="프로필 수정"
+          title="이메일 수정"
           navigation={navigation}
           useBackButton={true}
           onPressBack={() => navigation.goBack()}

@@ -9,18 +9,18 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
-import LabelTitle from '../../../components/LabelTitle';
-import colors from '../../../style/colors';
-import Input from '../../../components/Input';
+import LabelTitle from '@components/LabelTitle';
+import colors from '@style/colors';
+import Input from '@components/Input';
 import useForm from '../../../hooks/useForm';
 import { useState, useRef, useEffect } from 'react';
-import CheckMark from '../../../../assets/check.svg';
-import typography from '../../../style/typography';
-import Button from '../../../components/Button';
-import { checkUserIdDuplicate } from '../../../api/signUp';
+import CheckMark from '@assets/check.svg';
+import typography from '@style/typography';
+import Button from '@components/Button';
+import { checkUserIdDuplicate } from '@api/signUp';
 import { KeyboardAvoidingView } from 'react-native';
-import { sendCouncilEmail } from '../../../api/councilSignUp';
-import { checkCouncilLoginIdDuplicate } from '../../../api/councilSignUp';
+import { sendCouncilEmail } from '@api/councilSignUp';
+import { checkCouncilLoginIdDuplicate } from '@api/councilSignUp';
 
 // 비밀번호 조건 검사 함수
 const checkPasswordConditions = (password) => {

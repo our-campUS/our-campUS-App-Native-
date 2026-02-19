@@ -31,3 +31,39 @@ export const getReviewList = async (
     throw error;
   }
 };
+
+export const deleteReview = async (reviewId) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const response = await api.delete(`/reviews/${reviewId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('리뷰 삭제 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('리뷰 삭제 실패:', error);
+    throw error;
+  }
+};
+
+export const editReview = async (reviewId, reviewData) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const response = await api.patch(`/reviews/${reviewId}`, reviewData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('리뷰 수정 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('리뷰 수정 실패:', error);
+    throw error;
+  }
+};
