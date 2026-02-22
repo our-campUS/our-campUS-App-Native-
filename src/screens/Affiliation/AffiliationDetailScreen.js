@@ -553,10 +553,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
-  recommendTitle: {
-    ...typography.body4Bold,
-    color: colors.gray[850],
-  },
   placeType: {
     ...typography.caption2Regular,
     color: colors.gray[700],
@@ -573,7 +569,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: -2,
-    alignItems: 'flex-start',
   },
   detailDistanceWrapper: {
     flexDirection: 'row',

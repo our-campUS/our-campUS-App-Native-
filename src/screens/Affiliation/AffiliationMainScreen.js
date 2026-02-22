@@ -45,9 +45,12 @@ const styles = StyleSheet.create({
   },
   activityTypeSelector: {
     width: '100%',
-    padding: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 9,
+    backgroundColor: colors.gray['000'],
   },
   activityTypeSelectorButton: {
     borderRadius: 30,
@@ -78,32 +81,28 @@ const styles = StyleSheet.create({
   },
   searchIconButton: {
     marginLeft: 'auto',
-    padding: 4,
   },
   searchBarContainer: {
+    width: '100%',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    borderWidth: 1,
-    borderColor: colors.blue[300],
-    borderRadius: 30,
-    marginHorizontal: 20,
-    marginVertical: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    backgroundColor: colors.gray['000'],
   },
   searchChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.blue['050'],
-    borderRadius: 30,
-    paddingHorizontal: 10,
+    backgroundColor: colors.gray[200],
+    borderRadius: 5,
+    paddingHorizontal: 6,
     paddingVertical: 4,
   },
   searchChipText: {
-    ...typography.body4Regular,
-    color: colors.blue[600],
+    ...typography.caption2Regular,
+    color: colors.gray[800],
   },
   searchInput: {
     flex: 1,
@@ -141,41 +140,41 @@ const AffiliationMainScreen = ({ navigation }) => {
     setIsLoading(true);
     try {
       if (tab === 'school') {
-        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
           getStudentSchoolAffiliateList(accessToken),
           getStudentSchoolEventList(accessToken),
           getStudentSchoolUpcomingEventList(accessToken),
         ]);
-        setSchoolAffiliatePosts(affiliatePosts);
-        setSchoolEventPosts(eventPosts);
-        setUpcomingSchoolEvents(upcomingEvents);
-        setAffiliatePosts(affiliatePosts);
-        setEventPosts(eventPosts);
-        setUpcomingEvents(upcomingEvents);
+        setSchoolAffiliatePosts(fetched);
+        setSchoolEventPosts(fetchedEvents);
+        setUpcomingSchoolEvents(fetchedUpcoming);
+        setAffiliatePosts(fetched);
+        setEventPosts(fetchedEvents);
+        setUpcomingEvents(fetchedUpcoming);
       } else if (tab === 'major') {
-        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
           getStudentMajorAffiliateList(accessToken),
           getStudentMajorEventList(accessToken),
           getStudentMajorUpcomingEventList(accessToken),
         ]);
-        setMajorAffiliatePosts(affiliatePosts);
-        setMajorEventPosts(eventPosts);
-        setUpcomingMajorEvents(upcomingEvents);
-        setAffiliatePosts(affiliatePosts);
-        setEventPosts(eventPosts);
-        setUpcomingEvents(upcomingEvents);
+        setMajorAffiliatePosts(fetched);
+        setMajorEventPosts(fetchedEvents);
+        setUpcomingMajorEvents(fetchedUpcoming);
+        setAffiliatePosts(fetched);
+        setEventPosts(fetchedEvents);
+        setUpcomingEvents(fetchedUpcoming);
       } else if (tab === 'college') {
-        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
           getStudentCollegeAffiliateList(accessToken),
           getStudentCollegeEventList(accessToken),
           getStudentCollegeUpcomingEventList(accessToken),
         ]);
-        setCollegeAffiliatePosts(affiliatePosts);
-        setCollegeEventPosts(eventPosts);
-        setUpcomingCollegeEvents(upcomingEvents);
-        setAffiliatePosts(affiliatePosts);
-        setEventPosts(eventPosts);
-        setUpcomingEvents(upcomingEvents);
+        setCollegeAffiliatePosts(fetched);
+        setCollegeEventPosts(fetchedEvents);
+        setUpcomingCollegeEvents(fetchedUpcoming);
+        setAffiliatePosts(fetched);
+        setEventPosts(fetchedEvents);
+        setUpcomingEvents(fetchedUpcoming);
       }
       // 로드된 탭 추가
       setLoadedTabs((prev) => new Set([...prev, tab]));
@@ -300,7 +299,7 @@ const AffiliationMainScreen = ({ navigation }) => {
               }}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
-              <Ionicons name="close" size={13} color={colors.blue[600]} />
+              <Ionicons name="close" size={13} color={colors.gray[800]} />
             </Pressable>
           </View>
           <TextInput
@@ -312,7 +311,7 @@ const AffiliationMainScreen = ({ navigation }) => {
             autoFocus
             returnKeyType="search"
           />
-          <Ionicons name="search" size={18} color={colors.gray[400]} />
+          <Ionicons name="search" size={16} color={colors.gray[400]} />
         </View>
       ) : (
         <View style={styles.activityTypeSelector}>
@@ -358,7 +357,7 @@ const AffiliationMainScreen = ({ navigation }) => {
             style={styles.searchIconButton}
             onPress={() => setIsSearchMode(true)}
           >
-            <Ionicons name="search" size={20} color={colors.gray[600]} />
+            <Ionicons name="search" size={16} color={colors.gray[400]} />
           </Pressable>
         </View>
       )}
