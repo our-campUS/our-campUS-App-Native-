@@ -6,7 +6,9 @@ import {
   ScrollView,
   FlatList,
   Pressable,
+  TextInput,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
@@ -74,10 +76,47 @@ const styles = StyleSheet.create({
     ...typography.body4Regular,
     color: colors.blue[600],
   },
+  searchIconButton: {
+    marginLeft: 'auto',
+    padding: 4,
+  },
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: colors.blue[300],
+    borderRadius: 30,
+    marginHorizontal: 20,
+    marginVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  searchChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.blue['050'],
+    borderRadius: 30,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  searchChipText: {
+    ...typography.body4Regular,
+    color: colors.blue[600],
+  },
+  searchInput: {
+    flex: 1,
+    ...typography.body4Regular,
+    color: colors.gray[850],
+    paddingVertical: 0,
+  },
 });
 
 const AffiliationMainScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const { accessToken } = useAuthStore();
   const [affiliatePosts, setAffiliatePosts] = useState([]);
   const [eventPosts, setEventPosts] = useState([]);
@@ -250,52 +289,93 @@ const AffiliationMainScreen = ({ navigation }) => {
       )}
       {/* <AffiliationCarousel /> */}
       {/* <AffiliationColumnList navigation={navigation} /> */}
-      <View style={styles.activityTypeSelector}>
-        <Pressable
-          style={[
-            styles.activityTypeSelectorButton,
-            selectedActivityType === '제휴'
-              ? styles.activityTypeSelectorButtonPressed
-              : styles.activityTypeSelectorButton,
-          ]}
-          onPress={() => setSelectedActivityType('제휴')}
-        >
-          <Text
-            style={
+      {isSearchMode ? (
+        <View style={styles.searchBarContainer}>
+          <View style={styles.searchChip}>
+            <Text style={styles.searchChipText}>{selectedActivityType}</Text>
+            <Pressable
+              onPress={() => {
+                setIsSearchMode(false);
+                setSearchText('');
+              }}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Ionicons name="close" size={13} color={colors.blue[600]} />
+            </Pressable>
+          </View>
+          <TextInput
+            style={styles.searchInput}
+            placeholder={`어떤 ${selectedActivityType}를 찾으시나요?`}
+            placeholderTextColor={colors.gray[400]}
+            value={searchText}
+            onChangeText={setSearchText}
+            autoFocus
+            returnKeyType="search"
+          />
+          <Ionicons name="search" size={18} color={colors.gray[400]} />
+        </View>
+      ) : (
+        <View style={styles.activityTypeSelector}>
+          <Pressable
+            style={[
+              styles.activityTypeSelectorButton,
               selectedActivityType === '제휴'
-                ? styles.activityTypeSelectorButtonTextPressed
-                : styles.activityTypeSelectorButtonText
-            }
+                ? styles.activityTypeSelectorButtonPressed
+                : styles.activityTypeSelectorButton,
+            ]}
+            onPress={() => setSelectedActivityType('제휴')}
           >
-            제휴
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.activityTypeSelectorButton,
-            selectedActivityType === '행사'
-              ? styles.activityTypeSelectorButtonPressed
-              : styles.activityTypeSelectorButton,
-          ]}
-          onPress={() => setSelectedActivityType('행사')}
-        >
-          <Text
-            style={
+            <Text
+              style={
+                selectedActivityType === '제휴'
+                  ? styles.activityTypeSelectorButtonTextPressed
+                  : styles.activityTypeSelectorButtonText
+              }
+            >
+              제휴
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.activityTypeSelectorButton,
               selectedActivityType === '행사'
-                ? styles.activityTypeSelectorButtonTextPressed
-                : styles.activityTypeSelectorButtonText
-            }
+                ? styles.activityTypeSelectorButtonPressed
+                : styles.activityTypeSelectorButton,
+            ]}
+            onPress={() => setSelectedActivityType('행사')}
           >
-            행사
-          </Text>
-        </Pressable>
-      </View>
+            <Text
+              style={
+                selectedActivityType === '행사'
+                  ? styles.activityTypeSelectorButtonTextPressed
+                  : styles.activityTypeSelectorButtonText
+              }
+            >
+              행사
+            </Text>
+          </Pressable>
+          <Pressable
+            style={styles.searchIconButton}
+            onPress={() => setIsSearchMode(true)}
+          >
+            <Ionicons name="search" size={20} color={colors.gray[600]} />
+          </Pressable>
+        </View>
+      )}
       {selectedActivityType === '제휴' && (
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
-          data={affiliatePosts}
+          data={
+            isSearchMode && searchText
+              ? affiliatePosts.filter(
+                  (post) =>
+                    post.title?.includes(searchText) ||
+                    post.placeName?.includes(searchText)
+                )
+              : affiliatePosts
+          }
           renderItem={({ item }) => (
             <AffiliationColumnListItem
               handleLike={handleLike}
@@ -312,7 +392,15 @@ const AffiliationMainScreen = ({ navigation }) => {
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
-          data={eventPosts}
+          data={
+            isSearchMode && searchText
+              ? eventPosts.filter(
+                  (post) =>
+                    post.title?.includes(searchText) ||
+                    post.placeName?.includes(searchText)
+                )
+              : eventPosts
+          }
           renderItem={({ item }) => (
             <AffiliationColumnListItem
               handleLike={handleLike}
