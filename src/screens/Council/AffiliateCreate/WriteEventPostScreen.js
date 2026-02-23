@@ -29,7 +29,7 @@ import {
   getCouncilImagePresignedUrl,
   uploadImageToPresignedUrl,
 } from '../../../api/uploadImage';
-import Toast from 'react-native-toast-message';
+import Toast from '../../../components/common/Toast';
 
 const WriteEventPostScreen = ({ navigation, route }) => {
   const colorScheme = Appearance.getColorScheme();
@@ -46,6 +46,8 @@ const WriteEventPostScreen = ({ navigation, route }) => {
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [placeInfo, setPlaceInfo] = useState(null);
   const { accessToken } = useAuthStore();
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     handleImagePicker();
@@ -243,15 +245,8 @@ const WriteEventPostScreen = ({ navigation, route }) => {
     let response = await createCouncilPost(finalSubmitEventData, accessToken);
     console.log('response at handleSubmit', response);
     if (response.data.code === 201) {
-      Toast.show({
-        type: 'success',
-        text1: '행사 글쓰기 성공',
-        text2: '행사 글이 성공적으로 등록되었습니다.',
-        position: 'top',
-        topOffset: 100,
-        visibilityTime: 1000,
-        autoHide: true,
-      });
+      setToastMessage('게시글이 등록되었어요!');
+      setToastVisible(true);
       setTimeout(() => {
         navigation?.reset({
           index: 0,
@@ -412,7 +407,13 @@ const WriteEventPostScreen = ({ navigation, route }) => {
           />
         </View>
       </ScrollView>
-      <Toast />
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={() => setToastVisible(false)}
+        duration={1000}
+        hasNavBar={false}
+      />
       {showStartPicker && Platform.OS === 'ios' && (
         <View style={styles.datePickerContainer}>
           <DateTimePicker
