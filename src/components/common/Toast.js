@@ -1,3 +1,4 @@
+import typography from '@/style/typography';
 import React, { useEffect, useRef } from 'react';
 import { Text, StyleSheet, Animated, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'white',
-    fontSize: 14,
+    ...typography.body4Regular,
   },
 });
 

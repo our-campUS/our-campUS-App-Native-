@@ -5,6 +5,7 @@ import {
   ScrollView,
   FlatList,
   Image,
+  Alert,
   useWindowDimensions,
   Pressable,
 } from 'react-native';
@@ -46,6 +47,7 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   const [startHour, setStartHour] = useState(null);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   console.log('user', user);
   console.log('route.params', route.params);
   const postId = route.params?.item?.postId;
@@ -68,8 +70,16 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
 
   const handleConfirmDelete = async () => {
     setIsDeleteModalVisible(false);
-    await deleteCouncilPost(postId, accessToken);
-    navigation.goBack();
+    setIsDeleting(true);
+    try {
+      await deleteCouncilPost(postId, accessToken);
+      navigation.goBack();
+    } catch (error) {
+      console.error('deleteCouncilPost error', error);
+      Alert.alert('삭제 실패', '게시글 삭제 중 오류가 발생했어요. 다시 시도해주세요.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
   useEffect(() => {
     if (postId) {
