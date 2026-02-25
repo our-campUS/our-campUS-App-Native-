@@ -11,6 +11,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import { useState, useEffect } from 'react';
@@ -133,8 +134,7 @@ const AffiliationMainScreen = ({ navigation }) => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loadedTabs, setLoadedTabs] = useState(new Set()); // 이미 로드된 탭 추적
   const [isLoading, setIsLoading] = useState(false);
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   // 특정 탭의 데이터를 fetch하는 함수
   const fetchTabData = async (tab) => {
@@ -245,8 +245,7 @@ const AffiliationMainScreen = ({ navigation }) => {
       const response = await toggleStudentAffiliateLike(accessToken, postId);
       console.log('handleLike response', response);
 
-      setToastMessage(wasLiked ? '관심 목록에서 삭제되었어요.' : '관심 목록에 추가되었어요!');
-      setToastVisible(true);
+      showToast(wasLiked ? '관심 목록에서 삭제되었어요.' : '관심 목록에 추가되었어요!');
 
       // 좋아요 상태 업데이트 함수
       const updateLikeStatus = (posts, setPosts) => {
@@ -425,7 +424,7 @@ const AffiliationMainScreen = ({ navigation }) => {
       <Toast
         message={toastMessage}
         visible={toastVisible}
-        onHide={() => setToastVisible(false)}
+        onHide={hideToast}
       />
     </SafeAreaView>
   );

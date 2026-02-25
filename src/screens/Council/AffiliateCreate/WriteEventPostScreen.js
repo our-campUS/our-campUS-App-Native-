@@ -30,6 +30,7 @@ import {
   uploadImageToPresignedUrl,
 } from '../../../api/uploadImage';
 import Toast from '../../../components/common/Toast';
+import useToast from '../../../hooks/useToast';
 
 const WriteEventPostScreen = ({ navigation, route }) => {
   const colorScheme = Appearance.getColorScheme();
@@ -46,8 +47,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [placeInfo, setPlaceInfo] = useState(null);
   const { accessToken } = useAuthStore();
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   useEffect(() => {
     handleImagePicker();
@@ -245,8 +245,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
     let response = await createCouncilPost(finalSubmitEventData, accessToken);
     console.log('response at handleSubmit', response);
     if (response.data.code === 201) {
-      setToastMessage('게시글이 등록되었어요!');
-      setToastVisible(true);
+      showToast('게시글이 등록되었어요!');
       setTimeout(() => {
         navigation?.reset({
           index: 0,
@@ -410,7 +409,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
       <Toast
         message={toastMessage}
         visible={toastVisible}
-        onHide={() => setToastVisible(false)}
+        onHide={hideToast}
         duration={1000}
         hasNavBar={false}
       />

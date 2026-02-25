@@ -1,6 +1,7 @@
 import typography from '@/style/typography';
+import colors from '../../style/colors';
 import React, { useEffect, useRef } from 'react';
-import { Text, StyleSheet, Animated, useWindowDimensions } from 'react-native';
+import { Text, StyleSheet, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TAB_BAR_HEIGHT = 49;
@@ -15,12 +16,11 @@ const Toast = ({
 }) => {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
-  const { height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
   const bottomPosition = hasNavBar
     ? insets.bottom + tabBarHeight + 22
-    : screenHeight - 736;
+    : insets.bottom + 22;
 
   useEffect(() => {
     if (visible) {
@@ -80,13 +80,13 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     alignSelf: 'center',
-    backgroundColor: '#595F63CC',
+    backgroundColor: colors.overlay.toast,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 50,
   },
   text: {
-    color: 'white',
+    color: colors.common.white,
     ...typography.body4Regular,
   },
 });

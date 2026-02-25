@@ -18,6 +18,7 @@ import {
   EditCouncilPost,
 } from '../../../api/councilAffiliate';
 import Toast from '../../../components/common/Toast';
+import useToast from '../../../hooks/useToast';
 
 const LOGO_CATEGORIES = [
   {
@@ -79,8 +80,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     useState(false);
   console.log(route.params);
   const [dataFromPreviousScreen, setDataFromPreviousScreen] = useState(null);
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   // route.params가 변경될 때마다 즉시 로고를 찾기
   const initialLogo = useMemo(() => {
@@ -190,8 +190,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     let response = await createCouncilPost(finalData, accessToken);
     console.log('response at handleSubmit', response);
     if (response.data.code === 201) {
-      setToastMessage('게시글이 등록되었어요!');
-      setToastVisible(true);
+      showToast('게시글이 등록되었어요!');
       setTimeout(() => {
         navigation?.reset({
           index: 0,
@@ -232,8 +231,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     );
     console.log('response at handleEditSubmit', response);
     if (response.data.code === 200) {
-      setToastMessage('게시글이 수정되었어요!');
-      setToastVisible(true);
+      showToast('게시글이 수정되었어요!');
       setTimeout(() => {
         navigation?.reset({
           index: 0,
@@ -314,7 +312,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
       <Toast
         message={toastMessage}
         visible={toastVisible}
-        onHide={() => setToastVisible(false)}
+        onHide={hideToast}
         duration={1000}
         hasNavBar={false}
       />
