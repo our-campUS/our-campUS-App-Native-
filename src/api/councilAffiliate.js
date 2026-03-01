@@ -137,14 +137,16 @@ export const deleteCouncilPost = async (postId, accessToken) => {
     if (response.data.code === 200) {
       console.log('deleteCouncilPost success');
       console.log(response.data);
-      // return response;
+      return response;
     } else {
       console.log('deleteCouncilPost error');
       console.log(response.data);
+      throw new Error(response.data.message || 'deleteCouncilPost failed');
     }
   } catch (error) {
     console.log('deleteCouncilPost error');
     console.log(error.response);
+    throw error;
   }
 };
 

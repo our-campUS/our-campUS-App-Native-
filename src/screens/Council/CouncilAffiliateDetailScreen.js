@@ -5,6 +5,7 @@ import {
   ScrollView,
   FlatList,
   Image,
+  Alert,
   useWindowDimensions,
   Pressable,
 } from 'react-native';
@@ -24,10 +25,13 @@ import PlaceHolderRepresentativeImage from '../../../assets/placeHolderImage.svg
 import BadgeIcon from '../../../assets/badgeIcon.svg';
 import CouponIcon from '../../../assets/couponIcon.svg';
 import useAuthStore from '../../store/authStore';
+import EditPostBottomSheet from '../../components/Council/EditPostBottomSheet';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import {
   getCouncilAffiliatePostDetail,
   getCouncilAffiliatePosts,
   getCouncilEventPosts,
+  deleteCouncilPost,
 } from '../../api/councilAffiliate';
 
 const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
@@ -41,10 +45,42 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   const [recommendData, setRecommendData] = useState(null);
   const [startMinute, setStartMinute] = useState(null);
   const [startHour, setStartHour] = useState(null);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   console.log('user', user);
   console.log('route.params', route.params);
   const postId = route.params?.item?.postId;
+  const category = route.params?.item?.category;
   console.log('postId', postId);
+
+  const handleEdit = () => {
+    setIsMenuVisible(false);
+    if (category === 'PARTNERSHIP') {
+      navigation.navigate('AffiliateEditScreen', { postId });
+    } else {
+      navigation.navigate('EventEditScreen', { postId });
+    }
+  };
+
+  const handleDelete = () => {
+    setIsMenuVisible(false);
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleteModalVisible(false);
+    setIsDeleting(true);
+    try {
+      await deleteCouncilPost(postId, accessToken);
+      navigation.goBack();
+    } catch (error) {
+      console.error('deleteCouncilPost error', error);
+      Alert.alert('삭제 실패', '게시글 삭제 중 오류가 발생했어요. 다시 시도해주세요.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   useEffect(() => {
     if (postId) {
       const fetchPostDetail = async () => {
@@ -133,6 +169,24 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
         navigation={navigation}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
+        useRightButton={true}
+        rightButtonText="⋮"
+        onPressRight={() => setIsMenuVisible(true)}
+      />
+      <EditPostBottomSheet
+        isVisible={isMenuVisible}
+        onClose={() => setIsMenuVisible(false)}
+        onSelectEdit={handleEdit}
+        onSelectDelete={handleDelete}
+      />
+      <ConfirmModal
+        isVisible={isDeleteModalVisible}
+        onClose={() => setIsDeleteModalVisible(false)}
+        onConfirm={handleConfirmDelete}
+        title="삭제하기"
+        description="게시글을 삭제하시겠어요?"
+        confirmText="확인"
+        cancelText="취소"
       />
       {/* <View style={{ height: 20 }} /> */}
       <ScrollView style={{ flex: 1 }}>
@@ -429,10 +483,6 @@ const styles = StyleSheet.create({
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  recommendTitle: {
-    ...typography.body4Bold,
-    color: colors.gray[850],
   },
   placeType: {
     ...typography.caption2Regular,

@@ -13,7 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import LabelTitle from '../../components/LabelTitle';
 import ReviewItem from '../../components/review/ReviewItem';
-import ReviewActionModal from '../../components/review/ReviewActionModal';
+// import ReviewActionModal from '../../components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
 import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
@@ -27,7 +27,7 @@ const ReviewListScreen = () => {
 
   const { storeName, star, placeId, reviewSize } = route.params;
 
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false); // TODO: 스캔 플로우 복구 시 주석 해제
   const [filter, setFilter] = useState('LATEST');
 
   const [reviews, setReviews] = useState([]);
@@ -198,7 +198,15 @@ const ReviewListScreen = () => {
       <View style={styles.floatingButtonContainer}>
         <TouchableOpacity
           style={styles.writeButton}
-          onPress={() => setModalVisible(true)}
+          onPress={() => {
+            // TODO: 스캔 플로우 복구 시 아래 주석 해제
+            // setModalVisible(true);
+            navigation.navigate('WriteReviewScreen', {
+              placeId: placeId,
+              storeName: storeName,
+              rating: star,
+            });
+          }}
         >
           <Ionicons
             name="pencil"
@@ -210,6 +218,7 @@ const ReviewListScreen = () => {
         </TouchableOpacity>
       </View>
 
+      {/* TODO: 스캔 플로우 복구 시 아래 주석 해제
       <ReviewActionModal
         isVisible={modalVisible}
         storeName={storeName}
@@ -219,6 +228,7 @@ const ReviewListScreen = () => {
           navigation.navigate('CameraScanScreen');
         }}
       />
+      */}
     </SafeAreaView>
   );
 };

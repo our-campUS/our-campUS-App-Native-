@@ -45,34 +45,35 @@ const MapSearchScreen = () => {
     setSearchHistory(history);
   };
 
-  useEffect(() => {
-    if (!keyword.trim()) {
-      setSearchResults([]);
-      return;
-    }
+  // NOTE: 검색 중 연관 검색어
+  // useEffect(() => {
+  //   if (!keyword.trim()) {
+  //     setSearchResults([]);
+  //     return;
+  //   }
 
-    const timer = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const lat = 37.55703;
-        const lng = 126.9602;
-        const data = await getPlacesSearchInfo(keyword, lat, lng);
+  //   const timer = setTimeout(async () => {
+  //     setLoading(true);
+  //     try {
+  //       const lat = 37.55703;
+  //       const lng = 126.9602;
+  //       const data = await getPlacesSearchInfo(keyword, lat, lng);
 
-        if (data) {
-          setSearchResults(data);
-        } else {
-          setSearchResults([]);
-        }
-      } catch (error) {
-        console.error('검색 실패:', error);
-        setSearchResults([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 500);
+  //       if (data) {
+  //         setSearchResults(data);
+  //       } else {
+  //         setSearchResults([]);
+  //       }
+  //     } catch (error) {
+  //       console.error('검색 실패:', error);
+  //       setSearchResults([]);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }, 500);
 
-    return () => clearTimeout(timer);
-  }, [keyword]);
+  //   return () => clearTimeout(timer);
+  // }, [keyword]);
 
   const renderEmptyComponent = () => (
     <View style={styles.emptyContainer}>
@@ -222,18 +223,15 @@ const MapSearchScreen = () => {
       </View>
 
       {/* 조건부 렌더링 */}
-      {keyword.length > 0 ? (
-        <FlatList
-          data={searchResults}
-          keyExtractor={(item, index) =>
-            item.placeKey ? String(item.placeKey) : String(index)
-          }
-          renderItem={renderResultItem}
-          contentContainerStyle={styles.listContent}
-          keyboardShouldPersistTaps="handled"
-          ListEmptyComponent={renderEmptyComponent}
-        />
-      ) : (
+      {keyword.length > 0 ? //   keyExtractor={(item, index) => //   data={searchResults} // <FlatList
+      //     item.placeKey ? String(item.placeKey) : String(index)
+      //   }
+      //   renderItem={renderResultItem}
+      //   contentContainerStyle={styles.listContent}
+      //   keyboardShouldPersistTaps="handled"
+      //   ListEmptyComponent={renderEmptyComponent}
+      // />
+      null : (
         <>
           <View style={styles.categoryWrapper}>
             <ScrollView

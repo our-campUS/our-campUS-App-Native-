@@ -36,6 +36,9 @@ const colors = {
     '050': '#E6F5FF', // light
     '000': '#F5FBFF',
   },
+  overlay: {
+    toast: '#595F63CC', // gray[700] 80% opacity
+  },
   orange: {
     900: '#733102', // dark active
     850: '#994104', // dark hover

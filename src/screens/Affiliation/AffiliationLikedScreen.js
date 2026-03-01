@@ -24,6 +24,8 @@ import { AFFILIATION_RECOMMEND_DATA } from '../../constants/DummyData';
 import PlaceHolderRepresentativeImage from '../../../assets/placeHolderImage.svg';
 import BadgeIcon from '../../../assets/badgeIcon.svg';
 import CouponIcon from '../../../assets/couponIcon.svg';
+import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 import {
   getStudentAffiliateDetail,
   getStudentAffiliateRecommendList,
@@ -46,6 +48,7 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
   const [isEmpty, setIsEmpty] = useState(true);
   const [recommendData, setRecommendData] = useState([]);
   const [imagesLoaded, setImagesLoaded] = useState({}); // 각 이미지의 로딩 상태 추적
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
   const [isFirstImageLoaded, setIsFirstImageLoaded] = useState(false); // 첫 번째 이미지 로딩 상태
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
@@ -276,6 +279,7 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
                     if (detailData) {
                       setDetailData({ ...detailData, liked: newLikedState });
                     }
+                    showToast(newLikedState ? '관심 목록에 추가되었어요!' : '관심 목록에서 삭제되었어요.');
                   } catch (error) {
                     // 실패 시 롤백
                     setIsLiked(!newLikedState);
@@ -389,6 +393,11 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
           </View>
         )}
       </ScrollView>
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+      />
     </SafeAreaView>
   );
 };

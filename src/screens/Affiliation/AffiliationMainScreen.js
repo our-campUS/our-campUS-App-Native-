@@ -6,8 +6,12 @@ import {
   ScrollView,
   FlatList,
   Pressable,
+  TextInput,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import { useState, useEffect } from 'react';
@@ -43,9 +47,12 @@ const styles = StyleSheet.create({
   },
   activityTypeSelector: {
     width: '100%',
-    padding: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 9,
+    backgroundColor: colors.gray['000'],
   },
   activityTypeSelectorButton: {
     borderRadius: 30,
@@ -74,10 +81,43 @@ const styles = StyleSheet.create({
     ...typography.body4Regular,
     color: colors.blue[600],
   },
+  searchIconButton: {
+    marginLeft: 'auto',
+  },
+  searchBarContainer: {
+    width: '100%',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.gray['000'],
+  },
+  searchChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.gray[200],
+    borderRadius: 5,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+  },
+  searchChipText: {
+    ...typography.caption2Regular,
+    color: colors.gray[800],
+  },
+  searchInput: {
+    flex: 1,
+    ...typography.body4Regular,
+    color: colors.gray[850],
+    paddingVertical: 0,
+  },
 });
 
 const AffiliationMainScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const { accessToken } = useAuthStore();
   const [affiliatePosts, setAffiliatePosts] = useState([]);
   const [eventPosts, setEventPosts] = useState([]);
@@ -94,6 +134,7 @@ const AffiliationMainScreen = ({ navigation }) => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loadedTabs, setLoadedTabs] = useState(new Set()); // 이미 로드된 탭 추적
   const [isLoading, setIsLoading] = useState(false);
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   // 특정 탭의 데이터를 fetch하는 함수
   const fetchTabData = async (tab) => {
@@ -102,41 +143,41 @@ const AffiliationMainScreen = ({ navigation }) => {
     setIsLoading(true);
     try {
       if (tab === 'school') {
-        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
           getStudentSchoolAffiliateList(accessToken),
           getStudentSchoolEventList(accessToken),
           getStudentSchoolUpcomingEventList(accessToken),
         ]);
-        setSchoolAffiliatePosts(affiliatePosts);
-        setSchoolEventPosts(eventPosts);
-        setUpcomingSchoolEvents(upcomingEvents);
-        setAffiliatePosts(affiliatePosts);
-        setEventPosts(eventPosts);
-        setUpcomingEvents(upcomingEvents);
+        setSchoolAffiliatePosts(fetched);
+        setSchoolEventPosts(fetchedEvents);
+        setUpcomingSchoolEvents(fetchedUpcoming);
+        setAffiliatePosts(fetched);
+        setEventPosts(fetchedEvents);
+        setUpcomingEvents(fetchedUpcoming);
       } else if (tab === 'major') {
-        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
           getStudentMajorAffiliateList(accessToken),
           getStudentMajorEventList(accessToken),
           getStudentMajorUpcomingEventList(accessToken),
         ]);
-        setMajorAffiliatePosts(affiliatePosts);
-        setMajorEventPosts(eventPosts);
-        setUpcomingMajorEvents(upcomingEvents);
-        setAffiliatePosts(affiliatePosts);
-        setEventPosts(eventPosts);
-        setUpcomingEvents(upcomingEvents);
+        setMajorAffiliatePosts(fetched);
+        setMajorEventPosts(fetchedEvents);
+        setUpcomingMajorEvents(fetchedUpcoming);
+        setAffiliatePosts(fetched);
+        setEventPosts(fetchedEvents);
+        setUpcomingEvents(fetchedUpcoming);
       } else if (tab === 'college') {
-        const [affiliatePosts, eventPosts, upcomingEvents] = await Promise.all([
+        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
           getStudentCollegeAffiliateList(accessToken),
           getStudentCollegeEventList(accessToken),
           getStudentCollegeUpcomingEventList(accessToken),
         ]);
-        setCollegeAffiliatePosts(affiliatePosts);
-        setCollegeEventPosts(eventPosts);
-        setUpcomingCollegeEvents(upcomingEvents);
-        setAffiliatePosts(affiliatePosts);
-        setEventPosts(eventPosts);
-        setUpcomingEvents(upcomingEvents);
+        setCollegeAffiliatePosts(fetched);
+        setCollegeEventPosts(fetchedEvents);
+        setUpcomingCollegeEvents(fetchedUpcoming);
+        setAffiliatePosts(fetched);
+        setEventPosts(fetchedEvents);
+        setUpcomingEvents(fetchedUpcoming);
       }
       // 로드된 탭 추가
       setLoadedTabs((prev) => new Set([...prev, tab]));
@@ -196,8 +237,15 @@ const AffiliationMainScreen = ({ navigation }) => {
 
   const handleLike = async (postId) => {
     try {
+      const currentPost =
+        affiliatePosts.find((p) => p.id === postId || p.postId === postId) ||
+        eventPosts.find((p) => p.id === postId || p.postId === postId);
+      const wasLiked = currentPost?.liked;
+
       const response = await toggleStudentAffiliateLike(accessToken, postId);
       console.log('handleLike response', response);
+
+      showToast(wasLiked ? '관심 목록에서 삭제되었어요.' : '관심 목록에 추가되었어요!');
 
       // 좋아요 상태 업데이트 함수
       const updateLikeStatus = (posts, setPosts) => {
@@ -250,52 +298,93 @@ const AffiliationMainScreen = ({ navigation }) => {
       )}
       {/* <AffiliationCarousel /> */}
       {/* <AffiliationColumnList navigation={navigation} /> */}
-      <View style={styles.activityTypeSelector}>
-        <Pressable
-          style={[
-            styles.activityTypeSelectorButton,
-            selectedActivityType === '제휴'
-              ? styles.activityTypeSelectorButtonPressed
-              : styles.activityTypeSelectorButton,
-          ]}
-          onPress={() => setSelectedActivityType('제휴')}
-        >
-          <Text
-            style={
+      {isSearchMode ? (
+        <View style={styles.searchBarContainer}>
+          <View style={styles.searchChip}>
+            <Text style={styles.searchChipText}>{selectedActivityType}</Text>
+            <Pressable
+              onPress={() => {
+                setIsSearchMode(false);
+                setSearchText('');
+              }}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Ionicons name="close" size={13} color={colors.gray[800]} />
+            </Pressable>
+          </View>
+          <TextInput
+            style={styles.searchInput}
+            placeholder={`어떤 ${selectedActivityType}를 찾으시나요?`}
+            placeholderTextColor={colors.gray[400]}
+            value={searchText}
+            onChangeText={setSearchText}
+            autoFocus
+            returnKeyType="search"
+          />
+          <Ionicons name="search" size={16} color={colors.gray[400]} />
+        </View>
+      ) : (
+        <View style={styles.activityTypeSelector}>
+          <Pressable
+            style={[
+              styles.activityTypeSelectorButton,
               selectedActivityType === '제휴'
-                ? styles.activityTypeSelectorButtonTextPressed
-                : styles.activityTypeSelectorButtonText
-            }
+                ? styles.activityTypeSelectorButtonPressed
+                : styles.activityTypeSelectorButton,
+            ]}
+            onPress={() => setSelectedActivityType('제휴')}
           >
-            제휴
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.activityTypeSelectorButton,
-            selectedActivityType === '행사'
-              ? styles.activityTypeSelectorButtonPressed
-              : styles.activityTypeSelectorButton,
-          ]}
-          onPress={() => setSelectedActivityType('행사')}
-        >
-          <Text
-            style={
+            <Text
+              style={
+                selectedActivityType === '제휴'
+                  ? styles.activityTypeSelectorButtonTextPressed
+                  : styles.activityTypeSelectorButtonText
+              }
+            >
+              제휴
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.activityTypeSelectorButton,
               selectedActivityType === '행사'
-                ? styles.activityTypeSelectorButtonTextPressed
-                : styles.activityTypeSelectorButtonText
-            }
+                ? styles.activityTypeSelectorButtonPressed
+                : styles.activityTypeSelectorButton,
+            ]}
+            onPress={() => setSelectedActivityType('행사')}
           >
-            행사
-          </Text>
-        </Pressable>
-      </View>
+            <Text
+              style={
+                selectedActivityType === '행사'
+                  ? styles.activityTypeSelectorButtonTextPressed
+                  : styles.activityTypeSelectorButtonText
+              }
+            >
+              행사
+            </Text>
+          </Pressable>
+          <Pressable
+            style={styles.searchIconButton}
+            onPress={() => setIsSearchMode(true)}
+          >
+            <Ionicons name="search" size={16} color={colors.gray[400]} />
+          </Pressable>
+        </View>
+      )}
       {selectedActivityType === '제휴' && (
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
-          data={affiliatePosts}
+          data={
+            isSearchMode && searchText
+              ? affiliatePosts.filter(
+                  (post) =>
+                    post.title?.includes(searchText) ||
+                    post.placeName?.includes(searchText)
+                )
+              : affiliatePosts
+          }
           renderItem={({ item }) => (
             <AffiliationColumnListItem
               handleLike={handleLike}
@@ -312,7 +401,15 @@ const AffiliationMainScreen = ({ navigation }) => {
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
-          data={eventPosts}
+          data={
+            isSearchMode && searchText
+              ? eventPosts.filter(
+                  (post) =>
+                    post.title?.includes(searchText) ||
+                    post.placeName?.includes(searchText)
+                )
+              : eventPosts
+          }
           renderItem={({ item }) => (
             <AffiliationColumnListItem
               handleLike={handleLike}
@@ -324,6 +421,11 @@ const AffiliationMainScreen = ({ navigation }) => {
           keyExtractor={(item) => item.id}
         />
       )}
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+      />
     </SafeAreaView>
   );
 };

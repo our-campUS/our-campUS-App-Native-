@@ -17,7 +17,8 @@ import {
   createCouncilPost,
   EditCouncilPost,
 } from '../../../api/councilAffiliate';
-import Toast from 'react-native-toast-message';
+import Toast from '../../../components/common/Toast';
+import useToast from '../../../hooks/useToast';
 
 const LOGO_CATEGORIES = [
   {
@@ -79,6 +80,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     useState(false);
   console.log(route.params);
   const [dataFromPreviousScreen, setDataFromPreviousScreen] = useState(null);
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   // route.params가 변경될 때마다 즉시 로고를 찾기
   const initialLogo = useMemo(() => {
@@ -188,15 +190,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     let response = await createCouncilPost(finalData, accessToken);
     console.log('response at handleSubmit', response);
     if (response.data.code === 201) {
-      Toast.show({
-        type: 'success',
-        text1: '제휴 글쓰기 성공',
-        text2: '제휴 글이 성공적으로 등록되었습니다.',
-        position: 'top',
-        topOffset: 100,
-        visibilityTime: 1000,
-        autoHide: true,
-      });
+      showToast('게시글이 등록되었어요!');
       setTimeout(() => {
         navigation?.reset({
           index: 0,
@@ -237,15 +231,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     );
     console.log('response at handleEditSubmit', response);
     if (response.data.code === 200) {
-      Toast.show({
-        type: 'success',
-        text1: '제휴 글 수정 성공',
-        text2: '제휴 글이 성공적으로 수정되었습니다.',
-        position: 'top',
-        topOffset: 100,
-        visibilityTime: 1000,
-        autoHide: true,
-      });
+      showToast('게시글이 수정되었어요!');
       setTimeout(() => {
         navigation?.reset({
           index: 0,
@@ -323,7 +309,13 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
           }
         />
       </View>
-      <Toast />
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        duration={1000}
+        hasNavBar={false}
+      />
       <ChooseLogoBottomSheet
         isVisible={isChooseLogoBottomSheetVisible}
         onClose={() => setIsChooseLogoBottomSheetVisible(false)}
