@@ -87,17 +87,6 @@ android {
         versionCode 1
         versionName "1.0"
         
-        // env 설정
-        def envFile = rootProject.file("../.env")
-        def env = new Properties()
-        
-        if (envFile.exists()) {
-            env.load(new FileInputStream(envFile))
-        }
-
-        manifestPlaceholders = [
-            NAVER_CLIENT_ID: env.getProperty("NAVER_CLIENT_ID") ?: "" 
-        ]
     }
     signingConfigs {
         debug {

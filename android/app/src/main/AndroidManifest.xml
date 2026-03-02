@@ -19,10 +19,7 @@
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="0f9184fd81013e6c5cee65e7e2d21151" />
-        <meta-data
-            android:name="com.naver.maps.map.NCP_KEY_ID"
-            android:value="${NAVER_CLIENT_ID}" />
+            android:value="e946ff8b2f70ab517762db6e96f0fb0f" />
 
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
@@ -33,7 +30,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- 스킴 = 반드시 네이티브 앱키 그대로 -->
-                <data android:scheme="kakao0f9184fd81013e6c5cee65e7e2d21151"/>
+                <data android:scheme="kakaoe946ff8b2f70ab517762db6e96f0fb0f"/>
             </intent-filter>
         </activity>
 
