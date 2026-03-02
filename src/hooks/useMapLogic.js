@@ -1,18 +1,11 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import {
-  Dimensions,
-  Keyboard,
-  Platform,
-  PermissionsAndroid,
-  Alert,
-} from 'react-native';
+import { Keyboard } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   getAddressFromCoords,
   getPartnerships,
   getMapMarkers,
   getPartnershipDetail,
-  getPlacesByKeyword,
   getPlacesSearch,
   getPlacesSearchInfo,
   getPlaceStatus,
@@ -30,6 +23,7 @@ export const useMapLogic = (mapRef) => {
   const [currentAddress, setCurrentAddress] = useState('');
 
   const [partnerships, setPartnerships] = useState([]);
+
   const [mapMarkers, setMapMarkers] = useState([]);
   const [selectedStoreDetail, setSelectedStoreDetail] = useState(null);
 
@@ -41,11 +35,9 @@ export const useMapLogic = (mapRef) => {
     latitude: 37.5570389272802,
     longitude: 126.960204232592,
   });
-
   useFocusEffect(
     useCallback(() => {
       if (searchKeyword || selectedCategory) {
-        console.log('🔄 [리스트] 화면 복귀: 데이터 새로고침');
         fetchPartnershipList(false);
       }
     }, [searchKeyword, selectedCategory]) // 의존성 배열 확인
@@ -57,14 +49,12 @@ export const useMapLogic = (mapRef) => {
 
     const processedData = rawData.map((item) => {
       const targetId = item.placeId || item.id;
-      const existingPartner = mapMarkers.find((m) => m.placeId == targetId);
+      const existingPartner = mapMarkers.find((m) => m.placeId === targetId);
 
       const hasPartnership = item.partnerships && item.partnerships.length > 0;
       const extractedPostId = hasPartnership
         ? item.partnerships[0]?.postId
         : item.postId;
-
-      console.log('타겟 아이디' + targetId);
 
       return {
         ...item,
@@ -200,41 +190,15 @@ export const useMapLogic = (mapRef) => {
           return;
         }
 
-        console.log('🔎 키워드 검색 시작:', searchKeyword);
         const rawData = await getPlacesSearchInfo(searchKeyword, lat, lng);
-
-        console.log('📦 원본 검색 결과:', rawData);
-        console.log('📦 첫 번째 항목:', rawData?.[0]);
-
         newData = await processSearchData(rawData, true);
-
-        console.log('📦 처리된 결과:', newData);
-        console.log('📦 첫 번째 처리된 항목:', newData?.[0]);
-      }
-      // C. 일반 리스트
-      else {
-        const response = await getPartnerships({
-          lat: 37.5570389272802,
-          lng: 126.960204232592,
-          cursor: isLoadMore ? nextCursor : null,
-          size: 5,
-        });
-        if (response?.code === 200) {
-          newData = await processSearchData(
-            response.data.map((item) => ({ ...item, type: 'PARTNER' })),
-            true
-          );
-        }
       }
 
       // 상태 업데이트
       if (!isLoadMore) {
-        // 중복 제거
         const uniqueMarkers = Array.from(
           new Map(newData.map((item) => [item.placeId, item])).values()
         );
-
-        console.log('📍 새 마커 설정:', uniqueMarkers.length, '개');
         setMapMarkers(uniqueMarkers);
       }
 
@@ -279,8 +243,6 @@ export const useMapLogic = (mapRef) => {
         setSelectedCategory(null);
         setSelectedMarkerId(null);
       } else if (searchType === 'LOCATION' && selectedLocation) {
-        console.log('1️⃣ 이전 화면에서 넘겨온 데이터:', selectedLocation);
-
         const locationData = {
           placeId: selectedLocation.placeId,
           name: selectedLocation.name,
@@ -295,8 +257,6 @@ export const useMapLogic = (mapRef) => {
           postId: selectedLocation.postId,
         };
 
-        console.log('2️⃣ 생성된 locationData:', locationData);
-
         setMapMarkers((prev) => {
           const filtered = prev.filter(
             (m) => m.placeId !== locationData.placeId
@@ -309,11 +269,6 @@ export const useMapLogic = (mapRef) => {
 
         const fetchDetailIfNeeded = async () => {
           if (selectedLocation.postId) {
-            console.log(
-              '📍 제휴글 상세 정보 조회 중...',
-              selectedLocation.postId
-            );
-
             const detail = await getPartnershipDetail(
               selectedLocation.postId,
               selectedLocation.latitude,
@@ -321,20 +276,14 @@ export const useMapLogic = (mapRef) => {
             );
 
             if (detail) {
-              console.log('✅ 상세 정보 조회 성공:', detail);
               setSelectedStoreDetail({
                 ...detail,
-                placeId: locationData.placeId, // 원본 placeId 명시적 유지
+                placeId: locationData.placeId,
               });
             } else {
-              console.log('⚠️ 상세 정보 조회 실패, 기본 데이터 사용');
               setSelectedStoreDetail(locationData);
             }
-          } else if (selectedLocation.partnerships?.length > 0) {
-            console.log('⚠️ postId 없음, 검색 결과의 기본 이미지 사용');
-            setSelectedStoreDetail(locationData);
           } else {
-            console.log('📌 일반 장소');
             setSelectedStoreDetail(locationData);
           }
         };
@@ -367,7 +316,7 @@ export const useMapLogic = (mapRef) => {
   }, [searchKeyword, selectedCategory]);
 
   const handleCameraIdle = async (e) => {
-    const { latitude, longitude, zoom } = e;
+    const { latitude, longitude, minLat, maxLat, minLng, maxLng } = e;
     lastCameraRef.current = { latitude, longitude };
 
     const addressData = await getAddressFromCoords(latitude, longitude);
@@ -375,22 +324,13 @@ export const useMapLogic = (mapRef) => {
 
     if (searchKeyword || selectedCategory) return;
 
-    if (mapRef.current) {
-      try {
-        const zoomFactor = Math.pow(2, 16 - (zoom || 16));
-        const delta = 0.01 * zoomFactor;
-        const markers = await getMapMarkers(
-          latitude - delta,
-          latitude + delta,
-          longitude - delta,
-          longitude + delta
-        );
-        if (markers) {
-          setMapMarkers(markers.map((item) => ({ ...item, type: 'PARTNER' })));
-        }
-      } catch (err) {
-        console.error(err);
+    try {
+      const markers = await getMapMarkers(minLat, maxLat, minLng, maxLng);
+      if (markers?.length > 0) {
+        setMapMarkers(markers.map((item) => ({ ...item, type: 'PARTNER' })));
       }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -424,37 +364,8 @@ export const useMapLogic = (mapRef) => {
     setSelectedCategory(null);
     setSearchKeyword(null);
     setSelectedStoreDetail(null);
-    setMapMarkers([]);
     setPartnerships([]);
   };
-
-  // const handleCurrentLocation = async () => {
-  //   try {
-  //     // 1. [Android] 권한 요청 로직 강화
-  //     if (Platform.OS === 'android') {
-  //       const granted = await PermissionsAndroid.request(
-  //         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-  //       );
-  //       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-  //         Alert.alert('알림', '위치 권한을 허용해주세요.');
-  //         return;
-  //       }
-  //     }
-
-  //     // 2. [iOS/Android 공통] MapRef 유효성 체크
-  //     if (!mapRef.current) {
-  //         console.log("Map ref is not ready");
-  //         return;
-  //     }
-
-  //     // 3. 트래킹 모드 설정 ('Follow'로 설정하면 현위치로 이동하며 따라다님)
-  //     // @mj-studio/react-native-naver-map 라이브러리 방식
-  //     mapRef.current.setLocationTrackingMode('Follow');
-
-  //   } catch (e) {
-  //     console.error('handleCurrentLocation Error:', e);
-  //   }
-  // };
 
   const handleCurrentLocation = () => {
     const TARGET_LAT = 37.5570389272802;
@@ -466,8 +377,6 @@ export const useMapLogic = (mapRef) => {
       zoom: 16,
       duration: 500,
     });
-
-    console.log('📍 임의 설정한 위치로 이동했습니다.');
   };
 
   // --- 5. 계산된 데이터 (Displayed Data) ---

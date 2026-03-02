@@ -1,13 +1,9 @@
 import { initializeKakaoSDK } from '@react-native-kakao/core';
-// import { login } from '@react-native-kakao/user';
 import { KAKAO_NATIVE_APP_KEY } from '@env';
-// import api from './axiosInstance';
-// import useAuthStore from '../store/authStore';
 
 // 카카오 SDK 초기화
 export function initKakao() {
   initializeKakaoSDK(KAKAO_NATIVE_APP_KEY);
-  console.log('KAKAO_NATIVE_APP_KEY', KAKAO_NATIVE_APP_KEY);
 }
 
 import {
@@ -58,7 +54,7 @@ export async function onKakaoLogin() {
 
     return { isValid: false, isProfileNotCompleted: false };
   } catch (error) {
-    console.error('❌ Kakao Login Error:', error.response);
+    console.error('❌ Kakao Login Error:', error?.message ?? error);
     return false;
   }
 }
