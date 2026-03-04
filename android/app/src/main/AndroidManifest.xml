@@ -19,7 +19,7 @@
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="e946ff8b2f70ab517762db6e96f0fb0f" />
+            android:value="${KAKAO_NATIVE_APP_KEY}" />
 
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
@@ -30,7 +30,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- 스킴 = 반드시 네이티브 앱키 그대로 -->
-                <data android:scheme="kakaoe946ff8b2f70ab517762db6e96f0fb0f"/>
+                <data android:scheme="${KAKAO_APP_SCHEME}"/>
             </intent-filter>
         </activity>
 
