@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Animated,
@@ -7,16 +7,12 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import {
-  NaverMapView,
-  NaverMapMarkerOverlay,
-} from '@mj-studio/react-native-naver-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import KakaoMapWebView from '../../components/map/KakaoMapWebView';
 
 import SearchBar from '../../components/SearchBar';
 import CategoryList from '../../components/map/CategoryList';
 import BottomSheet from '../../components/map/BottomSheet';
-import MapPin from '../../components/common/MapPin';
 import LocationIcon from '../../../assets/icons/location.svg';
 import theme from '../../style';
 
@@ -74,60 +70,50 @@ const MapScreen = () => {
     extrapolate: 'clamp',
   });
 
-  const getPinSize = (type) => (type === 'SELECTED' ? 56 : 44);
-
   const uniqueMarkers = useMemo(() => {
     const seen = new Set();
     return mapMarkers.filter((item) => {
-      if (seen.has(item.placeId)) {
-        return false;
-      }
+      if (seen.has(item.placeId)) return false;
       seen.add(item.placeId);
       return true;
     });
   }, [mapMarkers]);
 
+  const markersWithPinType = useMemo(() => {
+    return uniqueMarkers.map((item) => {
+      const isSelected = item.placeId === selectedMarkerId;
+      const pinType = isSelected
+        ? 'SELECTED'
+        : item.partnerTitle || item.type === 'PARTNER'
+        ? 'PARTNER'
+        : 'DEFAULT';
+      return { ...item, pinType };
+    });
+  }, [uniqueMarkers, selectedMarkerId]);
+
+  const handleMarkerTap = useCallback(
+    ({ placeId }) => {
+      const item = uniqueMarkers.find((m) => String(m.placeId) === String(placeId));
+      if (item) handlePinPress(item);
+    },
+    [uniqueMarkers, handlePinPress],
+  );
+
   return (
     <View style={styles.container}>
-      <NaverMapView
+      <KakaoMapWebView
         ref={mapRef}
         style={{ flex: 1 }}
-        onCameraIdle={handleCameraIdle}
         initialCamera={{
           latitude: 37.5570389272802,
           longitude: 126.960204232592,
           zoom: 16,
         }}
-        isShowLocationButton={false}
-        isShowZoomControls={false}
-        onTapMap={handleReset}
-      >
-        {uniqueMarkers.map((item, index) => {
-          const isSelected = item.placeId === selectedMarkerId;
-          const pinType = isSelected
-            ? 'SELECTED'
-            : item.partnerTitle || item.type === 'PARTNER'
-            ? 'PARTNER'
-            : 'DEFAULT';
-
-          const uniqueKey = `marker-${item.placeId}-${item.latitude}-${item.longitude}-${index}`;
-
-          return (
-            <NaverMapMarkerOverlay
-              key={uniqueKey}
-              latitude={item.latitude}
-              longitude={item.longitude}
-              width={getPinSize(pinType)}
-              height={getPinSize(pinType)}
-              anchor={{ x: 0.5, y: isSelected ? 1 : 0.5 }}
-              onTap={() => handlePinPress(item)}
-              caption={{ text: item.name }}
-            >
-              <MapPin type={pinType} category={item.category} />
-            </NaverMapMarkerOverlay>
-          );
-        })}
-      </NaverMapView>
+        markers={markersWithPinType}
+        onCameraIdle={handleCameraIdle}
+        onMarkerTap={handleMarkerTap}
+        onMapTap={handleReset}
+      />
 
       {/* 상단 검색바 영역 */}
       <View
