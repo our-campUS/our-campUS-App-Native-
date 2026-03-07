@@ -13,6 +13,7 @@ import AnnouncementScreen from '../../screens/MyPage/AnnouncementScreen';
 import AnnouncementDetailScreen from '../../screens/MyPage/AnnouncementDetailScreen';
 import InqueryMainScreen from '../../screens/MyPage/InqueryMainScreen';
 import CouncilChangePasswordCode from '../../screens/Council/MyPage/CouncilChangePasswordCode';
+import WebViewScreen from '../../screens/MyPage/WebViewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -87,6 +88,11 @@ const CouncilMainPageStack = () => {
       <Stack.Screen
         name="CouncilChangePasswordCode"
         component={CouncilChangePasswordCode}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="WebViewScreen"
+        component={WebViewScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

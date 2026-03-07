@@ -9,6 +9,7 @@ import InterestedPlaceIcon from '../../../../assets/Vector2.svg';
 import WrittenReviewIcon from '../../../../assets/ReviewIcon.svg';
 import ListItem from '../../../components/common/ListItem';
 import CouncilDefaultImage from '../../../../assets/councilDefaultImage.png';
+import MY_PAGE_MENU_LINKS from '../../../constants/myPageMenuLinks';
 import useAuthStore from '../../../store/authStore';
 
 const CouncilMyPageDefaultScreen = ({ navigation }) => {
@@ -64,6 +65,28 @@ const CouncilMyPageDefaultScreen = ({ navigation }) => {
           <ListItem
             title="1:1 문의게시판"
             onPress={() => navigation.navigate('InqueryMainScreen')}
+          />
+          <ListItem
+            title="서비스 이용안내"
+            onPress={() => {
+              if (MY_PAGE_MENU_LINKS.SERVICE_GUIDE) {
+                navigation.navigate('WebViewScreen', {
+                  uri: MY_PAGE_MENU_LINKS.SERVICE_GUIDE,
+                  title: '서비스 이용안내',
+                });
+              }
+            }}
+          />
+          <ListItem
+            title="개인정보 처리방침"
+            onPress={() => {
+              if (MY_PAGE_MENU_LINKS.PRIVACY_POLICY) {
+                navigation.navigate('WebViewScreen', {
+                  uri: MY_PAGE_MENU_LINKS.PRIVACY_POLICY,
+                  title: '개인정보 처리방침',
+                });
+              }
+            }}
           />
         </View>
       </View>
