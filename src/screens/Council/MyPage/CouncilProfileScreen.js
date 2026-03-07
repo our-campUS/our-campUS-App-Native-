@@ -16,7 +16,7 @@ import typography from '@style/typography';
 import CouncilDefaultImage from '@assets/councilDefaultImage.png';
 import EditIcon from '@assets/editIcon.svg';
 import CouncilEditIcon from '@assets/CouncilEditIcon.svg';
-import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
+import ListItem from '@components/common/ListItem';
 import { useState } from 'react';
 import Button from '@components/Button';
 import CustomToast from '@components/CustomToast';
@@ -236,55 +236,38 @@ const CouncilProfileScreen = ({ navigation, route }) => {
           <Text style={{ ...typography.body4Bold, color: colors.gray[400] }}>
             회원 정보
           </Text>
-          <View style={styles.profileInfoItem}>
-            <Text style={styles.profileInfoItemTitle}>인증자 성함</Text>
-            <View style={styles.profileInfoItemRightWrapper}>
-              <Text style={styles.profileInfoItemRightText}>
-                {' '}
-                {user?.authName || '인증 전'}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.profileInfoItem}>
-            <Text style={styles.profileInfoItemTitle}>아이디</Text>
-            <View style={styles.profileInfoItemRightWrapper}>
-              <Text style={styles.profileInfoItemRightText}>
-                {user.loginId}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.profileInfoItem}>
-            <Text style={styles.profileInfoItemTitle}>이메일</Text>
-            <View style={styles.profileInfoItemRightWrapper}>
-              <Text style={styles.profileInfoItemRightText}>{user.email}</Text>
-            </View>
-          </View>
+          <ListItem
+            title="인증자 성함"
+            rightText={user?.authName || '인증 전'}
+            showArrow={false}
+          />
+          <ListItem
+            title="아이디"
+            rightText={user.loginId}
+            showArrow={false}
+          />
+          <ListItem
+            title="이메일"
+            rightText={user.email}
+            showArrow={false}
+          />
         </View>
         <View style={styles.logoutButtonWrapper}>
           <Text style={{ ...typography.body4Bold, color: colors.gray[400] }}>
             계정 보안
           </Text>
-          <Pressable
-            style={styles.profileInfoItem}
+          <ListItem
+            title="비밀번호 변경"
             onPress={() => navigation.navigate('CouncilChangePasswordCode')}
-          >
-            <Text style={styles.profileInfoItemTitle}>비밀번호 변경</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <Pressable
-            style={styles.profileInfoItem}
+          />
+          <ListItem
+            title="로그아웃"
             onPress={() => setIsLogoutModalVisible(true)}
-          >
-            <Text style={styles.profileInfoItemTitle}>로그아웃</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <Pressable
-            style={styles.profileInfoItem}
+          />
+          <ListItem
+            title="탈퇴하기"
             onPress={() => navigation.navigate('CouncilCancelMembershipScreen')}
-          >
-            <Text style={styles.profileInfoItemTitle}>탈퇴하기</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
+          />
         </View>
       </SafeAreaView>
       <Modal
@@ -376,24 +359,6 @@ const styles = StyleSheet.create({
     marginTop: 36,
     borderTopWidth: 1,
     borderTopColor: colors.gray[200],
-  },
-  profileInfoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  profileInfoItemTitle: {
-    ...typography.body2Regular,
-    color: colors.gray[850],
-  },
-  profileInfoItemRightWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  profileInfoItemRightText: {
-    ...typography.body3Regular,
-    color: colors.gray[400],
   },
   logoutButtonWrapper: {
     paddingHorizontal: 20,

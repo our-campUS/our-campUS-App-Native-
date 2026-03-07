@@ -15,7 +15,7 @@ import EditIcon from '../../../assets/editIcon.svg';
 import InterestedAffiliationIcon from '../../../assets/Vector3.svg';
 import InterestedPlaceIcon from '../../../assets/Vector2.svg';
 import WrittenReviewIcon from '../../../assets/ReviewIcon.svg';
-import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
+import ListItem from '../../components/common/ListItem';
 
 import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
@@ -91,20 +91,14 @@ const MyPageDefaultScreen = ({ navigation }) => {
           고객센터
         </Text>
         <View style={styles.customerServiceItemWrapper}>
-          <Pressable
-            style={styles.customerServiceItem}
+          <ListItem
+            title="공지사항"
             onPress={() => navigation.navigate('AnnouncementScreen')}
-          >
-            <Text style={styles.customerServiceItemText}>공지사항</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <Pressable
-            style={styles.customerServiceItem}
+          />
+          <ListItem
+            title="1:1 문의게시판"
             onPress={() => navigation.navigate('InqueryMainScreen')}
-          >
-            <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
+          />
         </View>
       </View>
     </SafeAreaView>
@@ -183,15 +177,6 @@ const styles = StyleSheet.create({
   customerServiceItemWrapper: {
     gap: 14,
     marginTop: 18,
-  },
-  customerServiceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  customerServiceItemText: {
-    ...typography.body2Regular,
-    color: colors.gray[850],
   },
 });
 
