@@ -1,12 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-import { View, Text, Keyboard } from 'react-native';
 import { Platform } from 'react-native';
 
 import HomeIcon from '../../assets/Vector1.svg';
 import MapIcon from '../../assets/Vector2.svg';
 import PartnershipIcon from '../../assets/Vector3.svg';
-import StampIcon from '../../assets/Vector4.svg';
 import MyPageIcon from '../../assets/Vector5.svg';
 import ReportIcon from '../../assets/report.svg';
 
@@ -24,13 +22,7 @@ import CouncilMainPageStack from '../navigations/Council/CouncilMainPageStack';
 
 const Tab = createBottomTabNavigator();
 
-const PlaceholderScreen = () => {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>PlaceholderScreen</Text>
-    </View>
-  );
-};
+import WIPScreen from './common/WIPScreen';
 
 const ICONS = {
   Home: HomeIcon,
@@ -128,7 +120,7 @@ const CouncilMainTab = () => {
       />
       <Tab.Screen
         name="Report"
-        component={PlaceholderScreen}
+        component={WIPScreen}
         options={{ title: '운영리포트' }}
       />
       <Tab.Screen

@@ -17,7 +17,7 @@ import MapScreen from '../screens/Map/MapScreen';
 import AffiliationSelectStack from '../navigations/AffiliationSelectStack';
 import MapStack from '../navigations/MapStack';
 import MyPageStack from '../navigations/MyPageStack';
-import StampStack from '../navigations/StampStack';
+import WIPScreen from './common/WIPScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -118,7 +118,7 @@ const MainTab = () => {
       />
       <Tab.Screen
         name="Stamp"
-        component={StampStack}
+        component={WIPScreen}
         options={{ title: '스탬프' }}
       />
       <Tab.Screen
