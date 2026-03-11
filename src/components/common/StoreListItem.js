@@ -252,4 +252,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StoreListItem;
+export default React.memo(StoreListItem);
