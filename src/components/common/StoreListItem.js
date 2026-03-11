@@ -31,12 +31,14 @@ const StoreListItem = ({
     setIsLiked(!isLiked);
 
     try {
-      const response = await togglePlaceLike(item);
+      const responseData = await togglePlaceLike(item);
 
-      console.log('👍 좋아요 응답:', response);
-      const responseData = response.data || response;
+      if (!responseData) {
+        setIsLiked(previousState);
+        return;
+      }
 
-      if (responseData && responseData.placeId) {
+      if (responseData.placeId) {
         if (onLikeToggle) {
           onLikeToggle(item.placeId, {
             placeId: responseData.placeId,
