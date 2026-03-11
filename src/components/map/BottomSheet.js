@@ -13,7 +13,6 @@ import { useNavigation } from '@react-navigation/native';
 import StoreListItem from '../common/StoreListItem';
 import theme from '../../style';
 import colors from '../../style/colors';
-import { updatePlaceState } from '../../hooks/useMapLogic';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
@@ -107,9 +106,6 @@ const BottomSheet = ({
         renderItem={({ item }) => (
           <StoreListItem
             item={item}
-            onLikeToggle={(placeId, newData) => {
-              updatePlaceState(placeId, newData);
-            }}
             onPress={() => {
               onItemPress(item.placeId);
 
@@ -122,8 +118,8 @@ const BottomSheet = ({
                 },
               });
             }}
-            onLikeToggle={(oldId, newData) => {
-              if (onUpdateStore) onUpdateStore(oldId, newData);
+            onLikeToggle={(placeId, newData) => {
+              if (onUpdateStore) onUpdateStore(placeId, newData);
             }}
           />
         )}
