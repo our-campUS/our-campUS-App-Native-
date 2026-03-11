@@ -12,6 +12,7 @@ import LikedIcon from '../../../assets/Liked.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 
 import { togglePlaceLike } from '../../api/place';
+import { formatDistance, calculateWalkingTime } from '../../utils/distance';
 
 const StoreListItem = ({
   item,
@@ -143,10 +144,11 @@ const StoreListItem = ({
                     height={20}
                     style={styles.iconMargin}
                   />
-                  <Text style={styles.infoText}>{item.address}</Text>
+                  <Text style={styles.infoText}>
+                    걸어서 {calculateWalkingTime(item.distance)}분
+                  </Text>
                   <Text style={styles.distanceText}>
-                    {' '}
-                    {item.distance}
+                    {formatDistance(item.distance)}
                   </Text>
                 </View>
               </>
@@ -241,10 +243,17 @@ const styles = StyleSheet.create({
   infoText: {
     ...typography.body4Regular,
     color: theme.colors.textDim,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   distanceText: {
     ...typography.caption1Regular,
+    lineHeight: typography.body4Regular.lineHeight,
     color: colors.gray[400],
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+    marginLeft: 4,
+    transform: [{translateY: 1}],
   },
   thumbnail: {
     width: 68,
