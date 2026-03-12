@@ -15,8 +15,9 @@ import EditIcon from '../../../assets/editIcon.svg';
 import InterestedAffiliationIcon from '../../../assets/Vector3.svg';
 import InterestedPlaceIcon from '../../../assets/Vector2.svg';
 import WrittenReviewIcon from '../../../assets/ReviewIcon.svg';
-import ArrowRightIcon from '../../../assets/ArrowRightIcon.svg';
+import ListItem from '../../components/common/ListItem';
 
+import MY_PAGE_MENU_LINKS from '../../constants/myPageMenuLinks';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
 
@@ -91,20 +92,36 @@ const MyPageDefaultScreen = ({ navigation }) => {
           고객센터
         </Text>
         <View style={styles.customerServiceItemWrapper}>
-          <Pressable
-            style={styles.customerServiceItem}
+          <ListItem
+            title="공지사항"
             onPress={() => navigation.navigate('AnnouncementScreen')}
-          >
-            <Text style={styles.customerServiceItemText}>공지사항</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <Pressable
-            style={styles.customerServiceItem}
+          />
+          <ListItem
+            title="1:1 문의게시판"
             onPress={() => navigation.navigate('InqueryMainScreen')}
-          >
-            <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
+          />
+          <ListItem
+            title="서비스 이용안내"
+            onPress={() => {
+              if (MY_PAGE_MENU_LINKS.SERVICE_GUIDE) {
+                navigation.navigate('WebViewScreen', {
+                  uri: MY_PAGE_MENU_LINKS.SERVICE_GUIDE,
+                  title: '서비스 이용안내',
+                });
+              }
+            }}
+          />
+          <ListItem
+            title="개인정보 처리방침"
+            onPress={() => {
+              if (MY_PAGE_MENU_LINKS.PRIVACY_POLICY) {
+                navigation.navigate('WebViewScreen', {
+                  uri: MY_PAGE_MENU_LINKS.PRIVACY_POLICY,
+                  title: '개인정보 처리방침',
+                });
+              }
+            }}
+          />
         </View>
       </View>
     </SafeAreaView>
@@ -183,15 +200,6 @@ const styles = StyleSheet.create({
   customerServiceItemWrapper: {
     gap: 14,
     marginTop: 18,
-  },
-  customerServiceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  customerServiceItemText: {
-    ...typography.body2Regular,
-    color: colors.gray[850],
   },
 });
 

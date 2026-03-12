@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';
@@ -7,8 +7,9 @@ import EditIcon from '../../../../assets/editIcon.svg';
 import InterestedAffiliationIcon from '../../../../assets/Vector3.svg';
 import InterestedPlaceIcon from '../../../../assets/Vector2.svg';
 import WrittenReviewIcon from '../../../../assets/ReviewIcon.svg';
-import ArrowRightIcon from '../../../../assets/ArrowRightIcon.svg';
+import ListItem from '../../../components/common/ListItem';
 import CouncilDefaultImage from '../../../../assets/councilDefaultImage.png';
+import MY_PAGE_MENU_LINKS from '../../../constants/myPageMenuLinks';
 import useAuthStore from '../../../store/authStore';
 
 const CouncilMyPageDefaultScreen = ({ navigation }) => {
@@ -42,13 +43,10 @@ const CouncilMyPageDefaultScreen = ({ navigation }) => {
           계정관리
         </Text>
         <View style={styles.customerServiceItemWrapper}>
-          <Pressable
-            style={styles.customerServiceItem}
+          <ListItem
+            title="내 계정"
             onPress={() => navigation.navigate('CouncilProfileScreen')}
-          >
-            <Text style={styles.customerServiceItemText}>내 계정</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
+          />
         </View>
         <Text
           style={{
@@ -60,20 +58,36 @@ const CouncilMyPageDefaultScreen = ({ navigation }) => {
           고객 센터
         </Text>
         <View style={styles.customerServiceItemWrapper}>
-          <Pressable
-            style={styles.customerServiceItem}
+          <ListItem
+            title="공지사항"
             onPress={() => navigation.navigate('AnnouncementScreen')}
-          >
-            <Text style={styles.customerServiceItemText}>공지사항</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <Pressable
-            style={styles.customerServiceItem}
+          />
+          <ListItem
+            title="1:1 문의게시판"
             onPress={() => navigation.navigate('InqueryMainScreen')}
-          >
-            <Text style={styles.customerServiceItemText}>1:1 문의게시판</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
+          />
+          <ListItem
+            title="서비스 이용안내"
+            onPress={() => {
+              if (MY_PAGE_MENU_LINKS.SERVICE_GUIDE) {
+                navigation.navigate('WebViewScreen', {
+                  uri: MY_PAGE_MENU_LINKS.SERVICE_GUIDE,
+                  title: '서비스 이용안내',
+                });
+              }
+            }}
+          />
+          <ListItem
+            title="개인정보 처리방침"
+            onPress={() => {
+              if (MY_PAGE_MENU_LINKS.PRIVACY_POLICY) {
+                navigation.navigate('WebViewScreen', {
+                  uri: MY_PAGE_MENU_LINKS.PRIVACY_POLICY,
+                  title: '개인정보 처리방침',
+                });
+              }
+            }}
+          />
         </View>
       </View>
     </SafeAreaView>
@@ -130,15 +144,6 @@ const styles = StyleSheet.create({
   customerServiceItemWrapper: {
     gap: 14,
     marginTop: 18,
-  },
-  customerServiceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  customerServiceItemText: {
-    ...typography.body2Regular,
-    color: colors.gray[850],
   },
   councilIdentityContainer: {
     width: '100%',

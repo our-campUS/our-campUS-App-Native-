@@ -13,7 +13,7 @@ import LabelTitle from '@components/LabelTitle';
 import typography from '@style/typography';
 import defaultProfileImage from '@assets/defaultProfileImage.png';
 import EditIcon from '@assets/EditImage.svg';
-import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
+import ListItem from '@components/common/ListItem';
 import { useState, useEffect } from 'react';
 import Button from '@components/Button';
 import useAuthStore from '@store/authStore';
@@ -144,44 +144,31 @@ const MyPageProfileEditScreen = ({ navigation, route }) => {
         </View>
         <Text style={styles.nickname}>{user?.name || '사용자'}</Text>
         <View style={styles.profileInfoWrapper}>
-          <Pressable
-            style={styles.profileInfoItem}
+          <ListItem
+            title="닉네임"
             onPress={() => navigation.navigate('EditNicknameScreen')}
-          >
-            <Text style={styles.profileInfoItemTitle}>닉네임</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <Pressable
-            style={styles.profileInfoItem}
+          />
+          {/* TODO: 인증 완료 시 표시할 텍스트 분기 처리 필요 */}
+          <ListItem
+            title="학적정보"
+            rightText="인증 전"
             onPress={() => navigation.navigate('ChangeScholarInfoScreen')}
-          >
-            <Text style={styles.profileInfoItemTitle}>학적정보</Text>
-            <View style={styles.profileInfoItemRightWrapper}>
-              {/* TODO: 인증 완료 시 표시할 텍스트 분기 처리 필요 */}
-              <Text style={styles.profileInfoItemRightText}>인증 전</Text>
-              <ArrowRightIcon width={10} height={10} color={colors.gray[400]} />
-            </View>
-          </Pressable>
-          <View style={styles.profileInfoItem}>
-            <Text style={styles.profileInfoItemTitle}>연결된 계정</Text>
-            <Text style={styles.profileInfoItemRightText}>카카오</Text>
-          </View>
+          />
+          <ListItem
+            title="연결된 계정"
+            rightText="카카오"
+            showArrow={false}
+          />
         </View>
         <View style={styles.logoutButtonWrapper}>
-          <Pressable
-            style={styles.profileInfoItem}
+          <ListItem
+            title="로그아웃"
             onPress={() => setIsLogoutModalVisible(true)}
-          >
-            <Text style={styles.profileInfoItemTitle}>로그아웃</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
-          <Pressable
-            style={styles.profileInfoItem}
+          />
+          <ListItem
+            title="회원 탈퇴"
             onPress={() => navigation.navigate('CancelMembershipScreen')}
-          >
-            <Text style={styles.profileInfoItemTitle}>회원 탈퇴</Text>
-            <ArrowRightIcon width={10} height={10} color="#ADB3B8" />
-          </Pressable>
+          />
         </View>
       </SafeAreaView>
       <Modal
@@ -259,24 +246,6 @@ const styles = StyleSheet.create({
     marginTop: 36,
     borderTopWidth: 1,
     borderTopColor: colors.gray[200],
-  },
-  profileInfoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  profileInfoItemTitle: {
-    ...typography.body2Regular,
-    color: colors.gray[850],
-  },
-  profileInfoItemRightWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  profileInfoItemRightText: {
-    ...typography.body3Regular,
-    color: colors.gray[400],
   },
   logoutButtonWrapper: {
     paddingHorizontal: 20,
