@@ -261,11 +261,13 @@ export const togglePlaceLike = async (placeData) => {
       },
     });
 
-    console.log('서버 응답:', response.data);
-    return response.data;
+    if (response.data.code === 200 || response.data.code === 0) {
+      return response.data.data;
+    }
+    return false;
   } catch (error) {
     console.error('좋아요 요청 실패:', error);
-    throw error;
+    return false;
   }
 };
 

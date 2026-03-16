@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import theme from '../../style';
+import colors from '../../style/colors';
 import typography from '../../style/typography';
 
 import StarIcon from '../../../assets/icons/common/star.svg';
@@ -18,6 +12,7 @@ import LikedIcon from '../../../assets/Liked.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 
 import { togglePlaceLike } from '../../api/place';
+import { formatDistance, calculateWalkingTime } from '../../utils/distance';
 
 const StoreListItem = ({
   item,
@@ -37,13 +32,14 @@ const StoreListItem = ({
     setIsLiked(!isLiked);
 
     try {
-      // 2. 서버 요청
-      const response = await togglePlaceLike(item);
+      const responseData = await togglePlaceLike(item);
 
-      console.log('👍 좋아요 응답:', response);
-      const responseData = response.data || response;
+      if (!responseData) {
+        setIsLiked(previousState);
+        return;
+      }
 
-      if (responseData && responseData.placeId) {
+      if (responseData.placeId) {
         if (onLikeToggle) {
           onLikeToggle(item.placeId, {
             placeId: responseData.placeId,
@@ -58,7 +54,8 @@ const StoreListItem = ({
   };
 
   const categoryLabel =
-    CATEGORIES.find((cat) => cat.id === item.category)?.label || item.category;
+    CATEGORIES.find((cat) => cat.id === item.category)?.label ||
+    item.category;
 
   const tags = [];
   if (item.tag) tags.push(item.tag);
@@ -67,23 +64,30 @@ const StoreListItem = ({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+      <Pressable
+        testID="store-list-item-pressable"
+        onPress={onPress}
+      >
         <View style={styles.headerRow}>
           <View style={styles.titleWrapper}>
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.category}>{categoryLabel}</Text>
           </View>
-          <TouchableOpacity
+          <Pressable
+            testID="store-like-button"
             style={styles.likeButton}
             onPress={handleLikePress}
-            activeOpacity={0.7}
           >
             {isLiked ? (
-              <LikedIcon width={16} height={15} color={theme.colors.primary2} />
+              <LikedIcon
+                width={12}
+                height={11}
+                color={theme.colors.primary2}
+              />
             ) : (
-              <UnlikedIcon width={16} height={15} />
+              <UnlikedIcon width={12} height={11} />
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {tags.length > 0 && (
@@ -96,58 +100,71 @@ const StoreListItem = ({
           </View>
         )}
 
-        <View style={[styles.infoRow, !showImages && { marginBottom: 0 }]}>
-          <View style={styles.infoItem}>
-            <StarIcon width={20} height={20} style={{ marginRight: 4 }} />
-            <Text style={styles.infoText}>{item.star}</Text>
-          </View>
+        <View style={styles.infoSection}>
+          <View style={styles.infoLeft}>
+            <View style={styles.infoItem}>
+              <StarIcon
+                width={20}
+                height={20}
+                style={styles.iconMargin}
+              />
+              <Text style={styles.infoText}>{item.star}</Text>
+            </View>
 
-          {showDiscountDetail ? (
-            item.partnerTitle && (
-              <View style={styles.infoItem}>
-                <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
-                <Text style={styles.infoText}>{item.partnerTitle}</Text>
-              </View>
-            )
-          ) : (
-            <>
-              {item.partnerTitle && (
+            {showDiscountDetail ? (
+              item.partnerTitle && (
                 <View style={styles.infoItem}>
                   <TicketIcon
                     width={20}
                     height={20}
-                    style={{ marginRight: 4 }}
+                    style={styles.iconMargin}
                   />
-                  <Text style={styles.infoText}>{item.partnerTitle}</Text>
+                  <Text style={styles.infoText}>
+                    {item.partnerTitle}
+                  </Text>
                 </View>
-              )}
-              <View style={styles.infoItem}>
-                <PinIcon width={20} height={20} style={{ marginRight: 4 }} />
-                <Text style={styles.infoText}>
-                  {item.address} {item.distance}
-                </Text>
-              </View>
-            </>
-          )}
-        </View>
-      </TouchableOpacity>
+              )
+            ) : (
+              <>
+                {item.partnerTitle && (
+                  <View style={styles.infoItem}>
+                    <TicketIcon
+                      width={20}
+                      height={20}
+                      style={styles.iconMargin}
+                    />
+                    <Text style={styles.infoText}>
+                      {item.partnerTitle}
+                    </Text>
+                  </View>
+                )}
+                <View style={styles.infoItem}>
+                  <PinIcon
+                    width={20}
+                    height={20}
+                    style={styles.iconMargin}
+                  />
+                  <Text style={styles.infoText}>
+                    걸어서 {calculateWalkingTime(item.distance)}분
+                  </Text>
+                  <Text style={styles.distanceText}>
+                    {formatDistance(item.distance)}
+                  </Text>
+                </View>
+              </>
+            )}
+          </View>
 
-      {showImages && images.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.imageScroll}
-        >
-          {images.map((imgUrl, index) => (
+          {showImages && images.length > 0 && (
             <Image
-              key={index}
-              source={{ uri: imgUrl }}
-              style={styles.storeImage}
+              testID="store-thumbnail"
+              source={{ uri: images[0] }}
+              style={styles.thumbnail}
               resizeMode="cover"
             />
-          ))}
-        </ScrollView>
-      )}
+          )}
+        </View>
+      </Pressable>
     </View>
   );
 };
@@ -164,7 +181,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   titleWrapper: {
     flexDirection: 'row',
@@ -172,12 +189,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   likeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: theme.colors.background,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.gray[300],
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
@@ -191,12 +208,11 @@ const styles = StyleSheet.create({
     ...typography.caption1Regular,
     color: theme.colors.textDim,
   },
-
   tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 10,
-    gap: 6,
+    marginBottom: 4,
+    gap: 4,
   },
   badge: {
     backgroundColor: theme.colors.primary1Light,
@@ -205,32 +221,46 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   badgeText: {
-    color: theme.colors.primary1,
+    color: colors.blue[600],
     ...typography.caption2Bold,
   },
-
-  infoRow: {
-    marginBottom: 8,
+  infoSection: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  infoLeft: {
+    flex: 1,
+    gap: 4,
   },
   infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 10,
   },
+  iconMargin: {
+    marginRight: 4,
+  },
   infoText: {
     ...typography.body4Regular,
     color: theme.colors.textDim,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
-  imageScroll: {
-    flexDirection: 'row',
+  distanceText: {
+    ...typography.caption1Regular,
+    lineHeight: typography.body4Regular.lineHeight,
+    color: colors.gray[400],
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+    marginLeft: 4,
+    transform: [{translateY: 1}],
   },
-  storeImage: {
-    width: 88,
-    height: 88,
+  thumbnail: {
+    width: 68,
+    height: 68,
     borderRadius: 8,
     backgroundColor: theme.colors.backgroundSub,
-    marginRight: 8,
   },
 });
 
-export default StoreListItem;
+export default React.memo(StoreListItem);
