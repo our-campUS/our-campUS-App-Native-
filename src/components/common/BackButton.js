@@ -16,7 +16,7 @@ const BackButton = ({ onPress, color = colors.gray[800], style }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 5,
+    paddingHorizontal: 5,
     zIndex: 1,
   },
 });
