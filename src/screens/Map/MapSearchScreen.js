@@ -14,13 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import SearchBar from '../../components/SearchBar';
 import theme from '../../style';
-import colors from '../../style/colors';
 import { CATEGORIES } from '../../constants/MapData';
 import typography from '../../style/typography';
 import SearchingPinIcon from '../../../assets/icons/common/pin.svg';
 import SearchingShakeIcon from '../../../assets/icons/search-list/searchingShake.svg';
 import SearchIcon from '../../../assets/icons/search-list/search.svg';
-import WarningIcon from '../../../assets/icons/warning-line.svg';
+import EmptyResult from '../../components/common/EmptyResult';
 
 import { getPlacesSearchInfo } from '../../api/place';
 import {
@@ -76,12 +75,7 @@ const MapSearchScreen = () => {
   //   return () => clearTimeout(timer);
   // }, [keyword]);
 
-  const renderEmptyComponent = () => (
-    <View style={styles.emptyContainer}>
-      <WarningIcon width={56} height={56} />
-      <Text style={styles.emptyText}>검색 결과가 없습니다.</Text>
-    </View>
-  );
+  const renderEmptyComponent = () => <EmptyResult />;
 
   const onSubmit = async () => {
     if (!keyword.trim()) return;
@@ -366,16 +360,7 @@ const styles = StyleSheet.create({
     ...typography.caption1Regular,
     marginRight: 8,
   },
-  emptyContainer: {
-    paddingTop: 200,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    marginTop: 20,
-    color: colors.gray[300],
-    ...typography.body2Bold,
-  },
+
   emptyHistoryContainer: {
     paddingTop: 100,
     alignItems: 'center',
