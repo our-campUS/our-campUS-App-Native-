@@ -20,6 +20,7 @@ import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
 import { useNavigation } from '@react-navigation/native';
 import { getTodayEvent } from '../../api/studentAffiliate';
+import { checkUnreadNotification } from '../../api/notification';
 
 const HomeSection = ({
   title,
@@ -45,12 +46,21 @@ const HomeSection = ({
 };
 
 const HomeScreen = () => {
-  const [hasNewNotification, setHasNewNotification] = useState(true);
+  const [hasNewNotification, setHasNewNotification] = useState(false);
 
   const user = useAuthStore((state) => state.user);
   const navigation = useNavigation();
   const [todayEvent, setTodayEvent] = useState(null);
   const { accessToken } = useAuthStore();
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      if (!accessToken) return;
+      const hasUnread = await checkUnreadNotification();
+      setHasNewNotification(hasUnread);
+    };
+    fetchUnread();
+  }, [accessToken]);
 
   useEffect(() => {
     const fetchEvent = async () => {
