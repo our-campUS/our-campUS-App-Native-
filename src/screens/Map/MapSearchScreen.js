@@ -243,6 +243,12 @@ const MapSearchScreen = () => {
                 <TouchableOpacity
                   key={`${cat.id}-${index}`}
                   style={styles.categoryChip}
+                  onPress={() =>
+                    navigation.navigate('MapScreen', {
+                      searchType: 'CATEGORY',
+                      category: { id: cat.id, label: cat.label },
+                    })
+                  }
                 >
                   <View>
                     <cat.IconComponent

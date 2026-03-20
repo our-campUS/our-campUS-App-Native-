@@ -240,8 +240,12 @@ export const useMapLogic = (mapRef) => {
   // 파라미터(다른 화면에서 넘어왔을 때) 처리
   useEffect(() => {
     if (route.params) {
-      const { searchType, keyword, selectedLocation } = route.params;
-      if (searchType === 'KEYWORD' && keyword) {
+      const { searchType, keyword, selectedLocation, category } = route.params;
+      if (searchType === 'CATEGORY' && category) {
+        setSelectedCategory(category);
+        setSearchKeyword(null);
+        setSelectedMarkerId(null);
+      } else if (searchType === 'KEYWORD' && keyword) {
         setSearchKeyword(keyword);
         setSelectedCategory(null);
         setSelectedMarkerId(null);
