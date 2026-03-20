@@ -20,7 +20,7 @@ const ListItem = ({
         <View style={styles.rightWrapper}>
           {rightText && <Text style={styles.rightText}>{rightText}</Text>}
           {showArrow && (
-            <ArrowRightIcon width={10} height={10} color={colors.gray[400]} />
+            <ArrowRightIcon width={7} height={11} color={colors.gray[400]} />
           )}
         </View>
       )}

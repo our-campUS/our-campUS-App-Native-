@@ -299,7 +299,7 @@ const StoreDetailScreen = () => {
                   <TouchableOpacity key={index} style={styles.partnerTag}>
                     <Text style={styles.partnerTagText}>{tag}</Text>
                     <ArrowRightIcon
-                      width={8}
+                      width={5}
                       height={8}
                       color={theme.colors.primary1}
                     />
