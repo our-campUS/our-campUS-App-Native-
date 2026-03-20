@@ -11,7 +11,6 @@ import typography from '@style/typography';
 import LabelTitle from '@components/LabelTitle';
 import Input from '@components/Input';
 import { useState } from 'react';
-import { editNickname } from '@api/profile';
 import Button from '@components/Button';
 import CheckIcon from '@assets/check.svg';
 import useAuthStore from '@store/authStore';
