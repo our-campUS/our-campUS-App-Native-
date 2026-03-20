@@ -273,14 +273,24 @@ export const togglePlaceLike = async (placeData) => {
 
 export const getPlaceStatus = async (placeId, latitude, longitude) => {
   try {
-    let url = `/places/detail?latitude=${latitude}&longitude=${longitude}`;
+    const token = useAuthStore.getState().accessToken;
+
+    const params = {
+      lat: latitude,
+      lng: longitude,
+    };
     if (placeId) {
-      url += `&placeId=${placeId}`;
+      params.placeId = placeId;
     }
 
-    const response = await api.get(url);
+    const response = await api.get('/places/detail', {
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    if (response.data && response.data.code === 0) {
+    if (response.data && (response.data.code === 200 || response.data.code === 0)) {
       return response.data.data;
     }
     return null;
