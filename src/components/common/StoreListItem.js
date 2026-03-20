@@ -85,7 +85,7 @@ const StoreListItem = ({
                 color={theme.colors.primary2}
               />
             ) : (
-              <UnlikedIcon width={12} height={11} />
+              <UnlikedIcon width={12} height={12} />
             )}
           </Pressable>
         </View>

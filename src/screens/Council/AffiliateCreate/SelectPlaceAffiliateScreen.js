@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';
-import BackIcon from '../../../../assets/back.svg';
+import BackButton from '../../../components/common/BackButton';
 import CancelIcon from '../../../../assets/proicons_cancel.svg';
 import { useState } from 'react';
 import {
@@ -43,12 +43,10 @@ const SelectPlaceAffiliateScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.searchBarWrapper}>
         <View style={styles.searchBarContainer}>
-          <Pressable
-            style={styles.backButton}
+          <BackButton
             onPress={() => navigation.goBack()}
-          >
-            <BackIcon width={20} height={10} color={colors.gray[800]} />
-          </Pressable>
+            style={styles.backButton}
+          />
           <TextInput
             autoCorrect={false}
             autoCapitalize="none"
@@ -165,8 +163,6 @@ const styles = StyleSheet.create({
     color: colors.gray[400],
   },
   backButton: {
-    width: 20,
-    height: 10,
     marginRight: 8,
   },
   cancelButton: {

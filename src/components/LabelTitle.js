@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import colors from '@style/colors';
 import typography from '@style/typography';
-import { Pressable } from 'react-native';
-import BackIcon from '@assets/back.svg';
+import BackButton from '@components/common/BackButton';
 
 const styles = StyleSheet.create({
   container: {
@@ -62,7 +61,7 @@ const LabelTitle = ({
   return (
     <View style={[styles.container, additionalStyle]}>
       {useBackButton && (
-        <Pressable
+        <BackButton
           onPress={() => {
             if (onPressBack) {
               onPressBack();
@@ -70,12 +69,7 @@ const LabelTitle = ({
               navigation.goBack();
             }
           }}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={{ padding: 5, zIndex: 1 }}
-        >
-          {/* <Text style={styles.backButton}>{'<'}</Text> */}
-          <BackIcon width={20} height={10} />
-        </Pressable>
+        />
       )}
       <Text style={styles.title} pointerEvents="none">
         {title}
