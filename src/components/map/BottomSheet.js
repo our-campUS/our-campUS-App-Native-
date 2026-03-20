@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import StoreListItem from '../common/StoreListItem';
+import EmptyResult from '../common/EmptyResult';
 import theme from '../../style';
 import colors from '../../style/colors';
 
@@ -125,6 +126,7 @@ const BottomSheet = ({
             }}
           />
         )}
+        ListEmptyComponent={!isLoading ? <EmptyResult paddingTop={60} /> : null}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         ListFooterComponent={
