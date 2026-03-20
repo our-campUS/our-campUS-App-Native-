@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
   },
   customButtonText: {
     ...typography.heading6,
-    colors: colors.gray['000'],
+    color: colors.gray['000'],
   },
   bannerContainer: {
     height: 250,
