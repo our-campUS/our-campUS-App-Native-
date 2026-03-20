@@ -73,12 +73,11 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
   useEffect(() => {
     console.log('route.params?.item', route.params?.item);
     const fetchStudentAffiliateDetail = async () => {
-      const response = await getStudentAffiliateDetail(
+      const data = await getStudentAffiliateDetail(
         accessToken,
         route.params?.item?.id
       );
-      console.log('fetchStudentAffiliateDetail response', response);
-      const data = response.data.data;
+      console.log('fetchStudentAffiliateDetail data', data);
       setDetailData(data);
       // detailData에서 liked 상태 업데이트
       if (data?.liked !== undefined) {
@@ -125,14 +124,13 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const fetchStudentAffiliateRecommendList = async () => {
-      let category = detailData?.category;
-      const response = await getStudentAffiliateRecommendList(
+      const data = await getStudentAffiliateRecommendList(
         accessToken,
         councilType,
         item?.id,
         detailData?.category
       );
-      setRecommendData(response?.data?.data?.content || []);
+      setRecommendData(data?.content || []);
     };
     fetchStudentAffiliateRecommendList();
   }, [detailData]);

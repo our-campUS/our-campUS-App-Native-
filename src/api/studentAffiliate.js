@@ -143,10 +143,13 @@ export const getStudentAffiliateDetail = async (accessToken, postId) => {
       },
     });
     console.log('getStudentAffiliateDetail response', response);
-    return response;
+    if (response.data.code === 200 || response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
   } catch (error) {
     console.error('getStudentAffiliateDetail error', error.response);
-    return [];
+    return null;
   }
 };
 
@@ -181,7 +184,10 @@ export const getStudentAffiliateRecommendList = async (
       },
     });
     console.log('getStudentAffiliateRecommendList response', response);
-    return response;
+    if (response.data.code === 200 || response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
   } catch (error) {
     console.error('getStudentAffiliateRecommendList error', error.response);
     return [];
@@ -275,7 +281,10 @@ export const toggleStudentAffiliateLike = async (accessToken, postId) => {
       }
     );
     console.log('toggleStudentAffiliateLike response', response);
-    return response;
+    if (response.data.code === 200 || response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
   } catch (error) {
     console.error('toggleStudentAffiliateLike error', error.response);
     throw error;
