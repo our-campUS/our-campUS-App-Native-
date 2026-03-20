@@ -71,7 +71,7 @@ const WriteReviewScreen = () => {
 
     if (editMode && existingReview) {
       try {
-        await editReview(existingReview.id, {
+        await editReview(existingReview.reviewId || existingReview.id, {
           content: reviewText,
           star: rating,
           imageUrls: existingReview.imageUrls || [],
@@ -110,7 +110,7 @@ const WriteReviewScreen = () => {
           imageUrls: [],
           place: store
             ? {
-                placeName: store.name || store.placeName,
+                placeName: store.name || store.placeName || '',
                 placeKey: store.placeKey || '',
                 address: store.address || '',
                 category: store.category || '',
@@ -122,7 +122,16 @@ const WriteReviewScreen = () => {
                 },
                 imgUrls: store.imgUrls || [],
               }
-            : null,
+            : {
+                placeName: route.params?.storeName || '',
+                placeKey: route.params?.placeKey || '',
+                address: '',
+                category: '',
+                link: '',
+                telephone: '',
+                coordinate: { latitude: 0, longitude: 0 },
+                imgUrls: [],
+              },
         });
       }
 

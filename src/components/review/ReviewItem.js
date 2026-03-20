@@ -26,8 +26,8 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
     star: item.star || 0,
     imageUrls: item.imageUrls || [],
     comment: item.comment || item.content || '',
-    name: item.name || item.userName || item.place || '',
-    date: item.date || item.createDate || '',
+    name: item.name || item.userName || item.placeName || item.place || '',
+    date: item.date || item.createDate || item.createdAt || '',
   };
 
   const formatDate = (dateString) => {
