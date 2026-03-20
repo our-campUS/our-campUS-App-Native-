@@ -92,7 +92,7 @@ export async function changeCouncilPassword(
     if (response.data.code === 200 || response.data.code === 0) {
       return { success: true, message: '비밀번호 변경 성공' };
     }
-    // return { success: false, message: response.data.message };
+    return { success: false, message: response.data.message };
   } catch (error) {
     console.log('changeCouncilPassword error', error.response);
     return { success: false, message: error.response.data.message };
