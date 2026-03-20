@@ -150,6 +150,13 @@ export const getStudentAffiliateDetail = async (accessToken, postId) => {
   }
 };
 
+// councilType 탭 이름 → API enum 매핑
+const COUNCIL_TYPE_MAP = {
+  school: 'SCHOOL_COUNCIL',
+  major: 'MAJOR_COUNCIL',
+  college: 'COLLEGE_COUNCIL',
+};
+
 // 제휴 / 행사 추천 게시글 목록 조회
 export const getStudentAffiliateRecommendList = async (
   accessToken,
@@ -161,20 +168,18 @@ export const getStudentAffiliateRecommendList = async (
   console.log('getStudentAffiliateRecommendList excludeId', excludeId);
   console.log('getStudentAffiliateRecommendList category', category);
   try {
-    const response = await api.get(
-      `/users/student-council/posts/${councilType}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        params: {
-          excludePostId: excludeId,
-          category: category,
-          page: 0,
-          size: 10,
-        },
-      }
-    );
+    const response = await api.get('/users/student-council/posts', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        councilType: COUNCIL_TYPE_MAP[councilType] || councilType,
+        excludePostId: excludeId,
+        category: category,
+        page: 1,
+        size: 10,
+      },
+    });
     console.log('getStudentAffiliateRecommendList response', response);
     return response;
   } catch (error) {
