@@ -187,13 +187,14 @@ export const getStudentAffiliateRecommendList = async (
 export const getStudentSchoolUpcomingEventList = async (accessToken) => {
   try {
     const response = await api.get(
-      '/users/student-council/posts/school/events/upcoming',
+      '/users/student-council/posts/events/upcoming',
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-          page: 0,
+          councilType: 'SCHOOL_COUNCIL',
+          page: 1,
           size: 3,
         },
       }
@@ -210,13 +211,14 @@ export const getStudentSchoolUpcomingEventList = async (accessToken) => {
 export const getStudentMajorUpcomingEventList = async (accessToken) => {
   try {
     const response = await api.get(
-      '/users/student-council/posts/major/events/upcoming',
+      '/users/student-council/posts/events/upcoming',
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-          page: 0,
+          councilType: 'MAJOR_COUNCIL',
+          page: 1,
           size: 3,
         },
       }
@@ -233,13 +235,14 @@ export const getStudentMajorUpcomingEventList = async (accessToken) => {
 export const getStudentCollegeUpcomingEventList = async (accessToken) => {
   try {
     const response = await api.get(
-      '/users/student-council/posts/college/events/upcoming',
+      '/users/student-council/posts/events/upcoming',
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-          page: 0,
+          councilType: 'COLLEGE_COUNCIL',
+          page: 1,
           size: 3,
         },
       }
