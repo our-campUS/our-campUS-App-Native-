@@ -59,6 +59,16 @@ export const SEARCH_ICON_CONFIG = {
   },
 };
 
+export const normalizeCategory = (category) => {
+  if (!category) return 'PARTNER';
+  const c = String(category).toUpperCase();
+  if (c.includes('카페') || c.includes('CAFE') || c.includes('CE7')) return 'CAFE';
+  if (c.includes('식당') || c.includes('음식') || c.includes('FOOD') || c.includes('FD6') || c.includes('RESTAURANT')) return 'FOOD';
+  if (c.includes('술') || c.includes('PUB') || c.includes('BAR') || c.includes('주점')) return 'PUB';
+  if (c.includes('편의점') || c.includes('STORE') || c.includes('CS2') || c.includes('CONVENIENCE')) return 'STORE';
+  return 'PARTNER';
+};
+
 // Dummy
 export const RECENT_SEARCHES = [
   { id: 1, text: '스타벅스 상도역 1호점', type: SEARCH_TYPE.STORE },

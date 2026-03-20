@@ -12,6 +12,7 @@ import KakaoMapWebView from '../../components/map/KakaoMapWebView';
 
 import SearchBar from '../../components/SearchBar';
 import CategoryList from '../../components/map/CategoryList';
+import { normalizeCategory } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import LocationIcon from '../../../assets/icons/location.svg';
 import theme from '../../style';
@@ -43,6 +44,7 @@ const MapScreen = () => {
     fetchPartnershipList,
     handleCameraIdle,
     handlePinPress,
+    handleMapTap,
     handleReset,
     handleCurrentLocation,
   } = actions;
@@ -84,12 +86,13 @@ const MapScreen = () => {
       const isSelected = item.placeId === selectedMarkerId;
       const pinType = isSelected
         ? 'SELECTED'
-        : item.partnerTitle || item.type === 'PARTNER'
+        : item.partnerTitle || item.type === 'PARTNER' || item.isPartner
         ? 'PARTNER'
         : 'DEFAULT';
-      return { ...item, pinType };
+      const category = selectedCategory ? selectedCategory.id : normalizeCategory(item.category);
+      return { ...item, pinType, category };
     });
-  }, [uniqueMarkers, selectedMarkerId]);
+  }, [uniqueMarkers, selectedMarkerId, selectedCategory]);
 
   const handleMarkerTap = useCallback(
     ({ placeId }) => {
@@ -112,7 +115,7 @@ const MapScreen = () => {
         markers={markersWithPinType}
         onCameraIdle={handleCameraIdle}
         onMarkerTap={handleMarkerTap}
-        onMapTap={handleReset}
+        onMapTap={handleMapTap}
       />
 
       {/* 상단 검색바 영역 */}

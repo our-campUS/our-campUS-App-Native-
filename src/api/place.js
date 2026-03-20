@@ -97,11 +97,12 @@ export const getMapMarkers = async (minLat, maxLat, minLng, maxLng) => {
     });
 
     if (response.data.code === 200) {
+      console.log('✅ 지도 마커 응답:', response.data.data);
       return response.data.data;
     }
     return [];
   } catch (error) {
-    console.error('지도 마커 조회 실패:', error);
+    console.error('❌ 지도 마커 조회 실패:', error.response?.data || error.message);
     return [];
   }
 };
@@ -159,6 +160,8 @@ export const getPlacesSearch = async (keyword, lat, lng) => {
   try {
     const token = useAuthStore.getState().accessToken;
 
+    console.log('👉 [API 요청] getPlacesSearch 파라미터:', { keyword, lat, lng });
+
     const response = await api.get('/places/search', {
       params: {
         keyword: keyword,
@@ -170,12 +173,14 @@ export const getPlacesSearch = async (keyword, lat, lng) => {
       },
     });
 
+    console.log('✅ 카테고리 검색 응답:', response.data);
+
     if (response.data.code === 200) {
       return response.data.data;
     }
     return [];
   } catch (error) {
-    console.error('장소 검색 실패:', error);
+    console.error('❌ 장소 검색 실패:', error.response?.data || error.message);
     return [];
   }
 };
@@ -183,6 +188,8 @@ export const getPlacesSearch = async (keyword, lat, lng) => {
 export const getPlacesSearchInfo = async (keyword, lat, lng) => {
   try {
     const token = useAuthStore.getState().accessToken;
+
+    console.log('👉 [API 요청] getPlacesSearchInfo 파라미터:', { keyword, lat, lng });
 
     const response = await api.get('/places/search/info', {
       params: {
@@ -195,12 +202,14 @@ export const getPlacesSearchInfo = async (keyword, lat, lng) => {
       },
     });
 
+    console.log('✅ 키워드 검색 응답:', response.data);
+
     if (response.data.code === 200) {
       return response.data.data;
     }
     return [];
   } catch (error) {
-    console.error('장소 검색 실패:', error);
+    console.error('❌ 장소 검색 실패:', error.response?.data || error.message);
     return [];
   }
 };

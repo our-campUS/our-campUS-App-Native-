@@ -6,7 +6,6 @@ import {
   getPartnerships,
   getMapMarkers,
   getPartnershipDetail,
-  getPlacesSearch,
   getPlacesSearchInfo,
   getPlaceStatus,
 } from '../api/place';
@@ -174,7 +173,7 @@ export const useMapLogic = (mapRef) => {
             );
           }
         } else {
-          const rawData = await getPlacesSearch(
+          const rawData = await getPlacesSearchInfo(
             selectedCategory.label,
             lat,
             lng
@@ -336,9 +335,6 @@ export const useMapLogic = (mapRef) => {
 
   const handlePinPress = async (item) => {
     setSelectedMarkerId(item.placeId);
-    setSearchKeyword(null);
-    setSelectedCategory(null);
-    setPartnerships([]);
 
     if (item.postId) {
       const { latitude, longitude } = lastCameraRef.current;
@@ -356,6 +352,11 @@ export const useMapLogic = (mapRef) => {
     } else {
       setSelectedStoreDetail(item);
     }
+  };
+
+  const handleMapTap = () => {
+    setSelectedMarkerId(null);
+    setSelectedStoreDetail(null);
   };
 
   const handleReset = () => {
@@ -421,6 +422,7 @@ export const useMapLogic = (mapRef) => {
       fetchPartnershipList,
       handleCameraIdle,
       handlePinPress,
+      handleMapTap,
       handleReset,
       handleCurrentLocation,
       updatePlaceState,
