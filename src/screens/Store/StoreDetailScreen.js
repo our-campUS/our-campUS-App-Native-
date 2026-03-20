@@ -460,6 +460,7 @@ const StoreDetailScreen = () => {
               //   });
               // }
               navigation.navigate('WriteReviewScreen', {
+                store: storeData,
                 placeId: storeData.placeId,
                 placeKey: storeData.placeKey,
                 storeName: storeData.name,
