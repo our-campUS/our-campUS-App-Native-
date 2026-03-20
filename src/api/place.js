@@ -244,21 +244,17 @@ export const togglePlaceLike = async (placeData) => {
     const token = useAuthStore.getState().accessToken;
 
     const body = {
+      placeId: null,
       placeName: placeData.name || placeData.placeName,
-
-      placeKey: placeData.placeKey || placeData.placeId || placeData.id,
-
+      placeKey: placeData.placeKey,
       address: placeData.address || '',
       category: placeData.category || '기타',
-
       link: placeData.link || '',
       telephone: placeData.telephone || placeData.phone || '',
-
       coordinate: {
         latitude: placeData.latitude || placeData.coordinate?.latitude || 0,
         longitude: placeData.longitude || placeData.coordinate?.longitude || 0,
       },
-
       imgUrls: placeData.imgUrls || [],
     };
 

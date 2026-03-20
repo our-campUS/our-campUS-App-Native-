@@ -92,11 +92,11 @@ const StoreListItem = ({
             {isLiked ? (
               <LikedIcon
                 width={12}
-                height={11}
+                height={11.25}
                 color={theme.colors.primary2}
               />
             ) : (
-              <UnlikedIcon width={12} height={11} />
+              <UnlikedIcon width={12} height={11.25} />
             )}
           </Pressable>
         </View>
