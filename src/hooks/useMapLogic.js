@@ -65,7 +65,7 @@ export const useMapLogic = (mapRef) => {
         placeId: targetId || `temp_${Date.now()}_${Math.random()}`,
         name: item.placeName || item.name || '이름 없음',
         address: item.address || '',
-        category: item.category || '기타',
+        category: item.placeCategory || item.category || '기타',
         imgUrls: item.imgUrls || [],
         latitude: item.coordinate?.latitude || item.latitude || 0,
         longitude: item.coordinate?.longitude || item.longitude || 0,

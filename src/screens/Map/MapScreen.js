@@ -92,7 +92,7 @@ const MapScreen = () => {
         : 'DEFAULT';
       const category = selectedCategory
         ? selectedCategory.id
-        : normalizeCategory(item.category);
+        : normalizeCategory(item.placeCategory || item.category);
       return { ...item, pinType, category };
     });
   }, [uniqueMarkers, selectedMarkerId, selectedCategory]);
