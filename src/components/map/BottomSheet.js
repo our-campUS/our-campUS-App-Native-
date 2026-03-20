@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import StoreListItem from '../common/StoreListItem';
+import EmptyResult from '../common/EmptyResult';
 import theme from '../../style';
 import colors from '../../style/colors';
 
@@ -28,6 +29,7 @@ const BottomSheet = ({
   onEndReached,
   isLoading,
   onUpdateStore,
+  userLocation,
 }) => {
   const navigation = useNavigation();
   const HEIGHT_MAX = maxHeight * 0.75;
@@ -106,6 +108,7 @@ const BottomSheet = ({
         renderItem={({ item }) => (
           <StoreListItem
             item={item}
+            userLocation={userLocation}
             onPress={() => {
               onItemPress(item.placeId);
 
@@ -123,6 +126,7 @@ const BottomSheet = ({
             }}
           />
         )}
+        ListEmptyComponent={!isLoading ? <EmptyResult paddingTop={60} /> : null}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         ListFooterComponent={

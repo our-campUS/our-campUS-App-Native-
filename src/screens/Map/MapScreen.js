@@ -12,6 +12,7 @@ import KakaoMapWebView from '../../components/map/KakaoMapWebView';
 
 import SearchBar from '../../components/SearchBar';
 import CategoryList from '../../components/map/CategoryList';
+import { normalizeCategory } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import LocationIcon from '../../../assets/icons/location.svg';
 import theme from '../../style';
@@ -36,6 +37,7 @@ const MapScreen = () => {
     currentAddress,
     mapMarkers,
     loading,
+    userLocation,
   } = state;
   const {
     setSelectedMarkerId,
@@ -43,6 +45,7 @@ const MapScreen = () => {
     fetchPartnershipList,
     handleCameraIdle,
     handlePinPress,
+    handleMapTap,
     handleReset,
     handleCurrentLocation,
   } = actions;
@@ -84,19 +87,24 @@ const MapScreen = () => {
       const isSelected = item.placeId === selectedMarkerId;
       const pinType = isSelected
         ? 'SELECTED'
-        : item.partnerTitle || item.type === 'PARTNER'
+        : item.partnerTitle || item.type === 'PARTNER' || item.isPartner
         ? 'PARTNER'
         : 'DEFAULT';
-      return { ...item, pinType };
+      const category = selectedCategory
+        ? selectedCategory.id
+        : normalizeCategory(item.placeCategory || item.category);
+      return { ...item, pinType, category };
     });
-  }, [uniqueMarkers, selectedMarkerId]);
+  }, [uniqueMarkers, selectedMarkerId, selectedCategory]);
 
   const handleMarkerTap = useCallback(
     ({ placeId }) => {
-      const item = uniqueMarkers.find((m) => String(m.placeId) === String(placeId));
+      const item = uniqueMarkers.find(
+        (m) => String(m.placeId) === String(placeId)
+      );
       if (item) handlePinPress(item);
     },
-    [uniqueMarkers, handlePinPress],
+    [uniqueMarkers, handlePinPress]
   );
 
   return (
@@ -105,14 +113,14 @@ const MapScreen = () => {
         ref={mapRef}
         style={{ flex: 1 }}
         initialCamera={{
-          latitude: 37.5570389272802,
-          longitude: 126.960204232592,
+          latitude: 37.5050,
+          longitude: 126.9570,
           zoom: 16,
         }}
         markers={markersWithPinType}
         onCameraIdle={handleCameraIdle}
         onMarkerTap={handleMarkerTap}
-        onMapTap={handleReset}
+        onMapTap={handleMapTap}
       />
 
       {/* 상단 검색바 영역 */}
@@ -193,6 +201,7 @@ const MapScreen = () => {
         onEndReached={() => fetchPartnershipList(true)}
         isLoading={loading}
         onUpdateStore={actions.updatePlaceState}
+        userLocation={userLocation}
       />
     </View>
   );

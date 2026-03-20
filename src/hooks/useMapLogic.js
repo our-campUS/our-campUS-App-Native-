@@ -6,7 +6,6 @@ import {
   getPartnerships,
   getMapMarkers,
   getPartnershipDetail,
-  getPlacesSearch,
   getPlacesSearchInfo,
   getPlaceStatus,
 } from '../api/place';
@@ -30,10 +29,14 @@ export const useMapLogic = (mapRef) => {
   const [nextCursor, setNextCursor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
+  const [userLocation] = useState({
+    latitude: 37.5050,
+    longitude: 126.9570,
+  });
 
   const lastCameraRef = useRef({
-    latitude: 37.5570389272802,
-    longitude: 126.960204232592,
+    latitude: 37.5050,
+    longitude: 126.9570,
   });
   useFocusEffect(
     useCallback(() => {
@@ -62,7 +65,7 @@ export const useMapLogic = (mapRef) => {
         placeId: targetId || `temp_${Date.now()}_${Math.random()}`,
         name: item.placeName || item.name || '이름 없음',
         address: item.address || '',
-        category: item.category || '기타',
+        category: item.placeCategory || item.category || '기타',
         imgUrls: item.imgUrls || [],
         latitude: item.coordinate?.latitude || item.latitude || 0,
         longitude: item.coordinate?.longitude || item.longitude || 0,
@@ -174,7 +177,7 @@ export const useMapLogic = (mapRef) => {
             );
           }
         } else {
-          const rawData = await getPlacesSearch(
+          const rawData = await getPlacesSearchInfo(
             selectedCategory.label,
             lat,
             lng
@@ -237,8 +240,12 @@ export const useMapLogic = (mapRef) => {
   // 파라미터(다른 화면에서 넘어왔을 때) 처리
   useEffect(() => {
     if (route.params) {
-      const { searchType, keyword, selectedLocation } = route.params;
-      if (searchType === 'KEYWORD' && keyword) {
+      const { searchType, keyword, selectedLocation, category } = route.params;
+      if (searchType === 'CATEGORY' && category) {
+        setSelectedCategory(category);
+        setSearchKeyword(null);
+        setSelectedMarkerId(null);
+      } else if (searchType === 'KEYWORD' && keyword) {
         setSearchKeyword(keyword);
         setSelectedCategory(null);
         setSelectedMarkerId(null);
@@ -336,9 +343,6 @@ export const useMapLogic = (mapRef) => {
 
   const handlePinPress = async (item) => {
     setSelectedMarkerId(item.placeId);
-    setSearchKeyword(null);
-    setSelectedCategory(null);
-    setPartnerships([]);
 
     if (item.postId) {
       const { latitude, longitude } = lastCameraRef.current;
@@ -358,6 +362,11 @@ export const useMapLogic = (mapRef) => {
     }
   };
 
+  const handleMapTap = () => {
+    setSelectedMarkerId(null);
+    setSelectedStoreDetail(null);
+  };
+
   const handleReset = () => {
     Keyboard.dismiss();
     setSelectedMarkerId(null);
@@ -368,8 +377,8 @@ export const useMapLogic = (mapRef) => {
   };
 
   const handleCurrentLocation = () => {
-    const TARGET_LAT = 37.5570389272802;
-    const TARGET_LNG = 126.960204232592;
+    const TARGET_LAT = 37.5050;
+    const TARGET_LNG = 126.9570;
 
     mapRef.current?.animateCameraTo({
       latitude: TARGET_LAT,
@@ -413,6 +422,7 @@ export const useMapLogic = (mapRef) => {
       partnerships,
       mapMarkers,
       loading,
+      userLocation,
     },
     actions: {
       setSelectedMarkerId,
@@ -421,6 +431,7 @@ export const useMapLogic = (mapRef) => {
       fetchPartnershipList,
       handleCameraIdle,
       handlePinPress,
+      handleMapTap,
       handleReset,
       handleCurrentLocation,
       updatePlaceState,
