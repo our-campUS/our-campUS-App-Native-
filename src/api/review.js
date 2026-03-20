@@ -106,6 +106,28 @@ export const createPartnershipReview = async (placeId, reviewData) => {
   }
 };
 
+// 내가 쓴 리뷰 목록 조회
+export const getMyReviews = async (page = 1, size = 10) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const response = await api.get('/reviews/mine', {
+      params: { page, size },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200 || response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error('내가 쓴 리뷰 조회 실패:', error);
+    throw error;
+  }
+};
+
 export const editReview = async (reviewId, reviewData) => {
   try {
     const token = useAuthStore.getState().accessToken;
