@@ -12,10 +12,11 @@ import LikedIcon from '../../../assets/Liked.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 
 import { togglePlaceLike } from '../../api/place';
-import { formatDistance, calculateWalkingTime } from '../../utils/distance';
+import { formatDistance, calculateWalkingTime, calculateDistanceInMeters } from '../../utils/distance';
 
 const StoreListItem = ({
   item,
+  userLocation,
   onPress,
   showImages = true,
   showDiscountDetail = false,
@@ -56,6 +57,16 @@ const StoreListItem = ({
   const categoryLabel =
     CATEGORIES.find((cat) => cat.id === item.category)?.label ||
     item.category;
+
+  const distanceInMeters =
+    userLocation && item.latitude && item.longitude
+      ? calculateDistanceInMeters(
+          userLocation.latitude,
+          userLocation.longitude,
+          item.latitude,
+          item.longitude,
+        )
+      : (item.distance != null ? item.distance : null);
 
   const tags = [];
   if (item.tag) tags.push(item.tag);
@@ -102,14 +113,12 @@ const StoreListItem = ({
 
         <View style={styles.infoSection}>
           <View style={styles.infoLeft}>
-            <View style={styles.infoItem}>
-              <StarIcon
-                width={20}
-                height={20}
-                style={styles.iconMargin}
-              />
-              <Text style={styles.infoText}>{item.star}</Text>
-            </View>
+            {item.star != null && item.star !== '' && (
+              <View style={styles.infoItem}>
+                <StarIcon width={20} height={20} style={styles.iconMargin} />
+                <Text style={styles.infoText}>{item.star}</Text>
+              </View>
+            )}
 
             {showDiscountDetail ? (
               item.partnerTitle && (
@@ -145,10 +154,10 @@ const StoreListItem = ({
                     style={styles.iconMargin}
                   />
                   <Text style={styles.infoText}>
-                    걸어서 {calculateWalkingTime(item.distance)}분
+                    걸어서 {calculateWalkingTime(distanceInMeters)}분
                   </Text>
                   <Text style={styles.distanceText}>
-                    {formatDistance(item.distance)}
+                    {formatDistance(distanceInMeters)}
                   </Text>
                 </View>
               </>

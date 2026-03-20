@@ -28,6 +28,7 @@ const BottomSheet = ({
   onEndReached,
   isLoading,
   onUpdateStore,
+  userLocation,
 }) => {
   const navigation = useNavigation();
   const HEIGHT_MAX = maxHeight * 0.75;
@@ -106,6 +107,7 @@ const BottomSheet = ({
         renderItem={({ item }) => (
           <StoreListItem
             item={item}
+            userLocation={userLocation}
             onPress={() => {
               onItemPress(item.placeId);
 

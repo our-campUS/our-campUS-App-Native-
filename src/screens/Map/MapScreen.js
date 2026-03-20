@@ -37,6 +37,7 @@ const MapScreen = () => {
     currentAddress,
     mapMarkers,
     loading,
+    userLocation,
   } = state;
   const {
     setSelectedMarkerId,
@@ -89,17 +90,21 @@ const MapScreen = () => {
         : item.partnerTitle || item.type === 'PARTNER' || item.isPartner
         ? 'PARTNER'
         : 'DEFAULT';
-      const category = selectedCategory ? selectedCategory.id : normalizeCategory(item.category);
+      const category = selectedCategory
+        ? selectedCategory.id
+        : normalizeCategory(item.category);
       return { ...item, pinType, category };
     });
   }, [uniqueMarkers, selectedMarkerId, selectedCategory]);
 
   const handleMarkerTap = useCallback(
     ({ placeId }) => {
-      const item = uniqueMarkers.find((m) => String(m.placeId) === String(placeId));
+      const item = uniqueMarkers.find(
+        (m) => String(m.placeId) === String(placeId)
+      );
       if (item) handlePinPress(item);
     },
-    [uniqueMarkers, handlePinPress],
+    [uniqueMarkers, handlePinPress]
   );
 
   return (
@@ -108,8 +113,8 @@ const MapScreen = () => {
         ref={mapRef}
         style={{ flex: 1 }}
         initialCamera={{
-          latitude: 37.5570389272802,
-          longitude: 126.960204232592,
+          latitude: 37.5050,
+          longitude: 126.9570,
           zoom: 16,
         }}
         markers={markersWithPinType}
@@ -196,6 +201,7 @@ const MapScreen = () => {
         onEndReached={() => fetchPartnershipList(true)}
         isLoading={loading}
         onUpdateStore={actions.updatePlaceState}
+        userLocation={userLocation}
       />
     </View>
   );

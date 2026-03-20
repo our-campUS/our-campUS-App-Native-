@@ -29,10 +29,14 @@ export const useMapLogic = (mapRef) => {
   const [nextCursor, setNextCursor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
+  const [userLocation] = useState({
+    latitude: 37.5050,
+    longitude: 126.9570,
+  });
 
   const lastCameraRef = useRef({
-    latitude: 37.5570389272802,
-    longitude: 126.960204232592,
+    latitude: 37.5050,
+    longitude: 126.9570,
   });
   useFocusEffect(
     useCallback(() => {
@@ -369,8 +373,8 @@ export const useMapLogic = (mapRef) => {
   };
 
   const handleCurrentLocation = () => {
-    const TARGET_LAT = 37.5570389272802;
-    const TARGET_LNG = 126.960204232592;
+    const TARGET_LAT = 37.5050;
+    const TARGET_LNG = 126.9570;
 
     mapRef.current?.animateCameraTo({
       latitude: TARGET_LAT,
@@ -414,6 +418,7 @@ export const useMapLogic = (mapRef) => {
       partnerships,
       mapMarkers,
       loading,
+      userLocation,
     },
     actions: {
       setSelectedMarkerId,
