@@ -14,12 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import SearchBar from '../../components/SearchBar';
 import theme from '../../style';
-import colors from '../../style/colors';
 import { CATEGORIES } from '../../constants/MapData';
 import typography from '../../style/typography';
 import SearchingPinIcon from '../../../assets/icons/common/pin.svg';
 import SearchingShakeIcon from '../../../assets/icons/search-list/searchingShake.svg';
-import WarningIcon from '../../../assets/icons/warning-line.svg';
+import SearchIcon from '../../../assets/icons/search-list/search.svg';
+import EmptyResult from '../../components/common/EmptyResult';
 
 import { getPlacesSearchInfo } from '../../api/place';
 import {
@@ -75,12 +75,7 @@ const MapSearchScreen = () => {
   //   return () => clearTimeout(timer);
   // }, [keyword]);
 
-  const renderEmptyComponent = () => (
-    <View style={styles.emptyContainer}>
-      <WarningIcon width={56} height={56} />
-      <Text style={styles.emptyText}>검색 결과가 존재하지 않습니다</Text>
-    </View>
-  );
+  const renderEmptyComponent = () => <EmptyResult />;
 
   const onSubmit = async () => {
     if (!keyword.trim()) return;
@@ -101,12 +96,15 @@ const MapSearchScreen = () => {
     let IconComponent;
     let iconColor;
 
+    let iconBgColor;
     if (item.type === 'KEYWORD') {
-      IconComponent = Ionicons;
+      IconComponent = SearchIcon;
       iconColor = theme.colors.textDim;
+      iconBgColor = 'transparent';
     } else if (item.type === 'LOCATION') {
       IconComponent = SearchingPinIcon;
       iconColor = theme.colors.primary;
+      iconBgColor = iconColor + '20';
     }
 
     return (
@@ -127,14 +125,8 @@ const MapSearchScreen = () => {
           }
         }}
       >
-        <View
-          style={[styles.iconCircle, { backgroundColor: iconColor + '20' }]}
-        >
-          {item.type === 'KEYWORD' ? (
-            <IconComponent name="search" size={22} color={iconColor} />
-          ) : (
-            <IconComponent width={22} height={22} color={iconColor} />
-          )}
+        <View style={[styles.iconCircle, { backgroundColor: iconBgColor }]}>
+          <IconComponent width={22} height={22} color={iconColor} />
         </View>
         <Text style={styles.historyText}>{item.text}</Text>
         <TouchableOpacity
@@ -223,9 +215,7 @@ const MapSearchScreen = () => {
       </View>
 
       {/* 조건부 렌더링 */}
-      {keyword.length > 0 ? //   keyExtractor={(item, index) => //   data={searchResults} // <FlatList
-      //     item.placeKey ? String(item.placeKey) : String(index)
-      //   }
+      {keyword.length > 0 ? //   } //     item.placeKey ? String(item.placeKey) : String(index) //   keyExtractor={(item, index) => //   data={searchResults} // <FlatList
       //   renderItem={renderResultItem}
       //   contentContainerStyle={styles.listContent}
       //   keyboardShouldPersistTaps="handled"
@@ -243,6 +233,12 @@ const MapSearchScreen = () => {
                 <TouchableOpacity
                   key={`${cat.id}-${index}`}
                   style={styles.categoryChip}
+                  onPress={() =>
+                    navigation.navigate('MapScreen', {
+                      searchType: 'CATEGORY',
+                      category: { id: cat.id, label: cat.label },
+                    })
+                  }
                 >
                   <View>
                     <cat.IconComponent
@@ -364,16 +360,7 @@ const styles = StyleSheet.create({
     ...typography.caption1Regular,
     marginRight: 8,
   },
-  emptyContainer: {
-    paddingTop: 200,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    marginTop: 20,
-    color: colors.gray[300],
-    ...typography.body2Bold,
-  },
+
   emptyHistoryContainer: {
     paddingTop: 100,
     alignItems: 'center',

@@ -73,12 +73,11 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
   useEffect(() => {
     console.log('route.params?.item', route.params?.item);
     const fetchStudentAffiliateDetail = async () => {
-      const response = await getStudentAffiliateDetail(
+      const data = await getStudentAffiliateDetail(
         accessToken,
         route.params?.item?.id || route.params?.item?.postId
       );
-      console.log('fetchStudentAffiliateDetail response', response);
-      const data = response.data.data;
+      console.log('fetchStudentAffiliateDetail data', data);
       setDetailData(data);
       // detailData에서 liked 상태 업데이트
       if (data?.liked !== undefined) {

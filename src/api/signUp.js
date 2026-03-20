@@ -27,6 +27,9 @@ export async function onKakaoLogin() {
     if (response.data.code === 200) {
       const {
         nickname,
+        campusNickname,
+        userId,
+        kakaoId,
         email,
         profileImage,
         accessToken,
@@ -37,6 +40,9 @@ export async function onKakaoLogin() {
       useAuthStore.getState().setAuthFromKakao({
         user: {
           name: nickname,
+          campusNickname,
+          userId,
+          kakaoId,
           email,
           profileImage,
           role: 'USER',

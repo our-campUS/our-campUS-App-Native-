@@ -97,11 +97,12 @@ export const getMapMarkers = async (minLat, maxLat, minLng, maxLng) => {
     });
 
     if (response.data.code === 200) {
+      console.log('✅ 지도 마커 응답:', response.data.data);
       return response.data.data;
     }
     return [];
   } catch (error) {
-    console.error('지도 마커 조회 실패:', error);
+    console.error('❌ 지도 마커 조회 실패:', error.response?.data || error.message);
     return [];
   }
 };
@@ -159,6 +160,8 @@ export const getPlacesSearch = async (keyword, lat, lng) => {
   try {
     const token = useAuthStore.getState().accessToken;
 
+    console.log('👉 [API 요청] getPlacesSearch 파라미터:', { keyword, lat, lng });
+
     const response = await api.get('/places/search', {
       params: {
         keyword: keyword,
@@ -170,12 +173,14 @@ export const getPlacesSearch = async (keyword, lat, lng) => {
       },
     });
 
+    console.log('✅ 카테고리 검색 응답:', response.data);
+
     if (response.data.code === 200) {
       return response.data.data;
     }
     return [];
   } catch (error) {
-    console.error('장소 검색 실패:', error);
+    console.error('❌ 장소 검색 실패:', error.response?.data || error.message);
     return [];
   }
 };
@@ -183,6 +188,8 @@ export const getPlacesSearch = async (keyword, lat, lng) => {
 export const getPlacesSearchInfo = async (keyword, lat, lng) => {
   try {
     const token = useAuthStore.getState().accessToken;
+
+    console.log('👉 [API 요청] getPlacesSearchInfo 파라미터:', { keyword, lat, lng });
 
     const response = await api.get('/places/search/info', {
       params: {
@@ -195,12 +202,14 @@ export const getPlacesSearchInfo = async (keyword, lat, lng) => {
       },
     });
 
+    console.log('✅ 키워드 검색 응답:', response.data);
+
     if (response.data.code === 200) {
       return response.data.data;
     }
     return [];
   } catch (error) {
-    console.error('장소 검색 실패:', error);
+    console.error('❌ 장소 검색 실패:', error.response?.data || error.message);
     return [];
   }
 };
@@ -235,21 +244,17 @@ export const togglePlaceLike = async (placeData) => {
     const token = useAuthStore.getState().accessToken;
 
     const body = {
+      placeId: null,
       placeName: placeData.name || placeData.placeName,
-
-      placeKey: placeData.placeKey || placeData.placeId || placeData.id,
-
+      placeKey: placeData.placeKey,
       address: placeData.address || '',
       category: placeData.category || '기타',
-
       link: placeData.link || '',
       telephone: placeData.telephone || placeData.phone || '',
-
       coordinate: {
         latitude: placeData.latitude || placeData.coordinate?.latitude || 0,
         longitude: placeData.longitude || placeData.coordinate?.longitude || 0,
       },
-
       imgUrls: placeData.imgUrls || [],
     };
 
@@ -273,14 +278,24 @@ export const togglePlaceLike = async (placeData) => {
 
 export const getPlaceStatus = async (placeId, latitude, longitude) => {
   try {
-    let url = `/places/detail?latitude=${latitude}&longitude=${longitude}`;
+    const token = useAuthStore.getState().accessToken;
+
+    const params = {
+      lat: latitude,
+      lng: longitude,
+    };
     if (placeId) {
-      url += `&placeId=${placeId}`;
+      params.placeId = placeId;
     }
 
-    const response = await api.get(url);
+    const response = await api.get('/places/detail', {
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    if (response.data && response.data.code === 0) {
+    if (response.data && (response.data.code === 200 || response.data.code === 0)) {
       return response.data.data;
     }
     return null;

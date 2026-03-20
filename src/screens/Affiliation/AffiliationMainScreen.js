@@ -11,6 +11,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from '../../components/common/Toast';
+import EmptyResult from '../../components/common/EmptyResult';
 import useToast from '../../hooks/useToast';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
@@ -394,6 +395,7 @@ const AffiliationMainScreen = ({ navigation }) => {
             />
           )}
           keyExtractor={(item) => item.id}
+          ListEmptyComponent={<EmptyResult paddingTop={100} />}
         />
       )}
       {selectedActivityType === '행사' && (
@@ -419,6 +421,7 @@ const AffiliationMainScreen = ({ navigation }) => {
             />
           )}
           keyExtractor={(item) => item.id}
+          ListEmptyComponent={<EmptyResult paddingTop={100} />}
         />
       )}
       <Toast

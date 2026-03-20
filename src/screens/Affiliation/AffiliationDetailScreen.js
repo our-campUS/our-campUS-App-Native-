@@ -73,12 +73,11 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
   useEffect(() => {
     console.log('route.params?.item', route.params?.item);
     const fetchStudentAffiliateDetail = async () => {
-      const response = await getStudentAffiliateDetail(
+      const data = await getStudentAffiliateDetail(
         accessToken,
         route.params?.item?.id
       );
-      console.log('fetchStudentAffiliateDetail response', response);
-      const data = response.data.data;
+      console.log('fetchStudentAffiliateDetail data', data);
       setDetailData(data);
       // detailData에서 liked 상태 업데이트
       if (data?.liked !== undefined) {
@@ -125,14 +124,13 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const fetchStudentAffiliateRecommendList = async () => {
-      let category = detailData?.category;
-      const response = await getStudentAffiliateRecommendList(
+      const data = await getStudentAffiliateRecommendList(
         accessToken,
         councilType,
         item?.id,
         detailData?.category
       );
-      setRecommendData(response?.data?.data?.content || []);
+      setRecommendData(data?.content || []);
     };
     fetchStudentAffiliateRecommendList();
   }, [detailData]);
@@ -288,13 +286,13 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
                 }}
               >
                 {isLiked ? (
-                  <LikeIcon width={18} height={18} color={colors.orange[500]} />
+                  <LikeIcon width={12} height={11.25} color={colors.orange[500]} />
                 ) : (
-                  <UnLikeIcon width={18} height={18} color={colors.gray[300]} />
+                  <UnLikeIcon width={12} height={11.25} color={colors.gray[300]} />
                 )}
               </Pressable>
               <Pressable style={styles.button}>
-                <ShareIcon width={18} height={18} />
+                <ShareIcon width={10.5} height={12} />
               </Pressable>
             </View>
             <View style={styles.placeAndDate}>
@@ -482,9 +480,9 @@ const styles = StyleSheet.create({
     right: 20,
   },
   button: {
-    width: 32,
-    height: 32,
-    borderRadius: 100,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     borderWidth: 0.5,
     borderColor: colors.gray[300],
     alignItems: 'center',

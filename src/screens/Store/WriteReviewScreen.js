@@ -16,7 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Toast from 'react-native-toast-message';
 import LabelTitle from '@components/LabelTitle';
-import { editReview } from '@api/review';
+import { editReview, createReview, createPartnershipReview } from '@api/review';
 import theme from '@style';
 import typography from '@style/typography';
 import shadow from '@style/shadow';
@@ -71,7 +71,7 @@ const WriteReviewScreen = () => {
 
     if (editMode && existingReview) {
       try {
-        await editReview(existingReview.id, {
+        await editReview(existingReview.reviewId || existingReview.id, {
           content: reviewText,
           star: rating,
           imageUrls: existingReview.imageUrls || [],
@@ -90,8 +90,58 @@ const WriteReviewScreen = () => {
       return;
     }
 
-    console.log('리뷰 등록 완료', { rating, reviewText });
-    navigation.navigate('ReviewResultScreen');
+    try {
+      const store = route.params?.store;
+      const placeId = route.params?.placeId;
+      const isPartnership = store?.isPartnership || store?.isPartner;
+
+      let result;
+      if (isPartnership && placeId) {
+        result = await createPartnershipReview(placeId, {
+          content: reviewText,
+          star: rating,
+          isVerified: false,
+          imageUrls: [],
+        });
+      } else {
+        result = await createReview({
+          content: reviewText,
+          star: rating,
+          imageUrls: [],
+          place: store
+            ? {
+                placeName: store.name || store.placeName || '',
+                placeKey: store.placeKey || '',
+                address: store.address || '',
+                category: store.category || '',
+                link: store.link || '',
+                telephone: store.telephone || store.phone || '',
+                coordinate: {
+                  latitude: store.latitude || store.coordinate?.latitude || 0,
+                  longitude: store.longitude || store.coordinate?.longitude || 0,
+                },
+                imgUrls: store.imgUrls || [],
+              }
+            : {
+                placeName: route.params?.storeName || '',
+                placeKey: route.params?.placeKey || '',
+                address: '',
+                category: '',
+                link: '',
+                telephone: '',
+                coordinate: { latitude: 0, longitude: 0 },
+                imgUrls: [],
+              },
+        });
+      }
+
+      navigation.navigate('ReviewResultScreen', { reviewResult: result });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: '리뷰 등록에 실패하였습니다.',
+      });
+    }
   };
 
   return (

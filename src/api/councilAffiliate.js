@@ -16,10 +16,12 @@ export const createCouncilPost = async (data, accessToken) => {
     } else {
       console.log('createCouncilAffiliate error');
       console.log(response.data);
+      return null;
     }
   } catch (error) {
     console.log('createCouncilAffiliate error');
     console.log(error.response);
+    return null;
   }
 };
 
@@ -43,10 +45,12 @@ export const getCouncilAffiliatePosts = async (accessToken) => {
     } else {
       console.log('getCouncilAffiliatePosts error');
       console.log(response.data);
+      return null;
     }
   } catch (error) {
     console.log('getCouncilAffiliatePosts error');
     console.log(error.response);
+    return null;
   }
 };
 
@@ -70,10 +74,12 @@ export const getCouncilEventPosts = async (accessToken) => {
     } else {
       console.log('getCouncilEventPosts error');
       console.log(response.data);
+      return null;
     }
   } catch (error) {
     console.log('getCouncilEventPosts error');
     console.log(error.response);
+    return null;
   }
 };
 
@@ -92,10 +98,12 @@ export const getCouncilAffiliatePostDetail = async (postId, accessToken) => {
     } else {
       console.log('getCouncilAffiliatePostDetail error');
       console.log(response.data);
+      return null;
     }
   } catch (error) {
     console.log('getCouncilAffiliatePostDetail error');
     console.log(error.response);
+    return null;
   }
 };
 
@@ -118,10 +126,12 @@ export const EditCouncilPost = async (data, accessToken, postId) => {
     } else {
       console.log('EditCouncilPost error');
       console.log(response.data);
+      return null;
     }
   } catch (error) {
     console.log('EditCouncilPost error');
     console.log(error.response);
+    return null;
   }
 };
 
@@ -168,10 +178,12 @@ export const searchCouncilAffiliatePlace = async (keyword, accessToken) => {
     } else {
       console.log('searchCouncilAffiliatePlace error');
       console.log(response.data);
+      return null;
     }
   } catch (error) {
     console.log('searchCouncilAffiliatePlace error');
     console.log(error.response);
+    return null;
   }
 };
 
@@ -193,9 +205,11 @@ export const getAvailableEvents = async (accessToken) => {
     } else {
       console.log('getAvailableEvents error');
       console.log(response.data);
+      return null;
     }
   } catch (error) {
     console.log('getAvailableEvents error');
     console.log(error.response);
+    return null;
   }
 };

@@ -183,7 +183,7 @@ export const editProfileImage = async (image) => {
         },
       }
     );
-    if (response.code === 200 || response.data.code === 200) {
+    if (response.data.code === 200 || response.data.code === 0) {
       console.log('유저 프로필 이미지 변경 성공 api:', response.data);
       console.log(
         '유저 프로필 이미지 변경 성공 response:',
@@ -219,7 +219,7 @@ export const editAcademicInfo = async (schoolId, majorId) => {
         },
       }
     );
-    if (response.code === 200 || response.data.code === 200) {
+    if (response.data.code === 200 || response.data.code === 0) {
       console.log('유저 학적 정보 변경 성공 api:', response.data);
       console.log('유저 학적 정보 변경 성공 response:', response.data.data);
       return {

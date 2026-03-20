@@ -271,12 +271,12 @@ const StoreDetailScreen = () => {
                   >
                     {isLiked ? (
                       <LikedIcon
-                        width={16}
-                        height={15}
+                        width={12}
+                        height={11.25}
                         color={theme.colors.primary2}
                       />
                     ) : (
-                      <UnlikedIcon width={12} height={12} />
+                      <UnlikedIcon width={12} height={11.25} />
                     )}
                   </View>
                 </TouchableOpacity>
@@ -460,6 +460,7 @@ const StoreDetailScreen = () => {
               //   });
               // }
               navigation.navigate('WriteReviewScreen', {
+                store: storeData,
                 placeId: storeData.placeId,
                 placeKey: storeData.placeKey,
                 storeName: storeData.name,
@@ -532,9 +533,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   iconCircleButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 20,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
     justifyContent: 'center',
@@ -707,7 +708,7 @@ const styles = StyleSheet.create({
   },
   customButtonText: {
     ...typography.heading6,
-    colors: colors.gray['000'],
+    color: colors.gray['000'],
   },
   bannerContainer: {
     height: 250,

@@ -13,7 +13,7 @@ export async function councilLogin(data) {
       const user = {
         role: 'COUNCIL',
         councilName: response.data.data.councilName,
-        councilId: response.data.councilId,
+        councilId: response.data.data.councilId,
         schoolName: response.data.data.schoolName,
         majorName: response.data.data.majorName,
         collegeName: response.data.data.collegeName,

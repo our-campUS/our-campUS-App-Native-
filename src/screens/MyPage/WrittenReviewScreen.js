@@ -1,19 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import LabelTitle from '@components/LabelTitle';
-import { REVIEW_DATA } from '@constants/DummyData';
 import ReviewItem from '@components/review/ReviewItem';
 import ReviewEditBottomSheet from '@components/review/ReviewEditBottomSheet';
-import { deleteReview } from '@api/review';
+import { deleteReview, getMyReviews } from '@api/review';
 import colors from '@style/colors';
 import typography from '@style/typography';
 
 const WrittenReviewScreen = ({ navigation }) => {
-  const [reviews, setReviews] = useState(REVIEW_DATA);
+  const [reviews, setReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
+
+  const fetchMyReviews = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await getMyReviews();
+      setReviews(data?.content || []);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: '리뷰 목록을 불러오지 못했습니다.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMyReviews();
+  }, [fetchMyReviews]);
 
   const handleMorePress = (item) => {
     setSelectedReview(item);
@@ -35,9 +54,10 @@ const WrittenReviewScreen = ({ navigation }) => {
     if (!selectedReview) return;
 
     try {
-      await deleteReview(selectedReview.id);
+      const reviewId = selectedReview.reviewId || selectedReview.id;
+      await deleteReview(reviewId);
       setReviews((prev) =>
-        prev.filter((r) => r.id !== selectedReview.id)
+        prev.filter((r) => (r.reviewId || r.id) !== reviewId)
       );
       Toast.show({
         type: 'success',
@@ -65,7 +85,7 @@ const WrittenReviewScreen = ({ navigation }) => {
           renderItem={({ item }) => (
             <ReviewItem item={item} onMorePress={handleMorePress} />
           )}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => (item.reviewId || item.id).toString()}
         />
       </View>
       <ReviewEditBottomSheet
