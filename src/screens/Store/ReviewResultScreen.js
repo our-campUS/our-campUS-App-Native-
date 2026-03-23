@@ -18,6 +18,7 @@ import theme from '@style';
 import typography from '@style/typography';
 import colors from '@style/colors';
 import RankingIcon from '@assets/icons/trophy.svg';
+import LinearGradient from 'react-native-linear-gradient';
 import BannerCard from '@components/common/BannerCard';
 
 const RECOMMEND_STORES = [
@@ -160,8 +161,18 @@ const ReviewResultScreen = () => {
       );
     } else if (caseType === 4) {
       return (
-        <View style={styles.middleActionContainer}>
-          <View style={styles.requestBoxWrapper}>
+        <View
+          style={[
+            styles.middleActionContainer,
+            styles.middleActionContainerTransparent,
+          ]}
+        >
+          <LinearGradient
+            colors={['#FFFFFF', '#E6F5FF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.requestBoxWrapper}
+          >
             <Text style={styles.middleTitle}>
               스타벅스 상도점이{'\n'}제휴를 진행하지 않아{'\n'}아쉽다면?
             </Text>
@@ -172,7 +183,7 @@ const ReviewResultScreen = () => {
             <TouchableOpacity style={styles.outlineButton}>
               <Text style={styles.outlineButtonText}>제휴 요청하기 {'>'}</Text>
             </TouchableOpacity>
-          </View>
+          </LinearGradient>
         </View>
       );
     }
@@ -188,9 +199,7 @@ const ReviewResultScreen = () => {
       <View
         style={[
           styles.bottomListContainer,
-          isBlueBackground
-            ? { backgroundColor: theme.colors.primary1Light }
-            : { backgroundColor: theme.colors.background },
+          isBlueBackground && { backgroundColor: colors.blue['000'] },
         ]}
       >
         <View style={styles.bottomHeader}>
@@ -409,6 +418,10 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     backgroundColor: colors.blue['000'],
   },
+  middleActionContainerTransparent: {
+    backgroundColor: 'transparent',
+    paddingVertical: 0,
+  },
   middleTitle: {
     ...typography.heading4,
     color: theme.colors.text,
@@ -440,7 +453,6 @@ const styles = StyleSheet.create({
   // Case 4 Request Box
   requestBoxWrapper: {
     width: '100%',
-    backgroundColor: theme.colors.primary1Light,
     borderRadius: 20,
     padding: 40,
     alignItems: 'center',
