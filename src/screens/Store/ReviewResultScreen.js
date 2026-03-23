@@ -18,6 +18,7 @@ import theme from '@style';
 import typography from '@style/typography';
 import colors from '@style/colors';
 import RankingIcon from '@assets/icons/trophy.svg';
+import BannerCard from '@components/common/BannerCard';
 
 const RECOMMEND_STORES = [
   {
@@ -146,18 +147,11 @@ const ReviewResultScreen = () => {
             다음에는 제휴 혜택을 이용해보세요!
           </Text>
 
-          {/* [TODO] main page 배너 컴포넌트 */}
-          <View style={styles.guideBox}>
-            <View style={styles.guideIconPlaceholder} />
-            <View>
-              <Text style={styles.guideBoxTitle}>
-                제휴 이용하고 스탬프 받아가세요!
-              </Text>
-              <Text style={styles.guideBoxSub}>
-                제휴만 이용해도 혜택이 팡팡
-              </Text>
-            </View>
-          </View>
+          <BannerCard
+            title="제휴 이용하고 스탬프 받아가세요!"
+            subtitle="제휴만 이용해도 혜택이 팡팡"
+            imageSource={require('../../../assets/images/home/banner_04.png')}
+          />
 
           <Button
             title="스탬프 채울 수 있는 제휴 보러가기"
@@ -428,34 +422,6 @@ const styles = StyleSheet.create({
     ...typography.body4Regular,
     color: theme.colors.textDim,
     textAlign: 'center',
-  },
-  guideBox: {
-    width: '100%',
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: colors.gray[200],
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  guideIconPlaceholder: {
-    width: 40,
-    height: 40,
-    backgroundColor: colors.gray[200],
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  guideBoxTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginBottom: 2,
-  },
-  guideBoxSub: {
-    fontSize: 12,
-    color: colors.gray[500],
   },
   blueButton: {
     width: '100%',
