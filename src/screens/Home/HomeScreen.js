@@ -117,7 +117,7 @@ const HomeScreen = () => {
 
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={() => console.log('알림 클릭')}
+                onPress={() => navigation.navigate('NotificationScreen')}
                 style={styles.notificationBtn}
               >
                 <Ionicons
