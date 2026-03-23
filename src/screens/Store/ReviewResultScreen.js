@@ -97,10 +97,6 @@ const ReviewResultScreen = () => {
       comment: '떡볶이 정말 양 많아요. 아 근데 스벅이네...',
       name: '최서*',
       date: '25.02.14',
-      imageUrls: [
-        'https://via.placeholder.com/138x138?text=Cafe+Photo+1',
-        'https://via.placeholder.com/138x138?text=Cafe+Photo+2',
-      ],
     };
 
     return (
@@ -385,12 +381,12 @@ const styles = StyleSheet.create({
   },
   rankingHeader: {
     flexDirection: 'row',
-    gap: 2,
+    gap: 4,
+    marginBottom: 12,
   },
   rankingTitle: {
     ...typography.heading6,
     color: theme.colors.textDim,
-    marginBottom: 12,
   },
   rankingRow: {
     flexDirection: 'row',

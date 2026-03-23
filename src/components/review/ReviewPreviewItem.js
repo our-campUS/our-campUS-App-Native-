@@ -45,13 +45,11 @@ const ReviewItemCompact = ({ item, variant = 'default' }) => {
           <Text style={styles.reviewUser}>{review.createdAt}</Text>
         </View>
       </View>
-      {review.thumbnailImgUrl ? (
+      {review.thumbnailImgUrl && (
         <Image
           source={{ uri: review.thumbnailImgUrl }}
           style={styles.reviewImagePlaceholder}
         />
-      ) : (
-        <View style={styles.reviewImagePlaceholder} />
       )}
     </View>
   );
