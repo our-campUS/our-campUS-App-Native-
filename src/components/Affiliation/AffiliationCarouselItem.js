@@ -148,7 +148,7 @@ const AffiliationCarouselItem = ({
       </Text>
       <View style={styles.bottomContainer}>
         <View style={styles.placeContainer}>
-          <Vector2 width={9.6} height={12.4} color={colors.gray[300]} />
+          <Vector2 width={20} height={20} color={colors.gray[300]} />
           <Text style={styles.place} numberOfLines={1} ellipsizeMode="tail">
             {item.place || item.placeName} {item.detailedLocation}
           </Text>

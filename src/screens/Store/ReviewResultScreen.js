@@ -20,21 +20,12 @@ import colors from '@style/colors';
 import RankingIcon from '@assets/icons/trophy.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import BannerCard from '@components/common/BannerCard';
+import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 
 const RECOMMEND_STORES = [
-  {
-    id: 1,
-    name: '수아르떼 중앙대점',
-    benefit: '첫방문 20% 할인',
-    dist: '0.0km',
-  },
-  {
-    id: 2,
-    name: '스타벅스 상도역점',
-    benefit: '첫방문 20% 할인',
-    dist: '0.1km',
-  },
-  { id: 3, name: '투썸플레이스', benefit: '첫방문 10% 할인', dist: '0.2km' },
+  { id: 1, name: '수아르떼 중앙대점', benefit: '첫방문 20% 할인', distance: '0.0km', type: '제휴' },
+  { id: 2, name: '스타벅스 상도역점', benefit: '첫방문 20% 할인', distance: '0.1km', type: '제휴' },
+  { id: 3, name: '투썸플레이스', benefit: '첫방문 10% 할인', distance: '0.2km', type: '제휴' },
 ];
 
 const ReviewResultScreen = () => {
@@ -214,27 +205,12 @@ const ReviewResultScreen = () => {
         </View>
 
         {RECOMMEND_STORES.map((store, index) => (
-          <View key={store.id} style={styles.storeRow}>
-            <View style={styles.storeImage} />
-            <View style={styles.storeInfo}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons
-                  name="checkmark-circle"
-                  size={16}
-                  color="#6BAAF9"
-                  style={{ marginRight: 4 }}
-                />
-                <Text style={styles.storeName}>{store.name}</Text>
-                <Text style={styles.storeCategory}>카페</Text>
-              </View>
-              <Text style={styles.storeBenefit}>{store.benefit}</Text>
-              <Text style={styles.storeDist}>걸어서 4분 {store.dist}</Text>
-            </View>
-            {/* 순위 배지 (1, 2, 3) */}
-            <View style={styles.rankBadge}>
-              <Text style={styles.rankText}>{index + 1}</Text>
-            </View>
-          </View>
+          <RecommendStoreCard
+            key={store.id}
+            item={store}
+            variant="long"
+            rank={index + 1}
+          />
         ))}
 
         <Button
@@ -489,61 +465,6 @@ const styles = StyleSheet.create({
     ...typography.body3Regular,
     color: theme.colors.textDim,
     textAlign: 'center',
-  },
-  storeRow: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: 'center',
-    ...theme.shadows.level1,
-  },
-  storeImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    backgroundColor: colors.gray[200],
-    marginRight: 12,
-  },
-  storeInfo: {
-    flex: 1,
-  },
-  storeName: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginRight: 6,
-  },
-  storeCategory: {
-    fontSize: 11,
-    color: colors.gray[400],
-  },
-  storeBenefit: {
-    fontSize: 12,
-    color: colors.gray[500],
-    marginTop: 2,
-    marginBottom: 2,
-  },
-  storeDist: {
-    fontSize: 11,
-    color: colors.gray[400],
-  },
-  rankBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 20,
-    height: 20,
-    backgroundColor: theme.colors.primary1,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rankText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: theme.colors.background,
   },
 });
 
