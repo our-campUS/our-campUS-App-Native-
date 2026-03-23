@@ -1,10 +1,5 @@
 import React, { useCallback } from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-} from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -12,12 +7,12 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LabelTitle from '../../components/LabelTitle';
 import NotificationItem from '../../components/common/NotificationItem';
 import EmptyResult from '../../components/common/EmptyResult';
+import LoadingFooter from '../../components/common/LoadingFooter';
 import useCursorPagination from '../../hooks/useCursorPagination';
 import {
   getNotifications,
   markNotificationRead,
 } from '../../api/notification';
-import theme from '../../style';
 import colors from '../../style/colors';
 
 const NotificationScreen = () => {
@@ -95,15 +90,6 @@ const NotificationScreen = () => {
     );
   };
 
-  const renderFooter = () => {
-    if (!loading || notifications.length === 0) return null;
-    return (
-      <View style={styles.footerLoader}>
-        <ActivityIndicator size="small" color={theme.colors.primary1} />
-      </View>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <LabelTitle
@@ -117,7 +103,7 @@ const NotificationScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         ListEmptyComponent={renderEmpty}
-        ListFooterComponent={renderFooter}
+        ListFooterComponent={<LoadingFooter loading={loading} />}
         contentContainerStyle={
           notifications.length === 0 ? styles.emptyContent : styles.listContent
         }
@@ -134,7 +120,7 @@ const NotificationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.common.white,
   },
   emptyContent: {
     flexGrow: 1,
@@ -143,10 +129,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 20,
-  },
-  footerLoader: {
-    paddingVertical: 20,
-    alignItems: 'center',
   },
 });
 

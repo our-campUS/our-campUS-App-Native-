@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   SafeAreaView,
-  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -15,6 +14,7 @@ import LabelTitle from '../../components/LabelTitle';
 import ReviewItem from '../../components/review/ReviewItem';
 // import ReviewActionModal from '../../components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
 import useCursorPagination from '../../hooks/useCursorPagination';
+import LoadingFooter from '../../components/common/LoadingFooter';
 import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
@@ -125,15 +125,6 @@ const ReviewListScreen = () => {
     </View>
   );
 
-  const renderFooter = () => {
-    if (!loading) return null;
-    return (
-      <View style={styles.footerLoader}>
-        <ActivityIndicator size="small" color={theme.colors.primary1} />
-      </View>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
@@ -149,7 +140,7 @@ const ReviewListScreen = () => {
         renderItem={renderItem}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
-        ListFooterComponent={renderFooter}
+        ListFooterComponent={<LoadingFooter loading={loading} />}
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
         onRefresh={handleRefresh}
@@ -267,10 +258,6 @@ const styles = StyleSheet.create({
   emptySubText: {
     ...typography.caption1Regular,
     color: colors.gray[300],
-  },
-  footerLoader: {
-    paddingVertical: 20,
-    alignItems: 'center',
   },
   floatingButtonContainer: {
     position: 'absolute',
