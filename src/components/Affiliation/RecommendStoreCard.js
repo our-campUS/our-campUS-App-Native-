@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import BadgeIcon from '@assets/badgeIcon.svg';
 import CouponIcon from '@assets/couponIcon.svg';
-import PlaceIcon from '@assets/Vector2.svg';
+import PlaceIcon from '@assets/icons/place-icon.svg';
 import CalendarIcon from '@assets/calendar.svg';
 import RankIcon from '@assets/icons/rank-icon.svg';
 import colors from '@style/colors';

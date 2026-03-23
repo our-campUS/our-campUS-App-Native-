@@ -21,11 +21,30 @@ import RankingIcon from '@assets/icons/trophy.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import BannerCard from '@components/common/BannerCard';
 import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
+import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 
 const RECOMMEND_STORES = [
-  { id: 1, name: '수아르떼 중앙대점', benefit: '첫방문 20% 할인', distance: '0.0km', type: '제휴' },
-  { id: 2, name: '스타벅스 상도역점', benefit: '첫방문 20% 할인', distance: '0.1km', type: '제휴' },
-  { id: 3, name: '투썸플레이스', benefit: '첫방문 10% 할인', distance: '0.2km', type: '제휴' },
+  {
+    id: 1,
+    name: '수아르떼 중앙대점',
+    benefit: '첫방문 20% 할인',
+    distance: '0.0km',
+    type: '제휴',
+  },
+  {
+    id: 2,
+    name: '스타벅스 상도역점',
+    benefit: '첫방문 20% 할인',
+    distance: '0.1km',
+    type: '제휴',
+  },
+  {
+    id: 3,
+    name: '투썸플레이스',
+    benefit: '첫방문 10% 할인',
+    distance: '0.2km',
+    type: '제휴',
+  },
 ];
 
 const ReviewResultScreen = () => {
@@ -33,6 +52,7 @@ const ReviewResultScreen = () => {
 
   // [개발용 state]
   const [caseType, setCaseType] = useState(1);
+  const [partnerRequested, setPartnerRequested] = useState(false);
 
   const handleClose = () => {
     navigation.popToTop();
@@ -171,8 +191,29 @@ const ReviewResultScreen = () => {
               캠퍼스가 학생회에 의견을 대신 전해드려요!
             </Text>
 
-            <TouchableOpacity style={styles.outlineButton}>
-              <Text style={styles.outlineButtonText}>제휴 요청하기 {'>'}</Text>
+            <TouchableOpacity
+              style={[
+                styles.outlineButton,
+                partnerRequested && styles.outlineButtonDone,
+              ]}
+              onPress={() => setPartnerRequested(true)}
+              disabled={partnerRequested}
+            >
+              <Text
+                style={[
+                  styles.outlineButtonText,
+                  partnerRequested && styles.outlineButtonTextDone,
+                ]}
+              >
+                {partnerRequested ? '제휴 요청 완료' : '제휴 요청하기'}
+              </Text>
+              {!partnerRequested && (
+                <ArrowRightIcon
+                  width={5}
+                  height={10}
+                  color={colors.blue[600]}
+                />
+              )}
             </TouchableOpacity>
           </LinearGradient>
         </View>
@@ -441,10 +482,23 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary1,
     borderRadius: 10,
     backgroundColor: theme.colors.background,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  outlineButtonDone: {
+    borderColor: colors.blue[300],
+    backgroundColor: colors.blue[100],
   },
   outlineButtonText: {
     ...typography.body4Bold,
     color: colors.blue[600],
+  },
+  outlineButtonTextDone: {
+    color: colors.blue[300],
+  },
+  outlineButtonIcon: {
+    marginLeft: 4,
   },
 
   // === Bottom List (Case 1, 2, 4) ===
