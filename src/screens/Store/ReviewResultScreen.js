@@ -142,7 +142,7 @@ const ReviewResultScreen = () => {
     if (caseType === 3) {
       return (
         <View style={styles.middleActionContainer}>
-          <Text style={styles.middleTitle}>캠퍼스를 100% 이용하는 법</Text>
+          <Text style={styles.middleTitle}>캠어스를 100% 이용하는 법</Text>
           <Text style={styles.middleSubtitle}>
             다음에는 제휴 혜택을 이용해보세요!
           </Text>
@@ -151,12 +151,13 @@ const ReviewResultScreen = () => {
             title="제휴 이용하고 스탬프 받아가세요!"
             subtitle="제휴만 이용해도 혜택이 팡팡"
             imageSource={require('../../../assets/images/home/banner_04.png')}
+            style={styles.bannerCard}
           />
 
           <Button
             title="스탬프 채울 수 있는 제휴 보러가기"
             // onPress={() => }
-            style={styles.blueButton}
+            style={[styles.blueButton, styles.blueButtonAfterBanner]}
             textStyle={styles.blueButtonText}
           />
         </View>
@@ -423,9 +424,14 @@ const styles = StyleSheet.create({
     color: theme.colors.textDim,
     textAlign: 'center',
   },
+  bannerCard: {
+    marginTop: 32,
+    marginBottom: 0,
+  },
   blueButton: {
     width: '100%',
     height: 50,
+    marginTop: 20,
     backgroundColor: colors.blue[400],
     borderRadius: 16,
     justifyContent: 'center',
