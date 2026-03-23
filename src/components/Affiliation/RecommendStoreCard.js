@@ -39,7 +39,11 @@ const RecommendStoreCard = ({ item, variant = 'short', rank }) => {
           {item?.approved && (
             <BadgeIcon width={20} height={20} style={styles.badgeIcon} />
           )}
-          <Text style={isLong ? styles.nameLong : styles.nameShort}>
+          <Text
+            style={isLong ? styles.nameLong : styles.nameShort}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {name}
           </Text>
           <Text style={isLong ? styles.placeTypeLong : styles.placeTypeShort}>
@@ -145,11 +149,13 @@ const styles = StyleSheet.create({
   nameShort: {
     ...typography.body4Bold,
     color: theme.colors.text,
+    flexShrink: 1,
   },
   nameLong: {
     ...typography.heading6,
     fontWeight: 'bold',
     color: theme.colors.text,
+    flexShrink: 1,
   },
   placeTypeShort: {
     ...typography.caption2Regular,
