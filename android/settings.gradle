@@ -18,12 +18,13 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://www.jitpack.io" }
+        maven { url = "https://www.jitpack.io" }
 
-        // Kakao SDK repositories
-        maven { url 'https://devrepo.kakao.com/nexus/repository/kakao-public/' }
-        maven { url 'https://devrepo.kakao.com/nexus/repository/kakaopay-public/' }
-        maven { url 'https://devrepo.kakao.com/nexus/content/groups/android/' }
+        // Kakao SDK repository (groups/public이 kakao-public + kakaopay-public 포함)
+        maven { url = 'https://devrepo.kakao.com/nexus/content/groups/public/' }
+
+        // AsyncStorage v3 local Maven repo
+        maven { url = new File(rootProject.projectDir, "../node_modules/@react-native-async-storage/async-storage/android/local_repo") }
     }
 }
 
