@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,7 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { togglePlaceLike, getPlaceStatus } from '@api/place';
+import { togglePlaceLike } from '@api/place';
 import { getReviewList } from '@api/review';
 
 import LabelTitle from '@components/LabelTitle';
@@ -130,7 +129,6 @@ const StoreDetailScreen = () => {
       const newPlaceId = response?.data?.placeId || response?.placeId;
 
       if (!currentPlaceId && newPlaceId) {
-        console.log(`🎉 새 장소 등록됨! ID: ${newPlaceId}`);
         setCurrentPlaceId(newPlaceId);
       }
 
@@ -152,66 +150,6 @@ const StoreDetailScreen = () => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true; // 언마운트 시 상태 업데이트 방지
-
-      const fetchLatestStatus = async () => {
-        try {
-          const checkId = currentPlaceId || storeData.placeId;
-          // ID가 없으면 조회 불가 (또는 위도경도로 조회)
-          const status = await getPlaceStatus(
-            checkId,
-            storeData.latitude,
-            storeData.longitude
-          );
-
-          if (isActive && status) {
-            console.log('🔄 [상세] 최신 상태 동기화:', status.liked);
-            setIsLiked(status.liked); // ★ 여기서 서버 데이터로 덮어씌움!
-
-            if (status.placeId && !currentPlaceId) {
-              setCurrentPlaceId(status.placeId);
-            }
-          }
-        } catch (error) {
-          console.error('상태 조회 실패');
-        }
-      };
-
-      fetchLatestStatus();
-
-      return () => {
-        isActive = false;
-      };
-    }, [currentPlaceId]) // 의존성 배열
-  );
-
-  useEffect(() => {
-    const fetchLatestStatus = async () => {
-      try {
-        const status = await getPlaceStatus(
-          currentPlaceId || storeData.placeId,
-          storeData.latitude,
-          storeData.longitude
-        );
-
-        if (status) {
-          console.log('🔄 최신 상태 동기화:', status.liked);
-
-          setIsLiked(status.liked);
-
-          if (status.placeId && !currentPlaceId) {
-            setCurrentPlaceId(status.placeId);
-          }
-        }
-      } catch (error) {
-        console.error('최신 상태 확인 실패');
-      }
-    };
-
-    fetchLatestStatus();
-  }, []);
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {

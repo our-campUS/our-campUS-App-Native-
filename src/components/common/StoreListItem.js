@@ -22,11 +22,11 @@ const StoreListItem = ({
   showDiscountDetail = false,
   onLikeToggle,
 }) => {
-  const [isLiked, setIsLiked] = useState(!!item.placeId && item.isLiked);
+  const [isLiked, setIsLiked] = useState(!!item.isLiked);
 
   useEffect(() => {
-    setIsLiked(!!item.placeId && item.isLiked);
-  }, [item.placeId, item.isLiked]);
+    setIsLiked(!!item.isLiked);
+  }, [item.isLiked]);
 
   const handleLikePress = async () => {
     const previousState = isLiked;

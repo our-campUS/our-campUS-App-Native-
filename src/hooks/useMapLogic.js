@@ -102,11 +102,9 @@ export const useMapLogic = (mapRef) => {
             ...item, // 1. 기본 정보
             ...detailData, // 2. 제휴 상세 정보 (있으면)
 
-            // 3. 좋아요 상태 덮어쓰기
-            // 서버에서 liked: true 라고 오면 -> isLiked: true로 매핑
-            isLiked: status ? status.liked : item.isLiked || false,
+            // 3. API에서 isLiked를 명시적으로 제공하면 우선 신뢰, 없으면 getPlaceStatus 결과 사용
+            isLiked: item.isLiked !== undefined ? item.isLiked : (status ? status.liked : false),
 
-            // (선택) 서버가 partnership: true라고 알려주면 그것도 반영
             isPartner: status ? status.partnership : item.isPartner,
           };
         } catch (err) {
