@@ -96,7 +96,7 @@ const StoreDetailScreen = () => {
 
   useEffect(() => {
     const isValidPlaceId = storeData.placeId && !String(storeData.placeId).startsWith('temp_');
-    if (storeData.isPartner || !isValidPlaceId || storeData.reviews?.length > 0) return;
+    if (!isValidPlaceId || storeData.reviews?.length > 0) return;
     getReviewList(storeData.placeId)
       .then((res) => {
         const items = (res?.data?.items || []).map((r) => ({
