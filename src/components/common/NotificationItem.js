@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 
@@ -68,8 +69,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.gray[200],
-    backgroundColor: colors.common.white,
+    borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.background,
   },
   row: {
     flexDirection: 'row',
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.orange[500],
+    backgroundColor: theme.colors.primary2,
   },
   contentWrapper: {
     flex: 1,
@@ -109,11 +110,11 @@ const styles = StyleSheet.create({
   },
   body: {
     ...typography.body4Bold,
-    color: colors.gray[850],
+    color: theme.colors.text,
   },
   time: {
     ...typography.caption1Regular,
-    color: colors.gray[400],
+    color: theme.colors.textDisabled,
   },
 });
 

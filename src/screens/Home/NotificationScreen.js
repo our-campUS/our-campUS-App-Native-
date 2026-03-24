@@ -13,6 +13,7 @@ import {
   getNotifications,
   markNotificationRead,
 } from '../../api/notification';
+import theme from '../../style';
 import colors from '../../style/colors';
 
 const NotificationScreen = () => {
@@ -121,7 +122,7 @@ const NotificationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.common.white,
+    backgroundColor: theme.colors.background,
   },
   emptyContent: {
     flexGrow: 1,
