@@ -79,6 +79,16 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       );
       console.log('fetchStudentAffiliateDetail data', data);
       setDetailData(data);
+      // API 데이터로 item state 보완 (알림 진입 시 id만 전달되므로)
+      if (data) {
+        setItem((prev) => ({
+          ...prev,
+          title: prev?.title || data?.title,
+          placeName: prev?.placeName || data?.place,
+          endDateTime: prev?.endDateTime || data?.endDate || data?.startDateTime,
+          category: prev?.category || data?.category,
+        }));
+      }
       // detailData에서 liked 상태 업데이트
       if (data?.liked !== undefined) {
         setIsLiked(data.liked);
@@ -261,7 +271,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
                 ellipsizeMode="tail"
                 textBreakStrategy="balanced"
               >
-                {route.params?.item?.title}
+                {item?.title}
               </Text>
             </View>
             <View style={styles.buttonWrapper}>
@@ -300,7 +310,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
               <View style={styles.placeWrapper}>
                 <PlaceIcon width={20} height={20} color={colors.gray[300]} />
                 <Text style={styles.place}>
-                  {route.params?.item?.placeName}
+                  {item?.placeName}
                 </Text>
                 {/* <Text style={styles.distance}>0.0km</Text> */}
               </View>

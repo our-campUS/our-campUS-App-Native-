@@ -4,17 +4,18 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 
-// TODO: 추후 API에 프로필 이미지 URL 추가 시 URL 기반 Image로 교체
-const NOTIFICATION_TYPE_CONFIG = {
-  COUNCIL_POST_CREATED: { useIcon: true },
-  SYSTEM_NOTICE: { useIcon: false },
-  REWARD_GRANTED: { useIcon: false },
-};
+const ProfileImage = ({ profileImageUrl, type }) => {
+  if (profileImageUrl) {
+    return (
+      <Image
+        source={{ uri: profileImageUrl }}
+        style={styles.profileImage}
+      />
+    );
+  }
 
-const ProfileImage = ({ type }) => {
-  const config = NOTIFICATION_TYPE_CONFIG[type];
-
-  if (config?.useIcon) {
+  // fallback: URL 없을 때 타입별 기본 아이콘
+  if (type === 'COUNCIL_POST_CREATED') {
     return (
       <Ionicons
         name="person-circle"
@@ -42,7 +43,7 @@ const NotificationItem = ({ notification, onPress }) => {
     >
       <View style={styles.row}>
         <View style={styles.profileWrapper}>
-          <ProfileImage type={type} />
+          <ProfileImage profileImageUrl={notification.profileImageUrl} type={type} />
           {!isRead && <View style={styles.unreadDot} />}
         </View>
 
