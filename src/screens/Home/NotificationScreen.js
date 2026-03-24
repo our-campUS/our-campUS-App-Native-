@@ -57,9 +57,9 @@ const NotificationScreen = () => {
     // 타입별 화면 이동
     switch (notification.type) {
       case 'COUNCIL_POST_CREATED':
-        // TODO: 알림 API에 councilType 필드 추가 시 councilType도 전달 (추천 목록 조회용)
         navigation.navigate('AffiliationDetailScreen', {
           item: { id: notification.referenceId },
+          councilType: notification.councilType,
         });
         break;
       case 'REWARD_GRANTED':
