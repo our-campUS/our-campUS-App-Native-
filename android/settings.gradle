@@ -20,10 +20,8 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = "https://www.jitpack.io" }
 
-        // Kakao SDK repositories
-        maven { url = 'https://devrepo.kakao.com/nexus/repository/kakao-public/' }
-        maven { url = 'https://devrepo.kakao.com/nexus/repository/kakaopay-public/' }
-        maven { url = 'https://devrepo.kakao.com/nexus/content/groups/android/' }
+        // Kakao SDK repository (groups/public이 kakao-public + kakaopay-public 포함)
+        maven { url = 'https://devrepo.kakao.com/nexus/content/groups/public/' }
     }
 }
 
