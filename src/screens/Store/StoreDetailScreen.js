@@ -86,14 +86,6 @@ const StoreDetailScreen = () => {
     placeKey: paramStore.placeKey || paramStore.id,
   };
 
-  console.log('================= [StoreDetailScreen Debug] =================');
-  console.log('1. 이전 화면에서 넘겨준 원본 (route.params):', route.params);
-  console.log('-------------------------------------------------------------');
-  console.log(
-    '2. 최종 렌더링 데이터 (storeData):',
-    JSON.stringify(storeData, null, 2)
-  );
-  console.log('=============================================================');
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);

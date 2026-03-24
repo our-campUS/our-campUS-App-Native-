@@ -64,8 +64,7 @@ const ReviewResultScreen = () => {
     const fetchStores = (lat, lng) => {
       getPartnershipList(lat, lng)
         .then((data) => {
-          console.log('제휴 매장 목록:', data);
-          setPartnerStores(
+setPartnerStores(
             data.map((item) => ({
               id: item.placeId,
               placeName: item.placeName,
