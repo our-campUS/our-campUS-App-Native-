@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StampImage from '@assets/images/stamp.png';
 import Button from '@components/Button';
@@ -22,37 +22,66 @@ import LinearGradient from 'react-native-linear-gradient';
 import BannerCard from '@components/common/BannerCard';
 import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
+import { getPartnershipList } from '@api/review';
 
-const RECOMMEND_STORES = [
-  {
-    id: 1,
-    name: '수아르떼 중앙대점',
-    benefit: '첫방문 20% 할인',
-    distance: '0.0km',
-    type: '제휴',
-  },
-  {
-    id: 2,
-    name: '스타벅스 상도역점',
-    benefit: '첫방문 20% 할인',
-    distance: '0.1km',
-    type: '제휴',
-  },
-  {
-    id: 3,
-    name: '투썸플레이스',
-    benefit: '첫방문 10% 할인',
-    distance: '0.2km',
-    type: '제휴',
-  },
-];
+const formatDistance = (meters) => {
+  if (meters == null) return null;
+  return meters >= 1000
+    ? `${(meters / 1000).toFixed(1)}km`
+    : `${Math.round(meters)}m`;
+};
+
+const getOrdinal = (n) => {
+  const ordinals = ['첫번째', '두번째', '세번째', '네번째', '다섯번째', '여섯번째', '일곱번째', '여덟번째', '아홉번째', '열번째'];
+  return n >= 1 && n <= 10 ? ordinals[n - 1] : `${n}번째`;
+};
+
+const getJosa = (str) => {
+  if (!str) return '이';
+  const code = str.charCodeAt(str.length - 1);
+  if (code < 0xAC00 || code > 0xD7A3) return '이';
+  return (code - 0xAC00) % 28 > 0 ? '이' : '가';
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  return dateStr.slice(2).replace(/-/g, '.');
+};
 
 const ReviewResultScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
 
-  // [개발용 state]
-  const [caseType, setCaseType] = useState(1);
+  const { reviewResult, caseType = 3, placeName = '' } = route.params || {};
+  const reviewData = reviewResult?.review;
+  const resultData = reviewResult?.result;
+  const rankingData = reviewResult?.ranking;
+
   const [partnerRequested, setPartnerRequested] = useState(false);
+  const [partnerStores, setPartnerStores] = useState([]);
+
+  useEffect(() => {
+    const fetchStores = (lat, lng) => {
+      getPartnershipList(lat, lng)
+        .then((data) => {
+          console.log('제휴 매장 목록:', data);
+          setPartnerStores(
+            data.map((item) => ({
+              id: item.placeId,
+              placeName: item.placeName,
+              category: item.category,
+              benefit: item.partnership,
+              thumbnailImageUrl: item.thumbnailUrl,
+              distance: formatDistance(item.distance),
+              type: '제휴',
+            })),
+          );
+        })
+        .catch((e) => console.error('제휴 매장 목록 오류:', e));
+    };
+
+    fetchStores(37.505, 126.957);
+  }, []);
 
   const handleClose = () => {
     navigation.popToTop();
@@ -101,24 +130,22 @@ const ReviewResultScreen = () => {
   };
 
   const renderReviewCard = () => {
-    const showHeader = caseType === 3 || caseType === 4;
-
-    // ReviewItem에 전달할 데이터 포맷
+    const ordinal = getOrdinal(resultData?.userReviewCountOfPlace ?? 1);
     const reviewItemData = {
-      star: 5,
-      comment: '떡볶이 정말 양 많아요. 아 근데 스벅이네...',
-      name: '최서*',
-      date: '25.02.14',
+      star: reviewData?.star ?? 0,
+      comment: reviewData?.content ?? '',
+      name: reviewData?.userName ?? '',
+      date: formatDate(reviewData?.createDate),
     };
 
     return (
       <View style={styles.reviewSection}>
         <View style={{ alignItems: 'center', marginBottom: 20 }}>
           <Text style={styles.reviewCompleteTitle}>
-            <Text style={{ color: '#6BAAF9' }}>첫번째</Text> 리뷰 작성 완료!
+            <Text style={{ color: '#6BAAF9' }}>{ordinal}</Text> 리뷰 작성 완료!
           </Text>
           <Text style={styles.reviewCompleteSub}>
-            스타벅스 상도역점의 첫번째 리뷰 작성 완료
+            {placeName}의 {ordinal} 리뷰 작성 완료
           </Text>
         </View>
 
@@ -127,19 +154,19 @@ const ReviewResultScreen = () => {
         <View style={styles.rankingContainer}>
           <View style={styles.rankingHeader}>
             <RankingIcon width={18} height={18} />
-            <Text style={styles.rankingTitle}>서연님의 리뷰 랭킹</Text>
+            <Text style={styles.rankingTitle}>{reviewData?.userName ?? ''}님의 리뷰 랭킹</Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>정치국제학과에서</Text>
-            <Text style={styles.rankingValue}>첫번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>{rankingData?.major?.scope}에서</Text>
+            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.major?.rank ?? 1)} 리뷰</Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>사회과학대에서</Text>
-            <Text style={styles.rankingValue}>4번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>{rankingData?.college?.scope}에서</Text>
+            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.college?.rank ?? 1)} 리뷰</Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>중앙대 전체에서</Text>
-            <Text style={styles.rankingValue}>9번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>{rankingData?.school?.scope}에서</Text>
+            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.school?.rank ?? 1)} 리뷰</Text>
           </View>
         </View>
       </View>
@@ -185,7 +212,7 @@ const ReviewResultScreen = () => {
             style={styles.requestBoxWrapper}
           >
             <Text style={styles.middleTitle}>
-              스타벅스 상도점이{'\n'}제휴를 진행하지 않아{'\n'}아쉽다면?
+              {placeName}{getJosa(placeName)}{'\n'}제휴를 진행하지 않아{'\n'}아쉽다면?
             </Text>
             <Text style={[styles.middleSubtitle, { marginTop: 8 }]}>
               캠퍼스가 학생회에 의견을 대신 전해드려요!
@@ -245,7 +272,7 @@ const ReviewResultScreen = () => {
           </Text>
         </View>
 
-        {RECOMMEND_STORES.map((store, index) => (
+        {partnerStores.map((store, index) => (
           <RecommendStoreCard
             key={store.id}
             item={store}
@@ -274,32 +301,6 @@ const ReviewResultScreen = () => {
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color={colors.gray[800]} />
         </TouchableOpacity>
-      </View>
-
-      {/* 개발용 토글 */}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          gap: 10,
-          marginBottom: 10,
-        }}
-      >
-        {[1, 2, 3, 4].map((num) => (
-          <TouchableOpacity
-            key={num}
-            onPress={() => setCaseType(num)}
-            style={{
-              padding: 8,
-              backgroundColor: caseType === num ? 'black' : '#ddd',
-              borderRadius: 4,
-            }}
-          >
-            <Text style={{ color: caseType === num ? 'white' : 'black' }}>
-              Case {num}
-            </Text>
-          </TouchableOpacity>
-        ))}
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>

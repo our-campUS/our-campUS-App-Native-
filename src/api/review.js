@@ -128,6 +128,23 @@ export const getMyReviews = async (page = 1, size = 10) => {
   }
 };
 
+export const getPartnershipList = async (lat, lng) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+    const response = await api.get('/reviews/partnership-list', {
+      params: { lat, lng },
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.data.code === 200 || response.data.code === 0) {
+      return response.data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('제휴 매장 목록 조회 실패:', error);
+    return [];
+  }
+};
+
 export const editReview = async (reviewId, reviewData) => {
   try {
     const token = useAuthStore.getState().accessToken;
