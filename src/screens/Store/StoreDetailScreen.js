@@ -15,6 +15,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { togglePlaceLike, getPlaceStatus } from '@api/place';
+import { getReviewList } from '@api/review';
 
 import LabelTitle from '@components/LabelTitle';
 import Button from '@components/Button';
@@ -97,6 +98,28 @@ const StoreDetailScreen = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
   const [currentPlaceId, setCurrentPlaceId] = useState(storeData.placeId);
+  const [reviews, setReviews] = useState(storeData.reviews);
+  const [reviewSize, setReviewSize] = useState(storeData.reviewSize);
+
+  useEffect(() => {
+    const isValidPlaceId = storeData.placeId && !String(storeData.placeId).startsWith('temp_');
+    if (storeData.isPartner || !isValidPlaceId || storeData.reviews?.length > 0) return;
+    getReviewList(storeData.placeId)
+      .then((res) => {
+        const items = (res?.data?.items || []).map((r) => ({
+          id: r.id,
+          star: r.star,
+          comment: r.content,
+          name: r.userName,
+          date: r.createDate?.slice(2).replace(/-/g, '.') ?? '',
+          imageUrls: r.imageUrls?.length ? r.imageUrls : undefined,
+        }));
+        setReviews(items);
+        setReviewSize(items.length);
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeData.placeId]);
 
   const handleLikePress = async () => {
     const previousState = isLiked;
@@ -348,11 +371,11 @@ const StoreDetailScreen = () => {
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
                 <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
-                {storeData.reviewSize > 0 ? (
+                {reviewSize > 0 ? (
                   <>
-                    <Text style={styles.detailText}>{storeData.star}</Text>
+                    <Text style={styles.detailText}>{storeData.averageStar ?? storeData.star}</Text>
                     <Text style={styles.detailTextSub}>
-                      ({storeData.reviewSize})
+                      ({reviewSize})
                     </Text>
                   </>
                 ) : (
@@ -403,21 +426,21 @@ const StoreDetailScreen = () => {
               <Text style={styles.reviewTitle}>
                 리뷰{' '}
                 <Text style={styles.detailTextSub}>
-                  {storeData.reviewSize}개
+                  {reviewSize}개
                 </Text>
               </Text>
               <TouchableOpacity
-                disabled={!storeData.reviewSize || storeData.reviewSize === 0}
+                disabled={!reviewSize}
                 onPress={() =>
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
-                    star: storeData.star,
+                    star: storeData.averageStar ?? storeData.star,
                     placeId: currentPlaceId,
-                    reviewSize: storeData.reviewSize,
+                    reviewSize: reviewSize,
                   })
                 }
               >
-                {storeData.reviewSize > 0 && (
+                {reviewSize > 0 && (
                   <Ionicons
                     name="chevron-forward"
                     size={20}
@@ -427,8 +450,8 @@ const StoreDetailScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {storeData.reviews && storeData.reviews.length > 0 ? (
-              storeData.reviews.map((review) => (
+            {reviews?.length > 0 ? (
+              reviews.map((review) => (
                 <ReviewItemCompact key={review.id} item={review} />
               ))
             ) : (

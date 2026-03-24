@@ -136,6 +136,7 @@ const ReviewResultScreen = () => {
       comment: reviewData?.content ?? '',
       name: reviewData?.userName ?? '',
       date: formatDate(reviewData?.createDate),
+      imageUrls: reviewData?.imageUrls?.length ? reviewData.imageUrls : undefined,
     };
 
     return (
@@ -191,7 +192,7 @@ const ReviewResultScreen = () => {
 
           <Button
             title="스탬프 채울 수 있는 제휴 보러가기"
-            // onPress={() => }
+            onPress={() => navigation.navigate('MainTab', { screen: 'Partnership' })}
             style={[styles.blueButton, styles.blueButtonAfterBanner]}
             textStyle={styles.blueButtonText}
           />
@@ -283,7 +284,7 @@ const ReviewResultScreen = () => {
 
         <Button
           title="제휴 더 보러가기"
-          // onPress={() => }
+          onPress={() => navigation.navigate('MainTab', { screen: 'Partnership' })}
           style={styles.blueButton}
           textStyle={styles.blueButtonText}
         />

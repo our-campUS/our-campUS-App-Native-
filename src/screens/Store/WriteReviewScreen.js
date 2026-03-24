@@ -18,6 +18,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 import LabelTitle from '@components/LabelTitle';
 import { editReview, createReview, createPartnershipReview } from '@api/review';
+import {
+  convertToPng,
+  getCommonImagePresignedUrl,
+  uploadImageToPresignedUrl,
+} from '@api/uploadImage';
 import theme from '@style';
 import typography from '@style/typography';
 import shadow from '@style/shadow';
@@ -68,8 +73,30 @@ const WriteReviewScreen = () => {
   const handleOpenGallery = async () => {
     const result = await launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 });
     if (!result.didCancel && result.assets?.length) {
-      setPhotos(result.assets.map(a => a.uri));
+      setPhotos(result.assets.map(a => ({
+        uri: a.uri,
+        width: a.width,
+        height: a.height,
+        type: a.type,
+      })));
     }
+  };
+
+  const uploadPhotos = async () => {
+    if (photos.length === 0) return [];
+    const pngImages = await Promise.all(photos.map(convertToPng));
+    const presignedUrls = await Promise.all(
+      pngImages.map(async (image) => {
+        const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(image);
+        return { uploadUrl, imageUrl, image };
+      }),
+    );
+    await Promise.all(
+      presignedUrls.map(({ uploadUrl, image }) =>
+        uploadImageToPresignedUrl(uploadUrl, image),
+      ),
+    );
+    return presignedUrls.map((p) => p.imageUrl);
   };
 
   const isValid = reviewText.length >= 20 && rating > 0;
@@ -103,19 +130,21 @@ const WriteReviewScreen = () => {
       const placeId = route.params?.placeId;
       const isPartnership = store?.isPartnership || store?.isPartner;
 
+      const imageUrls = await uploadPhotos();
+
       let result;
       if (isPartnership && placeId) {
         result = await createPartnershipReview(placeId, {
           content: reviewText,
           star: rating,
           isVerified: false,
-          imageUrls: [],
+          imageUrls,
         });
       } else {
         result = await createReview({
           content: reviewText,
           star: rating,
-          imageUrls: [],
+          imageUrls,
           place: store
             ? {
                 placeName: store.name || store.placeName || '',
@@ -227,9 +256,9 @@ const WriteReviewScreen = () => {
               <Text style={styles.addPhotoText}>사진 촬영하기</Text>
             </TouchableOpacity>
 
-            {photos.map((uri, index) => (
+            {photos.map((photo, index) => (
               <View key={index} style={styles.photoItemPlaceholder}>
-                <Image source={{ uri }} style={styles.photoItemImage} />
+                <Image source={{ uri: photo.uri }} style={styles.photoItemImage} />
                 <TouchableOpacity
                   style={styles.photoDeleteButton}
                   onPress={() => setPhotos(prev => prev.filter((_, i) => i !== index))}
