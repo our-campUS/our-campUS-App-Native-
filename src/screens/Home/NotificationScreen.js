@@ -58,7 +58,6 @@ const NotificationScreen = () => {
       case 'COUNCIL_POST_CREATED':
         navigation.navigate('AffiliationDetailScreen', {
           item: { id: notification.referenceId },
-          councilType: notification.senderType,
         });
         break;
       case 'REWARD_GRANTED':

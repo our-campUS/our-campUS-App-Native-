@@ -123,6 +123,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
   }, [detailData?.images]);
 
   useEffect(() => {
+    if (!councilType) return;
     const fetchStudentAffiliateRecommendList = async () => {
       const data = await getStudentAffiliateRecommendList(
         accessToken,
