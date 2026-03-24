@@ -12,6 +12,7 @@ import WriteReviewScreen from '../screens/Store/WriteReviewScreen';
 import ReviewResultScreen from '../screens/Store/ReviewResultScreen';
 import SelectStoreScreen from '../screens/Stamp/SelectStoreScreen';
 import AffiliationDetailScreen from '../screens/Affiliation/AffiliationDetailScreen';
+import NotificationScreen from '../screens/Home/NotificationScreen';
 
 import useAuthStore from '../store/authStore';
 
@@ -58,6 +59,11 @@ const MainStack = () => {
       <Stack.Screen
         name="AffiliationDetailScreen"
         component={AffiliationDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NotificationScreen"
+        component={NotificationScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

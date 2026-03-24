@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   SafeAreaView,
-  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -14,6 +13,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LabelTitle from '../../components/LabelTitle';
 import ReviewItem from '../../components/review/ReviewItem';
 // import ReviewActionModal from '../../components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
+import useCursorPagination from '../../hooks/useCursorPagination';
+import LoadingFooter from '../../components/common/LoadingFooter';
 import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
@@ -30,62 +31,24 @@ const ReviewListScreen = () => {
   // const [modalVisible, setModalVisible] = useState(false); // TODO: 스캔 플로우 복구 시 주석 해제
   const [filter, setFilter] = useState('LATEST');
 
-  const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [hasNext, setHasNext] = useState(false);
-  const [nextCursorCreatedAt, setNextCursorCreatedAt] = useState(null);
-  const [nextCursorId, setNextCursorId] = useState(null);
+  const fetchReviewsFn = useCallback(
+    (cursorCreatedAt, cursorId) =>
+      getReviewList(placeId, cursorCreatedAt, cursorId, 10),
+    [placeId],
+  );
+
+  const {
+    items: reviews,
+    loading,
+    refreshing,
+    fetchData: fetchReviews,
+    handleRefresh,
+    handleLoadMore,
+  } = useCursorPagination(fetchReviewsFn);
 
   useEffect(() => {
     fetchReviews();
   }, []);
-
-  const fetchReviews = async (isLoadMore = false) => {
-    if (loading) return;
-    if (isLoadMore && !hasNext) return;
-
-    try {
-      setLoading(true);
-
-      const response = await getReviewList(
-        placeId,
-        isLoadMore ? nextCursorCreatedAt : null,
-        isLoadMore ? nextCursorId : null,
-        10
-      );
-
-      if (response?.code === 200 || response?.data) {
-        const newReviews = response.data.items || [];
-
-        setReviews((prev) =>
-          isLoadMore ? [...prev, ...newReviews] : newReviews
-        );
-
-        setHasNext(response.data.hasNext || false);
-        setNextCursorCreatedAt(response.data.nextCursorCreatedAt);
-        setNextCursorId(response.data.nextCursorId);
-      }
-    } catch (error) {
-      console.error('리뷰 목록 조회 실패:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    setNextCursorCreatedAt(null);
-    setNextCursorId(null);
-    fetchReviews(false);
-  };
-
-  const handleLoadMore = () => {
-    if (hasNext && !loading) {
-      fetchReviews(true);
-    }
-  };
 
   const renderHeader = () => (
     <View style={styles.listHeader}>
@@ -162,15 +125,6 @@ const ReviewListScreen = () => {
     </View>
   );
 
-  const renderFooter = () => {
-    if (!loading) return null;
-    return (
-      <View style={styles.footerLoader}>
-        <ActivityIndicator size="small" color={theme.colors.primary1} />
-      </View>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <LabelTitle
@@ -186,7 +140,7 @@ const ReviewListScreen = () => {
         renderItem={renderItem}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
-        ListFooterComponent={renderFooter}
+        ListFooterComponent={<LoadingFooter loading={loading} />}
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
         onRefresh={handleRefresh}
@@ -304,10 +258,6 @@ const styles = StyleSheet.create({
   emptySubText: {
     ...typography.caption1Regular,
     color: colors.gray[300],
-  },
-  footerLoader: {
-    paddingVertical: 20,
-    alignItems: 'center',
   },
   floatingButtonContainer: {
     position: 'absolute',
