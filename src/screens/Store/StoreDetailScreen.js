@@ -79,8 +79,10 @@ const StoreDetailScreen = () => {
     phone: paramStore.telephone || paramStore.phone || '',
     hours: paramStore.hours || [],
 
-    isPartner: paramStore.isPartnership,
-    partnerTags: paramStore.tag ? [paramStore.tag] : [],
+    isPartner: paramStore.isPartnership || paramStore.type === 'PARTNER' || (paramStore.partnerships?.length > 0),
+    partnerTags: paramStore.partnerships?.length > 0
+      ? paramStore.partnerships.map((p) => p.councilName).filter(Boolean)
+      : paramStore.tag ? [paramStore.tag] : [],
 
     placeId: paramStore.placeId || null,
     placeKey: paramStore.placeKey || paramStore.id,
