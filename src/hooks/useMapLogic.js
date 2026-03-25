@@ -352,13 +352,12 @@ export const useMapLogic = (mapRef) => {
         longitude
       );
       if (detail) {
-        const pinDetail = {
-          ...detail,
-          placeId: item.placeId,
+        setSelectedStoreDetail({
           backendPlaceId: item.backendPlaceId || item.placeId || null,
           isLiked: item.isLiked,
-        };
-        setSelectedStoreDetail(pinDetail);
+          ...detail,
+          placeId: item.placeId,
+        });
       }
     } else {
       setSelectedStoreDetail(item);
