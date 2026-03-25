@@ -5,6 +5,7 @@ import RatingIcon from '../../../assets/icons/rating.svg';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import theme from '../../style';
+import { formatReviewDate } from '../../utils/dateTime';
 
 const ReviewItemCompact = ({ item, variant = 'default' }) => {
   if (!item) return null;
@@ -42,7 +43,7 @@ const ReviewItemCompact = ({ item, variant = 'default' }) => {
         <Text style={styles.reviewContent}>{review.content}</Text>
         <View style={styles.reviewMeta}>
           <Text style={styles.reviewUser}>{review.writerName}</Text>
-          <Text style={styles.reviewUser}>{review.createdAt}</Text>
+          <Text style={styles.reviewUser}>{formatReviewDate(review.createdAt)}</Text>
         </View>
       </View>
       {review.thumbnailImgUrl ? (

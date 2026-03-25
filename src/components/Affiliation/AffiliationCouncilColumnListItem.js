@@ -8,6 +8,7 @@ import CalendarIcon from '../../../assets/calendar.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 import LikedIcon from '../../../assets/Liked.svg';
 import { useState, useEffect } from 'react';
+import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 import useAuthStore from '../../store/authStore';
 import ThreeDotIcon from '../../../assets/threeDot.svg';
 import AffiliationColumnListItemSkeleton from './AffiliationColumnListItemSkeleton';
@@ -89,16 +90,11 @@ const AffiliationCouncilColumnListItem = ({
   navigation,
   handleThreeDotIconPress = null,
 }) => {
-  const [endYear, setEndYear] = useState(null);
-  const [endMonth, setEndMonth] = useState(null);
-  const [endDay, setEndDay] = useState(null);
   const user = useAuthStore((state) => state.user);
   const [liked, setLiked] = useState(item.liked || false);
   const [isLikeIconPressed, setIsLikeIconPressed] = useState(false);
   const [isCouncil, setIsCouncil] = useState(false);
   const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
-  const [startHour, setStartHour] = useState(null);
-  const [startMinute, setStartMinute] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   useEffect(() => {
@@ -116,30 +112,6 @@ const AffiliationCouncilColumnListItem = ({
       setIsImageLoaded(true);
     }
   }, [item?.postId, item?.thumbnailImageUrl]);
-
-  useEffect(() => {
-    // endDateTime 우선 사용, 없으면 dateTime 사용 (AffiliationColumnListItem과 동일하게)
-    const dateTime = item?.endDateTime || item?.dateTime;
-    if (dateTime) {
-      setEndYear(dateTime.slice(0, 4));
-      setEndMonth(dateTime.slice(5, 7));
-      if (dateTime.slice(5, 7).startsWith('0')) {
-        setEndMonth(dateTime.slice(6, 7));
-      }
-      setEndDay(dateTime.slice(8, 10));
-      if (item?.category === 'EVENT') {
-        setStartHour(dateTime.slice(11, 13));
-        setStartMinute(dateTime.slice(14, 16));
-      }
-    } else {
-      // dateTime이 없으면 초기화 (skeleton 방지)
-      setEndYear(null);
-      setEndMonth(null);
-      setEndDay(null);
-      setStartHour(null);
-      setStartMinute(null);
-    }
-  }, [item?.endDateTime, item?.dateTime, item?.category]);
 
   // useEffect(() => {
   //   if (user?.role === 'COUNCIL') {
@@ -177,9 +149,7 @@ const AffiliationCouncilColumnListItem = ({
   const isDataLoaded =
     item?.title &&
     (item?.place || item?.placeName) &&
-    endYear &&
-    endMonth &&
-    endDay;
+    (item?.endDateTime || item?.dateTime);
 
   // 데이터가 로드되지 않았거나, 이미지가 있고 아직 로드되지 않았으면 스켈레톤 표시
   const shouldShowSkeleton =
@@ -261,11 +231,11 @@ const AffiliationCouncilColumnListItem = ({
                 color={colors.gray[300]}
                 style={{ marginLeft: -2 }}
               />
-              {endYear && endMonth && endDay ? (
+              {(item?.endDateTime || item?.dateTime) ? (
                 <Text style={styles.date}>
                   {item?.category === 'EVENT'
-                    ? `${endYear}년 ${endMonth}월 ${endDay}일 ${startHour}시 ${startMinute}분`
-                    : `${endYear}년 ${endMonth}월 ${endDay}일 까지`}
+                    ? formatKoreanDateTime(item.endDateTime || item.dateTime)
+                    : formatKoreanDate(item.endDateTime || item.dateTime)}
                 </Text>
               ) : null}
             </View>

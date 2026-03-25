@@ -8,6 +8,7 @@ import CalendarIcon from '../../../assets/calendar.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 import LikedIcon from '../../../assets/Liked.svg';
 import { useState, useEffect } from 'react';
+import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 import useAuthStore from '../../store/authStore';
 import ThreeDotIcon from '../../../assets/threeDot.svg';
 import AffiliationColumnListItemSkeleton from './AffiliationColumnListItemSkeleton';
@@ -92,16 +93,11 @@ const LikedColumnListItem = ({
   councilType = null,
   isLikedScreen = false,
 }) => {
-  const [endYear, setEndYear] = useState(null);
-  const [endMonth, setEndMonth] = useState(null);
-  const [endDay, setEndDay] = useState(null);
   const user = useAuthStore((state) => state.user);
   const [liked, setLiked] = useState(item.liked || false);
   const [isLikeIconPressed, setIsLikeIconPressed] = useState(false);
   const [isCouncil, setIsCouncil] = useState(false);
   const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
-  const [startHour, setStartHour] = useState(null);
-  const [startMinute, setStartMinute] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   useEffect(() => {
@@ -124,21 +120,6 @@ const LikedColumnListItem = ({
       setIsImageLoaded(true);
     }
   }, [item?.thumbnailImageUrl]);
-
-  useEffect(() => {
-    {
-      setEndYear(item?.dateTime?.slice(0, 4));
-      setEndMonth(item?.dateTime?.slice(5, 7));
-      if (item?.endDateTime?.slice(5, 7).startsWith('0')) {
-        setEndMonth(item?.dateTime?.slice(6, 7));
-      }
-      setEndDay(item?.dateTime?.slice(8, 10));
-      if (item?.category === 'EVENT') {
-        setStartHour(item?.dateTime?.slice(11, 13));
-        setStartMinute(item?.dateTime?.slice(14, 16));
-      }
-    }
-  }, [item]);
 
   // useEffect(() => {
   //   if (user?.role === 'COUNCIL') {
@@ -190,9 +171,7 @@ const LikedColumnListItem = ({
   const isDataLoaded =
     item?.title &&
     (item?.place || item?.placeName) &&
-    endYear &&
-    endMonth &&
-    endDay;
+    item?.dateTime;
 
   // 데이터가 로드되지 않았거나, 이미지가 있고 아직 로드되지 않았으면 스켈레톤 표시
   const shouldShowSkeleton =
@@ -278,15 +257,11 @@ const LikedColumnListItem = ({
                 color={colors.gray[300]}
                 style={{ marginLeft: -2 }}
               />
-              {endYear && endMonth && endDay ? (
+              {item?.dateTime ? (
                 <Text style={styles.date}>
                   {item?.category === 'EVENT'
-                    ? `${endYear}년 ${endMonth}월 ${endDay}일 ${
-                        startHour || ''
-                      }${startHour ? '시' : ''} ${startMinute || ''}${
-                        startMinute ? '분' : ''
-                      }`
-                    : `${endYear}년 ${endMonth}월 ${endDay}일 까지`}
+                    ? formatKoreanDateTime(item.dateTime)
+                    : formatKoreanDate(item.dateTime)}
                 </Text>
               ) : null}
             </View>
