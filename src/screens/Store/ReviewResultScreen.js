@@ -22,7 +22,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import BannerCard from '@components/common/BannerCard';
 import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
-import { getPartnershipList } from '@api/review';
+import { getPartnershipList } from '@api/partnership';
 
 const formatDistance = (meters) => {
   if (meters == null) return null;
