@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 
 const CELL_SIZE = 16;
@@ -11,8 +11,14 @@ const CheckerboardPlaceholder = ({
   borderRadius = 0,
   style,
 }) => {
+  const isPercentWidth = typeof width === 'string';
+  const [measuredWidth, setMeasuredWidth] = useState(0);
+  const resolvedWidth = isPercentWidth ? measuredWidth : width;
+
   const rows = useMemo(() => {
-    const numCols = Math.ceil(width / CELL_SIZE);
+    if (!resolvedWidth || !height) return null;
+
+    const numCols = Math.ceil(resolvedWidth / CELL_SIZE);
     const numRows = Math.ceil(height / CELL_SIZE);
     const result = [];
 
@@ -38,10 +44,15 @@ const CheckerboardPlaceholder = ({
       );
     }
     return result;
-  }, [width, height]);
+  }, [resolvedWidth, height]);
+
+  const handleLayout = isPercentWidth
+    ? (e) => setMeasuredWidth(e.nativeEvent.layout.width)
+    : undefined;
 
   return (
     <View
+      onLayout={handleLayout}
       style={[
         styles.container,
         { width, height, borderRadius },
