@@ -15,6 +15,7 @@ import ThreeDotIcon from '@assets/threeDot.svg';
 import colors from '@style/colors';
 import typography from '@style/typography';
 import theme from '@style';
+import { formatReviewDate } from '../../utils/dateTime';
 
 const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -28,11 +29,6 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
     comment: item.comment || item.content || '',
     name: item.name || item.userName || item.placeName || item.place || '',
     date: item.date || item.createDate || item.createdAt || '',
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    return dateString.slice(2).replace(/-/g, '.');
   };
 
   const renderStars = () => {
@@ -114,7 +110,7 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
       {/* ⭐ 장소 / 날짜 */}
       <View style={styles.placeAndDateWrapper}>
         <Text style={styles.placeText}>{review.name}</Text>
-        <Text style={styles.dateText}>{formatDate(review.date)}</Text>
+        <Text style={styles.dateText}>{formatReviewDate(review.date)}</Text>
       </View>
     </View>
   );
