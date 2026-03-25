@@ -107,13 +107,13 @@ const styles = StyleSheet.create({
     height: 88,
     padding: 16,
     borderWidth: 1,
-    borderColor: colors.gray['050'],
+    borderColor: theme.colors.backgroundSub,
     backgroundColor: colors.gray['000'],
   },
   long: {
     width: 335,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.background,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: theme.colors.backgroundSub,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     width: 68,
     height: 68,
     borderRadius: 8,
-    backgroundColor: colors.gray[200],
+    backgroundColor: theme.colors.border,
   },
   infoWrapper: {
     maxWidth: 180,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   },
   rankText: {
     ...typography.caption2Bold,
-    color: 'white',
+    color: theme.colors.textWhite,
     position: 'absolute',
     top: 9,
     left: 9,
