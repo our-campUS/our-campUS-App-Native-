@@ -19,6 +19,7 @@ import { formatReviewDate } from '../../utils/dateTime';
 
 const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
 
   if (!item) return null;
 
@@ -93,18 +94,25 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
             style={styles.commentText}
             numberOfLines={isExpanded ? undefined : 2}
             ellipsizeMode="tail"
+            onTextLayout={(e) => {
+              if (!isExpanded) {
+                setIsTruncated(e.nativeEvent.lines.length > 2);
+              }
+            }}
           >
             {review.comment}
           </Text>
         </View>
 
-        <Pressable onPress={() => setIsExpanded(!isExpanded)}>
-          {isExpanded ? (
-            <ArrowUpIcon width={24} height={24} />
-          ) : (
-            <ArrowDownIcon width={24} height={24} />
-          )}
-        </Pressable>
+        {isTruncated && (
+          <Pressable onPress={() => setIsExpanded(!isExpanded)}>
+            {isExpanded ? (
+              <ArrowUpIcon width={24} height={24} />
+            ) : (
+              <ArrowDownIcon width={24} height={24} />
+            )}
+          </Pressable>
+        )}
       </View>
 
       {/* ⭐ 장소 / 날짜 */}
