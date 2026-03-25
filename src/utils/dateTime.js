@@ -18,7 +18,7 @@ export const parseISODate = (isoString) => {
 export const formatKoreanDate = (isoString) => {
   const parsed = parseISODate(isoString);
   if (!parsed) return '';
-  return `${parsed.year}년 ${parsed.month}월 ${parsed.day}일 까지`;
+  return `${parsed.year}년 ${parsed.month}월 ${parsed.day}일까지`;
 };
 
 // "2026년 3월 5일 14시 30분" (시간 없으면 날짜만)
