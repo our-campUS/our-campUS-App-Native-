@@ -1,6 +1,8 @@
-import React, { memo } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useState, memo } from 'react';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import RatingIcon from '../../../assets/icons/rating.svg';
+import ArrowDownIcon from '@assets/ArrowDown.svg';
+import ArrowUpIcon from '@assets/ArrowUp.svg';
 
 import colors from '../../style/colors';
 import typography from '../../style/typography';
@@ -8,6 +10,10 @@ import theme from '../../style';
 import { formatReviewDate } from '../../utils/dateTime';
 
 const ReviewItemCompact = ({ item, variant = 'default' }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const [measured, setMeasured] = useState(false);
+
   if (!item) return null;
 
   // 다양한 데이터 포맷 지원
@@ -37,10 +43,38 @@ const ReviewItemCompact = ({ item, variant = 'default' }) => {
       : styles.reviewItem;
 
   return (
-    <View style={containerStyle}>
+    <View style={[containerStyle, !measured && { opacity: 0 }]}>
       <View style={styles.reviewTextWrapper}>
         <View style={styles.reviewRating}>{renderStars()}</View>
-        <Text style={styles.reviewContent}>{review.content}</Text>
+        <View style={styles.reviewContentWrapper}>
+          <View style={styles.reviewContentTextContainer}>
+            <Text
+              style={styles.reviewContentText}
+              numberOfLines={measured && !isExpanded ? 2 : undefined}
+              ellipsizeMode="tail"
+              onTextLayout={(e) => {
+                if (!measured) {
+                  setIsTruncated(e.nativeEvent.lines.length > 2);
+                  setMeasured(true);
+                }
+              }}
+            >
+              {review.content}
+            </Text>
+          </View>
+          {isTruncated && (
+            <Pressable
+              onPress={() => setIsExpanded(!isExpanded)}
+              hitSlop={8}
+            >
+              {isExpanded ? (
+                <ArrowUpIcon width={20} height={20} />
+              ) : (
+                <ArrowDownIcon width={20} height={20} />
+              )}
+            </Pressable>
+          )}
+        </View>
         <View style={styles.reviewMeta}>
           <Text style={styles.reviewUser}>{review.writerName}</Text>
           <Text style={styles.reviewUser}>{formatReviewDate(review.createdAt)}</Text>
@@ -82,10 +116,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 16,
   },
-  reviewContent: {
+  reviewContentWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  reviewContentTextContainer: {
+    flexShrink: 1,
+    minWidth: 0,
+    marginRight: 8,
+  },
+  reviewContentText: {
     ...typography.body3Regular,
     color: theme.colors.text,
-    marginBottom: 8,
   },
   reviewMeta: {
     flexDirection: 'row',

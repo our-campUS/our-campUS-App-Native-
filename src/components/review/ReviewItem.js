@@ -20,6 +20,7 @@ import { formatReviewDate } from '../../utils/dateTime';
 const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
+  const [measured, setMeasured] = useState(false);
 
   if (!item) return null;
 
@@ -53,6 +54,7 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
         styles.baseContainer,
         variant === 'list' && styles.listContainer,
         variant === 'card' && styles.cardContainer,
+        !measured && { opacity: 0 },
       ]}
     >
       {/* ⭐ 별점 */}
@@ -92,11 +94,12 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
         <View style={styles.commentTextContainer}>
           <Text
             style={styles.commentText}
-            numberOfLines={isExpanded ? undefined : 2}
+            numberOfLines={measured && !isExpanded ? 2 : undefined}
             ellipsizeMode="tail"
             onTextLayout={(e) => {
-              if (!isExpanded) {
+              if (!measured) {
                 setIsTruncated(e.nativeEvent.lines.length > 2);
+                setMeasured(true);
               }
             }}
           >
