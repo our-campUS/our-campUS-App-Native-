@@ -276,6 +276,37 @@ export const togglePlaceLike = async (placeData) => {
   }
 };
 
+export const getLikedPlaces = async ({ lat, lng, cursor = null, size = 5 }) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    if (!lat || !lng) {
+      console.warn('⚠️ 위도/경도 값이 없어 요청을 중단합니다.');
+      return null;
+    }
+
+    const params = { lat, lng, size };
+    if (cursor) {
+      params.cursor = cursor;
+    }
+
+    const response = await api.get('/places/likes', {
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200 || response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error('❌ 관심 장소 조회 실패:', error.response?.data || error.message);
+    return null;
+  }
+};
+
 export const getPlaceStatus = async (placeId, latitude, longitude) => {
   try {
     const token = useAuthStore.getState().accessToken;
