@@ -15,7 +15,7 @@ import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
 import { useState, useRef, useEffect } from 'react';
-import PlaceHolderImage from '../../../../assets/blankImage.svg';
+import CheckerboardPlaceholder from '../../../components/common/CheckerboardPlaceholder';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
@@ -286,10 +286,9 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             renderItem={({ item, index }) => (
               <View style={[styles.imageContainer, { width }]}>
                 {isEmpty ? (
-                  <PlaceHolderImage
+                  <CheckerboardPlaceholder
                     width={width}
                     height={375}
-                    preserveAspectRatio="none"
                   />
                 ) : (
                   <Image
