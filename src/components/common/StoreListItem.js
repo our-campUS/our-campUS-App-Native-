@@ -40,13 +40,11 @@ const StoreListItem = ({
         return;
       }
 
-      if (responseData.placeId) {
-        if (onLikeToggle) {
-          onLikeToggle(item.placeId, {
-            placeId: responseData.placeId,
-            isLiked: responseData.liked,
-          });
-        }
+      if (onLikeToggle) {
+        onLikeToggle(item.placeId, {
+          placeId: responseData.placeId || item.placeId,
+          isLiked: responseData.liked,
+        });
       }
     } catch (error) {
       setIsLiked(previousState);

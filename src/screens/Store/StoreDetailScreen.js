@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -13,7 +14,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { togglePlaceLike } from '@api/place';
+import { togglePlaceLike, getPlaceStatus } from '@api/place';
 import { getReviewList } from '@api/review';
 
 import LabelTitle from '@components/LabelTitle';
@@ -83,21 +84,21 @@ const StoreDetailScreen = () => {
       ? paramStore.partnerships.map((p) => p.councilName).filter(Boolean)
       : paramStore.tag ? [paramStore.tag] : [],
 
+    backendPlaceId: paramStore.backendPlaceId !== undefined ? paramStore.backendPlaceId : (paramStore.placeId || null),
     placeId: paramStore.placeId || null,
     placeKey: paramStore.placeKey || paramStore.id,
   };
 
 
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
-  const [currentPlaceId, setCurrentPlaceId] = useState(storeData.placeId);
+  const [currentPlaceId, setCurrentPlaceId] = useState(storeData.backendPlaceId);
   const [reviews, setReviews] = useState(storeData.reviews);
   const [reviewSize, setReviewSize] = useState(storeData.reviewSize);
 
   useEffect(() => {
-    const isValidPlaceId = storeData.placeId && !String(storeData.placeId).startsWith('temp_');
-    if (!isValidPlaceId || storeData.reviews?.length > 0) return;
-    getReviewList(storeData.placeId)
+    if (!storeData.backendPlaceId || storeData.reviews?.length > 0) return;
+    getReviewList(storeData.backendPlaceId)
       .then((res) => {
         const items = (res?.data?.items || []).map((r) => ({
           id: r.id,
@@ -122,7 +123,7 @@ const StoreDetailScreen = () => {
     try {
       const requestBody = {
         ...storeData,
-        placeId: currentPlaceId,
+        backendPlaceId: currentPlaceId,
       };
 
       const response = await togglePlaceLike(requestBody);
@@ -150,6 +151,37 @@ const StoreDetailScreen = () => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!currentPlaceId) return;
+
+      let isActive = true;
+
+      const fetchLatestStatus = async () => {
+        try {
+          const status = await getPlaceStatus(
+            currentPlaceId,
+            storeData.latitude,
+            storeData.longitude
+          );
+          if (isActive && status) {
+            setIsLiked(status.isLiked);
+            if (status.placeId && !currentPlaceId) {
+              setCurrentPlaceId(status.placeId);
+            }
+          }
+        } catch (error) {
+          // silent
+        }
+      };
+
+      fetchLatestStatus();
+
+      return () => {
+        isActive = false;
+      };
+    }, [currentPlaceId, storeData.latitude, storeData.longitude])
+  );
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {

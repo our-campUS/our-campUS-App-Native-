@@ -62,6 +62,7 @@ export const useMapLogic = (mapRef) => {
       return {
         ...item,
 
+        backendPlaceId: item.placeId || null,
         placeId: targetId || `temp_${Date.now()}_${Math.random()}`,
         name: item.placeName || item.name || '이름 없음',
         address: item.address || '',
@@ -98,15 +99,16 @@ export const useMapLogic = (mapRef) => {
           );
 
           // C. 데이터 병합
-          return {
+          const merged = {
             ...item, // 1. 기본 정보
             ...detailData, // 2. 제휴 상세 정보 (있으면)
 
             // 3. API에서 isLiked를 명시적으로 제공하면 우선 신뢰, 없으면 getPlaceStatus 결과 사용
-            isLiked: item.isLiked !== undefined ? item.isLiked : (status ? status.liked : false),
+            isLiked: item.isLiked !== undefined ? item.isLiked : (status ? status.isLiked : false),
 
-            isPartner: status ? status.partnership : item.isPartner,
+            isPartner: status ? status.isPartnership : item.isPartner,
           };
+          return merged;
         } catch (err) {
           console.warn(`아이템 처리 중 에러: ${item.name}`);
           return item; // 에러나면 기본 정보만 반환
@@ -332,7 +334,7 @@ export const useMapLogic = (mapRef) => {
     try {
       const markers = await getMapMarkers(minLat, maxLat, minLng, maxLng);
       if (markers?.length > 0) {
-        setMapMarkers(markers.map((item) => ({ ...item, type: 'PARTNER' })));
+        setMapMarkers(markers.map((item) => ({ ...item, type: 'PARTNER', backendPlaceId: item.placeId || null })));
       }
     } catch (err) {
       console.error(err);
@@ -350,10 +352,13 @@ export const useMapLogic = (mapRef) => {
         longitude
       );
       if (detail) {
-        setSelectedStoreDetail({
+        const pinDetail = {
           ...detail,
           placeId: item.placeId,
-        });
+          backendPlaceId: item.backendPlaceId || item.placeId || null,
+          isLiked: item.isLiked,
+        };
+        setSelectedStoreDetail(pinDetail);
       }
     } else {
       setSelectedStoreDetail(item);
