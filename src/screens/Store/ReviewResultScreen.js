@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StampImage from '@assets/images/stamp.png';
 import Button from '@components/Button';
-import ReviewItemCompact from '@components/review/ReviewPreviewItem';
+import ReviewItem from '@components/review/ReviewItem';
 
 import theme from '@style';
 import typography from '@style/typography';
@@ -113,7 +113,7 @@ const ReviewResultScreen = () => {
           </Text>
         </View>
 
-        <ReviewItemCompact item={reviewItemData} variant="card" />
+        <ReviewItem item={reviewItemData} variant="preview" card />
 
         <View style={styles.rankingContainer}>
           <View style={styles.rankingHeader}>
