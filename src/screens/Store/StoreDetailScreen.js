@@ -89,8 +89,7 @@ const StoreDetailScreen = () => {
     placeKey: paramStore.placeKey || paramStore.id,
   };
 
-
-const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
   const [currentPlaceId, setCurrentPlaceId] = useState(storeData.backendPlaceId);
   const [reviews, setReviews] = useState(storeData.reviews);
@@ -105,7 +104,7 @@ const [activeImageIndex, setActiveImageIndex] = useState(0);
           star: r.star,
           comment: r.content,
           name: r.userName,
-          date: r.createDate?.slice(2).replace(/-/g, '.') ?? '',
+          date: r.createDate ?? '',
           imageUrls: r.imageUrls?.length ? r.imageUrls : undefined,
         }));
         setReviews(items);
