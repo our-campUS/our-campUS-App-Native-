@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StampImage from '@assets/images/stamp.png';
 import Button from '@components/Button';
@@ -18,28 +18,69 @@ import theme from '@style';
 import typography from '@style/typography';
 import colors from '@style/colors';
 import RankingIcon from '@assets/icons/trophy.svg';
+import LinearGradient from 'react-native-linear-gradient';
+import BannerCard from '@components/common/BannerCard';
+import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
+import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
+import { getPartnershipList } from '@api/partnership';
 
-const RECOMMEND_STORES = [
-  {
-    id: 1,
-    name: '수아르떼 중앙대점',
-    benefit: '첫방문 20% 할인',
-    dist: '0.0km',
-  },
-  {
-    id: 2,
-    name: '스타벅스 상도역점',
-    benefit: '첫방문 20% 할인',
-    dist: '0.1km',
-  },
-  { id: 3, name: '투썸플레이스', benefit: '첫방문 10% 할인', dist: '0.2km' },
-];
+const formatDistance = (meters) => {
+  if (meters == null) return null;
+  return meters >= 1000
+    ? `${(meters / 1000).toFixed(1)}km`
+    : `${Math.round(meters)}m`;
+};
+
+const getOrdinal = (n) => {
+  const ordinals = ['첫번째', '두번째', '세번째', '네번째', '다섯번째', '여섯번째', '일곱번째', '여덟번째', '아홉번째', '열번째'];
+  return n >= 1 && n <= 10 ? ordinals[n - 1] : `${n}번째`;
+};
+
+const getJosa = (str) => {
+  if (!str) return '이';
+  const code = str.charCodeAt(str.length - 1);
+  if (code < 0xAC00 || code > 0xD7A3) return '이';
+  return (code - 0xAC00) % 28 > 0 ? '이' : '가';
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  return dateStr.slice(2).replace(/-/g, '.');
+};
 
 const ReviewResultScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
 
-  // [개발용 state]
-  const [caseType, setCaseType] = useState(1);
+  const { reviewResult, caseType = 3, placeName = '' } = route.params || {};
+  const reviewData = reviewResult?.review;
+  const resultData = reviewResult?.result;
+  const rankingData = reviewResult?.ranking;
+
+  const [partnerRequested, setPartnerRequested] = useState(false);
+  const [partnerStores, setPartnerStores] = useState([]);
+
+  useEffect(() => {
+    const fetchStores = (lat, lng) => {
+      getPartnershipList(lat, lng)
+        .then((data) => {
+setPartnerStores(
+            data.map((item) => ({
+              id: item.placeId,
+              placeName: item.placeName,
+              category: item.category,
+              benefit: item.partnership,
+              thumbnailImageUrl: item.thumbnailUrl,
+              distance: formatDistance(item.distance),
+              type: '제휴',
+            })),
+          );
+        })
+        .catch((e) => console.error('제휴 매장 목록 오류:', e));
+    };
+
+    fetchStores(37.505, 126.957);
+  }, []);
 
   const handleClose = () => {
     navigation.popToTop();
@@ -88,28 +129,23 @@ const ReviewResultScreen = () => {
   };
 
   const renderReviewCard = () => {
-    const showHeader = caseType === 3 || caseType === 4;
-
-    // ReviewItem에 전달할 데이터 포맷
+    const ordinal = getOrdinal(resultData?.userReviewCountOfPlace ?? 1);
     const reviewItemData = {
-      star: 5,
-      comment: '떡볶이 정말 양 많아요. 아 근데 스벅이네...',
-      name: '최서*',
-      date: '25.02.14',
-      imageUrls: [
-        'https://via.placeholder.com/138x138?text=Cafe+Photo+1',
-        'https://via.placeholder.com/138x138?text=Cafe+Photo+2',
-      ],
+      star: reviewData?.star ?? 0,
+      comment: reviewData?.content ?? '',
+      name: reviewData?.userName ?? '',
+      date: formatDate(reviewData?.createDate),
+      imageUrls: reviewData?.imageUrls?.length ? reviewData.imageUrls : undefined,
     };
 
     return (
       <View style={styles.reviewSection}>
         <View style={{ alignItems: 'center', marginBottom: 20 }}>
           <Text style={styles.reviewCompleteTitle}>
-            <Text style={{ color: '#6BAAF9' }}>첫번째</Text> 리뷰 작성 완료!
+            <Text style={{ color: '#6BAAF9' }}>{ordinal}</Text> 리뷰 작성 완료!
           </Text>
           <Text style={styles.reviewCompleteSub}>
-            스타벅스 상도역점의 첫번째 리뷰 작성 완료
+            {placeName}의 {ordinal} 리뷰 작성 완료
           </Text>
         </View>
 
@@ -118,19 +154,19 @@ const ReviewResultScreen = () => {
         <View style={styles.rankingContainer}>
           <View style={styles.rankingHeader}>
             <RankingIcon width={18} height={18} />
-            <Text style={styles.rankingTitle}>서연님의 리뷰 랭킹</Text>
+            <Text style={styles.rankingTitle}>{reviewData?.userName ?? ''}님의 리뷰 랭킹</Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>정치국제학과에서</Text>
-            <Text style={styles.rankingValue}>첫번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>{rankingData?.major?.scope}에서</Text>
+            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.major?.rank ?? 1)} 리뷰</Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>사회과학대에서</Text>
-            <Text style={styles.rankingValue}>4번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>{rankingData?.college?.scope}에서</Text>
+            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.college?.rank ?? 1)} 리뷰</Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>중앙대 전체에서</Text>
-            <Text style={styles.rankingValue}>9번째 리뷰</Text>
+            <Text style={styles.rankingLabel}>{rankingData?.school?.scope}에서</Text>
+            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.school?.rank ?? 1)} 리뷰</Text>
           </View>
         </View>
       </View>
@@ -141,47 +177,72 @@ const ReviewResultScreen = () => {
     if (caseType === 3) {
       return (
         <View style={styles.middleActionContainer}>
-          <Text style={styles.middleTitle}>캠퍼스를 100% 이용하는 법</Text>
+          <Text style={styles.middleTitle}>캠어스를 100% 이용하는 법</Text>
           <Text style={styles.middleSubtitle}>
             다음에는 제휴 혜택을 이용해보세요!
           </Text>
 
-          {/* [TODO] main page 배너 컴포넌트 */}
-          <View style={styles.guideBox}>
-            <View style={styles.guideIconPlaceholder} />
-            <View>
-              <Text style={styles.guideBoxTitle}>
-                제휴 이용하고 스탬프 받아가세요!
-              </Text>
-              <Text style={styles.guideBoxSub}>
-                제휴만 이용해도 혜택이 팡팡
-              </Text>
-            </View>
-          </View>
+          <BannerCard
+            title="제휴 이용하고 스탬프 받아가세요!"
+            subtitle="제휴만 이용해도 혜택이 팡팡"
+            imageSource={require('../../../assets/images/home/banner_04.png')}
+            style={styles.bannerCard}
+          />
 
           <Button
             title="스탬프 채울 수 있는 제휴 보러가기"
-            // onPress={() => }
-            style={styles.blueButton}
+            onPress={() => navigation.navigate('MainTab', { screen: 'Partnership' })}
+            style={[styles.blueButton, styles.blueButtonAfterBanner]}
             textStyle={styles.blueButtonText}
           />
         </View>
       );
     } else if (caseType === 4) {
       return (
-        <View style={styles.middleActionContainer}>
-          <View style={styles.requestBoxWrapper}>
+        <View
+          style={[
+            styles.middleActionContainer,
+            styles.middleActionContainerTransparent,
+          ]}
+        >
+          <LinearGradient
+            colors={['#FFFFFF', '#E6F5FF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.requestBoxWrapper}
+          >
             <Text style={styles.middleTitle}>
-              스타벅스 상도점이{'\n'}제휴를 진행하지 않아{'\n'}아쉽다면?
+              {placeName}{getJosa(placeName)}{'\n'}제휴를 진행하지 않아{'\n'}아쉽다면?
             </Text>
             <Text style={[styles.middleSubtitle, { marginTop: 8 }]}>
               캠퍼스가 학생회에 의견을 대신 전해드려요!
             </Text>
 
-            <TouchableOpacity style={styles.outlineButton}>
-              <Text style={styles.outlineButtonText}>제휴 요청하기 {'>'}</Text>
+            <TouchableOpacity
+              style={[
+                styles.outlineButton,
+                partnerRequested && styles.outlineButtonDone,
+              ]}
+              onPress={() => setPartnerRequested(true)}
+              disabled={partnerRequested}
+            >
+              <Text
+                style={[
+                  styles.outlineButtonText,
+                  partnerRequested && styles.outlineButtonTextDone,
+                ]}
+              >
+                {partnerRequested ? '제휴 요청 완료' : '제휴 요청하기'}
+              </Text>
+              {!partnerRequested && (
+                <ArrowRightIcon
+                  width={5}
+                  height={10}
+                  color={colors.blue[600]}
+                />
+              )}
             </TouchableOpacity>
-          </View>
+          </LinearGradient>
         </View>
       );
     }
@@ -197,14 +258,12 @@ const ReviewResultScreen = () => {
       <View
         style={[
           styles.bottomListContainer,
-          isBlueBackground
-            ? { backgroundColor: theme.colors.primary1Light }
-            : { backgroundColor: theme.colors.background },
+          isBlueBackground && { backgroundColor: colors.blue['000'] },
         ]}
       >
         <View style={styles.bottomHeader}>
           <Text style={styles.bottomTitle}>
-            {isBlueBackground ? '제휴 매장 둘러보기' : '제휴 매장 둘러보기'}
+            제휴 매장 둘러보기
           </Text>
           <Text style={styles.bottomSubtitle}>
             {isBlueBackground
@@ -213,33 +272,18 @@ const ReviewResultScreen = () => {
           </Text>
         </View>
 
-        {RECOMMEND_STORES.map((store, index) => (
-          <View key={store.id} style={styles.storeRow}>
-            <View style={styles.storeImage} />
-            <View style={styles.storeInfo}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons
-                  name="checkmark-circle"
-                  size={16}
-                  color="#6BAAF9"
-                  style={{ marginRight: 4 }}
-                />
-                <Text style={styles.storeName}>{store.name}</Text>
-                <Text style={styles.storeCategory}>카페</Text>
-              </View>
-              <Text style={styles.storeBenefit}>{store.benefit}</Text>
-              <Text style={styles.storeDist}>걸어서 4분 {store.dist}</Text>
-            </View>
-            {/* 순위 배지 (1, 2, 3) */}
-            <View style={styles.rankBadge}>
-              <Text style={styles.rankText}>{index + 1}</Text>
-            </View>
-          </View>
+        {partnerStores.map((store, index) => (
+          <RecommendStoreCard
+            key={store.id}
+            item={store}
+            variant="long"
+            rank={index + 1}
+          />
         ))}
 
         <Button
           title="제휴 더 보러가기"
-          // onPress={() => }
+          onPress={() => navigation.navigate('MainTab', { screen: 'Partnership' })}
           style={styles.blueButton}
           textStyle={styles.blueButtonText}
         />
@@ -257,32 +301,6 @@ const ReviewResultScreen = () => {
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color={colors.gray[800]} />
         </TouchableOpacity>
-      </View>
-
-      {/* 개발용 토글 */}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          gap: 10,
-          marginBottom: 10,
-        }}
-      >
-        {[1, 2, 3, 4].map((num) => (
-          <TouchableOpacity
-            key={num}
-            onPress={() => setCaseType(num)}
-            style={{
-              padding: 8,
-              backgroundColor: caseType === num ? 'black' : '#ddd',
-              borderRadius: 4,
-            }}
-          >
-            <Text style={{ color: caseType === num ? 'white' : 'black' }}>
-              Case {num}
-            </Text>
-          </TouchableOpacity>
-        ))}
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -390,12 +408,12 @@ const styles = StyleSheet.create({
   },
   rankingHeader: {
     flexDirection: 'row',
-    gap: 2,
+    gap: 4,
+    marginBottom: 12,
   },
   rankingTitle: {
     ...typography.heading6,
     color: theme.colors.textDim,
-    marginBottom: 12,
   },
   rankingRow: {
     flexDirection: 'row',
@@ -418,6 +436,10 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     backgroundColor: colors.blue['000'],
   },
+  middleActionContainerTransparent: {
+    backgroundColor: 'transparent',
+    paddingVertical: 0,
+  },
   middleTitle: {
     ...typography.heading4,
     color: theme.colors.text,
@@ -429,37 +451,14 @@ const styles = StyleSheet.create({
     color: theme.colors.textDim,
     textAlign: 'center',
   },
-  guideBox: {
-    width: '100%',
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: colors.gray[200],
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  guideIconPlaceholder: {
-    width: 40,
-    height: 40,
-    backgroundColor: colors.gray[200],
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  guideBoxTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginBottom: 2,
-  },
-  guideBoxSub: {
-    fontSize: 12,
-    color: colors.gray[500],
+  bannerCard: {
+    marginTop: 32,
+    marginBottom: 0,
   },
   blueButton: {
     width: '100%',
     height: 50,
+    marginTop: 20,
     backgroundColor: colors.blue[400],
     borderRadius: 16,
     justifyContent: 'center',
@@ -472,7 +471,6 @@ const styles = StyleSheet.create({
   // Case 4 Request Box
   requestBoxWrapper: {
     width: '100%',
-    backgroundColor: theme.colors.primary1Light,
     borderRadius: 20,
     padding: 40,
     alignItems: 'center',
@@ -485,10 +483,23 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary1,
     borderRadius: 10,
     backgroundColor: theme.colors.background,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  outlineButtonDone: {
+    borderColor: colors.blue[300],
+    backgroundColor: colors.blue[100],
   },
   outlineButtonText: {
     ...typography.body4Bold,
     color: colors.blue[600],
+  },
+  outlineButtonTextDone: {
+    color: colors.blue[300],
+  },
+  outlineButtonIcon: {
+    marginLeft: 4,
   },
 
   // === Bottom List (Case 1, 2, 4) ===
@@ -509,61 +520,6 @@ const styles = StyleSheet.create({
     ...typography.body3Regular,
     color: theme.colors.textDim,
     textAlign: 'center',
-  },
-  storeRow: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: 'center',
-    ...theme.shadows.level1,
-  },
-  storeImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    backgroundColor: colors.gray[200],
-    marginRight: 12,
-  },
-  storeInfo: {
-    flex: 1,
-  },
-  storeName: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginRight: 6,
-  },
-  storeCategory: {
-    fontSize: 11,
-    color: colors.gray[400],
-  },
-  storeBenefit: {
-    fontSize: 12,
-    color: colors.gray[500],
-    marginTop: 2,
-    marginBottom: 2,
-  },
-  storeDist: {
-    fontSize: 11,
-    color: colors.gray[400],
-  },
-  rankBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 20,
-    height: 20,
-    backgroundColor: theme.colors.primary1,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rankText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: theme.colors.background,
   },
 });
 
