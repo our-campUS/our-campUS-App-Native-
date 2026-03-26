@@ -68,9 +68,9 @@ const ReviewItemCompact = ({ item, variant = 'default' }) => {
               hitSlop={8}
             >
               {isExpanded ? (
-                <ArrowUpIcon width={20} height={20} />
+                <ArrowUpIcon width={24} height={24} />
               ) : (
-                <ArrowDownIcon width={20} height={20} />
+                <ArrowDownIcon width={24} height={24} />
               )}
             </Pressable>
           )}
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   reviewContentTextContainer: {
-    flexShrink: 1,
+    flex: 1,
     minWidth: 0,
     marginRight: 8,
   },
