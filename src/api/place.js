@@ -244,7 +244,7 @@ export const togglePlaceLike = async (placeData) => {
     const token = useAuthStore.getState().accessToken;
 
     const body = {
-      placeId: null,
+      placeId: 'backendPlaceId' in placeData ? placeData.backendPlaceId : null,
       placeName: placeData.name || placeData.placeName,
       placeKey: placeData.placeKey,
       address: placeData.address || '',
@@ -257,8 +257,6 @@ export const togglePlaceLike = async (placeData) => {
       },
       imgUrls: placeData.imgUrls || [],
     };
-
-    console.log('좋아요 요청 데이터 (전체 전송):', body);
 
     const response = await api.post('/places/like-place', body, {
       headers: {

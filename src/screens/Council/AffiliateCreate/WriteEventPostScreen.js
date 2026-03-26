@@ -15,7 +15,7 @@ import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
 import { useState, useRef, useEffect } from 'react';
-import PlaceHolderImage from '../../../../assets/blankImage.svg';
+import CheckerboardPlaceholder from '../../../components/common/CheckerboardPlaceholder';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
@@ -31,6 +31,13 @@ import {
 } from '../../../api/uploadImage';
 import Toast from '../../../components/common/Toast';
 import useToast from '../../../hooks/useToast';
+import {
+  formatDotDate,
+  formatClockTime,
+  createDateOnly,
+  createTimeOnly,
+  toISODateTimeString,
+} from '../../../utils/dateTime';
 
 const WriteEventPostScreen = ({ navigation, route }) => {
   const colorScheme = Appearance.getColorScheme();
@@ -170,39 +177,6 @@ const WriteEventPostScreen = ({ navigation, route }) => {
     return presignedUrls.map((presignedUrl) => presignedUrl.imageUrl);
   };
 
-  const formatDate = (date) => {
-    if (!date) return '';
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yyyy}.${mm}.${dd}`;
-  };
-
-  const formatTime = (date) => {
-    if (!date) return '';
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    return `${hh}:${mm}`;
-  };
-
-  // 날짜만 사용하는 Date 객체 생성 (시간을 자정으로 설정하여 시간대 변환 문제 방지)
-  const createDateOnly = (date) => {
-    if (!date) return null;
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
-    return new Date(year, month, day, 0, 0, 0, 0);
-  };
-
-  // 시간만 사용하는 Date 객체 생성 (날짜는 2000-01-01로 설정하여 시간만 추출)
-  const createTimeOnly = (date) => {
-    if (!date) return null;
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    // 날짜는 고정값으로 설정하여 시간만 저장 (시간대 변환 방지)
-    return new Date(2000, 0, 1, hours, minutes, 0, 0);
-  };
-
   useEffect(() => {
     if (title && place && startDate && startTime && detailPlace) {
       setIsButtonDisabled(false);
@@ -212,18 +186,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
   }, [title, place, startDate, startTime, detailPlace]);
 
   const handleSubmitEvent = async () => {
-    // 날짜와 시간을 'YYYY-MM-DDTHH:mm' 형식으로 직접 조합 (시간대 변환 없이)
-    const formatDateTimeToISO = (date, time) => {
-      if (!date || !time) return null;
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(time.getHours()).padStart(2, '0');
-      const minutes = String(time.getMinutes()).padStart(2, '0');
-      return `${year}-${month}-${day}T${hours}:${minutes}`;
-    };
-
-    const startDateTime = formatDateTimeToISO(startDate, startTime);
+    const startDateTime = toISODateTimeString(startDate, startTime);
     console.log('startDate', startDate);
     console.log('startTime', startTime);
     console.log('startDateTime', startDateTime);
@@ -286,10 +249,9 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             renderItem={({ item, index }) => (
               <View style={[styles.imageContainer, { width }]}>
                 {isEmpty ? (
-                  <PlaceHolderImage
+                  <CheckerboardPlaceholder
                     width={width}
                     height={375}
-                    preserveAspectRatio="none"
                   />
                 ) : (
                   <Image
@@ -355,7 +317,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
               <Input
                 isOrange={true}
                 placeholder="날짜"
-                value={formatDate(startDate)}
+                value={formatDotDate(startDate)}
                 usePopUPModal={true}
                 additionalStyle={styles.startDateInput}
                 useDatePicker={true}
@@ -373,7 +335,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             <View style={styles.dateInputWrapper}>
               <Input
                 placeholder="시간"
-                value={formatTime(startTime)}
+                value={formatClockTime(startTime)}
                 usePopUPModal={true}
                 additionalStyle={styles.endDateInput}
                 useDatePicker={true}

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import StoreCard from '../common/StoreCard';
 import { getRandomPlaces } from '../../api/place';
 import { calculateDistance } from '../../utils/distance';
-const DEFAULT_STORE_IMAGE = require('../../../assets/images/default_image.png');
+const DEFAULT_STORE_IMAGE = require('../../../assets/images/default_image.webp');
 
 const RecommendSection = () => {
   const navigation = useNavigation();

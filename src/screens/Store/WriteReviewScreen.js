@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,12 +11,18 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Toast from 'react-native-toast-message';
 import LabelTitle from '@components/LabelTitle';
 import { editReview, createReview, createPartnershipReview } from '@api/review';
+import {
+  convertToPng,
+  getCommonImagePresignedUrl,
+  uploadImageToPresignedUrl,
+} from '@api/uploadImage';
 import theme from '@style';
 import typography from '@style/typography';
 import shadow from '@style/shadow';
@@ -58,11 +64,40 @@ const WriteReviewScreen = () => {
   const [photos, setPhotos] = useState(
     editMode && existingReview?.imageUrls?.length
       ? existingReview.imageUrls
-      : [1, 2, 3]
+      : []
   );
   const [selection, setSelection] = useState(
     editMode ? { start: 0, end: 0 } : undefined
   );
+
+  const handleOpenGallery = async () => {
+    const result = await launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 });
+    if (!result.didCancel && result.assets?.length) {
+      setPhotos(result.assets.map(a => ({
+        uri: a.uri,
+        width: a.width,
+        height: a.height,
+        type: a.type,
+      })));
+    }
+  };
+
+  const uploadPhotos = async () => {
+    if (photos.length === 0) return [];
+    const pngImages = await Promise.all(photos.map(convertToPng));
+    const presignedUrls = await Promise.all(
+      pngImages.map(async (image) => {
+        const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(image);
+        return { uploadUrl, imageUrl, image };
+      }),
+    );
+    await Promise.all(
+      presignedUrls.map(({ uploadUrl, image }) =>
+        uploadImageToPresignedUrl(uploadUrl, image),
+      ),
+    );
+    return presignedUrls.map((p) => p.imageUrl);
+  };
 
   const isValid = reviewText.length >= 20 && rating > 0;
 
@@ -95,19 +130,21 @@ const WriteReviewScreen = () => {
       const placeId = route.params?.placeId;
       const isPartnership = store?.isPartnership || store?.isPartner;
 
+      const imageUrls = await uploadPhotos();
+
       let result;
       if (isPartnership && placeId) {
         result = await createPartnershipReview(placeId, {
           content: reviewText,
           star: rating,
           isVerified: false,
-          imageUrls: [],
+          imageUrls,
         });
       } else {
         result = await createReview({
           content: reviewText,
           star: rating,
-          imageUrls: [],
+          imageUrls,
           place: store
             ? {
                 placeName: store.name || store.placeName || '',
@@ -135,7 +172,14 @@ const WriteReviewScreen = () => {
         });
       }
 
-      navigation.navigate('ReviewResultScreen', { reviewResult: result });
+      const reviewCaseType = isPartnership && placeId ? 3 : 4;
+      const storePlaceName =
+        store?.name || store?.placeName || route.params?.storeName || '';
+      navigation.navigate('ReviewResultScreen', {
+        reviewResult: result,
+        caseType: reviewCaseType,
+        placeName: storePlaceName,
+      });
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -201,7 +245,7 @@ const WriteReviewScreen = () => {
             style={styles.photoScroll}
             contentContainerStyle={styles.photoContainer}
           >
-            <TouchableOpacity style={styles.addPhotoButton}>
+            <TouchableOpacity style={styles.addPhotoButton} onPress={handleOpenGallery}>
               <View>
                 <Ionicons
                   name="camera"
@@ -214,9 +258,13 @@ const WriteReviewScreen = () => {
 
             {photos.map((photo, index) => (
               <View key={index} style={styles.photoItemPlaceholder}>
-                <Text style={{ color: colors.gray[400], fontSize: 10 }}>
-                  IMG_{index}
-                </Text>
+                <Image source={{ uri: photo.uri }} style={styles.photoItemImage} />
+                <TouchableOpacity
+                  style={styles.photoDeleteButton}
+                  onPress={() => setPhotos(prev => prev.filter((_, i) => i !== index))}
+                >
+                  <Ionicons name="close-circle" size={20} color={colors.gray[800]} />
+                </TouchableOpacity>
               </View>
             ))}
           </ScrollView>
@@ -321,6 +369,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    overflow: 'hidden',
+  },
+  photoItemImage: {
+    width: '100%',
+    height: '100%',
+  },
+  photoDeleteButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
   },
 
   bottomButtonWrapper: {

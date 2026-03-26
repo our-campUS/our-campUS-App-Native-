@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import GiftIcon from '../../../assets/icons/gift.svg';
-import StampFilledImage from '../../../assets/images/stamp/stamp_filled.png';
-import StampVariantImage from '../../../assets/images/stamp/stamp_variant.png';
+import StampFilledImage from '../../../assets/images/stamp/stamp_filled.webp';
+import StampVariantImage from '../../../assets/images/stamp/stamp_variant.webp';
 import PencilIcon from '../../../assets/icons/pencil.svg';
 
 import theme from '../../style';

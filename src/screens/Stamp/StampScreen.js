@@ -16,7 +16,7 @@ import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 
-import StampSubImage from '../../../assets/images/stamp/stamp_sub.png';
+import StampSubImage from '../../../assets/images/stamp/stamp_sub.webp';
 import StampBoard from '../../components/Stamp/StampBoard';
 
 import ShareFriendIcon from '../../../assets/icons/invite/share_friend.svg';

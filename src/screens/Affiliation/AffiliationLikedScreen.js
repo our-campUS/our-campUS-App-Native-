@@ -14,14 +14,13 @@ import { useState, useRef, useEffect } from 'react';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import LabelTitle from '../../components/LabelTitle';
-import PlaceHolderImage from '../../../assets/blankImage.svg';
+import CheckerboardPlaceholder from '../../components/common/CheckerboardPlaceholder';
 import LikeIcon from '../../../assets/Liked.svg';
 import UnLikeIcon from '../../../assets/Unliked.svg';
 import ShareIcon from '../../../assets/share.svg';
 import PlaceIcon from '../../../assets/Vector2.svg';
 import DateIcon from '../../../assets/calendar.svg';
 import { AFFILIATION_RECOMMEND_DATA } from '../../constants/DummyData';
-import PlaceHolderRepresentativeImage from '../../../assets/placeHolderImage.svg';
 import BadgeIcon from '../../../assets/badgeIcon.svg';
 import CouponIcon from '../../../assets/couponIcon.svg';
 import Toast from '../../components/common/Toast';
@@ -32,17 +31,13 @@ import {
   toggleStudentAffiliateLike,
 } from '../../api/studentAffiliate';
 import useAuthStore from '../../store/authStore';
+import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 
 const AffiliationLikedScreen = ({ navigation, route }) => {
   const [isLiked, setIsLiked] = useState(true);
   const { accessToken } = useAuthStore();
   const [item, setItem] = useState(route.params?.item);
   const [councilType, setCouncilType] = useState(route.params?.councilType);
-  const [dateYear, setDateYear] = useState();
-  const [dateMonth, setDateMonth] = useState();
-  const [dateDay, setDateDay] = useState();
-  const [dateHour, setDateHour] = useState();
-  const [dateMinute, setDateMinute] = useState();
   const [detailData, setDetailData] = useState();
   const [detailImages, setDetailImages] = useState();
   const [isEmpty, setIsEmpty] = useState(true);
@@ -90,18 +85,6 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
   useEffect(() => {
     console.log('councilType', councilType);
   }, [route.params?.councilType]);
-
-  useEffect(() => {
-    setDateYear(item?.dateTime?.slice(0, 4));
-    setDateMonth(item?.dateTime?.slice(5, 7));
-    if (item?.dateTime?.slice(5, 7).startsWith('0')) {
-      setDateMonth(item?.dateTime?.slice(6, 7));
-    }
-    setDateDay(item?.dateTime?.slice(8, 10));
-    if (item?.dateTime?.slice(8, 10).startsWith('0')) {
-      setDateDay(item?.dateTime?.slice(9, 10));
-    }
-  }, [item?.dateTime]);
 
   useEffect(() => {
     console.log('detailData', detailData);
@@ -187,10 +170,9 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
               return (
                 <View style={[styles.imageContainer, { width }]}>
                   {isEmpty ? (
-                    <PlaceHolderImage
+                    <CheckerboardPlaceholder
                       width={width}
                       height={375}
-                      preserveAspectRatio="none"
                     />
                   ) : (
                     <>
@@ -308,16 +290,11 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
             <View style={styles.dateWrapper}>
               <DateIcon width={24} height={24} color={colors.gray[300]} />
               {/* <Text style={styles.date}>{route.params?.item?.date}</Text> */}
-              {detailData?.category === 'PARTNERSHIP' ? (
-                <Text style={styles.date}>
-                  {dateYear}년 {dateMonth}월 {dateDay}일 까지
-                </Text>
-              ) : (
-                <Text style={styles.date}>
-                  {dateYear}년 {dateMonth}월 {dateDay}일 {dateHour}시{' '}
-                  {dateMinute}분
-                </Text>
-              )}
+              <Text style={styles.date}>
+                {detailData?.category === 'PARTNERSHIP'
+                  ? formatKoreanDate(detailData?.endDate)
+                  : formatKoreanDateTime(detailData?.startDateTime)}
+              </Text>
               {/* <Text style={styles.time}>D-1</Text> */}
             </View>
           </View>
@@ -349,7 +326,7 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
                         style={{ width: 56, height: 56, borderRadius: 8 }}
                       />
                     ) : (
-                      <PlaceHolderRepresentativeImage width={56} height={56} />
+                      <CheckerboardPlaceholder width={56} height={56} borderRadius={10} />
                     )}
                   </View>
                   <View style={styles.infoWrapper}>

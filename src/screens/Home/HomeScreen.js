@@ -21,6 +21,7 @@ import { getUserInfo } from '../../api/user';
 import { useNavigation } from '@react-navigation/native';
 import { getTodayEvent } from '../../api/studentAffiliate';
 import { checkUnreadNotification } from '../../api/notification';
+import { formatKoreanTime } from '../../utils/dateTime';
 
 const HomeSection = ({
   title,
@@ -86,18 +87,6 @@ const HomeScreen = () => {
     fetchData();
   }, []);
 
-  const formatTime = (isoString) => {
-    if (!isoString) return '';
-    const date = new Date(isoString);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-
-    if (minutes === 0) {
-      return `${hours}시`;
-    }
-    return `${hours}시 ${minutes}분`;
-  };
-
   if (!user) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -139,7 +128,7 @@ const HomeScreen = () => {
                 >
                   <Text style={styles.boldText}>오늘의 행사</Text>
                   {todayEvent.placeName} ‘{todayEvent.title}’가{' '}
-                  {formatTime(todayEvent.startDateTime)}에 있습니다 🎉
+                  {formatKoreanTime(todayEvent.startDateTime)}에 있습니다 🎉
                 </Text>
               </TouchableOpacity>
             ) : (
@@ -185,13 +174,13 @@ const HomeScreen = () => {
             <BannerCard
               title="좋은 제휴 아이디어 공유해주실래요?"
               subtitle="원하는 제휴 혜택을 학생회에게 직접 제안해요"
-              imageSource={require('../../../assets/images/home/banner_03.png')}
+              imageSource={require('../../../assets/images/home/banner_03.webp')}
               onPress={() => console.log('제안하기 클릭')}
             />
             <BannerCard
               title="제휴 이용하고 스탬프 받아가세요!"
               subtitle="제휴만 이용해도 혜택이 팡팡"
-              imageSource={require('../../../assets/images/home/banner_04.png')}
+              imageSource={require('../../../assets/images/home/banner_04.webp')}
               onPress={() => navigation.navigate('Stamp')}
             />
           </View>
