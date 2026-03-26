@@ -205,10 +205,7 @@ const AffiliationColumnListItem = ({
             <View style={styles.placeAndDateItem}>
               <PlaceIcon width={16} height={16} color={colors.gray[300]} />
               <Text style={styles.place} numberOfLines={1} ellipsizeMode="tail">
-                {item?.place || item?.placeName}
-                {item?.category === 'EVENT' && item?.detailedLocation
-                  ? ` ${item.detailedLocation}`
-                  : ''}
+                {item?.detailedLocation || item?.place || item?.placeName}
               </Text>
             </View>
             <View style={styles.placeAndDateItem}>
