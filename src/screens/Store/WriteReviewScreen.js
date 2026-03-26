@@ -87,8 +87,43 @@ const WriteReviewScreen = () => {
 
   const isValid = reviewText.length >= 20 && rating > 0;
 
+  const handleImagesBeforeSubmit = async () => {
+    const newAssets = photos.filter((p) => typeof p !== 'string');
+    if (newAssets.length === 0) return [];
+
+    const pngImages = await Promise.all(
+      newAssets.map((asset) => convertToPng(asset)),
+    );
+    const presignedResults = await Promise.all(
+      pngImages.map(async (image) => {
+        const { uploadUrl, imageUrl } =
+          await getCommonImagePresignedUrl(image);
+        return { uploadUrl, imageUrl, image };
+      }),
+    );
+    await Promise.all(
+      presignedResults.map(({ uploadUrl, image }) =>
+        uploadImageToPresignedUrl(uploadUrl, image),
+      ),
+    );
+    return presignedResults.map(({ imageUrl }) => imageUrl);
+  };
+
   const handleSubmit = async () => {
     if (!isValid) return;
+
+    setUploading(true);
+    let uploadedUrls = [];
+    try {
+      uploadedUrls = await handleImagesBeforeSubmit();
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: '이미지 업로드에 실패하였습니다.',
+      });
+      setUploading(false);
+      return;
+    }
 
     if (editMode && existingReview) {
       try {
@@ -108,6 +143,7 @@ const WriteReviewScreen = () => {
           text1: '리뷰 수정에 실패하였습니다.',
         });
       }
+      setUploading(false);
       return;
     }
 
@@ -122,13 +158,13 @@ const WriteReviewScreen = () => {
           content: reviewText,
           star: rating,
           isVerified: false,
-          imageUrls: [],
+          imageUrls: uploadedUrls,
         });
       } else {
         result = await createReview({
           content: reviewText,
           star: rating,
-          imageUrls: [],
+          imageUrls: uploadedUrls,
           place: store
             ? {
                 placeName: store.name || store.placeName || '',
@@ -162,6 +198,8 @@ const WriteReviewScreen = () => {
         type: 'error',
         text1: '리뷰 등록에 실패하였습니다.',
       });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -259,21 +297,27 @@ const WriteReviewScreen = () => {
           <TouchableOpacity
             style={[
               styles.submitButton,
-              isValid ? styles.activeButton : styles.disabledButton,
+              isValid && !uploading
+                ? styles.activeButton
+                : styles.disabledButton,
             ]}
-            disabled={!isValid}
+            disabled={!isValid || uploading}
             onPress={handleSubmit}
           >
-            <Text
-              style={[
-                styles.submitButtonText,
-                isValid
-                  ? { color: colors.gray[100] }
-                  : { color: theme.colors.background },
-              ]}
-            >
-              {editMode ? '수정하기' : '작성하기'}
-            </Text>
+            {uploading ? (
+              <ActivityIndicator color={colors.gray[100]} />
+            ) : (
+              <Text
+                style={[
+                  styles.submitButtonText,
+                  isValid
+                    ? { color: colors.gray[100] }
+                    : { color: theme.colors.background },
+                ]}
+              >
+                {editMode ? '수정하기' : '작성하기'}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
