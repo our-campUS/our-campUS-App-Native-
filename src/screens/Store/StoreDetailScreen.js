@@ -14,7 +14,9 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { togglePlaceLike, getPlaceStatus } from '@api/place';
+import { togglePlaceLike, getPlaceStatus, suggestPartnership } from '@api/place';
+import Toast from '@components/common/Toast';
+import useToast from '../../hooks/useToast';
 
 import LabelTitle from '@components/LabelTitle';
 import Button from '@components/Button';
@@ -94,9 +96,12 @@ const StoreDetailScreen = () => {
   );
   console.log('=============================================================');
 
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
   const [currentPlaceId, setCurrentPlaceId] = useState(storeData.placeId);
+  const [isSuggesting, setIsSuggesting] = useState(false);
 
   const handleLikePress = async () => {
     const previousState = isLiked;
@@ -195,6 +200,26 @@ const StoreDetailScreen = () => {
 
     fetchLatestStatus();
   }, []);
+
+  const handleSuggestPartnership = async () => {
+    if (isSuggesting) return;
+    setIsSuggesting(true);
+    try {
+      const result = await suggestPartnership({
+        ...storeData,
+        placeId: currentPlaceId,
+      });
+      if (result !== null) {
+        showToast('제휴 요청이 완료되었어요!');
+      } else {
+        showToast('제휴 요청에 실패했어요. 다시 시도해주세요.');
+      }
+    } catch {
+      showToast('제휴 요청에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setIsSuggesting(false);
+    }
+  };
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -308,7 +333,11 @@ const StoreDetailScreen = () => {
               </View>
             ) : (
               <View style={styles.nonPartnerRow}>
-                <TouchableOpacity style={styles.requestButton}>
+                <TouchableOpacity
+                  style={styles.requestButton}
+                  onPress={handleSuggestPartnership}
+                  disabled={isSuggesting}
+                >
                   <Text style={styles.requestButtonText}>제휴 요청하기</Text>
                   <ArrowRightIcon
                     width={8}
@@ -486,6 +515,8 @@ const StoreDetailScreen = () => {
         }}
       />
       */}
+
+      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} />
     </View>
   );
 };

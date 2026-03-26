@@ -276,6 +276,52 @@ export const togglePlaceLike = async (placeData) => {
   }
 };
 
+export const suggestPartnership = async (placeData) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const body = {
+      placeId: placeData.placeId || null,
+      placeName: placeData.name || placeData.placeName,
+      placeKey: placeData.placeKey || '',
+      address: placeData.address || '',
+      category: placeData.category || '기타',
+      link: placeData.link || '',
+      telephone: placeData.phone || placeData.telephone || '',
+      coordinate: {
+        latitude: placeData.latitude || 0,
+        longitude: placeData.longitude || 0,
+      },
+      imgUrls: placeData.imgUrls || [],
+    };
+
+    console.log('👉 [API 요청] suggestPartnership 데이터:', JSON.stringify(body, null, 2));
+
+    const response = await api.post('/places/suggest-partnership', body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200 || response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error('❌ 제휴 요청 실패:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      config: {
+        url: error.config?.url,
+        method: error.config?.method,
+        data: error.config?.data,
+      },
+    });
+    return null;
+  }
+};
+
 export const getPlaceStatus = async (placeId, latitude, longitude) => {
   try {
     const token = useAuthStore.getState().accessToken;
