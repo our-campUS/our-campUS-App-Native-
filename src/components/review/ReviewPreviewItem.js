@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
   reviewContentWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     marginBottom: 8,
   },
   reviewContentTextContainer: {
