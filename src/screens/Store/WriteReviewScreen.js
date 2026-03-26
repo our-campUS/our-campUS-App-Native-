@@ -222,22 +222,34 @@ const WriteReviewScreen = () => {
             style={styles.photoScroll}
             contentContainerStyle={styles.photoContainer}
           >
-            <TouchableOpacity style={styles.addPhotoButton}>
-              <View>
+            {photos.length < 10 && (
+              <TouchableOpacity
+                style={styles.addPhotoButton}
+                onPress={pickImage}
+              >
                 <Ionicons
                   name="camera"
-                  size={24}
+                  size={23}
                   color={theme.colors.primary1}
                 />
-              </View>
-              <Text style={styles.addPhotoText}>사진 촬영하기</Text>
-            </TouchableOpacity>
+                <Text style={styles.addPhotoText}>사진 촬영하기</Text>
+              </TouchableOpacity>
+            )}
 
             {photos.map((photo, index) => (
-              <View key={index} style={styles.photoItemPlaceholder}>
-                <Text style={{ color: colors.gray[400], fontSize: 10 }}>
-                  IMG_{index}
-                </Text>
+              <View key={index} style={styles.photoItem}>
+                <Image
+                  source={{
+                    uri: typeof photo === 'string' ? photo : photo.uri,
+                  }}
+                  style={styles.photoImage}
+                />
+                <TouchableOpacity
+                  style={styles.photoBadge}
+                  onPress={() => handleRemovePhoto(index)}
+                >
+                  <Text style={styles.photoBadgeText}>{index + 1}</Text>
+                </TouchableOpacity>
               </View>
             ))}
           </ScrollView>
@@ -320,28 +332,51 @@ const styles = StyleSheet.create({
   },
   photoContainer: {
     paddingRight: 20,
-    gap: 12,
+    gap: 8,
   },
   addPhotoButton: {
-    width: 100,
-    height: 100,
+    width: 90,
+    height: 90,
     backgroundColor: theme.colors.primary1Light,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 6,
+    padding: 10,
   },
   addPhotoText: {
     ...typography.caption2Regular,
-    color: colors.gray[500],
+    color: colors.gray[600],
   },
-  photoItemPlaceholder: {
-    width: 100,
-    height: 100,
-    backgroundColor: colors.gray[200],
+  photoItem: {
+    width: 90,
+    height: 90,
     borderRadius: 8,
+    position: 'relative',
+  },
+  photoImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 8,
+  },
+  photoBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 20,
+    height: 20,
+    borderRadius: 50,
+    backgroundColor: theme.colors.primary1,
+    borderWidth: 1,
+    borderColor: colors.gray[100],
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+  },
+  photoBadgeText: {
+    ...typography.caption1Regular,
+    fontSize: 12,
+    color: colors.gray[100],
+    lineHeight: 15,
   },
 
   bottomButtonWrapper: {
