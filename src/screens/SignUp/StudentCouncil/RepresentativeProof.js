@@ -3,8 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
-import ImageUpload from '../../../../assets/imageUpload.svg';
-import UploadFile from '../../../../assets/uploadFile.svg';
+import CheckerboardPlaceholder from '../../../components/common/CheckerboardPlaceholder';
+import UploadButton from '../../../components/common/UploadButton';
 import { useState, useEffect } from 'react';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import Button from '../../../components/Button';
@@ -155,9 +155,9 @@ const RepresentativeProof = ({ navigation, route }) => {
             />
           ) : (
             <>
-              <ImageUpload width={'100%'} height={150} />
+              <CheckerboardPlaceholder width={'100%'} height={150} borderRadius={12} />
               <View style={styles.uploadFileButton}>
-                <UploadFile width={120} height={40} />
+                <UploadButton variant="blue" />
               </View>
             </>
           )}

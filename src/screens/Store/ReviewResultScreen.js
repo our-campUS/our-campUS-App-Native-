@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import StampImage from '@assets/images/stamp.png';
+import StampImage from '@assets/images/stamp.webp';
 import Button from '@components/Button';
 import ReviewItemCompact from '@components/review/ReviewPreviewItem';
 

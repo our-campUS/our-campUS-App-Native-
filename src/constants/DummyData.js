@@ -40,11 +40,11 @@ export const STORE_DATA = [
 export const CAROUSEL_DATA = [
   {
     id: '1',
-    image: require('../../assets/images/home/banner_01.png'),
+    image: require('../../assets/images/home/banner_01.webp'),
   },
   {
     id: '2',
-    image: require('../../assets/images/home/banner_02.png'),
+    image: require('../../assets/images/home/banner_02.webp'),
   },
 ];
 

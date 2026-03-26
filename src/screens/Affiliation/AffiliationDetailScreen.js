@@ -14,13 +14,12 @@ import { useState, useRef, useEffect } from 'react';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import LabelTitle from '../../components/LabelTitle';
-import PlaceHolderImage from '../../../assets/blankImage.svg';
+import CheckerboardPlaceholder from '../../components/common/CheckerboardPlaceholder';
 import LikeIcon from '../../../assets/Liked.svg';
 import UnLikeIcon from '../../../assets/Unliked.svg';
 import ShareIcon from '../../../assets/share.svg';
 import PlaceIcon from '../../../assets/Vector2.svg';
 import DateIcon from '../../../assets/calendar.svg';
-import { AFFILIATION_RECOMMEND_DATA } from '../../constants/DummyData';
 import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import Toast from '../../components/common/Toast';
 import useToast from '../../hooks/useToast';
@@ -79,7 +78,8 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
           ...prev,
           title: prev?.title || data?.title,
           placeName: prev?.placeName || data?.place,
-          endDateTime: prev?.endDateTime || data?.endDate || data?.startDateTime,
+          endDateTime:
+            prev?.endDateTime || data?.endDate || data?.startDateTime,
           category: prev?.category || data?.category,
         }));
       }
@@ -179,11 +179,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
               return (
                 <View style={[styles.imageContainer, { width }]}>
                   {isEmpty ? (
-                    <PlaceHolderImage
-                      width={width}
-                      height={375}
-                      preserveAspectRatio="none"
-                    />
+                    <CheckerboardPlaceholder width={width} height={375} />
                   ) : (
                     <>
                       {!isImageLoaded && (
@@ -270,7 +266,11 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
                     if (detailData) {
                       setDetailData({ ...detailData, liked: newLikedState });
                     }
-                    showToast(newLikedState ? '관심 목록에 추가되었어요!' : '관심 목록에서 삭제되었어요.');
+                    showToast(
+                      newLikedState
+                        ? '관심 목록에 추가되었어요!'
+                        : '관심 목록에서 삭제되었어요.'
+                    );
                   } catch (error) {
                     // 실패 시 롤백
                     setIsLiked(!newLikedState);
@@ -279,9 +279,17 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
                 }}
               >
                 {isLiked ? (
-                  <LikeIcon width={12} height={11.25} color={colors.orange[500]} />
+                  <LikeIcon
+                    width={12}
+                    height={11.25}
+                    color={colors.orange[500]}
+                  />
                 ) : (
-                  <UnLikeIcon width={12} height={11.25} color={colors.gray[300]} />
+                  <UnLikeIcon
+                    width={12}
+                    height={11.25}
+                    color={colors.gray[300]}
+                  />
                 )}
               </Pressable>
               <Pressable style={styles.button}>
@@ -291,9 +299,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
             <View style={styles.placeAndDate}>
               <View style={styles.placeWrapper}>
                 <PlaceIcon width={20} height={20} color={colors.gray[300]} />
-                <Text style={styles.place}>
-                  {item?.placeName}
-                </Text>
+                <Text style={styles.place}>{item?.placeName}</Text>
                 {/* <Text style={styles.distance}>0.0km</Text> */}
               </View>
             </View>
@@ -333,11 +339,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
           </View>
         )}
       </ScrollView>
-      <Toast
-        message={toastMessage}
-        visible={toastVisible}
-        onHide={hideToast}
-      />
+      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} />
     </SafeAreaView>
   );
 };
