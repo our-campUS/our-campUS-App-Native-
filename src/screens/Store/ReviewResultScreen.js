@@ -263,7 +263,7 @@ setPartnerStores(
       >
         <View style={styles.bottomHeader}>
           <Text style={styles.bottomTitle}>
-            {isBlueBackground ? '제휴 매장 둘러보기' : '제휴 매장 둘러보기'}
+            제휴 매장 둘러보기
           </Text>
           <Text style={styles.bottomSubtitle}>
             {isBlueBackground
