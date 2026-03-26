@@ -236,9 +236,7 @@ const KakaoMapWebView = forwardRef(
 
     useImperativeHandle(ref, () => ({
       animateCameraTo: ({ latitude, longitude, zoom, duration }) => {
-        const js = `moveCameraInWebView(${latitude}, ${longitude}, ${zoom}, ${
-          duration || 0
-        }); true;`;
+        const js = `moveCameraInWebView(${latitude}, ${longitude}, ${zoom}, ${duration || 0}); true;`;
         webViewRef.current?.injectJavaScript(js);
       },
     }));

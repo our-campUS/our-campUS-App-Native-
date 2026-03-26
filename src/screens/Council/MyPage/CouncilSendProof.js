@@ -3,8 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
-import ImageUpload from '../../../../assets/imageUpload.svg';
-import CouncilUpload from '../../../../assets/CouncilUpload.svg';
+import CheckerboardPlaceholder from '../../../components/common/CheckerboardPlaceholder';
+import UploadButton from '../../../components/common/UploadButton';
 import { useState, useEffect } from 'react';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import Button from '../../../components/Button';
@@ -149,9 +149,9 @@ const CouncilSendProof = ({ navigation, route }) => {
             />
           ) : (
             <>
-              <ImageUpload width={'100%'} height={150} />
+              <CheckerboardPlaceholder width={'100%'} height={150} borderRadius={12} />
               <View style={styles.uploadFileButton}>
-                <CouncilUpload width={120} height={40} />
+                <UploadButton variant="orange" />
               </View>
             </>
           )}

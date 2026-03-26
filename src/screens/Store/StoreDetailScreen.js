@@ -15,6 +15,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { togglePlaceLike, getPlaceStatus } from '@api/place';
+import { getReviewList } from '@api/review';
 
 import LabelTitle from '@components/LabelTitle';
 import Button from '@components/Button';
@@ -78,25 +79,41 @@ const StoreDetailScreen = () => {
     phone: paramStore.telephone || paramStore.phone || '',
     hours: paramStore.hours || [],
 
-    isPartner: paramStore.isPartnership,
-    partnerTags: paramStore.tag ? [paramStore.tag] : [],
+    isPartner: paramStore.isPartnership || paramStore.type === 'PARTNER' || (paramStore.partnerships?.length > 0),
+    partnerTags: paramStore.partnerships?.length > 0
+      ? paramStore.partnerships.map((p) => p.councilName).filter(Boolean)
+      : paramStore.tag ? [paramStore.tag] : [],
 
+    backendPlaceId: paramStore.backendPlaceId !== undefined ? paramStore.backendPlaceId : (paramStore.placeId || null),
     placeId: paramStore.placeId || null,
     placeKey: paramStore.placeKey || paramStore.id,
   };
 
-  console.log('================= [StoreDetailScreen Debug] =================');
-  console.log('1. 이전 화면에서 넘겨준 원본 (route.params):', route.params);
-  console.log('-------------------------------------------------------------');
-  console.log(
-    '2. 최종 렌더링 데이터 (storeData):',
-    JSON.stringify(storeData, null, 2)
-  );
-  console.log('=============================================================');
 
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
-  const [currentPlaceId, setCurrentPlaceId] = useState(storeData.placeId);
+  const [currentPlaceId, setCurrentPlaceId] = useState(storeData.backendPlaceId);
+  const [reviews, setReviews] = useState(storeData.reviews);
+  const [reviewSize, setReviewSize] = useState(storeData.reviewSize);
+
+  useEffect(() => {
+    if (!storeData.backendPlaceId || storeData.reviews?.length > 0) return;
+    getReviewList(storeData.backendPlaceId)
+      .then((res) => {
+        const items = (res?.data?.items || []).map((r) => ({
+          id: r.id,
+          star: r.star,
+          comment: r.content,
+          name: r.userName,
+          date: r.createDate?.slice(2).replace(/-/g, '.') ?? '',
+          imageUrls: r.imageUrls?.length ? r.imageUrls : undefined,
+        }));
+        setReviews(items);
+        setReviewSize(items.length);
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeData.placeId]);
 
   const handleLikePress = async () => {
     const previousState = isLiked;
@@ -106,14 +123,13 @@ const StoreDetailScreen = () => {
     try {
       const requestBody = {
         ...storeData,
-        placeId: currentPlaceId,
+        backendPlaceId: currentPlaceId,
       };
 
       const response = await togglePlaceLike(requestBody);
       const newPlaceId = response?.data?.placeId || response?.placeId;
 
       if (!currentPlaceId && newPlaceId) {
-        console.log(`🎉 새 장소 등록됨! ID: ${newPlaceId}`);
         setCurrentPlaceId(newPlaceId);
       }
 
@@ -137,28 +153,25 @@ const StoreDetailScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      let isActive = true; // 언마운트 시 상태 업데이트 방지
+      if (!currentPlaceId) return;
+
+      let isActive = true;
 
       const fetchLatestStatus = async () => {
         try {
-          const checkId = currentPlaceId || storeData.placeId;
-          // ID가 없으면 조회 불가 (또는 위도경도로 조회)
           const status = await getPlaceStatus(
-            checkId,
+            currentPlaceId,
             storeData.latitude,
             storeData.longitude
           );
-
           if (isActive && status) {
-            console.log('🔄 [상세] 최신 상태 동기화:', status.liked);
-            setIsLiked(status.liked); // ★ 여기서 서버 데이터로 덮어씌움!
-
+            setIsLiked(status.isLiked);
             if (status.placeId && !currentPlaceId) {
               setCurrentPlaceId(status.placeId);
             }
           }
         } catch (error) {
-          console.error('상태 조회 실패');
+          // silent
         }
       };
 
@@ -167,34 +180,8 @@ const StoreDetailScreen = () => {
       return () => {
         isActive = false;
       };
-    }, [currentPlaceId]) // 의존성 배열
+    }, [currentPlaceId, storeData.latitude, storeData.longitude])
   );
-
-  useEffect(() => {
-    const fetchLatestStatus = async () => {
-      try {
-        const status = await getPlaceStatus(
-          currentPlaceId || storeData.placeId,
-          storeData.latitude,
-          storeData.longitude
-        );
-
-        if (status) {
-          console.log('🔄 최신 상태 동기화:', status.liked);
-
-          setIsLiked(status.liked);
-
-          if (status.placeId && !currentPlaceId) {
-            setCurrentPlaceId(status.placeId);
-          }
-        }
-      } catch (error) {
-        console.error('최신 상태 확인 실패');
-      }
-    };
-
-    fetchLatestStatus();
-  }, []);
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -348,11 +335,11 @@ const StoreDetailScreen = () => {
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
                 <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
-                {storeData.reviewSize > 0 ? (
+                {reviewSize > 0 ? (
                   <>
-                    <Text style={styles.detailText}>{storeData.star}</Text>
+                    <Text style={styles.detailText}>{storeData.averageStar ?? storeData.star}</Text>
                     <Text style={styles.detailTextSub}>
-                      ({storeData.reviewSize})
+                      ({reviewSize})
                     </Text>
                   </>
                 ) : (
@@ -403,21 +390,21 @@ const StoreDetailScreen = () => {
               <Text style={styles.reviewTitle}>
                 리뷰{' '}
                 <Text style={styles.detailTextSub}>
-                  {storeData.reviewSize}개
+                  {reviewSize}개
                 </Text>
               </Text>
               <TouchableOpacity
-                disabled={!storeData.reviewSize || storeData.reviewSize === 0}
+                disabled={!reviewSize}
                 onPress={() =>
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
-                    star: storeData.star,
+                    star: storeData.averageStar ?? storeData.star,
                     placeId: currentPlaceId,
-                    reviewSize: storeData.reviewSize,
+                    reviewSize: reviewSize,
                   })
                 }
               >
-                {storeData.reviewSize > 0 && (
+                {reviewSize > 0 && (
                   <Ionicons
                     name="chevron-forward"
                     size={20}
@@ -427,8 +414,8 @@ const StoreDetailScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {storeData.reviews && storeData.reviews.length > 0 ? (
-              storeData.reviews.map((review) => (
+            {reviews?.length > 0 ? (
+              reviews.map((review) => (
                 <ReviewItem key={review.id} item={review} variant="preview" />
               ))
             ) : (
