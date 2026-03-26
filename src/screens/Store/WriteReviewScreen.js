@@ -76,7 +76,7 @@ const WriteReviewScreen = () => {
     onSelectImages: (assets) => {
       setPhotos((prev) => [...prev, ...assets].slice(0, 10));
     },
-    selectionLimit: 10,
+    selectionLimit: 10 - photos.length,
     useGallery: true,
     useCamera: true,
   });
