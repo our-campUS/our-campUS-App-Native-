@@ -33,18 +33,14 @@ import {
   getCouncilEventPosts,
   deleteCouncilPost,
 } from '../../api/councilAffiliate';
+import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 
 const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [labelTitle, setLabelTitle] = useState('');
   const { user, accessToken } = useAuthStore();
   const [detailData, setDetailData] = useState(null);
-  const [endYear, setEndYear] = useState(null);
-  const [endMonth, setEndMonth] = useState(null);
-  const [endDay, setEndDay] = useState(null);
   const [recommendData, setRecommendData] = useState(null);
-  const [startMinute, setStartMinute] = useState(null);
-  const [startHour, setStartHour] = useState(null);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -117,29 +113,6 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
     console.log('recommendData', recommendData);
   }, [recommendData]);
 
-  useEffect(() => {
-    if (detailData) {
-      console.log('detailData', detailData);
-      setEndYear(detailData?.endDate?.slice(0, 4));
-      setEndMonth(
-        detailData?.endDate?.slice(5, 7) === '0'
-          ? detailData?.endDate?.slice(6, 7)
-          : detailData?.endDate?.slice(5, 7)
-      );
-      setEndDay(
-        detailData?.endDate?.slice(8, 10) === '0'
-          ? detailData?.endDate?.slice(9, 10)
-          : detailData?.endDate?.slice(8, 10)
-      );
-      if (detailData?.category === 'EVENT') {
-        setEndYear(detailData?.startDateTime?.slice(0, 4));
-        setEndMonth(detailData?.startDateTime?.slice(5, 7));
-        setEndDay(detailData?.startDateTime?.slice(8, 10));
-        setStartHour(detailData?.startDateTime?.slice(11, 13));
-        setStartMinute(detailData?.startDateTime?.slice(14, 16));
-      }
-    }
-  }, [detailData]);
   const { width } = useWindowDimensions();
   const detailImages = detailData?.images || [];
   const isEmpty = detailImages.length === 0;
@@ -261,16 +234,11 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
           </View>
           <View style={styles.dateWrapper}>
             <DateIcon width={24} height={24} color={colors.gray[300]} />
-            {detailData?.category === 'PARTNERSHIP' ? (
-              <Text style={styles.date}>
-                {endYear}년 {endMonth}월 {endDay}일 까지
-              </Text>
-            ) : (
-              <Text style={styles.date}>
-                {endYear}년 {endMonth}월 {endDay}일 {startHour}시 {startMinute}
-                분
-              </Text>
-            )}
+            <Text style={styles.date}>
+              {detailData?.category === 'PARTNERSHIP'
+                ? formatKoreanDate(detailData?.endDate)
+                : formatKoreanDateTime(detailData?.startDateTime)}
+            </Text>
             {/* <Text style={styles.time}>D-1</Text> */}
           </View>
         </View>

@@ -3,10 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import theme from '../../style';
 import colors from '../../style/colors';
 
-const BannerCard = ({ title, subtitle, onPress, imageSource }) => {
+const BannerCard = ({ title, subtitle, onPress, imageSource, style }) => {
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, style]}
       activeOpacity={0.7}
       onPress={onPress}
     >

@@ -3,8 +3,9 @@ import colors from '../../style/colors';
 import typography from '../../style/typography';
 import Vector2 from '../../../assets/Vector2.svg';
 import CalendarIcon from '../../../assets/calendar.svg';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
+import { parseISODate } from '../../utils/dateTime';
 
 const styles = StyleSheet.create({
   container: {
@@ -80,31 +81,11 @@ const AffiliationCarouselItem = ({
   councilType = null,
 }) => {
   const { user } = useAuthStore();
-  const [startYear, setStartYear] = useState(null);
-  const [startMonth, setStartMonth] = useState(null);
-  const [startDay, setStartDay] = useState(null);
-  const [startHour, setStartHour] = useState(null);
-  const [startMinute, setStartMinute] = useState(null);
 
   useEffect(() => {
     console.log('user', user);
   }, [user]);
 
-  useEffect(() => {
-    setStartYear(item?.dateTime?.slice(0, 4) || item?.endDateTime?.slice(0, 4));
-    setStartMonth(
-      item?.dateTime?.slice(5, 7) || item?.endDateTime?.slice(5, 7)
-    );
-    setStartDay(
-      item?.dateTime?.slice(8, 10) || item?.endDateTime?.slice(8, 10)
-    );
-    setStartHour(
-      item?.dateTime?.slice(11, 13) || item?.endDateTime?.slice(11, 13)
-    );
-    setStartMinute(
-      item?.dateTime?.slice(14, 16) || item?.endDateTime?.slice(14, 16)
-    );
-  }, [item]);
 
   return (
     <Pressable
@@ -156,7 +137,14 @@ const AffiliationCarouselItem = ({
         <View style={styles.dateContainer}>
           <CalendarIcon width={18} height={18} color={colors.gray[300]} />
           <Text style={styles.date} numberOfLines={1} ellipsizeMode="tail">
-            {startYear}.{startMonth}.{startDay} {startHour}:{startMinute}
+            {(() => {
+              const p = parseISODate(item?.dateTime || item?.endDateTime);
+              if (!p) return '';
+              const mm = String(p.month).padStart(2, '0');
+              const dd = String(p.day).padStart(2, '0');
+              const time = p.hour !== null ? ` ${String(p.hour).padStart(2, '0')}:${String(p.minute).padStart(2, '0')}` : '';
+              return `${p.year}.${mm}.${dd}${time}`;
+            })()}
           </Text>
         </View>
       </View>

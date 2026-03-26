@@ -21,9 +21,7 @@ import ShareIcon from '../../../assets/share.svg';
 import PlaceIcon from '../../../assets/Vector2.svg';
 import DateIcon from '../../../assets/calendar.svg';
 import { AFFILIATION_RECOMMEND_DATA } from '../../constants/DummyData';
-import PlaceHolderRepresentativeImage from '../../../assets/placeHolderImage.svg';
-import BadgeIcon from '../../../assets/badgeIcon.svg';
-import CouponIcon from '../../../assets/couponIcon.svg';
+import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import Toast from '../../components/common/Toast';
 import useToast from '../../hooks/useToast';
 import {
@@ -32,17 +30,13 @@ import {
   toggleStudentAffiliateLike,
 } from '../../api/studentAffiliate';
 import useAuthStore from '../../store/authStore';
+import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 
 const AffiliationDetailScreen = ({ navigation, route }) => {
   const [isLiked, setIsLiked] = useState(route.params?.item?.liked || false);
   const { accessToken } = useAuthStore();
   const [item, setItem] = useState(route.params?.item);
   const [councilType, setCouncilType] = useState(route.params?.councilType);
-  const [dateYear, setDateYear] = useState();
-  const [dateMonth, setDateMonth] = useState();
-  const [dateDay, setDateDay] = useState();
-  const [dateHour, setDateHour] = useState();
-  const [dateMinute, setDateMinute] = useState();
   const [detailData, setDetailData] = useState();
   const [detailImages, setDetailImages] = useState();
   const [isEmpty, setIsEmpty] = useState(true);
@@ -100,18 +94,6 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
   useEffect(() => {
     console.log('councilType', councilType);
   }, [route.params?.councilType]);
-
-  useEffect(() => {
-    setDateYear(item?.endDateTime?.slice(0, 4));
-    setDateMonth(item?.endDateTime?.slice(5, 7));
-    if (item?.endDateTime?.slice(5, 7).startsWith('0')) {
-      setDateMonth(item?.endDateTime?.slice(6, 7));
-    }
-    setDateDay(item?.endDateTime?.slice(8, 10));
-    if (item?.endDateTime?.slice(8, 10).startsWith('0')) {
-      setDateDay(item?.endDateTime?.slice(9, 10));
-    }
-  }, [item?.endDateTime]);
 
   useEffect(() => {
     console.log('detailData', detailData);
@@ -318,16 +300,11 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
             <View style={styles.dateWrapper}>
               <DateIcon width={24} height={24} color={colors.gray[300]} />
               {/* <Text style={styles.date}>{route.params?.item?.date}</Text> */}
-              {item?.category === 'PARTNERSHIP' ? (
-                <Text style={styles.date}>
-                  {dateYear}년 {dateMonth}월 {dateDay}일 까지
-                </Text>
-              ) : (
-                <Text style={styles.date}>
-                  {dateYear}년 {dateMonth}월 {dateDay}일 {dateHour}시{' '}
-                  {dateMinute}분
-                </Text>
-              )}
+              <Text style={styles.date}>
+                {detailData?.category === 'PARTNERSHIP'
+                  ? formatKoreanDate(detailData?.endDate)
+                  : formatKoreanDateTime(detailData?.startDateTime)}
+              </Text>
               {/* <Text style={styles.time}>D-1</Text> */}
             </View>
           </View>
@@ -350,53 +327,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
               contentContainerStyle={{ gap: 10 }}
               style={{ marginTop: 20 }}
               showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <View style={styles.recommendItemContainer}>
-                  <View style={styles.imageWrapper}>
-                    {item?.thumbnailImageUrl ? (
-                      <Image
-                        source={{ uri: item?.thumbnailImageUrl }}
-                        style={{ width: 56, height: 56, borderRadius: 8 }}
-                      />
-                    ) : (
-                      <PlaceHolderRepresentativeImage width={56} height={56} />
-                    )}
-                  </View>
-                  <View style={styles.infoWrapper}>
-                    <View style={styles.titleWrapper}>
-                      {item?.approved && <BadgeIcon width={20} height={20} />}
-                      <Text style={styles.recommendTitle}>
-                        {item?.placeName}
-                      </Text>
-                      <Text style={styles.placeType}>{item?.placeType}</Text>
-                    </View>
-                    <View style={styles.detailWrapper}>
-                      <View style={styles.detailExplainWrapper}>
-                        <CouponIcon width={15} height={15} />
-                        <Text
-                          numberOfLines={2}
-                          ellipsizeMode="tail"
-                          textBreakStrategy="balanced"
-                          style={styles.detailExplain}
-                        >
-                          {item?.title}
-                        </Text>
-                      </View>
-                      <View style={styles.detailDistanceWrapper}>
-                        <PlaceIcon
-                          width={12}
-                          height={12}
-                          color={colors.gray[300]}
-                        />
-                        <Text style={styles.detailDistance}>
-                          {/* {item?.distance} */}
-                          0.0km
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              )}
+              renderItem={({ item }) => <RecommendStoreCard item={item} />}
               keyExtractor={(item) => item.id}
             />
           </View>
@@ -545,62 +476,6 @@ const styles = StyleSheet.create({
   recommendTitle: {
     ...typography.heading4,
     color: colors.gray[850],
-  },
-  recommendItemContainer: {
-    width: 280,
-    height: 88,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.gray['050'],
-    backgroundColor: colors.gray['000'],
-    padding: 16,
-    flexDirection: 'row',
-  },
-  imageWrapper: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
-  },
-  infoWrapper: {
-    // backgroundColor: 'red',
-    maxWidth: 180,
-    marginLeft: 12,
-  },
-  titleWrapper: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-  },
-  placeType: {
-    ...typography.caption2Regular,
-    color: colors.gray[700],
-    marginLeft: 4,
-  },
-  detailWrapper: {
-    flexDirection: 'column',
-    gap: 2,
-    marginTop: 4,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-  },
-  detailExplainWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: -2,
-  },
-  detailDistanceWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailExplain: {
-    ...typography.caption1Regular,
-    color: colors.gray[700],
-    marginLeft: 4,
-  },
-  detailDistance: {
-    ...typography.caption1Regular,
-    color: colors.gray[700],
-    marginLeft: 4,
   },
 });
 

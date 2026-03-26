@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Keyboard } from 'react-native';
+
+const LAT_OFFSET_LIST = 0.0025;
+const LAT_OFFSET_ITEM = 0.001;
+
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   getAddressFromCoords,
@@ -30,13 +34,13 @@ export const useMapLogic = (mapRef) => {
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
   const [userLocation] = useState({
-    latitude: 37.5050,
-    longitude: 126.9570,
+    latitude: 37.505,
+    longitude: 126.957,
   });
 
   const lastCameraRef = useRef({
-    latitude: 37.5050,
-    longitude: 126.9570,
+    latitude: 37.505,
+    longitude: 126.957,
   });
   useFocusEffect(
     useCallback(() => {
@@ -62,6 +66,7 @@ export const useMapLogic = (mapRef) => {
       return {
         ...item,
 
+        backendPlaceId: item.placeId || null,
         placeId: targetId || `temp_${Date.now()}_${Math.random()}`,
         name: item.placeName || item.name || '이름 없음',
         address: item.address || '',
@@ -98,17 +103,21 @@ export const useMapLogic = (mapRef) => {
           );
 
           // C. 데이터 병합
-          return {
+          const merged = {
             ...item, // 1. 기본 정보
             ...detailData, // 2. 제휴 상세 정보 (있으면)
 
-            // 3. 좋아요 상태 덮어쓰기
-            // 서버에서 liked: true 라고 오면 -> isLiked: true로 매핑
-            isLiked: status ? status.liked : item.isLiked || false,
+            // 3. API에서 isLiked를 명시적으로 제공하면 우선 신뢰, 없으면 getPlaceStatus 결과 사용
+            isLiked:
+              item.isLiked !== undefined
+                ? item.isLiked
+                : status
+                ? status.isLiked
+                : false,
 
-            // (선택) 서버가 partnership: true라고 알려주면 그것도 반영
-            isPartner: status ? status.partnership : item.isPartner,
+            isPartner: status ? status.isPartnership : item.isPartner,
           };
+          return merged;
         } catch (err) {
           console.warn(`아이템 처리 중 에러: ${item.name}`);
           return item; // 에러나면 기본 정보만 반환
@@ -222,7 +231,7 @@ export const useMapLogic = (mapRef) => {
 
       if (!isLoadMore && newData.length > 0) {
         mapRef.current?.animateCameraTo({
-          latitude: newData[0].latitude,
+          latitude: newData[0].latitude - LAT_OFFSET_LIST,
           longitude: newData[0].longitude,
           zoom: 15,
           duration: 500,
@@ -298,7 +307,7 @@ export const useMapLogic = (mapRef) => {
         fetchDetailIfNeeded();
 
         mapRef.current?.animateCameraTo({
-          latitude: selectedLocation.latitude,
+          latitude: selectedLocation.latitude - LAT_OFFSET_ITEM,
           longitude: selectedLocation.longitude,
           zoom: 16,
           duration: 500,
@@ -334,7 +343,13 @@ export const useMapLogic = (mapRef) => {
     try {
       const markers = await getMapMarkers(minLat, maxLat, minLng, maxLng);
       if (markers?.length > 0) {
-        setMapMarkers(markers.map((item) => ({ ...item, type: 'PARTNER' })));
+        setMapMarkers(
+          markers.map((item) => ({
+            ...item,
+            type: 'PARTNER',
+            backendPlaceId: item.placeId || null,
+          }))
+        );
       }
     } catch (err) {
       console.error(err);
@@ -353,6 +368,8 @@ export const useMapLogic = (mapRef) => {
       );
       if (detail) {
         setSelectedStoreDetail({
+          backendPlaceId: item.backendPlaceId || item.placeId || null,
+          isLiked: item.isLiked,
           ...detail,
           placeId: item.placeId,
         });
@@ -377,8 +394,8 @@ export const useMapLogic = (mapRef) => {
   };
 
   const handleCurrentLocation = () => {
-    const TARGET_LAT = 37.5050;
-    const TARGET_LNG = 126.9570;
+    const TARGET_LAT = 37.505;
+    const TARGET_LNG = 126.957;
 
     mapRef.current?.animateCameraTo({
       latitude: TARGET_LAT,
