@@ -234,7 +234,7 @@ const StoreDetailScreen = () => {
     try {
       const result = await suggestPartnership({
         ...storeData,
-        placeId: currentPlaceId,
+        placeId: storeData.backendPlaceId || null,
       });
       if (result !== null) {
         showToast('제휴 요청이 완료되었어요!');
