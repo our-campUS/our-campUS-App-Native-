@@ -127,10 +127,11 @@ const WriteReviewScreen = () => {
 
     if (editMode && existingReview) {
       try {
+        const existingUrls = photos.filter((p) => typeof p === 'string');
         await editReview(existingReview.reviewId || existingReview.id, {
           content: reviewText,
           star: rating,
-          imageUrls: existingReview.imageUrls || [],
+          imageUrls: [...existingUrls, ...uploadedUrls],
         });
         Toast.show({
           type: 'success',
