@@ -13,6 +13,7 @@ import LabelTitle from '../../components/LabelTitle';
 import Input from '../../components/Input';
 import typography from '../../style/typography';
 import { useState, useEffect } from 'react';
+import { parseISODate } from '../../utils/dateTime';
 import MajorInputModal from '../../components/majorInputModal';
 import Button from '../../components/Button';
 import UniversityInputModal from '../../components/UniversityInputModal';
@@ -178,7 +179,11 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
             {user.nextUpdateAvailableDate && (
               <Text style={styles.noteText}>
                 * 다음 변경 가능일 :{' '}
-                {user.nextUpdateAvailableDate?.slice(0, 10)} 이후
+                {(() => {
+                  const p = parseISODate(user.nextUpdateAvailableDate);
+                  return p ? `${p.year}년 ${p.month}월 ${p.day}일` : '';
+                })()}{' '}
+                이후
               </Text>
             )}
           </View>

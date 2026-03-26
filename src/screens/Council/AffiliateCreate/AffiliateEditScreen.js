@@ -24,6 +24,7 @@ import useFormDraftStore from '../../../store/formDraftStore';
 import { Appearance } from 'react-native';
 import useAuthStore from '../../../store/authStore';
 import { getCouncilAffiliatePostDetail } from '../../../api/councilAffiliate';
+import { formatDotDate, createDateOnly, toISODateString } from '../../../utils/dateTime';
 
 const AffiliateEditScreen = ({ navigation, route }) => {
   const { accessToken } = useAuthStore();
@@ -176,22 +177,6 @@ const AffiliateEditScreen = ({ navigation, route }) => {
     );
   };
 
-  const formatDate = (date) => {
-    if (!date) return '';
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yyyy}.${mm}.${dd}`;
-  };
-
-  // 날짜만 사용하는 Date 객체 생성 (시간을 자정으로 설정하여 시간대 변환 문제 방지)
-  const createDateOnly = (date) => {
-    if (!date) return null;
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
-    return new Date(year, month, day, 0, 0, 0, 0);
-  };
 
   useEffect(() => {
     if (!previousPostData) {
@@ -217,21 +202,12 @@ const AffiliateEditScreen = ({ navigation, route }) => {
 
   const handleSubmit = () => {
     if (eventType === 'affiliate') {
-      // 날짜를 ISO 문자열로 변환 (시간대 변환 없이 날짜만)
-      const formatDateToISO = (date) => {
-        if (!date) return null;
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}T00:00:00.000Z`;
-      };
-
       navigation.navigate('SelectAffiliationLogoScreen', {
         type: 'affiliate',
         title: title,
         placeInfo: placeInfo,
-        startDate: formatDateToISO(startDate),
-        endDate: formatDateToISO(endDate),
+        startDate: toISODateString(startDate),
+        endDate: toISODateString(endDate),
         images: selectedImages,
         isEdit: true,
         postId: previousPostDataId,
@@ -338,7 +314,7 @@ const AffiliateEditScreen = ({ navigation, route }) => {
               <Input
                 isOrange={true}
                 placeholder="시작일"
-                value={formatDate(startDate)}
+                value={formatDotDate(startDate)}
                 usePopUPModal={true}
                 additionalStyle={styles.startDateInput}
                 useDatePicker={true}
@@ -356,7 +332,7 @@ const AffiliateEditScreen = ({ navigation, route }) => {
             <View style={styles.dateInputWrapper}>
               <Input
                 placeholder="종료일"
-                value={formatDate(endDate)}
+                value={formatDotDate(endDate)}
                 usePopUPModal={true}
                 additionalStyle={styles.endDateInput}
                 useDatePicker={true}

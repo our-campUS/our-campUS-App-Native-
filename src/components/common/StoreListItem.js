@@ -22,11 +22,11 @@ const StoreListItem = ({
   showDiscountDetail = false,
   onLikeToggle,
 }) => {
-  const [isLiked, setIsLiked] = useState(!!item.placeId && item.isLiked);
+  const [isLiked, setIsLiked] = useState(!!item.isLiked);
 
   useEffect(() => {
-    setIsLiked(!!item.placeId && item.isLiked);
-  }, [item.placeId, item.isLiked]);
+    setIsLiked(!!item.isLiked);
+  }, [item.isLiked]);
 
   const handleLikePress = async () => {
     const previousState = isLiked;
@@ -40,13 +40,11 @@ const StoreListItem = ({
         return;
       }
 
-      if (responseData.placeId) {
-        if (onLikeToggle) {
-          onLikeToggle(item.placeId, {
-            placeId: responseData.placeId,
-            isLiked: responseData.liked,
-          });
-        }
+      if (onLikeToggle) {
+        onLikeToggle(item.placeId, {
+          placeId: responseData.placeId || item.placeId,
+          isLiked: responseData.liked,
+        });
       }
     } catch (error) {
       setIsLiked(previousState);
@@ -101,11 +99,16 @@ const StoreListItem = ({
           </Pressable>
         </View>
 
-        {tags.length > 0 && (
+        {(tags.length > 0 || item.partnerships?.length > 0) && (
           <View style={styles.tagRow}>
             {tags.map((tag, index) => (
-              <View key={index} style={styles.badge}>
-                <Text style={styles.badgeText}>{item.tag}</Text>
+              <View key={`tag-${index}`} style={styles.badge}>
+                <Text style={styles.badgeText}>{tag}</Text>
+              </View>
+            ))}
+            {item.partnerships?.map((p) => (
+              <View key={`partner-${p.postId}`} style={styles.badge}>
+                <Text style={styles.badgeText}>{p.councilName}</Text>
               </View>
             ))}
           </View>
@@ -113,15 +116,15 @@ const StoreListItem = ({
 
         <View style={styles.infoSection}>
           <View style={styles.infoLeft}>
-            {item.star != null && item.star !== '' && (
+            {!!( item.averageStar ?? item.star) && (
               <View style={styles.infoItem}>
                 <StarIcon width={20} height={20} style={styles.iconMargin} />
-                <Text style={styles.infoText}>{item.star}</Text>
+                <Text style={styles.infoText}>{item.averageStar ?? item.star}</Text>
               </View>
             )}
 
             {showDiscountDetail ? (
-              item.partnerTitle && (
+              (item.partnerships?.[0]?.partnershipTitle ?? item.partnerTitle) && (
                 <View style={styles.infoItem}>
                   <TicketIcon
                     width={20}
@@ -129,13 +132,13 @@ const StoreListItem = ({
                     style={styles.iconMargin}
                   />
                   <Text style={styles.infoText}>
-                    {item.partnerTitle}
+                    {item.partnerships?.[0]?.partnershipTitle ?? item.partnerTitle}
                   </Text>
                 </View>
               )
             ) : (
               <>
-                {item.partnerTitle && (
+                {(item.partnerships?.[0]?.partnershipTitle ?? item.partnerTitle) && (
                   <View style={styles.infoItem}>
                     <TicketIcon
                       width={20}
@@ -143,7 +146,7 @@ const StoreListItem = ({
                       style={styles.iconMargin}
                     />
                     <Text style={styles.infoText}>
-                      {item.partnerTitle}
+                      {item.partnerships?.[0]?.partnershipTitle ?? item.partnerTitle}
                     </Text>
                   </View>
                 )}

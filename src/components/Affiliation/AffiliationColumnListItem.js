@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
 import ThreeDotIcon from '../../../assets/threeDot.svg';
 import AffiliationColumnListItemSkeleton from './AffiliationColumnListItemSkeleton';
+import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 
 const styles = StyleSheet.create({
   container: {
@@ -91,16 +92,11 @@ const AffiliationColumnListItem = ({
   handleThreeDotIconPress = null,
   councilType = null,
 }) => {
-  const [endYear, setEndYear] = useState(null);
-  const [endMonth, setEndMonth] = useState(null);
-  const [endDay, setEndDay] = useState(null);
   const user = useAuthStore((state) => state.user);
   const [liked, setLiked] = useState(item.liked || false);
   const [isLikeIconPressed, setIsLikeIconPressed] = useState(false);
   const [isCouncil, setIsCouncil] = useState(false);
   const [isThreeDotIconPressed, setIsThreeDotIconPressed] = useState(false);
-  const [startHour, setStartHour] = useState(null);
-  const [startMinute, setStartMinute] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   useEffect(() => {
@@ -123,21 +119,6 @@ const AffiliationColumnListItem = ({
       setIsImageLoaded(true);
     }
   }, [item?.thumbnailImageUrl]);
-
-  useEffect(() => {
-    {
-      setEndYear(item?.endDateTime?.slice(0, 4));
-      setEndMonth(item?.endDateTime?.slice(5, 7));
-      if (item?.endDateTime?.slice(5, 7).startsWith('0')) {
-        setEndMonth(item?.endDateTime?.slice(6, 7));
-      }
-      setEndDay(item?.endDateTime?.slice(8, 10));
-      if (item?.category === 'EVENT') {
-        setStartHour(item?.endDateTime?.slice(11, 13));
-        setStartMinute(item?.endDateTime?.slice(14, 16));
-      }
-    }
-  }, [item]);
 
   // useEffect(() => {
   //   if (user?.role === 'COUNCIL') {
@@ -187,9 +168,7 @@ const AffiliationColumnListItem = ({
   const isDataLoaded =
     item?.title &&
     (item?.place || item?.placeName) &&
-    endYear &&
-    endMonth &&
-    endDay;
+    item?.endDateTime;
 
   // 데이터가 로드되지 않았거나, 이미지가 있고 아직 로드되지 않았으면 스켈레톤 표시
   const shouldShowSkeleton =
@@ -271,15 +250,11 @@ const AffiliationColumnListItem = ({
                 color={colors.gray[300]}
                 style={{ marginLeft: -2 }}
               />
-              {endYear && endMonth && endDay ? (
+              {item?.endDateTime ? (
                 <Text style={styles.date}>
                   {item?.category === 'EVENT'
-                    ? `${endYear}년 ${endMonth}월 ${endDay}일 ${
-                        startHour || ''
-                      }${startHour ? '시' : ''} ${startMinute || ''}${
-                        startMinute ? '분' : ''
-                      }`
-                    : `${endYear}년 ${endMonth}월 ${endDay}일 까지`}
+                    ? formatKoreanDateTime(item.endDateTime)
+                    : formatKoreanDate(item.endDateTime)}
                 </Text>
               ) : null}
             </View>

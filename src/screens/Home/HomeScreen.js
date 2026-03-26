@@ -21,6 +21,7 @@ import { getUserInfo } from '../../api/user';
 import { useNavigation } from '@react-navigation/native';
 import { getTodayEvent } from '../../api/studentAffiliate';
 import { checkUnreadNotification } from '../../api/notification';
+import { formatKoreanTime } from '../../utils/dateTime';
 
 const HomeSection = ({
   title,
@@ -86,18 +87,6 @@ const HomeScreen = () => {
     fetchData();
   }, []);
 
-  const formatTime = (isoString) => {
-    if (!isoString) return '';
-    const date = new Date(isoString);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-
-    if (minutes === 0) {
-      return `${hours}시`;
-    }
-    return `${hours}시 ${minutes}분`;
-  };
-
   if (!user) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -139,7 +128,7 @@ const HomeScreen = () => {
                 >
                   <Text style={styles.boldText}>오늘의 행사</Text>
                   {todayEvent.placeName} ‘{todayEvent.title}’가{' '}
-                  {formatTime(todayEvent.startDateTime)}에 있습니다 🎉
+                  {formatKoreanTime(todayEvent.startDateTime)}에 있습니다 🎉
                 </Text>
               </TouchableOpacity>
             ) : (
