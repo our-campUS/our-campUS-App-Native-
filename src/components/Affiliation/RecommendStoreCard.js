@@ -117,7 +117,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: theme.colors.backgroundSub,
-    ...theme.shadows.level1,
   },
   imageShort: {
     width: 56,
