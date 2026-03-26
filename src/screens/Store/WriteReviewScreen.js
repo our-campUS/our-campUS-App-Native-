@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -17,6 +18,12 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 import LabelTitle from '@components/LabelTitle';
 import { editReview, createReview, createPartnershipReview } from '@api/review';
+import useImagePicker from '@/hooks/useImagePicker';
+import {
+  convertToPng,
+  getCommonImagePresignedUrl,
+  uploadImageToPresignedUrl,
+} from '@api/uploadImage';
 import theme from '@style';
 import typography from '@style/typography';
 import shadow from '@style/shadow';
@@ -58,11 +65,25 @@ const WriteReviewScreen = () => {
   const [photos, setPhotos] = useState(
     editMode && existingReview?.imageUrls?.length
       ? existingReview.imageUrls
-      : [1, 2, 3]
+      : []
   );
+  const [uploading, setUploading] = useState(false);
   const [selection, setSelection] = useState(
     editMode ? { start: 0, end: 0 } : undefined
   );
+
+  const { pickImage } = useImagePicker({
+    onSelectImages: (assets) => {
+      setPhotos((prev) => [...prev, ...assets].slice(0, 10));
+    },
+    selectionLimit: 10,
+    useGallery: true,
+    useCamera: true,
+  });
+
+  const handleRemovePhoto = (index) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const isValid = reviewText.length >= 20 && rating > 0;
 
