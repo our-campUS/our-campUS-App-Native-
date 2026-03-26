@@ -1,4 +1,15 @@
 const shadows = {
+  level1: {
+    shadowColor: '#B1B8BE',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+
   small: {
     // iOS 속성
     shadowColor: '#B1B8BE',

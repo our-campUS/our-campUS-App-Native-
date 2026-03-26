@@ -14,14 +14,13 @@ import { useState, useRef, useEffect } from 'react';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import LabelTitle from '../../components/LabelTitle';
-import PlaceHolderImage from '../../../assets/blankImage.svg';
+import CheckerboardPlaceholder from '../../components/common/CheckerboardPlaceholder';
 import LikeIcon from '../../../assets/Liked.svg';
 import UnLikeIcon from '../../../assets/Unliked.svg';
 import ShareIcon from '../../../assets/share.svg';
 import PlaceIcon from '../../../assets/Vector2.svg';
 import DateIcon from '../../../assets/calendar.svg';
 import { AFFILIATION_RECOMMEND_DATA } from '../../constants/DummyData';
-import PlaceHolderRepresentativeImage from '../../../assets/placeHolderImage.svg';
 import BadgeIcon from '../../../assets/badgeIcon.svg';
 import CouponIcon from '../../../assets/couponIcon.svg';
 import useAuthStore from '../../store/authStore';
@@ -175,10 +174,9 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
             renderItem={({ item, index }) => (
               <View style={[styles.imageContainer, { width }]}>
                 {isEmpty ? (
-                  <PlaceHolderImage
+                  <CheckerboardPlaceholder
                     width={width}
                     height={375}
-                    preserveAspectRatio="none"
                   />
                 ) : (
                   <Image
@@ -269,7 +267,7 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
                       style={{ width: 56, height: 56, borderRadius: 8 }}
                     />
                   ) : (
-                    <PlaceHolderRepresentativeImage width={56} height={56} />
+                    <CheckerboardPlaceholder width={56} height={56} borderRadius={10} />
                   )}
                 </View>
                 <View style={styles.infoWrapper}>

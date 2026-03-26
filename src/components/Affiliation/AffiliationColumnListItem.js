@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import { Image } from 'react-native';
-import PlaceHolderImage from '../../../assets/placeHolderImage.svg';
+import CheckerboardPlaceholder from '../common/CheckerboardPlaceholder';
 import PlaceIcon from '../../../assets/Vector2.svg';
 import CalendarIcon from '../../../assets/calendar.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
@@ -189,7 +189,7 @@ const AffiliationColumnListItem = ({
           </View>
         ) : (
           <View style={styles.imageContainer}>
-            <PlaceHolderImage width={108} height={108} style={styles.image} />
+            <CheckerboardPlaceholder width={108} height={108} borderRadius={10} />
           </View>
         )}
         <View style={styles.content}>
