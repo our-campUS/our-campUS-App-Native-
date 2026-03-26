@@ -185,7 +185,7 @@ setPartnerStores(
           <BannerCard
             title="제휴 이용하고 스탬프 받아가세요!"
             subtitle="제휴만 이용해도 혜택이 팡팡"
-            imageSource={require('../../../assets/images/home/banner_04.png')}
+            imageSource={require('../../../assets/images/home/banner_04.webp')}
             style={styles.bannerCard}
           />
 
