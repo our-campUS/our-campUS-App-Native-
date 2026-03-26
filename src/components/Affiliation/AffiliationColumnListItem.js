@@ -56,13 +56,6 @@ const styles = StyleSheet.create({
     marginTop: -4,
     flexShrink: 1,
   },
-  detailedLocation: {
-    ...typography.body4Regular,
-    color: colors.gray[700],
-    marginLeft: -4,
-    marginTop: -4,
-    flexShrink: 1,
-  },
   date: {
     ...typography.body4Regular,
     color: colors.gray[700],
@@ -213,16 +206,10 @@ const AffiliationColumnListItem = ({
               <PlaceIcon width={16} height={16} color={colors.gray[300]} />
               <Text style={styles.place} numberOfLines={1} ellipsizeMode="tail">
                 {item?.place || item?.placeName}
+                {item?.category === 'EVENT' && item?.detailedLocation
+                  ? ` ${item.detailedLocation}`
+                  : ''}
               </Text>
-              {item?.category === 'EVENT' && (
-                <Text
-                  style={styles.detailedLocation}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {item?.detailedLocation}
-                </Text>
-              )}
             </View>
             <View style={styles.placeAndDateItem}>
               <CalendarIcon
