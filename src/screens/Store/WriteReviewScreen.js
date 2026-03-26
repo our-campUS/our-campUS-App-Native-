@@ -96,11 +96,13 @@ const WriteReviewScreen = () => {
     );
     const presignedResults = await Promise.all(
       pngImages.map(async (image) => {
-        const { uploadUrl, imageUrl } =
-          await getCommonImagePresignedUrl(image);
-        return { uploadUrl, imageUrl, image };
+        const result = await getCommonImagePresignedUrl(image);
+        return { ...result, image };
       }),
     );
+    if (presignedResults.some((r) => r.isSuccess === false)) {
+      throw new Error('이미지 업로드 URL 발급에 실패했습니다.');
+    }
     await Promise.all(
       presignedResults.map(({ uploadUrl, image }) =>
         uploadImageToPresignedUrl(uploadUrl, image),
