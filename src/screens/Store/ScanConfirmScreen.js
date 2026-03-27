@@ -14,7 +14,7 @@ import theme from '@style';
 import typography from '@style/typography';
 import colors from '@style/colors';
 import DUMMY_STORE from '@constants/StoreData';
-import ReviewItemCompact from '@components/review/ReviewPreviewItem';
+import ReviewItem from '@components/review/ReviewItem';
 
 const ScanConfirmScreen = () => {
   const navigation = useNavigation();
@@ -81,7 +81,7 @@ const ScanConfirmScreen = () => {
           이미 리뷰가 작성된{'\n'}영수증이에요!
         </Text>
 
-        <ReviewItemCompact item={reviewItemData} />
+        <ReviewItem item={reviewItemData} variant="preview" />
 
         <View style={styles.spacer} />
 

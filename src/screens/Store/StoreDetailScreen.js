@@ -23,7 +23,7 @@ import theme from '@style';
 import colors from '@style/colors';
 import typography from '@style/typography';
 // import ReviewActionModal from '@components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
-import ReviewItemCompact from '@components/review/ReviewPreviewItem';
+import ReviewItem from '@components/review/ReviewItem';
 
 import StarIcon from '@assets/icons/common/star.svg';
 import PinIcon from '@assets/icons/common/pin.svg';
@@ -416,7 +416,7 @@ const [activeImageIndex, setActiveImageIndex] = useState(0);
 
             {reviews?.length > 0 ? (
               reviews.map((review) => (
-                <ReviewItemCompact key={review.id} item={review} />
+                <ReviewItem key={review.id} item={review} variant="preview" />
               ))
             ) : (
               <View style={styles.emptyReviewContainer}>
