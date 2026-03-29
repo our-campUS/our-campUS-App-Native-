@@ -24,7 +24,6 @@ import AffiliateSelectIcon from '../../../assets/supportIcon.svg';
 import CouncilDefaultImage from '../../../assets/councilDefaultImage.png';
 import useAuthStore from '../../store/authStore';
 import AffiliationColumnListItem from '../../components/Affiliation/AffiliationColumnListItem';
-import AffiliationCouncilColumnListItem from '../../components/Affiliation/AffiliationCouncilColumnListItem';
 import {
   AFFILIATION_COLUMN_LIST_DATA_AFFILIATION,
   AFFILIATION_COLUMN_LIST_DATA_EVENT,
@@ -228,7 +227,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           data={councilAffiliatePosts}
           keyExtractor={(item) => `affiliate-${item.postId}`}
           renderItem={({ item }) => (
-            <AffiliationCouncilColumnListItem
+            <AffiliationColumnListItem
               item={item}
               navigation={navigation}
               handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}
@@ -248,7 +247,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           data={councilEventPosts}
           keyExtractor={(item) => `event-${item.postId}`}
           renderItem={({ item }) => (
-            <AffiliationCouncilColumnListItem
+            <AffiliationColumnListItem
               item={item}
               navigation={navigation}
               handleThreeDotIconPress={(item) => handleThreeDotIconPress(item)}

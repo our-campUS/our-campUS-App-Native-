@@ -3,7 +3,6 @@ import LabelTitle from '../../components/LabelTitle';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import AffiliationColumnListItem from '../../components/Affiliation/AffiliationColumnListItem';
-import LikedColumnListItem from '../../components/Affiliation/LikedColumnListItem';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
@@ -109,10 +108,11 @@ const InterestedAffiliateScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           data={interestedAffiliatePosts}
           renderItem={({ item }) => (
-            <LikedColumnListItem
+            <AffiliationColumnListItem
               item={item}
               navigation={navigation}
               isLikedScreen={true}
+              alwaysShowLiked={true}
             />
           )}
           keyExtractor={(item) => item?.id || item?.postId}
@@ -125,10 +125,11 @@ const InterestedAffiliateScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           data={interestedEventPosts}
           renderItem={({ item }) => (
-            <LikedColumnListItem
+            <AffiliationColumnListItem
               item={item}
               navigation={navigation}
               isLikedScreen={true}
+              alwaysShowLiked={true}
             />
           )}
           keyExtractor={(item) => item?.id || item?.postId}

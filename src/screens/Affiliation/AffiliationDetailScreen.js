@@ -299,7 +299,13 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
             <View style={styles.placeAndDate}>
               <View style={styles.placeWrapper}>
                 <PlaceIcon width={20} height={20} color={colors.gray[300]} />
-                <Text style={styles.place}>{item?.placeName}</Text>
+                <Text
+                  style={styles.place}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {item?.placeName}
+                </Text>
                 {/* <Text style={styles.distance}>0.0km</Text> */}
               </View>
             </View>
@@ -446,6 +452,7 @@ const styles = StyleSheet.create({
     color: colors.gray[700],
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1,
   },
   distance: {
     marginLeft: 4,
