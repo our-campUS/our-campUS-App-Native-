@@ -3,7 +3,8 @@ import LabelTitle from '../../components/LabelTitle';
 import colors from '../../style/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import StoreListItem from '../../components/common/StoreListItem';
-import { useState, useCallback } from 'react';
+import EmptyResult from '../../components/common/EmptyResult';
+import { useState, useCallback, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { getLikedPlaces } from '../../api/place';
 
@@ -17,6 +18,7 @@ const mapToStoreItem = (item) => ({
   imgUrls: item.imageUrls,
   partnerTitle: item.partnershipTitle,
   distance: item.distanceMeter,
+  isLiked: true,
 });
 
 const InterestedPlaceScreen = ({ navigation }) => {
@@ -24,9 +26,11 @@ const InterestedPlaceScreen = ({ navigation }) => {
   const [nextCursor, setNextCursor] = useState(null);
   const [hasNext, setHasNext] = useState(true);
   const [loading, setLoading] = useState(false);
+  const loadingRef = useRef(false);
 
   const fetchPlaces = useCallback(async (cursor = null) => {
-    if (loading) return;
+    if (loadingRef.current) return;
+    loadingRef.current = true;
     setLoading(true);
     try {
       const data = await getLikedPlaces({
@@ -36,15 +40,16 @@ const InterestedPlaceScreen = ({ navigation }) => {
         size: 5,
       });
       if (data) {
-        const mapped = data.content.map(mapToStoreItem);
+        const mapped = (data.content ?? []).map(mapToStoreItem);
         setPlaces((prev) => (cursor ? [...prev, ...mapped] : mapped));
         setNextCursor(data.nextCursor);
         setHasNext(data.hasNext);
       }
     } finally {
+      loadingRef.current = false;
       setLoading(false);
     }
-  }, [loading]);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -82,6 +87,11 @@ const InterestedPlaceScreen = ({ navigation }) => {
         )}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.4}
+        ListEmptyComponent={
+          !loading ? (
+            <EmptyResult message="관심 장소가 없습니다." />
+          ) : null
+        }
         ListFooterComponent={
           loading ? (
             <View style={styles.footer}>
