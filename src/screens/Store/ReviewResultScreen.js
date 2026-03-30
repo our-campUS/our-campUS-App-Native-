@@ -24,6 +24,7 @@ import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { getPartnershipList } from '@api/partnership';
 
+
 const formatDistance = (meters) => {
   if (meters == null) return null;
   return meters >= 1000
@@ -43,16 +44,13 @@ const getJosa = (str) => {
   return (code - 0xAC00) % 28 > 0 ? '이' : '가';
 };
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '';
-  return dateStr.slice(2).replace(/-/g, '.');
-};
 
 const ReviewResultScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
   const { reviewResult, caseType = 3, placeName = '' } = route.params || {};
+
   const reviewData = reviewResult?.review;
   const resultData = reviewResult?.result;
   const rankingData = reviewResult?.ranking;
@@ -134,8 +132,12 @@ setPartnerStores(
       star: reviewData?.star ?? 0,
       comment: reviewData?.content ?? '',
       name: reviewData?.userName ?? '',
-      date: formatDate(reviewData?.createDate),
-      imageUrls: reviewData?.imageUrls?.length ? reviewData.imageUrls : undefined,
+      date: reviewData?.createDate ?? '',
+      imageUrls: reviewData?.imageUrls?.length
+        ? reviewData.imageUrls
+        : reviewData?.imageUrl
+        ? [reviewData.imageUrl]
+        : undefined,
     };
 
     return (
