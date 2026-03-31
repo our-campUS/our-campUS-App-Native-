@@ -293,8 +293,6 @@ export const suggestPartnership = async (placeData) => {
       imgUrls: placeData.imgUrls || [],
     };
 
-    console.log('👉 [API 요청] suggestPartnership 데이터:', JSON.stringify(body, null, 2));
-
     const response = await api.post('/places/suggest-partnership', body, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -302,20 +300,13 @@ export const suggestPartnership = async (placeData) => {
     });
 
     if (response.data.code === 200 || response.data.code === 0) {
-      return response.data.data;
+      return 'SUCCESS';
     }
     return null;
   } catch (error) {
-    console.error('❌ 제휴 요청 실패:', {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        data: error.config?.data,
-      },
-    });
+    if (error.response?.status === 409) {
+      return 'ALREADY_REQUESTED';
+    }
     return null;
   }
 };

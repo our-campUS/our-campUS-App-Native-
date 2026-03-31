@@ -109,6 +109,7 @@ const StoreDetailScreen = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
   const [isSuggesting, setIsSuggesting] = useState(false);
+  const [isPartnershipRequested, setIsPartnershipRequested] = useState(false);
   const [currentPlaceId, setCurrentPlaceId] = useState(
     storeData.backendPlaceId
   );
@@ -236,8 +237,14 @@ const StoreDetailScreen = () => {
         ...storeData,
         placeId: storeData.backendPlaceId || null,
       });
-      if (result !== null) {
+      if (result === 'SUCCESS') {
+        setIsPartnershipRequested(true);
+        setIsTooltipVisible(false);
         showToast('제휴 요청이 완료되었어요!');
+      } else if (result === 'ALREADY_REQUESTED') {
+        setIsPartnershipRequested(true);
+        setIsTooltipVisible(false);
+        showToast('이미 제휴 신청이 완료된 장소예요.');
       } else {
         showToast('제휴 요청에 실패했어요. 다시 시도해주세요.');
       }
@@ -361,16 +368,30 @@ const StoreDetailScreen = () => {
             ) : (
               <View style={styles.nonPartnerRow}>
                 <TouchableOpacity
-                  style={styles.requestButton}
+                  style={[
+                    styles.requestButton,
+                    isPartnershipRequested && styles.requestButtonDone,
+                  ]}
                   onPress={handleSuggestPartnership}
-                  disabled={isSuggesting}
+                  disabled={isSuggesting || isPartnershipRequested}
                 >
-                  <Text style={styles.requestButtonText}>제휴 요청하기</Text>
-                  <ArrowRightIcon
-                    width={8}
-                    height={8}
-                    color={theme.colors.primary1}
-                  />
+                  <Text
+                    style={[
+                      styles.requestButtonText,
+                      isPartnershipRequested && styles.requestButtonTextDone,
+                    ]}
+                  >
+                    {isPartnershipRequested
+                      ? '제휴 요청 완료'
+                      : '제휴 요청하기'}
+                  </Text>
+                  {!isPartnershipRequested && (
+                    <ArrowRightIcon
+                      width={5}
+                      height={10}
+                      color={colors.blue[600]}
+                    />
+                  )}
                 </TouchableOpacity>
                 {isTooltipVisible && (
                   <View style={styles.tooltip}>
@@ -632,11 +653,18 @@ const styles = StyleSheet.create({
     marginRight: 21,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
+  },
+  requestButtonDone: {
+    borderColor: colors.blue[300],
+    backgroundColor: colors.blue[100],
   },
   requestButtonText: {
-    color: theme.colors.primary1,
+    color: colors.blue[600],
     ...typography.caption2Bold,
+  },
+  requestButtonTextDone: {
+    color: colors.blue[300],
   },
   tooltip: {
     backgroundColor: theme.colors.primary1Light,
