@@ -17,46 +17,114 @@ import typography from '@style/typography';
 import theme from '@style';
 import { formatReviewDate } from '../../utils/dateTime';
 
-const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
+const ReviewItem = ({ item, variant = 'list', card = false, onMorePress }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const [measured, setMeasured] = useState(false);
 
   if (!item) return null;
 
-  // ⭐ API 데이터 안전 변환
+  const isPreview = variant === 'preview';
+
   const review = {
     star: item.star || 0,
+    content: item.content || item.comment || '',
+    name:
+      item.writerName ||
+      item.name ||
+      item.userName ||
+      item.placeName ||
+      '',
+    date: item.createdAt || item.date || item.createDate || '',
     imageUrls: item.imageUrls || [],
-    comment: item.comment || item.content || '',
-    name: item.name || item.userName || item.placeName || item.place || '',
-    date: item.date || item.createDate || item.createdAt || '',
+    thumbnailImgUrl: item.thumbnailImgUrl || item.imageUrls?.[0] || null,
   };
 
-  const renderStars = () => {
-    return [...Array(5)].map((_, index) => (
+  const starSize = isPreview ? 16 : 12;
+
+  const renderStars = () =>
+    [...Array(5)].map((_, index) => (
       <RatingIcon
         key={index}
-        width={12}
-        height={12}
+        width={starSize}
+        height={starSize}
         color={
           index < Math.floor(review.star)
             ? theme.colors.primary2
             : colors.gray[200]
         }
+        style={isPreview ? { marginRight: 1 } : undefined}
       />
     ));
-  };
+
+  const renderContentRow = () => (
+    <View
+      style={[styles.contentRow, isPreview && styles.contentRowPreview]}
+    >
+      <View style={styles.textContainer}>
+        <Text
+          style={styles.contentText}
+          numberOfLines={measured && !isExpanded ? 2 : undefined}
+          ellipsizeMode="tail"
+          onTextLayout={(e) => {
+            if (!measured) {
+              setIsTruncated(e.nativeEvent.lines.length > 2);
+              setMeasured(true);
+            }
+          }}
+        >
+          {review.content}
+        </Text>
+      </View>
+      {isTruncated && (
+        <Pressable onPress={() => setIsExpanded(!isExpanded)} hitSlop={8}>
+          {isExpanded ? (
+            <ArrowUpIcon width={24} height={24} />
+          ) : (
+            <ArrowDownIcon width={24} height={24} />
+          )}
+        </Pressable>
+      )}
+    </View>
+  );
+
+  const renderMeta = () => (
+    <View style={[styles.metaRow, !isPreview && styles.metaRowList]}>
+      <Text style={styles.metaText}>{review.name}</Text>
+      <Text style={styles.metaText}>{formatReviewDate(review.date)}</Text>
+    </View>
+  );
+
+  if (isPreview) {
+    const containerStyle = card
+      ? [styles.previewContainer, styles.previewCardStyle]
+      : styles.previewContainer;
+
+    return (
+      <View style={[containerStyle, !measured && { opacity: 0 }]}>
+        <View style={styles.previewTextWrapper}>
+          <View style={styles.previewStarsRow}>{renderStars()}</View>
+          {renderContentRow()}
+          {renderMeta()}
+        </View>
+        {review.thumbnailImgUrl && (
+          <Image
+            source={{ uri: review.thumbnailImgUrl }}
+            style={styles.previewThumbnail}
+          />
+        )}
+      </View>
+    );
+  }
+
+  const containerStyle = card
+    ? [styles.listContainer, styles.listCardStyle]
+    : styles.listContainer;
 
   return (
-    <View
-      style={[
-        styles.baseContainer,
-        variant === 'list' && styles.listContainer,
-        variant === 'card' && styles.cardContainer,
-      ]}
-    >
-      {/* ⭐ 별점 */}
+    <View style={[containerStyle, !measured && { opacity: 0 }]}>
       <View style={styles.starRatingWrapper}>
-        <View style={styles.starsRow}>{renderStars()}</View>
+        <View style={styles.listStarsRow}>{renderStars()}</View>
         {onMorePress && (
           <Pressable onPress={() => onMorePress(item)} hitSlop={8}>
             <ThreeDotIcon width={20} height={20} />
@@ -64,7 +132,6 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
         )}
       </View>
 
-      {/* ⭐ 이미지 */}
       {review.imageUrls.length > 0 && (
         <ScrollView
           horizontal
@@ -86,32 +153,8 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
         </ScrollView>
       )}
 
-      {/* ⭐ 댓글 */}
-      <View style={styles.commentTextWrapper}>
-        <View style={styles.commentTextContainer}>
-          <Text
-            style={styles.commentText}
-            numberOfLines={isExpanded ? undefined : 2}
-            ellipsizeMode="tail"
-          >
-            {review.comment}
-          </Text>
-        </View>
-
-        <Pressable onPress={() => setIsExpanded(!isExpanded)}>
-          {isExpanded ? (
-            <ArrowUpIcon width={24} height={24} />
-          ) : (
-            <ArrowDownIcon width={24} height={24} />
-          )}
-        </Pressable>
-      </View>
-
-      {/* ⭐ 장소 / 날짜 */}
-      <View style={styles.placeAndDateWrapper}>
-        <Text style={styles.placeText}>{review.name}</Text>
-        <Text style={styles.dateText}>{formatReviewDate(review.date)}</Text>
-      </View>
+      {renderContentRow()}
+      {renderMeta()}
     </View>
   );
 };
@@ -119,83 +162,101 @@ const ReviewItem = ({ item, variant = 'list', onMorePress }) => {
 export default memo(ReviewItem);
 
 const styles = StyleSheet.create({
-  baseContainer: {
-    width: '100%',
+  // === Shared ===
+  contentRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  contentRowPreview: {
+    marginBottom: 8,
+  },
+  textContainer: {
+    flex: 1,
+    minWidth: 0,
+    marginRight: 8,
+  },
+  contentText: {
+    ...typography.body3Regular,
+    color: theme.colors.text,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  metaRowList: {
+    marginTop: 12,
+  },
+  metaText: {
+    ...typography.caption1Regular,
+    color: theme.colors.textDisabled,
   },
 
+  // === Preview variant ===
+  previewContainer: {
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    paddingVertical: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  previewCardStyle: {
+    borderBottomWidth: 0,
+    borderRadius: 20,
+    backgroundColor: theme.colors.background,
+    padding: 16,
+    ...theme.shadows.level2,
+  },
+  previewTextWrapper: {
+    flex: 1,
+    marginRight: 16,
+  },
+  previewStarsRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  previewThumbnail: {
+    width: 80,
+    height: 80,
+    backgroundColor: colors.gray[100],
+    borderRadius: 8,
+  },
+
+  // === List variant ===
   listContainer: {
-    backgroundColor: colors.common.white,
+    width: '100%',
+    backgroundColor: theme.colors.background,
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.gray[200],
+    borderBottomColor: theme.colors.border,
   },
-
-  cardContainer: {
-    backgroundColor: colors.common.white,
+  listCardStyle: {
+    borderBottomWidth: 0,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    ...theme.shadows.level1,
+    ...theme.shadows.small,
   },
-
   starRatingWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
   },
-
-  starsRow: {
+  listStarsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
   },
-
   imageScrollWrapper: {
     marginBottom: 12,
   },
-
   imageScrollContainer: {
     paddingRight: 20,
   },
-
   imageItem: {
     width: 138,
     height: 138,
     borderRadius: 8,
-  },
-
-  commentTextWrapper: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  commentTextContainer: {
-    flexShrink: 1,
-    minWidth: 0,
-    marginRight: 8,
-  },
-
-  commentText: {
-    ...typography.body3Regular,
-    color: colors.gray[850],
-  },
-
-  placeAndDateWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-
-  placeText: {
-    ...typography.caption1Regular,
-    color: colors.gray[400],
-  },
-
-  dateText: {
-    ...typography.caption1Regular,
-    color: colors.gray[400],
   },
 });

@@ -12,7 +12,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StampImage from '@assets/images/stamp.webp';
 import Button from '@components/Button';
-import ReviewItemCompact from '@components/review/ReviewPreviewItem';
+import ReviewItem from '@components/review/ReviewItem';
 
 import theme from '@style';
 import typography from '@style/typography';
@@ -23,6 +23,7 @@ import BannerCard from '@components/common/BannerCard';
 import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { getPartnershipList } from '@api/partnership';
+
 
 const formatDistance = (meters) => {
   if (meters == null) return null;
@@ -43,16 +44,13 @@ const getJosa = (str) => {
   return (code - 0xAC00) % 28 > 0 ? '이' : '가';
 };
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '';
-  return dateStr.slice(2).replace(/-/g, '.');
-};
 
 const ReviewResultScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
   const { reviewResult, caseType = 3, placeName = '' } = route.params || {};
+
   const reviewData = reviewResult?.review;
   const resultData = reviewResult?.result;
   const rankingData = reviewResult?.ranking;
@@ -134,8 +132,12 @@ setPartnerStores(
       star: reviewData?.star ?? 0,
       comment: reviewData?.content ?? '',
       name: reviewData?.userName ?? '',
-      date: formatDate(reviewData?.createDate),
-      imageUrls: reviewData?.imageUrls?.length ? reviewData.imageUrls : undefined,
+      date: reviewData?.createDate ?? '',
+      imageUrls: reviewData?.imageUrls?.length
+        ? reviewData.imageUrls
+        : reviewData?.imageUrl
+        ? [reviewData.imageUrl]
+        : undefined,
     };
 
     return (
@@ -149,7 +151,7 @@ setPartnerStores(
           </Text>
         </View>
 
-        <ReviewItemCompact item={reviewItemData} variant="card" />
+        <ReviewItem item={reviewItemData} variant="preview" card />
 
         <View style={styles.rankingContainer}>
           <View style={styles.rankingHeader}>

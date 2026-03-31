@@ -29,7 +29,7 @@ import theme from '@style';
 import colors from '@style/colors';
 import typography from '@style/typography';
 // import ReviewActionModal from '@components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
-import ReviewItemCompact from '@components/review/ReviewPreviewItem';
+import ReviewItem from '@components/review/ReviewItem';
 
 import StarIcon from '@assets/icons/common/star.svg';
 import PinIcon from '@assets/icons/common/pin.svg';
@@ -125,7 +125,7 @@ const StoreDetailScreen = () => {
           star: r.star,
           comment: r.content,
           name: r.userName,
-          date: r.createDate?.slice(2).replace(/-/g, '.') ?? '',
+          date: r.createDate ?? '',
           imageUrls: r.imageUrls?.length ? r.imageUrls : undefined,
         }));
         setReviews(items);
@@ -503,7 +503,7 @@ const StoreDetailScreen = () => {
 
             {reviews?.length > 0 ? (
               reviews.map((review) => (
-                <ReviewItemCompact key={review.id} item={review} />
+                <ReviewItem key={review.id} item={review} variant="preview" />
               ))
             ) : (
               <View style={styles.emptyReviewContainer}>
