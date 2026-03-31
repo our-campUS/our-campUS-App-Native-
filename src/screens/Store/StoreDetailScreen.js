@@ -302,13 +302,11 @@ const StoreDetailScreen = () => {
                 </View>
               </View>
             ) : (
-              <View style={styles.emptyBanner}>
-                <Ionicons
-                  name="image-outline"
-                  size={48}
-                  color={colors.gray[300]}
-                />
-              </View>
+              <Image
+                source={require('../../../assets/images/default_image.webp')}
+                style={styles.emptyBanner}
+                resizeMode="cover"
+              />
             )}
           </View>
 
@@ -798,10 +796,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   emptyBanner: {
+    width: '100%',
     height: 250,
-    backgroundColor: colors.gray[100],
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   pageIndicator: {
     position: 'absolute',
