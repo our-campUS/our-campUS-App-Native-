@@ -274,6 +274,43 @@ export const togglePlaceLike = async (placeData) => {
   }
 };
 
+export const suggestPartnership = async (placeData) => {
+  try {
+    const token = useAuthStore.getState().accessToken;
+
+    const body = {
+      placeId: placeData.placeId || null,
+      placeName: placeData.name || placeData.placeName,
+      placeKey: placeData.placeKey || '',
+      address: placeData.address || '',
+      category: placeData.category || '기타',
+      link: placeData.link || '',
+      telephone: placeData.phone || placeData.telephone || '',
+      coordinate: {
+        latitude: placeData.latitude || 0,
+        longitude: placeData.longitude || 0,
+      },
+      imgUrls: placeData.imgUrls || [],
+    };
+
+    const response = await api.post('/places/suggest-partnership', body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.code === 200 || response.data.code === 0) {
+      return 'SUCCESS';
+    }
+    return null;
+  } catch (error) {
+    if (error.response?.status === 409) {
+      return 'ALREADY_REQUESTED';
+    }
+    return null;
+  }
+};
+
 export const getLikedPlaces = async ({ lat, lng, cursor = null, size = 5 }) => {
   try {
     const token = useAuthStore.getState().accessToken;

@@ -14,7 +14,13 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { togglePlaceLike, getPlaceStatus } from '@api/place';
+import {
+  togglePlaceLike,
+  getPlaceStatus,
+  suggestPartnership,
+} from '@api/place';
+import Toast from '@components/common/Toast';
+import useToast from '../../hooks/useToast';
 import { getReviewList } from '@api/review';
 
 import LabelTitle from '@components/LabelTitle';
@@ -79,19 +85,34 @@ const StoreDetailScreen = () => {
     phone: paramStore.telephone || paramStore.phone || '',
     hours: paramStore.hours || [],
 
-    isPartner: paramStore.isPartnership || paramStore.type === 'PARTNER' || (paramStore.partnerships?.length > 0),
-    partnerTags: paramStore.partnerships?.length > 0
-      ? paramStore.partnerships.map((p) => p.councilName).filter(Boolean)
-      : paramStore.tag ? [paramStore.tag] : [],
+    isPartner:
+      paramStore.isPartnership ||
+      paramStore.type === 'PARTNER' ||
+      paramStore.partnerships?.length > 0,
+    partnerTags:
+      paramStore.partnerships?.length > 0
+        ? paramStore.partnerships.map((p) => p.councilName).filter(Boolean)
+        : paramStore.tag
+        ? [paramStore.tag]
+        : [],
 
-    backendPlaceId: paramStore.backendPlaceId !== undefined ? paramStore.backendPlaceId : (paramStore.placeId || null),
+    backendPlaceId:
+      paramStore.backendPlaceId !== undefined
+        ? paramStore.backendPlaceId
+        : paramStore.placeId || null,
     placeId: paramStore.placeId || null,
     placeKey: paramStore.placeKey || paramStore.id,
   };
 
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
-  const [currentPlaceId, setCurrentPlaceId] = useState(storeData.backendPlaceId);
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [isPartnershipRequested, setIsPartnershipRequested] = useState(false);
+  const [currentPlaceId, setCurrentPlaceId] = useState(
+    storeData.backendPlaceId
+  );
   const [reviews, setReviews] = useState(storeData.reviews);
   const [reviewSize, setReviewSize] = useState(storeData.reviewSize);
 
@@ -111,7 +132,7 @@ const StoreDetailScreen = () => {
         setReviewSize(items.length);
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeData.placeId]);
 
   const handleLikePress = async () => {
@@ -152,14 +173,15 @@ const StoreDetailScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      if (!currentPlaceId) return;
+      const placeId = currentPlaceId || storeData.placeId;
+      if (!placeId) return;
 
       let isActive = true;
 
       const fetchLatestStatus = async () => {
         try {
           const status = await getPlaceStatus(
-            currentPlaceId,
+            placeId,
             storeData.latitude,
             storeData.longitude
           );
@@ -179,8 +201,34 @@ const StoreDetailScreen = () => {
       return () => {
         isActive = false;
       };
-    }, [currentPlaceId, storeData.latitude, storeData.longitude])
+    }, [currentPlaceId, storeData.placeId, storeData.latitude, storeData.longitude])
   );
+
+  const handleSuggestPartnership = async () => {
+    if (isSuggesting) return;
+    setIsSuggesting(true);
+    try {
+      const result = await suggestPartnership({
+        ...storeData,
+        placeId: storeData.backendPlaceId || null,
+      });
+      if (result === 'SUCCESS') {
+        setIsPartnershipRequested(true);
+        setIsTooltipVisible(false);
+        showToast('제휴 요청이 완료되었어요!');
+      } else if (result === 'ALREADY_REQUESTED') {
+        setIsPartnershipRequested(true);
+        setIsTooltipVisible(false);
+        showToast('이미 제휴 신청이 완료된 장소예요.');
+      } else {
+        showToast('제휴 요청에 실패했어요. 다시 시도해주세요.');
+      }
+    } catch {
+      showToast('제휴 요청에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setIsSuggesting(false);
+    }
+  };
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -229,13 +277,11 @@ const StoreDetailScreen = () => {
                 </View>
               </View>
             ) : (
-              <View style={styles.emptyBanner}>
-                <Ionicons
-                  name="image-outline"
-                  size={48}
-                  color={colors.gray[300]}
-                />
-              </View>
+              <Image
+                source={require('../../../assets/images/default_image.webp')}
+                style={styles.emptyBanner}
+                resizeMode="cover"
+              />
             )}
           </View>
 
@@ -294,13 +340,31 @@ const StoreDetailScreen = () => {
               </View>
             ) : (
               <View style={styles.nonPartnerRow}>
-                <TouchableOpacity style={styles.requestButton}>
-                  <Text style={styles.requestButtonText}>제휴 요청하기</Text>
-                  <ArrowRightIcon
-                    width={8}
-                    height={8}
-                    color={theme.colors.primary1}
-                  />
+                <TouchableOpacity
+                  style={[
+                    styles.requestButton,
+                    isPartnershipRequested && styles.requestButtonDone,
+                  ]}
+                  onPress={handleSuggestPartnership}
+                  disabled={isSuggesting || isPartnershipRequested}
+                >
+                  <Text
+                    style={[
+                      styles.requestButtonText,
+                      isPartnershipRequested && styles.requestButtonTextDone,
+                    ]}
+                  >
+                    {isPartnershipRequested
+                      ? '제휴 요청 완료'
+                      : '제휴 요청하기'}
+                  </Text>
+                  {!isPartnershipRequested && (
+                    <ArrowRightIcon
+                      width={5}
+                      height={10}
+                      color={colors.blue[600]}
+                    />
+                  )}
                 </TouchableOpacity>
                 {isTooltipVisible && (
                   <View style={styles.tooltip}>
@@ -336,10 +400,10 @@ const StoreDetailScreen = () => {
                 <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
                 {reviewSize > 0 ? (
                   <>
-                    <Text style={styles.detailText}>{storeData.averageStar ?? storeData.star}</Text>
-                    <Text style={styles.detailTextSub}>
-                      ({reviewSize})
+                    <Text style={styles.detailText}>
+                      {storeData.averageStar ?? storeData.star}
                     </Text>
+                    <Text style={styles.detailTextSub}>({reviewSize})</Text>
                   </>
                 ) : (
                   <Text
@@ -387,10 +451,7 @@ const StoreDetailScreen = () => {
           <View style={styles.reviewSection}>
             <View style={styles.reviewHeader}>
               <Text style={styles.reviewTitle}>
-                리뷰{' '}
-                <Text style={styles.detailTextSub}>
-                  {reviewSize}개
-                </Text>
+                리뷰 <Text style={styles.detailTextSub}>{reviewSize}개</Text>
               </Text>
               <TouchableOpacity
                 disabled={!reviewSize}
@@ -472,6 +533,8 @@ const StoreDetailScreen = () => {
         }}
       />
       */}
+
+      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} />
     </View>
   );
 };
@@ -563,11 +626,18 @@ const styles = StyleSheet.create({
     marginRight: 21,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
+  },
+  requestButtonDone: {
+    borderColor: colors.blue[300],
+    backgroundColor: colors.blue[100],
   },
   requestButtonText: {
-    color: theme.colors.primary1,
+    color: colors.blue[600],
     ...typography.caption2Bold,
+  },
+  requestButtonTextDone: {
+    color: colors.blue[300],
   },
   tooltip: {
     backgroundColor: theme.colors.primary1Light,
@@ -701,10 +771,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   emptyBanner: {
+    width: '100%',
     height: 250,
-    backgroundColor: colors.gray[100],
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   pageIndicator: {
     position: 'absolute',
