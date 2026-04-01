@@ -173,14 +173,15 @@ const StoreDetailScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      if (!currentPlaceId) return;
+      const placeId = currentPlaceId || storeData.placeId;
+      if (!placeId) return;
 
       let isActive = true;
 
       const fetchLatestStatus = async () => {
         try {
           const status = await getPlaceStatus(
-            currentPlaceId,
+            placeId,
             storeData.latitude,
             storeData.longitude
           );
@@ -200,34 +201,8 @@ const StoreDetailScreen = () => {
       return () => {
         isActive = false;
       };
-    }, [currentPlaceId, storeData.latitude, storeData.longitude])
+    }, [currentPlaceId, storeData.placeId, storeData.latitude, storeData.longitude])
   );
-
-  useEffect(() => {
-    const fetchLatestStatus = async () => {
-      try {
-        const status = await getPlaceStatus(
-          currentPlaceId || storeData.placeId,
-          storeData.latitude,
-          storeData.longitude
-        );
-
-        if (status) {
-          console.log('🔄 최신 상태 동기화:', status.liked);
-
-          setIsLiked(status.liked);
-
-          if (status.placeId && !currentPlaceId) {
-            setCurrentPlaceId(status.placeId);
-          }
-        }
-      } catch (error) {
-        console.error('최신 상태 확인 실패');
-      }
-    };
-
-    fetchLatestStatus();
-  }, []);
 
   const handleSuggestPartnership = async () => {
     if (isSuggesting) return;
