@@ -28,9 +28,12 @@ const InqueryMainScreen = ({ navigation }) => {
       {/* <View style={{ width: '100%', height: 20 }} /> */}
       <InquerySelectTab activeTab={activeTab} setActiveTab={setActiveTab} />
       {activeTab === 'pastInquery' ? (
-        <PastQueryView refreshKey={refreshKey} />
+        <PastQueryView refreshKey={refreshKey} isCouncil={isCouncil} />
       ) : (
-        <CreateNewQueryView handleCreateQuery={handleCreateQuery} />
+        <CreateNewQueryView
+          handleCreateQuery={handleCreateQuery}
+          isCouncil={isCouncil}
+        />
       )}
       <CustomToast />
     </SafeAreaView>

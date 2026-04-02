@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import { getMyInquiries } from '../../api/inquiry';
+import { getMyInquiries, getCouncilInquiries } from '../../api/inquiry';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import { useState, useCallback, useEffect } from 'react';
@@ -7,7 +7,6 @@ import ArrowDownIcon from '../../../assets/ArrowDown.svg';
 import ArrowUpIcon from '../../../assets/ArrowUp.svg';
 import PendingInqueryIcon from '../../../assets/PendingInqueryIcon.svg';
 import AnsweredInqueryIcon from '../../../assets/AnsweredInqueryIcon.svg';
-import useAuthStore from '../../store/authStore';
 import EmptyResult from '../../components/common/EmptyResult';
 import LoadingFooter from '../../components/common/LoadingFooter';
 
@@ -20,38 +19,41 @@ const formatDate = (isoString) => {
   return isoString.slice(0, 10).replace(/-/g, '.');
 };
 
-const PastQueryView = ({ refreshKey }) => {
+const PastQueryView = ({ refreshKey, isCouncil }) => {
   const [expandedItems, setExpandedItems] = useState({});
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
 
-  const fetchInquiries = useCallback(async (pageNum = 0, isRefresh = false) => {
-    if (isRefresh) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
-
-    const result = await getMyInquiries(pageNum, PAGE_SIZE);
-
-    if (result) {
-      const newItems = result.content || [];
-      if (isRefresh || pageNum === 0) {
-        setInquiries(newItems);
+  const fetchInquiries = useCallback(
+    async (pageNum = 0, isRefresh = false) => {
+      if (isRefresh) {
+        setRefreshing(true);
       } else {
-        setInquiries((prev) => [...prev, ...newItems]);
+        setLoading(true);
       }
-      setPage(pageNum);
-      setHasMore(pageNum + 1 < result.totalPages);
-    }
 
-    setLoading(false);
-    setRefreshing(false);
-  }, []);
+      const fetchFn = isCouncil ? getCouncilInquiries : getMyInquiries;
+      const result = await fetchFn(pageNum, PAGE_SIZE);
+
+      if (result) {
+        const newItems = result.content || [];
+        if (isRefresh || pageNum === 0) {
+          setInquiries(newItems);
+        } else {
+          setInquiries((prev) => [...prev, ...newItems]);
+        }
+        setPage(pageNum);
+        setHasMore(pageNum + 1 < result.totalPages);
+      }
+
+      setLoading(false);
+      setRefreshing(false);
+    },
+    [isCouncil]
+  );
 
   useEffect(() => {
     fetchInquiries(0, true);

@@ -11,12 +11,10 @@ import typography from '@style/typography';
 import shadows from '@style/shadow';
 import { useEffect, useState } from 'react';
 import Button from '@components/Button';
-import useAuthStore from '@store/authStore';
-import { createInquiry } from '../../api/inquiry';
+import { createInquiry, createCouncilInquiry } from '../../api/inquiry';
 import useToastStore from '../../store/toastStore';
 
-const CreateNewQueryView = ({ handleCreateQuery }) => {
-  const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
+const CreateNewQueryView = ({ handleCreateQuery, isCouncil }) => {
   const [inqueryTitle, setInqueryTitle] = useState('');
   const [inqueryContent, setInqueryContent] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -35,7 +33,8 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
       return;
     }
     setSubmitting(true);
-    const result = await createInquiry(inqueryTitle.trim(), inqueryContent);
+    const submitFn = isCouncil ? createCouncilInquiry : createInquiry;
+    const result = await submitFn(inqueryTitle.trim(), inqueryContent);
     setSubmitting(false);
 
     if (result) {
