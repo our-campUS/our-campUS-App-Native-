@@ -6,6 +6,7 @@ import {
   StatusBar,
   Keyboard,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../../../components/LabelTitle';
@@ -14,10 +15,10 @@ import Input from '../../../components/Input';
 import { useState, useEffect, useRef } from 'react';
 import typography from '../../../style/typography';
 import Button from '../../../components/Button';
-// import {
-//   verifyCouncilSignUpAuthCode,
-//   resendCouncilSignUpAuthCode,
-// } from '../../../api/councilSignUp';
+import {
+  verifyCouncilSignUpAuthCode,
+  resendCouncilSignUpAuthCode,
+} from '../../../api/councilSignUp';
 
 const CouncilVerfiyEmailCode = ({ navigation, route }) => {
   const email = route.params?.email;

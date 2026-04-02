@@ -14,7 +14,7 @@ import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { useState, useRef, useEffect } from 'react';
 import CheckMark from '../../../../assets/check.svg';
-// import { resetCouncilPassword } from '../../../api/councilLogin';
+import { resetCouncilPassword } from '../../../api/councilLogin';
 import Toast from 'react-native-toast-message';
 
 // 비밀번호 조건 검사 함수

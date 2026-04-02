@@ -515,10 +515,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 28,
   },
-  recommendTitle: {
-    ...typography.heading4,
-    color: colors.gray[850],
-  },
   recommendItemContainer: {
     width: 280,
     height: 88,
@@ -562,7 +558,6 @@ const styles = StyleSheet.create({
   },
   detailExplainWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
     marginLeft: -2,
     alignItems: 'flex-start',
   },

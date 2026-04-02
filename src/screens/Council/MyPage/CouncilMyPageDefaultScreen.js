@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';

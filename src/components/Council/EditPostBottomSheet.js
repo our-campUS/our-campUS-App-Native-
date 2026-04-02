@@ -20,6 +20,7 @@ const EditPostBottomSheet = ({
   onClose,
   onSelectEdit,
   onSelectDelete,
+  onSelectCategory,
 }) => {
   const translateY = useRef(new Animated.Value(0)).current;
   const overlayOpacity = useRef(new Animated.Value(1)).current;

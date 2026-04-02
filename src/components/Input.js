@@ -133,6 +133,7 @@ const Input = forwardRef(
       onSelectDropdownItem = null,
       hasError = false,
       usetimeLimit = false,
+      timeLimit,
       useOnlyNumber = false,
       maxLength,
       usePassWordIcon = false,

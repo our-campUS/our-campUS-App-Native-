@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Keyboard,
+  Alert,
+} from 'react-native';
 import colors from '@style/colors';
 import { StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
