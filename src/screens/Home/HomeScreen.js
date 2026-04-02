@@ -178,10 +178,10 @@ const HomeScreen = () => {
               onPress={() => console.log('제안하기 클릭')}
             />
             <BannerCard
-              title="제휴 이용하고 스탬프 받아가세요!"
-              subtitle="제휴만 이용해도 혜택이 팡팡"
+              title="제휴 이용하고 혜택 받아가세요!"
+              subtitle="리뷰만 작성해도 혜택이 팡팡"
               imageSource={require('../../../assets/images/home/banner_04.webp')}
-              onPress={() => navigation.navigate('Stamp')}
+              onPress={() => navigation.navigate('Affiliation')}
             />
           </View>
         </HomeSection>
