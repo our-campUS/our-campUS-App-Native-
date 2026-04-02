@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import Button from '@components/Button';
 import useAuthStore from '@store/authStore';
 import { createInquiry } from '../../api/inquiry';
-import Toast from 'react-native-toast-message';
+import useToastStore from '../../store/toastStore';
 
 const CreateNewQueryView = ({ handleCreateQuery }) => {
   const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
@@ -31,17 +31,24 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
   }, [inqueryContent, inqueryTitle, submitting]);
 
   const handleSubmit = async () => {
+    if (submitting) {
+      return;
+    }
     setSubmitting(true);
     const result = await createInquiry(inqueryTitle.trim(), inqueryContent);
     setSubmitting(false);
 
     if (result) {
-      Toast.show({ type: 'success', text1: '문의가 등록되었습니다.' });
+      useToastStore.getState().showToast('문의가 등록되었습니다.', 'success');
       setInqueryTitle('');
       setInqueryContent('');
-      handleCreateQuery();
+      setTimeout(() => {
+        handleCreateQuery();
+      }, 800);
     } else {
-      Toast.show({ type: 'error', text1: '문의 등록에 실패하였습니다.' });
+      useToastStore
+        .getState()
+        .showToast('문의 등록에 실패하였습니다.', 'error');
     }
   };
 

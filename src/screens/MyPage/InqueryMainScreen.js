@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../../components/LabelTitle';
 import colors from '../../style/colors';
+import CustomToast from '../../components/CustomToast';
 import InquerySelectTab from '../../components/MyPage/InquerySelectTab';
 import { useState } from 'react';
 import PastQueryView from './PastQueryView';
@@ -31,6 +32,7 @@ const InqueryMainScreen = ({ navigation }) => {
       ) : (
         <CreateNewQueryView handleCreateQuery={handleCreateQuery} />
       )}
+      <CustomToast />
     </SafeAreaView>
   );
 };
