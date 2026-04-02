@@ -49,9 +49,7 @@ const FindRepresentativeId = ({ navigation }) => {
         onPressBack={() => navigation.goBack()}
       />
       <View style={styles.statusBar}>
-        <View
-          style={{ backgroundColor: colors.gray[100], width: '100%' }}
-        ></View>
+        <View style={{ backgroundColor: colors.gray[100], width: '100%' }} />
       </View>
       <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
         <ScrollView>
@@ -67,7 +65,7 @@ const FindRepresentativeId = ({ navigation }) => {
           >
             메일주소를 입력해주세요.
           </Text>
-          <View style={{ marginTop: 56 }}></View>
+          <View style={{ marginTop: 56 }} />
           <Input
             useEmail={true}
             isOrange={true}

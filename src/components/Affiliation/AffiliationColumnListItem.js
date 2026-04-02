@@ -140,9 +140,7 @@ const AffiliationColumnListItem = ({
   };
 
   const isDataLoaded =
-    item?.title &&
-    (item?.place || item?.placeName) &&
-    dateValue;
+    item?.title && (item?.place || item?.placeName) && dateValue;
 
   // 데이터가 로드되지 않았거나, 이미지가 있고 아직 로드되지 않았으면 스켈레톤 표시
   const shouldShowSkeleton =
@@ -180,7 +178,11 @@ const AffiliationColumnListItem = ({
             {showLikeIcon && (
               <Pressable style={styles.unlikedIcon} onPress={handleLikePress}>
                 {alwaysShowLiked || liked ? (
-                  <LikedIcon width={18} height={18} color={colors.orange[500]} />
+                  <LikedIcon
+                    width={18}
+                    height={18}
+                    color={colors.orange[500]}
+                  />
                 ) : (
                   <UnlikedIcon width={18} height={18} />
                 )}
@@ -189,7 +191,11 @@ const AffiliationColumnListItem = ({
           </View>
         ) : (
           <View style={styles.imageContainer}>
-            <CheckerboardPlaceholder width={108} height={108} borderRadius={10} />
+            <CheckerboardPlaceholder
+              width={108}
+              height={108}
+              borderRadius={10}
+            />
           </View>
         )}
         <View style={styles.content}>

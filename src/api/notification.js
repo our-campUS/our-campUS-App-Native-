@@ -26,7 +26,7 @@ export const checkUnreadNotification = async () => {
 export const getNotifications = async (
   limit = 20,
   cursorCreatedAt = null,
-  cursorId = null,
+  cursorId = null
 ) => {
   try {
     const token = useAuthStore.getState().accessToken;
@@ -61,7 +61,7 @@ export const markNotificationRead = async (notificationId) => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      },
+      }
     );
 
     if (response.data.code === 200 || response.data.code === 0) {

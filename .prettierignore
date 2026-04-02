@@ -1,0 +1,9 @@
+node_modules/
+android/
+ios/
+build/
+coverage/
+*.bundle.js
+.metro-health-check*
+assets/
+package-lock.json

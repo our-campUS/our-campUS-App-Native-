@@ -8,22 +8,13 @@ import typography from '../../style/typography';
 const ProfileImage = ({ profileImageUrl, type }) => {
   if (profileImageUrl) {
     return (
-      <Image
-        source={{ uri: profileImageUrl }}
-        style={styles.profileImage}
-      />
+      <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
     );
   }
 
   // fallback: URL 없을 때 타입별 기본 아이콘
   if (type === 'COUNCIL_POST_CREATED') {
-    return (
-      <Ionicons
-        name="person-circle"
-        size={44}
-        color={colors.gray[300]}
-      />
-    );
+    return <Ionicons name="person-circle" size={44} color={colors.gray[300]} />;
   }
 
   return (
@@ -38,13 +29,13 @@ const NotificationItem = ({ notification, onPress }) => {
   const { type, title, body, isRead, createTimeBeforeNow } = notification;
 
   return (
-    <Pressable
-      style={styles.container}
-      onPress={() => onPress?.(notification)}
-    >
+    <Pressable style={styles.container} onPress={() => onPress?.(notification)}>
       <View style={styles.row}>
         <View style={styles.profileWrapper}>
-          <ProfileImage profileImageUrl={notification.profileImageUrl} type={type} />
+          <ProfileImage
+            profileImageUrl={notification.profileImageUrl}
+            type={type}
+          />
           {!isRead && <View style={styles.unreadDot} />}
         </View>
 

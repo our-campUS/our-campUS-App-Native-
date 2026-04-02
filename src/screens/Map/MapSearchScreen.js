@@ -215,13 +215,7 @@ const MapSearchScreen = () => {
       </View>
 
       {/* 조건부 렌더링 */}
-      {keyword.length > 0 ? //   } //     item.placeKey ? String(item.placeKey) : String(index) //   keyExtractor={(item, index) => //   data={searchResults} // <FlatList
-      //   renderItem={renderResultItem}
-      //   contentContainerStyle={styles.listContent}
-      //   keyboardShouldPersistTaps="handled"
-      //   ListEmptyComponent={renderEmptyComponent}
-      // />
-      null : (
+      {keyword.length > 0 ? null : ( // TODO: FlatList 검색 결과 렌더링 복구
         <>
           <View style={styles.categoryWrapper}>
             <ScrollView

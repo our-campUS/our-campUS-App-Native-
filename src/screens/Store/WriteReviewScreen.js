@@ -54,7 +54,9 @@ const WriteReviewScreen = () => {
     '스타벅스 상도역점';
 
   const [rating, setRating] = useState(
-    editMode && existingReview ? existingReview.star || existingReview.rating || 0 : 0
+    editMode && existingReview
+      ? existingReview.star || existingReview.rating || 0
+      : 0
   );
   const [reviewText, setReviewText] = useState(
     editMode && existingReview
@@ -71,14 +73,19 @@ const WriteReviewScreen = () => {
   );
 
   const handleOpenGallery = async () => {
-    const result = await launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 });
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      selectionLimit: 10,
+    });
     if (!result.didCancel && result.assets?.length) {
-      setPhotos(result.assets.map(a => ({
-        uri: a.uri,
-        width: a.width,
-        height: a.height,
-        type: a.type,
-      })));
+      setPhotos(
+        result.assets.map((a) => ({
+          uri: a.uri,
+          width: a.width,
+          height: a.height,
+          type: a.type,
+        }))
+      );
     }
   };
 
@@ -89,12 +96,12 @@ const WriteReviewScreen = () => {
       pngImages.map(async (image) => {
         const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(image);
         return { uploadUrl, imageUrl, image };
-      }),
+      })
     );
     await Promise.all(
       presignedUrls.map(({ uploadUrl, image }) =>
-        uploadImageToPresignedUrl(uploadUrl, image),
-      ),
+        uploadImageToPresignedUrl(uploadUrl, image)
+      )
     );
     return presignedUrls.map((p) => p.imageUrl);
   };
@@ -155,7 +162,8 @@ const WriteReviewScreen = () => {
                 telephone: store.telephone || store.phone || '',
                 coordinate: {
                   latitude: store.latitude || store.coordinate?.latitude || 0,
-                  longitude: store.longitude || store.coordinate?.longitude || 0,
+                  longitude:
+                    store.longitude || store.coordinate?.longitude || 0,
                 },
                 imgUrls: store.imgUrls || [],
               }
@@ -245,7 +253,10 @@ const WriteReviewScreen = () => {
             style={styles.photoScroll}
             contentContainerStyle={styles.photoContainer}
           >
-            <TouchableOpacity style={styles.addPhotoButton} onPress={handleOpenGallery}>
+            <TouchableOpacity
+              style={styles.addPhotoButton}
+              onPress={handleOpenGallery}
+            >
               <View>
                 <Ionicons
                   name="camera"
@@ -258,12 +269,21 @@ const WriteReviewScreen = () => {
 
             {photos.map((photo, index) => (
               <View key={index} style={styles.photoItemPlaceholder}>
-                <Image source={{ uri: photo.uri }} style={styles.photoItemImage} />
+                <Image
+                  source={{ uri: photo.uri }}
+                  style={styles.photoItemImage}
+                />
                 <TouchableOpacity
                   style={styles.photoDeleteButton}
-                  onPress={() => setPhotos(prev => prev.filter((_, i) => i !== index))}
+                  onPress={() =>
+                    setPhotos((prev) => prev.filter((_, i) => i !== index))
+                  }
                 >
-                  <Ionicons name="close-circle" size={20} color={colors.gray[800]} />
+                  <Ionicons
+                    name="close-circle"
+                    size={20}
+                    color={colors.gray[800]}
+                  />
                 </TouchableOpacity>
               </View>
             ))}

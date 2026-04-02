@@ -137,9 +137,7 @@ const ResetRepresentativePassword = ({ navigation, route }) => {
         onPressBack={() => navigation?.goBack()}
       />
       <View style={styles.statusBar}>
-        <View
-          style={{ backgroundColor: colors.gray[100], width: '100%' }}
-        ></View>
+        <View style={{ backgroundColor: colors.gray[100], width: '100%' }} />
       </View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.contents}>

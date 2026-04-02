@@ -6,6 +6,7 @@ import {
   StatusBar,
   Keyboard,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../../../components/LabelTitle';
@@ -149,7 +150,7 @@ const ReceiveAuthCodeForPassword = ({ navigation, route }) => {
         navigation={navigation}
       />
       <View style={styles.statusBar}>
-        <View style={{ backgroundColor: colors.white, width: '100%' }}></View>
+        <View style={{ backgroundColor: colors.white, width: '100%' }} />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"

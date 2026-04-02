@@ -6,6 +6,7 @@ import {
   StatusBar,
   Keyboard,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../../../components/LabelTitle';
@@ -150,14 +151,14 @@ const ReceiveAuthCode = ({ navigation, route }) => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View style={{ width: '100%', height: 20 }}></View>
+        <View style={{ width: '100%', height: 20 }} />
         <View style={[styles.statusBar]}>
           <View
             style={{ backgroundColor: colors.orange[400], width: '33.33%' }}
-          ></View>
+          />
           <View
             style={{ backgroundColor: colors.gray[100], width: '66.67%' }}
-          ></View>
+          />
         </View>
         <View style={styles.contents}>
           <View style={styles.inputWrapper}>

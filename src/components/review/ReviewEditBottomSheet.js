@@ -91,9 +91,7 @@ const ReviewEditBottomSheet = ({
       onRequestClose={onClose}
     >
       <View style={styles.container}>
-        <Animated.View
-          style={[styles.overlay, { opacity: overlayOpacity }]}
-        >
+        <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
           <Pressable style={styles.overlayPressable} onPress={closeSheet} />
         </Animated.View>
         <Animated.View

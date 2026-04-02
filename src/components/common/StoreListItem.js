@@ -12,7 +12,11 @@ import LikedIcon from '../../../assets/Liked.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 
 import { togglePlaceLike } from '../../api/place';
-import { formatDistance, calculateWalkingTime, calculateDistanceInMeters } from '../../utils/distance';
+import {
+  formatDistance,
+  calculateWalkingTime,
+  calculateDistanceInMeters,
+} from '../../utils/distance';
 
 const StoreListItem = ({
   item,
@@ -53,8 +57,7 @@ const StoreListItem = ({
   };
 
   const categoryLabel =
-    CATEGORIES.find((cat) => cat.id === item.category)?.label ||
-    item.category;
+    CATEGORIES.find((cat) => cat.id === item.category)?.label || item.category;
 
   const distanceInMeters =
     userLocation && item.latitude && item.longitude
@@ -62,9 +65,11 @@ const StoreListItem = ({
           userLocation.latitude,
           userLocation.longitude,
           item.latitude,
-          item.longitude,
+          item.longitude
         )
-      : (item.distance != null ? item.distance : null);
+      : item.distance != null
+      ? item.distance
+      : null;
 
   const tags = [];
   if (item.tag) tags.push(item.tag);
@@ -73,10 +78,7 @@ const StoreListItem = ({
 
   return (
     <View style={styles.container}>
-      <Pressable
-        testID="store-list-item-pressable"
-        onPress={onPress}
-      >
+      <Pressable testID="store-list-item-pressable" onPress={onPress}>
         <View style={styles.headerRow}>
           <View style={styles.titleWrapper}>
             <Text style={styles.name}>{item.name}</Text>
@@ -116,15 +118,18 @@ const StoreListItem = ({
 
         <View style={styles.infoSection}>
           <View style={styles.infoLeft}>
-            {!!( item.averageStar ?? item.star) && (
+            {!!(item.averageStar ?? item.star) && (
               <View style={styles.infoItem}>
                 <StarIcon width={20} height={20} style={styles.iconMargin} />
-                <Text style={styles.infoText}>{item.averageStar ?? item.star}</Text>
+                <Text style={styles.infoText}>
+                  {item.averageStar ?? item.star}
+                </Text>
               </View>
             )}
 
             {showDiscountDetail ? (
-              (item.partnerships?.[0]?.partnershipTitle ?? item.partnerTitle) && (
+              (item.partnerships?.[0]?.partnershipTitle ??
+                item.partnerTitle) && (
                 <View style={styles.infoItem}>
                   <TicketIcon
                     width={20}
@@ -132,13 +137,15 @@ const StoreListItem = ({
                     style={styles.iconMargin}
                   />
                   <Text style={styles.infoText}>
-                    {item.partnerships?.[0]?.partnershipTitle ?? item.partnerTitle}
+                    {item.partnerships?.[0]?.partnershipTitle ??
+                      item.partnerTitle}
                   </Text>
                 </View>
               )
             ) : (
               <>
-                {(item.partnerships?.[0]?.partnershipTitle ?? item.partnerTitle) && (
+                {(item.partnerships?.[0]?.partnershipTitle ??
+                  item.partnerTitle) && (
                   <View style={styles.infoItem}>
                     <TicketIcon
                       width={20}
@@ -146,16 +153,13 @@ const StoreListItem = ({
                       style={styles.iconMargin}
                     />
                     <Text style={styles.infoText}>
-                      {item.partnerships?.[0]?.partnershipTitle ?? item.partnerTitle}
+                      {item.partnerships?.[0]?.partnershipTitle ??
+                        item.partnerTitle}
                     </Text>
                   </View>
                 )}
                 <View style={styles.infoItem}>
-                  <PinIcon
-                    width={20}
-                    height={20}
-                    style={styles.iconMargin}
-                  />
+                  <PinIcon width={20} height={20} style={styles.iconMargin} />
                   <Text style={styles.infoText}>
                     걸어서 {calculateWalkingTime(distanceInMeters)}분
                   </Text>
@@ -265,7 +269,7 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     textAlignVertical: 'center',
     marginLeft: 4,
-    transform: [{translateY: 1}],
+    transform: [{ translateY: 1 }],
   },
   thumbnail: {
     width: 68,

@@ -71,7 +71,10 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
       navigation.goBack();
     } catch (error) {
       console.error('deleteCouncilPost error', error);
-      Alert.alert('삭제 실패', '게시글 삭제 중 오류가 발생했어요. 다시 시도해주세요.');
+      Alert.alert(
+        '삭제 실패',
+        '게시글 삭제 중 오류가 발생했어요. 다시 시도해주세요.'
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -174,10 +177,7 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
             renderItem={({ item, index }) => (
               <View style={[styles.imageContainer, { width }]}>
                 {isEmpty ? (
-                  <CheckerboardPlaceholder
-                    width={width}
-                    height={375}
-                  />
+                  <CheckerboardPlaceholder width={width} height={375} />
                 ) : (
                   <Image
                     source={{ uri: item }}
@@ -267,7 +267,11 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
                       style={{ width: 56, height: 56, borderRadius: 8 }}
                     />
                   ) : (
-                    <CheckerboardPlaceholder width={56} height={56} borderRadius={10} />
+                    <CheckerboardPlaceholder
+                      width={56}
+                      height={56}
+                      borderRadius={10}
+                    />
                   )}
                 </View>
                 <View style={styles.infoWrapper}>

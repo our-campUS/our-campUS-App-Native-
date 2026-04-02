@@ -201,7 +201,12 @@ const StoreDetailScreen = () => {
       return () => {
         isActive = false;
       };
-    }, [currentPlaceId, storeData.placeId, storeData.latitude, storeData.longitude])
+    }, [
+      currentPlaceId,
+      storeData.placeId,
+      storeData.latitude,
+      storeData.longitude,
+    ])
   );
 
   const handleSuggestPartnership = async () => {

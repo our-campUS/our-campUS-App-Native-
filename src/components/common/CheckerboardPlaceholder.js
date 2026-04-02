@@ -34,13 +34,13 @@ const CheckerboardPlaceholder = ({
               height: CELL_SIZE,
               backgroundColor: isDark ? COLOR_DARK : COLOR_LIGHT,
             }}
-          />,
+          />
         );
       }
       result.push(
         <View key={r} style={styles.row}>
           {cells}
-        </View>,
+        </View>
       );
     }
     return result;
@@ -53,11 +53,7 @@ const CheckerboardPlaceholder = ({
   return (
     <View
       onLayout={handleLayout}
-      style={[
-        styles.container,
-        { width, height, borderRadius },
-        style,
-      ]}
+      style={[styles.container, { width, height, borderRadius }, style]}
     >
       {rows}
     </View>

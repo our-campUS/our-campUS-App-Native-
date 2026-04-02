@@ -9,10 +9,7 @@ import NotificationItem from '../../components/common/NotificationItem';
 import EmptyResult from '../../components/common/EmptyResult';
 import LoadingFooter from '../../components/common/LoadingFooter';
 import useCursorPagination from '../../hooks/useCursorPagination';
-import {
-  getNotifications,
-  markNotificationRead,
-} from '../../api/notification';
+import { getNotifications, markNotificationRead } from '../../api/notification';
 import theme from '../../style';
 import colors from '../../style/colors';
 
@@ -22,7 +19,7 @@ const NotificationScreen = () => {
   const fetchNotificationsFn = useCallback(
     (cursorCreatedAt, cursorId) =>
       getNotifications(20, cursorCreatedAt, cursorId),
-    [],
+    []
   );
 
   const {
@@ -38,7 +35,7 @@ const NotificationScreen = () => {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-    }, [fetchData]),
+    }, [fetchData])
   );
 
   const handleItemPress = async (notification) => {
@@ -48,8 +45,8 @@ const NotificationScreen = () => {
       if (success) {
         setNotifications((prev) =>
           prev.map((item) =>
-            item.id === notification.id ? { ...item, isRead: true } : item,
-          ),
+            item.id === notification.id ? { ...item, isRead: true } : item
+          )
         );
       }
     }

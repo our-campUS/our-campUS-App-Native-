@@ -174,7 +174,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     console.log('handleSubmit');
     console.log('dataFromPreviousScreen', dataFromPreviousScreen);
     const finalImages = await handleImagesBeforeSubmit();
-    let finalData = {
+    const finalData = {
       category:
         dataFromPreviousScreen.type === 'affiliate' ? 'PARTNERSHIP' : 'EVENT',
       place: dataFromPreviousScreen.placeInfo,
@@ -187,7 +187,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
       thumbnailImageUrl: finalImages[0],
     };
     console.log('finalData', finalData);
-    let response = await createCouncilPost(finalData, accessToken);
+    const response = await createCouncilPost(finalData, accessToken);
     console.log('response at handleSubmit', response);
     if (response.data.code === 201) {
       showToast('게시글이 등록되었어요!');
@@ -211,7 +211,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     } else {
       finalImages = await handleImagesBeforeSubmit();
     }
-    let finalData = {
+    const finalData = {
       category:
         dataFromPreviousScreen.type === 'affiliate' ? 'PARTNERSHIP' : 'EVENT',
       place: dataFromPreviousScreen.placeInfo,
@@ -224,7 +224,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
       thumbnailImageUrl: finalImages[0],
     };
     console.log('finalDataEdit', finalData);
-    let response = await EditCouncilPost(
+    const response = await EditCouncilPost(
       finalData,
       accessToken,
       dataFromPreviousScreen?.postId

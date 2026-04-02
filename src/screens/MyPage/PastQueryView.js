@@ -127,11 +127,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     lineHeight: 20,
   },
-  answeredDate: {
-    ...typography.caption1Regular,
-    color: colors.gray[400],
-    marginTop: 8,
-  },
   inqueryContent: {
     ...typography.body4Regular,
     color: colors.gray[850],

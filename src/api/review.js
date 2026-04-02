@@ -5,7 +5,7 @@ export const getReviewList = async (
   placeId,
   cursorCreatedAt = null,
   cursorId = null,
-  size = 10,
+  size = 10
 ) => {
   try {
     const token = useAuthStore.getState().accessToken;
@@ -88,7 +88,7 @@ export const createPartnershipReview = async (placeId, reviewData) => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      },
+      }
     );
 
     if (
