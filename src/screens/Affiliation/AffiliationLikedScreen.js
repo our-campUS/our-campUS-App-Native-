@@ -170,10 +170,7 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
               return (
                 <View style={[styles.imageContainer, { width }]}>
                   {isEmpty ? (
-                    <CheckerboardPlaceholder
-                      width={width}
-                      height={375}
-                    />
+                    <CheckerboardPlaceholder width={width} height={375} />
                   ) : (
                     <>
                       {!isImageLoaded && (
@@ -260,7 +257,11 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
                     if (detailData) {
                       setDetailData({ ...detailData, liked: newLikedState });
                     }
-                    showToast(newLikedState ? '관심 목록에 추가되었어요!' : '관심 목록에서 삭제되었어요.');
+                    showToast(
+                      newLikedState
+                        ? '관심 목록에 추가되었어요!'
+                        : '관심 목록에서 삭제되었어요.'
+                    );
                   } catch (error) {
                     // 실패 시 롤백
                     setIsLiked(!newLikedState);
@@ -330,7 +331,11 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
                         style={{ width: 56, height: 56, borderRadius: 8 }}
                       />
                     ) : (
-                      <CheckerboardPlaceholder width={56} height={56} borderRadius={10} />
+                      <CheckerboardPlaceholder
+                        width={56}
+                        height={56}
+                        borderRadius={10}
+                      />
                     )}
                   </View>
                   <View style={styles.infoWrapper}>
@@ -373,11 +378,7 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
           </View>
         )}
       </ScrollView>
-      <Toast
-        message={toastMessage}
-        visible={toastVisible}
-        onHide={hideToast}
-      />
+      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} />
     </SafeAreaView>
   );
 };

@@ -86,7 +86,6 @@ const AffiliationCarouselItem = ({
     console.log('user', user);
   }, [user]);
 
-
   return (
     <Pressable
       style={styles.container}
@@ -142,7 +141,12 @@ const AffiliationCarouselItem = ({
               if (!p) return '';
               const mm = String(p.month).padStart(2, '0');
               const dd = String(p.day).padStart(2, '0');
-              const time = p.hour !== null ? ` ${String(p.hour).padStart(2, '0')}:${String(p.minute).padStart(2, '0')}` : '';
+              const time =
+                p.hour !== null
+                  ? ` ${String(p.hour).padStart(2, '0')}:${String(
+                      p.minute
+                    ).padStart(2, '0')}`
+                  : '';
               return `${p.year}.${mm}.${dd}${time}`;
             })()}
           </Text>

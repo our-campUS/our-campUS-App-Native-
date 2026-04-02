@@ -87,7 +87,7 @@ export const useMapLogic = (mapRef) => {
       processedData.map(async (item) => {
         try {
           // A. 제휴 상세 정보 (기존 로직)
-          let detailData = {};
+          const detailData = {};
           if (shouldFetchDetails && item.postId) {
             // ... (기존 getPartnershipDetail 호출 로직) ...
             // detailData = ...

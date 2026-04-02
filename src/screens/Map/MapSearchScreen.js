@@ -215,8 +215,7 @@ const MapSearchScreen = () => {
       </View>
 
       {/* 조건부 렌더링 */}
-      {keyword.length > 0 ? //   } //     item.placeKey ? String(item.placeKey) : String(index) //   keyExtractor={(item, index) => //   data={searchResults} // <FlatList
-      //   renderItem={renderResultItem}
+      {keyword.length > 0 ? //   renderItem={renderResultItem} //   } //     item.placeKey ? String(item.placeKey) : String(index) //   keyExtractor={(item, index) => //   data={searchResults} // <FlatList
       //   contentContainerStyle={styles.listContent}
       //   keyboardShouldPersistTaps="handled"
       //   ListEmptyComponent={renderEmptyComponent}

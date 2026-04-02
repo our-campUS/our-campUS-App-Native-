@@ -193,7 +193,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
 
     const finalImages = await handleImagesBeforeSubmit();
 
-    let finalSubmitEventData = {
+    const finalSubmitEventData = {
       title: title,
       category: 'EVENT',
       content: '행사',
@@ -205,7 +205,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
       thumbnailImageUrl: finalImages[0],
     };
     console.log('finalSubmitEventData', finalSubmitEventData);
-    let response = await createCouncilPost(finalSubmitEventData, accessToken);
+    const response = await createCouncilPost(finalSubmitEventData, accessToken);
     console.log('response at handleSubmit', response);
     if (response.data.code === 201) {
       showToast('게시글이 등록되었어요!');
@@ -249,10 +249,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
             renderItem={({ item, index }) => (
               <View style={[styles.imageContainer, { width }]}>
                 {isEmpty ? (
-                  <CheckerboardPlaceholder
-                    width={width}
-                    height={375}
-                  />
+                  <CheckerboardPlaceholder width={width} height={375} />
                 ) : (
                   <Image
                     source={{ uri: item.uri }}

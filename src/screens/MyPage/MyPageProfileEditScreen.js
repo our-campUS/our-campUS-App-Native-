@@ -68,9 +68,9 @@ const MyPageProfileEditScreen = ({ navigation, route }) => {
 
       try {
         console.log('selectedImage detected, starting upload process');
-        let convertedImage = await convertToPng(selectedImage);
+        const convertedImage = await convertToPng(selectedImage);
         console.log('convertedImage', convertedImage);
-        let { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
+        const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
           convertedImage
         );
         console.log('imageUrl', imageUrl);
@@ -133,7 +133,7 @@ const MyPageProfileEditScreen = ({ navigation, route }) => {
                 : defaultProfileImage
             }
             style={styles.profileImage}
-          // resizeMode="contain"
+            // resizeMode="contain"
           />
           <Pressable
             style={styles.editIcon}
@@ -154,11 +154,7 @@ const MyPageProfileEditScreen = ({ navigation, route }) => {
             rightText="인증 전"
             onPress={() => navigation.navigate('ChangeScholarInfoScreen')}
           />
-          <ListItem
-            title="연결된 계정"
-            rightText="카카오"
-            showArrow={false}
-          />
+          <ListItem title="연결된 계정" rightText="카카오" showArrow={false} />
         </View>
         <View style={styles.logoutButtonWrapper}>
           <ListItem

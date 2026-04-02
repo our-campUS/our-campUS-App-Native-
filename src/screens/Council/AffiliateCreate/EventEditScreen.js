@@ -270,7 +270,7 @@ const EventEditScreen = ({ navigation, route }) => {
 
     const finalImages = await handleImagesBeforeSubmit();
 
-    let finalSubmitEventData = {
+    const finalSubmitEventData = {
       title: title,
       category: 'EVENT',
       content: '행사',
@@ -282,7 +282,7 @@ const EventEditScreen = ({ navigation, route }) => {
       thumbnailImageUrl: finalImages[0],
     };
     console.log('finalSubmitEventData', finalSubmitEventData);
-    let response = await EditCouncilPost(
+    const response = await EditCouncilPost(
       finalSubmitEventData,
       accessToken,
       previousPostDataId
@@ -343,10 +343,7 @@ const EventEditScreen = ({ navigation, route }) => {
             renderItem={({ item, index }) => (
               <View style={[styles.imageContainer, { width }]}>
                 {isEmpty ? (
-                  <CheckerboardPlaceholder
-                    width={width}
-                    height={375}
-                  />
+                  <CheckerboardPlaceholder width={width} height={375} />
                 ) : (
                   <Image
                     source={

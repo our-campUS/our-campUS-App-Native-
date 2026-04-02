@@ -92,7 +92,7 @@ const SignUpFirstScreen = ({ navigation, route }) => {
           onPressBack={() => navigation.goBack()}
           navigation={navigation}
         />
-        <View style={{ width: 100, height: 20 }}></View>
+        <View style={{ width: 100, height: 20 }} />
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flexGrow: 1 }}
@@ -100,10 +100,10 @@ const SignUpFirstScreen = ({ navigation, route }) => {
           <View style={[styles.statusBar]}>
             <View
               style={{ backgroundColor: colors.blue[400], width: '50%' }}
-            ></View>
+             />
             <View
               style={{ backgroundColor: colors.gray[100], width: '50%' }}
-            ></View>
+             />
           </View>
           <View style={styles.greetingContainer}>
             <Text style={styles.greetingTitle}>
@@ -120,12 +120,12 @@ const SignUpFirstScreen = ({ navigation, route }) => {
               placeholder="학교 이름을 입력해주세요"
               value={FIXED_UNIVERSITY_NAME}
               onlyRead={true}
-            // TODO: 학교 선택 기능 재오픈 시 아래 주석 해제 + onlyRead 제거 + value={university}
-            // useMagnifyingGlass={true}
-            // usePopUPModal={true}
-            // onPressPopUPModal={() => {
-            //   setIsUniversityInputModalVisible(true);
-            // }}
+              // TODO: 학교 선택 기능 재오픈 시 아래 주석 해제 + onlyRead 제거 + value={university}
+              // useMagnifyingGlass={true}
+              // usePopUPModal={true}
+              // onPressPopUPModal={() => {
+              //   setIsUniversityInputModalVisible(true);
+              // }}
             />
             {/* TODO: 학교 선택 기능 재오픈 시 단과대 필드 주석 해제 */}
             {/* <Input

@@ -5,7 +5,11 @@ import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 
-const EmptyResult = ({ message = '검색 결과가 없습니다.', paddingTop = 200, icon }) => (
+const EmptyResult = ({
+  message = '검색 결과가 없습니다.',
+  paddingTop = 200,
+  icon,
+}) => (
   <View style={[styles.container, { paddingTop }]}>
     {icon || <WarningIcon width={56} height={56} />}
     <Text style={styles.text}>{message}</Text>

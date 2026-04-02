@@ -22,7 +22,11 @@ import Button from '../../../components/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import useFormDraftStore from '../../../store/formDraftStore';
 import { Appearance } from 'react-native';
-import { formatDotDate, createDateOnly, toISODateString } from '../../../utils/dateTime';
+import {
+  formatDotDate,
+  createDateOnly,
+  toISODateString,
+} from '../../../utils/dateTime';
 
 const WriteAffiliatePostScreen = ({ navigation, route }) => {
   const [placeInfo, setPlaceInfo] = useState(null);
@@ -172,10 +176,7 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
             renderItem={({ item, index }) => (
               <View style={[styles.imageContainer, { width }]}>
                 {isEmpty ? (
-                  <CheckerboardPlaceholder
-                    width={width}
-                    height={375}
-                  />
+                  <CheckerboardPlaceholder width={width} height={375} />
                 ) : (
                   <Image
                     source={{ uri: item.uri }}

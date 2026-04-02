@@ -43,7 +43,7 @@ const FoundRepresentativeId = ({ navigation, route }) => {
       <View style={styles.statusBar}>
         <View
           style={{ backgroundColor: colors.gray[100], width: '100%' }}
-        ></View>
+         />
       </View>
       <View style={styles.contents}>
         <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>

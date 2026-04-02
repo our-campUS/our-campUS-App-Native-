@@ -159,11 +159,11 @@ const VerifyRepresentativeIdCode = ({ navigation, route }) => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View style={{ width: '100%', height: 20 }}></View>
+        <View style={{ width: '100%', height: 20 }} />
         <View style={[styles.statusBar]}>
           <View
             style={{ backgroundColor: colors.gray[100], width: '100%' }}
-          ></View>
+           />
         </View>
         <View style={styles.contents}>
           <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>

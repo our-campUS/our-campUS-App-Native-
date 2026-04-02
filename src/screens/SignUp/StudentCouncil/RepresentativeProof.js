@@ -90,9 +90,9 @@ const RepresentativeProof = ({ navigation, route }) => {
   const handleFinalSubmit = async () => {
     console.log('finalData', finalData);
     console.log('selectedImage', selectedImage);
-    let convertedImage = await convertToPng(selectedImage);
+    const convertedImage = await convertToPng(selectedImage);
     console.log('convertedImage', convertedImage);
-    let { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
+    const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
       convertedImage
     );
     console.log('imageUrl', imageUrl);
@@ -100,12 +100,12 @@ const RepresentativeProof = ({ navigation, route }) => {
 
     await uploadImageToPresignedUrl(uploadUrl, convertedImage);
 
-    let finalDataReady = {
+    const finalDataReady = {
       ...finalData,
       electionImageUrl: imageUrl,
     };
     console.log('finalDataReady', finalDataReady);
-    let response = await submitCouncilSignUp(finalDataReady);
+    const response = await submitCouncilSignUp(finalDataReady);
     console.log('response', response);
     if (response.isSuccess) {
       navigation.navigate('RepresentativeSuccess');
@@ -122,14 +122,14 @@ const RepresentativeProof = ({ navigation, route }) => {
         onPressBack={() => navigation.goBack()}
         navigation={navigation}
       />
-      <View style={{ width: '100%', height: 20 }}></View>
+      <View style={{ width: '100%', height: 20 }} />
       <View style={styles.statusBar}>
         <View
           style={{ backgroundColor: colors.orange[400], width: '75%' }}
-        ></View>
+         />
         <View
           style={{ backgroundColor: colors.gray[100], width: '25%' }}
-        ></View>
+         />
       </View>
       <View style={styles.contentContainer}>
         <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>
@@ -155,7 +155,11 @@ const RepresentativeProof = ({ navigation, route }) => {
             />
           ) : (
             <>
-              <CheckerboardPlaceholder width={'100%'} height={150} borderRadius={12} />
+              <CheckerboardPlaceholder
+                width={'100%'}
+                height={150}
+                borderRadius={12}
+              />
               <View style={styles.uploadFileButton}>
                 <UploadButton variant="blue" />
               </View>

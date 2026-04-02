@@ -34,7 +34,7 @@ const ReviewListScreen = () => {
   const fetchReviewsFn = useCallback(
     (cursorCreatedAt, cursorId) =>
       getReviewList(placeId, cursorCreatedAt, cursorId, 10),
-    [placeId],
+    [placeId]
   );
 
   const {

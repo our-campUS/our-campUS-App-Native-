@@ -246,7 +246,9 @@ const AffiliationMainScreen = ({ navigation }) => {
       const response = await toggleStudentAffiliateLike(accessToken, postId);
       console.log('handleLike response', response);
 
-      showToast(wasLiked ? '관심 목록에서 삭제되었어요.' : '관심 목록에 추가되었어요!');
+      showToast(
+        wasLiked ? '관심 목록에서 삭제되었어요.' : '관심 목록에 추가되었어요!'
+      );
 
       // 좋아요 상태 업데이트 함수
       const updateLikeStatus = (posts, setPosts) => {
@@ -424,11 +426,7 @@ const AffiliationMainScreen = ({ navigation }) => {
           ListEmptyComponent={<EmptyResult paddingTop={100} />}
         />
       )}
-      <Toast
-        message={toastMessage}
-        visible={toastVisible}
-        onHide={hideToast}
-      />
+      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} />
     </SafeAreaView>
   );
 };

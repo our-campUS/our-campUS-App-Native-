@@ -100,7 +100,7 @@ const InterestedAffiliateScreen = ({ navigation }) => {
           </Text>
         </Pressable>
       </View>
-      <View style={{ width: '100%', height: 18 }}></View>
+      <View style={{ width: '100%', height: 18 }} />
       {selectedActivityType === '제휴' && (
         <FlatList
           style={{ width: '100%' }}

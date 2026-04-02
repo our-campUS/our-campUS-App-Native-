@@ -13,8 +13,8 @@ const RecommendSection = () => {
   useEffect(() => {
     const fetchData = async () => {
       // 내 위치 (기준점)
-      const myLat = 37.5050;
-      const myLng = 126.9570;
+      const myLat = 37.505;
+      const myLng = 126.957;
 
       const data = await getRandomPlaces(myLat, myLng);
 

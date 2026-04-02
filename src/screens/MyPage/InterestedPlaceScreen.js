@@ -8,8 +8,8 @@ import { useState, useCallback, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { getLikedPlaces } from '../../api/place';
 
-const USER_LAT = 37.5050;
-const USER_LNG = 126.9570;
+const USER_LAT = 37.505;
+const USER_LNG = 126.957;
 
 const mapToStoreItem = (item) => ({
   ...item,
@@ -88,9 +88,7 @@ const InterestedPlaceScreen = ({ navigation }) => {
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
-          !loading ? (
-            <EmptyResult message="관심 장소가 없습니다." />
-          ) : null
+          !loading ? <EmptyResult message="관심 장소가 없습니다." /> : null
         }
         ListFooterComponent={
           loading ? (

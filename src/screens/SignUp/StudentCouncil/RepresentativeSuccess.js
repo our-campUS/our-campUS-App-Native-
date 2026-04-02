@@ -65,7 +65,7 @@ const RepresentativeSuccess = ({ navigation }) => {
       <View style={[styles.statusBar]}>
         <View
           style={{ backgroundColor: colors.orange[400], width: '100%' }}
-        ></View>
+         />
       </View>
       <View style={styles.container}>
         <View style={styles.mainContent}>

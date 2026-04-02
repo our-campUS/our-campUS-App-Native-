@@ -24,7 +24,6 @@ import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { getPartnershipList } from '@api/partnership';
 
-
 const formatDistance = (meters) => {
   if (meters == null) return null;
   return meters >= 1000
@@ -33,17 +32,27 @@ const formatDistance = (meters) => {
 };
 
 const getOrdinal = (n) => {
-  const ordinals = ['첫번째', '두번째', '세번째', '네번째', '다섯번째', '여섯번째', '일곱번째', '여덟번째', '아홉번째', '열번째'];
+  const ordinals = [
+    '첫번째',
+    '두번째',
+    '세번째',
+    '네번째',
+    '다섯번째',
+    '여섯번째',
+    '일곱번째',
+    '여덟번째',
+    '아홉번째',
+    '열번째',
+  ];
   return n >= 1 && n <= 10 ? ordinals[n - 1] : `${n}번째`;
 };
 
 const getJosa = (str) => {
   if (!str) return '이';
   const code = str.charCodeAt(str.length - 1);
-  if (code < 0xAC00 || code > 0xD7A3) return '이';
-  return (code - 0xAC00) % 28 > 0 ? '이' : '가';
+  if (code < 0xac00 || code > 0xd7a3) return '이';
+  return (code - 0xac00) % 28 > 0 ? '이' : '가';
 };
-
 
 const ReviewResultScreen = () => {
   const navigation = useNavigation();
@@ -62,7 +71,7 @@ const ReviewResultScreen = () => {
     const fetchStores = (lat, lng) => {
       getPartnershipList(lat, lng)
         .then((data) => {
-setPartnerStores(
+          setPartnerStores(
             data.map((item) => ({
               id: item.placeId,
               placeName: item.placeName,
@@ -71,7 +80,7 @@ setPartnerStores(
               thumbnailImageUrl: item.thumbnailUrl,
               distance: formatDistance(item.distance),
               type: '제휴',
-            })),
+            }))
           );
         })
         .catch((e) => console.error('제휴 매장 목록 오류:', e));
@@ -156,19 +165,33 @@ setPartnerStores(
         <View style={styles.rankingContainer}>
           <View style={styles.rankingHeader}>
             <RankingIcon width={18} height={18} />
-            <Text style={styles.rankingTitle}>{reviewData?.userName ?? ''}님의 리뷰 랭킹</Text>
+            <Text style={styles.rankingTitle}>
+              {reviewData?.userName ?? ''}님의 리뷰 랭킹
+            </Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>{rankingData?.major?.scope}에서</Text>
-            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.major?.rank ?? 1)} 리뷰</Text>
+            <Text style={styles.rankingLabel}>
+              {rankingData?.major?.scope}에서
+            </Text>
+            <Text style={styles.rankingValue}>
+              {getOrdinal(rankingData?.major?.rank ?? 1)} 리뷰
+            </Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>{rankingData?.college?.scope}에서</Text>
-            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.college?.rank ?? 1)} 리뷰</Text>
+            <Text style={styles.rankingLabel}>
+              {rankingData?.college?.scope}에서
+            </Text>
+            <Text style={styles.rankingValue}>
+              {getOrdinal(rankingData?.college?.rank ?? 1)} 리뷰
+            </Text>
           </View>
           <View style={styles.rankingRow}>
-            <Text style={styles.rankingLabel}>{rankingData?.school?.scope}에서</Text>
-            <Text style={styles.rankingValue}>{getOrdinal(rankingData?.school?.rank ?? 1)} 리뷰</Text>
+            <Text style={styles.rankingLabel}>
+              {rankingData?.school?.scope}에서
+            </Text>
+            <Text style={styles.rankingValue}>
+              {getOrdinal(rankingData?.school?.rank ?? 1)} 리뷰
+            </Text>
           </View>
         </View>
       </View>
@@ -193,7 +216,9 @@ setPartnerStores(
 
           <Button
             title="스탬프 채울 수 있는 제휴 보러가기"
-            onPress={() => navigation.navigate('MainTab', { screen: 'Partnership' })}
+            onPress={() =>
+              navigation.navigate('MainTab', { screen: 'Partnership' })
+            }
             style={[styles.blueButton, styles.blueButtonAfterBanner]}
             textStyle={styles.blueButtonText}
           />
@@ -214,7 +239,9 @@ setPartnerStores(
             style={styles.requestBoxWrapper}
           >
             <Text style={styles.middleTitle}>
-              {placeName}{getJosa(placeName)}{'\n'}제휴를 진행하지 않아{'\n'}아쉽다면?
+              {placeName}
+              {getJosa(placeName)}
+              {'\n'}제휴를 진행하지 않아{'\n'}아쉽다면?
             </Text>
             <Text style={[styles.middleSubtitle, { marginTop: 8 }]}>
               캠퍼스가 학생회에 의견을 대신 전해드려요!
@@ -264,9 +291,7 @@ setPartnerStores(
         ]}
       >
         <View style={styles.bottomHeader}>
-          <Text style={styles.bottomTitle}>
-            제휴 매장 둘러보기
-          </Text>
+          <Text style={styles.bottomTitle}>제휴 매장 둘러보기</Text>
           <Text style={styles.bottomSubtitle}>
             {isBlueBackground
               ? '최근 한달 간 제휴 이용수가 많았던 매장을 살펴보세요.'
@@ -285,7 +310,9 @@ setPartnerStores(
 
         <Button
           title="제휴 더 보러가기"
-          onPress={() => navigation.navigate('MainTab', { screen: 'Partnership' })}
+          onPress={() =>
+            navigation.navigate('MainTab', { screen: 'Partnership' })
+          }
           style={styles.blueButton}
           textStyle={styles.blueButtonText}
         />

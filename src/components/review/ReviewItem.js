@@ -29,12 +29,7 @@ const ReviewItem = ({ item, variant = 'list', card = false, onMorePress }) => {
   const review = {
     star: item.star || 0,
     content: item.content || item.comment || '',
-    name:
-      item.writerName ||
-      item.name ||
-      item.userName ||
-      item.placeName ||
-      '',
+    name: item.writerName || item.name || item.userName || item.placeName || '',
     date: item.createdAt || item.date || item.createDate || '',
     imageUrls: item.imageUrls || [],
     thumbnailImgUrl: item.thumbnailImgUrl || item.imageUrls?.[0] || null,
@@ -58,9 +53,7 @@ const ReviewItem = ({ item, variant = 'list', card = false, onMorePress }) => {
     ));
 
   const renderContentRow = () => (
-    <View
-      style={[styles.contentRow, isPreview && styles.contentRowPreview]}
-    >
+    <View style={[styles.contentRow, isPreview && styles.contentRowPreview]}>
       <View style={styles.textContainer}>
         <Text
           style={styles.contentText}

@@ -92,9 +92,9 @@ const CouncilSendProof = ({ navigation, route }) => {
   const handleFinalSubmit = async () => {
     console.log('finalData', finalData);
     console.log('selectedImage', selectedImage);
-    let convertedImage = await convertToPng(selectedImage);
+    const convertedImage = await convertToPng(selectedImage);
     console.log('convertedImage', convertedImage);
-    let { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
+    const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
       convertedImage
     );
     console.log('imageUrl', imageUrl);
@@ -102,12 +102,12 @@ const CouncilSendProof = ({ navigation, route }) => {
 
     await uploadImageToPresignedUrl(uploadUrl, convertedImage);
 
-    let finalDataReady = {
+    const finalDataReady = {
       ...finalData,
       electionImageUrl: imageUrl,
     };
     console.log('finalDataReady', finalDataReady);
-    let response = await submitCouncilSignUp(finalDataReady);
+    const response = await submitCouncilSignUp(finalDataReady);
     console.log('response', response);
     if (response.isSuccess) {
       navigation.navigate('RepresentativeSuccess');
@@ -149,7 +149,11 @@ const CouncilSendProof = ({ navigation, route }) => {
             />
           ) : (
             <>
-              <CheckerboardPlaceholder width={'100%'} height={150} borderRadius={12} />
+              <CheckerboardPlaceholder
+                width={'100%'}
+                height={150}
+                borderRadius={12}
+              />
               <View style={styles.uploadFileButton}>
                 <UploadButton variant="orange" />
               </View>

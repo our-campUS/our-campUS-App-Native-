@@ -113,8 +113,8 @@ const MapScreen = () => {
         ref={mapRef}
         style={{ flex: 1 }}
         initialCamera={{
-          latitude: 37.5050,
-          longitude: 126.9570,
+          latitude: 37.505,
+          longitude: 126.957,
           zoom: 16,
         }}
         markers={markersWithPinType}

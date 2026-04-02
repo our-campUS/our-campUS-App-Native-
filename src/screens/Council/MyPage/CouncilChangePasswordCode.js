@@ -125,7 +125,7 @@ const CouncilChangePasswordCode = ({ navigation }) => {
           onPressBack={() => navigation.goBack()}
           navigation={navigation}
         />
-        <View style={{ width: '100%', height: 28 }}></View>
+        <View style={{ width: '100%', height: 28 }} />
         <View style={styles.inputWrapper}>
           <Input
             useTitle={true}

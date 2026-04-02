@@ -53,7 +53,7 @@ const FindRepresentativePassword = ({ navigation }) => {
       <View style={styles.statusBar}>
         <View
           style={{ backgroundColor: colors.gray[100], width: '100%' }}
-        ></View>
+         />
       </View>
       <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
         <ScrollView>
@@ -69,7 +69,7 @@ const FindRepresentativePassword = ({ navigation }) => {
           >
             아이디를 입력해주세요.
           </Text>
-          <View style={{ marginTop: 56 }}></View>
+          <View style={{ marginTop: 56 }} />
           <Input
             useId={true}
             isOrange={true}

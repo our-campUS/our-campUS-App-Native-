@@ -149,7 +149,7 @@ const ReceiveAuthCodeForPassword = ({ navigation, route }) => {
         navigation={navigation}
       />
       <View style={styles.statusBar}>
-        <View style={{ backgroundColor: colors.white, width: '100%' }}></View>
+        <View style={{ backgroundColor: colors.white, width: '100%' }} />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"

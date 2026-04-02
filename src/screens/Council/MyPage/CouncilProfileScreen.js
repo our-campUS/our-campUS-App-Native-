@@ -82,9 +82,9 @@ const CouncilProfileScreen = ({ navigation, route }) => {
 
       try {
         console.log('selectedImage detected, starting upload process');
-        let convertedImage = await convertToPng(selectedImage);
+        const convertedImage = await convertToPng(selectedImage);
         console.log('convertedImage', convertedImage);
-        let { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
+        const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
           convertedImage
         );
         console.log('imageUrl', imageUrl);
@@ -241,16 +241,8 @@ const CouncilProfileScreen = ({ navigation, route }) => {
             rightText={user?.authName || '인증 전'}
             showArrow={false}
           />
-          <ListItem
-            title="아이디"
-            rightText={user.loginId}
-            showArrow={false}
-          />
-          <ListItem
-            title="이메일"
-            rightText={user.email}
-            showArrow={false}
-          />
+          <ListItem title="아이디" rightText={user.loginId} showArrow={false} />
+          <ListItem title="이메일" rightText={user.email} showArrow={false} />
         </View>
         <View style={styles.logoutButtonWrapper}>
           <Text style={{ ...typography.body4Bold, color: colors.gray[400] }}>

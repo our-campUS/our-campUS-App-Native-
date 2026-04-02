@@ -24,7 +24,11 @@ import useFormDraftStore from '../../../store/formDraftStore';
 import { Appearance } from 'react-native';
 import useAuthStore from '../../../store/authStore';
 import { getCouncilAffiliatePostDetail } from '../../../api/councilAffiliate';
-import { formatDotDate, createDateOnly, toISODateString } from '../../../utils/dateTime';
+import {
+  formatDotDate,
+  createDateOnly,
+  toISODateString,
+} from '../../../utils/dateTime';
 
 const AffiliateEditScreen = ({ navigation, route }) => {
   const { accessToken } = useAuthStore();
@@ -177,7 +181,6 @@ const AffiliateEditScreen = ({ navigation, route }) => {
     );
   };
 
-
   useEffect(() => {
     if (!previousPostData) {
       setIsButtonDisabled(true);
@@ -253,10 +256,7 @@ const AffiliateEditScreen = ({ navigation, route }) => {
             renderItem={({ item, index }) => (
               <View style={[styles.imageContainer, { width }]}>
                 {isEmpty ? (
-                  <CheckerboardPlaceholder
-                    width={width}
-                    height={375}
-                  />
+                  <CheckerboardPlaceholder width={width} height={375} />
                 ) : (
                   <Image
                     source={

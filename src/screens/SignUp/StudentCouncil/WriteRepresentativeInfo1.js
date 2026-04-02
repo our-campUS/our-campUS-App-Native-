@@ -81,7 +81,7 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
 
   const handleNextButtonPress = () => {
     let councilType = '';
-    let schoolId = universityId;
+    const schoolId = universityId;
     let collegeIdValue = null;
     let majorIdValue = null;
     if (selectedValue === 'total') {
@@ -94,7 +94,7 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
       majorIdValue = majorId;
       collegeIdValue = collegeId;
     }
-    let finalData = {
+    const finalData = {
       councilType: councilType,
       schoolId: schoolId,
       collegeId: collegeId,
@@ -122,14 +122,14 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
           onPressBack={() => navigation?.goBack()}
           navigation={navigation}
         />
-        <View style={{ width: '100%', height: 20 }}></View>
+        <View style={{ width: '100%', height: 20 }} />
         <View style={[styles.statusBar]}>
           <View
             style={{ backgroundColor: colors.orange[400], width: '50%' }}
-          ></View>
+           />
           <View
             style={{ backgroundColor: colors.gray[100], width: '50%' }}
-          ></View>
+           />
         </View>
         <ScrollView
           keyboardShouldPersistTaps="handled"

@@ -107,7 +107,7 @@ const LoginRepresentative = ({ navigation }) => {
         <View style={styles.statusBar}>
           <View
             style={{ backgroundColor: colors.gray[100], width: '100%' }}
-          ></View>
+           />
         </View>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.contentContainer}>
