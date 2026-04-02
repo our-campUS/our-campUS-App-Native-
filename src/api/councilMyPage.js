@@ -62,6 +62,66 @@ export async function changeCouncilProfileImage(image) {
   }
 }
 
+// 학생회 이메일 변경 인증코드 발송 ( POST /auth/council/change/email/code )
+export async function sendCouncilChangeEmailCode(email) {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    const response = await api.post(
+      '/auth/council/change/email/code',
+      { email },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    const code = response.data.code;
+    if (code === 200 || code === 201 || code === 0) {
+      return { isSuccess: true };
+    }
+    return { isSuccess: false, message: response.data.message };
+  } catch (error) {
+    console.error('sendCouncilChangeEmailCode error:', error);
+    return { isSuccess: false, message: '인증코드 발송에 실패했습니다.' };
+  }
+}
+
+// 학생회 이메일 변경 인증코드 검증 ( POST /auth/council/change/email/code/verify )
+export async function verifyCouncilChangeEmailCode(email, code) {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    const response = await api.post(
+      '/auth/council/change/email/code/verify',
+      { email, code },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    const resCode = response.data.code;
+    if (resCode === 200 || resCode === 201 || resCode === 0) {
+      return { isValid: true };
+    }
+    return { isValid: false, message: response.data.message };
+  } catch (error) {
+    console.error('verifyCouncilChangeEmailCode error:', error);
+    return { isValid: false, message: '인증코드 검증에 실패했습니다.' };
+  }
+}
+
+// 학생회 이메일 변경 인증코드 재발송
+export async function resendCouncilChangeEmailCode(email) {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    const response = await api.post(
+      '/auth/council/change/email/code',
+      { email },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    const code = response.data.code;
+    if (code === 200 || code === 201 || code === 0) {
+      return { isSuccess: true };
+    }
+    return { isSuccess: false, message: response.data.message };
+  } catch (error) {
+    console.error('resendCouncilChangeEmailCode error:', error);
+    return { isSuccess: false, message: '인증코드 재발송에 실패했습니다.' };
+  }
+}
+
 // 학생회 회원탈퇴 ( PATCH /auth/council/withdraw )
 export async function withdrawCouncil(password) {
   try {
