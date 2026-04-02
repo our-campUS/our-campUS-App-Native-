@@ -6,10 +6,22 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.js\" \"*.{js,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"*.{js,json,md}\"",
     "start": "react-native start",
     "test": "jest",
     "android:release": "cd android && ./gradlew assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a",
     "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^3.0.1",
