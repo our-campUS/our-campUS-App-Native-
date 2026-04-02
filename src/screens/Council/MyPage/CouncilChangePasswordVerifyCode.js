@@ -16,9 +16,9 @@ import { useState, useEffect, useRef } from 'react';
 import typography from '../../../style/typography';
 import Button from '../../../components/Button';
 import {
-  verifyCouncilSignUpAuthCode,
-  resendCouncilSignUpAuthCode,
-} from '../../../api/councilSignUp';
+  verifyCouncilPasswordFindEmailCode,
+  resendCouncilPasswordFindEmailCode,
+} from '../../../api/councilLogin';
 
 const CouncilChangePasswordVerifyCode = ({ navigation, route }) => {
   const email = route.params?.email;
@@ -28,15 +28,9 @@ const CouncilChangePasswordVerifyCode = ({ navigation, route }) => {
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
   const [isExpired, setIsExpired] = useState(false);
   const intervalRef = useRef(null);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [verificationClicked, setVerificationClicked] = useState(false);
   const [isValid, setIsValid] = useState(null); // null: 검증 전, true: 성공, false: 실패
   const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
-
-  // 인증번호가 6자리이고 만료되지 않았는지 확인하여 버튼 활성화
-  useEffect(() => {
-    setIsButtonDisabled(code.length !== 6 || isExpired);
-  }, [code, isExpired]);
 
   useEffect(() => {
     // 타이머 시작
@@ -77,8 +71,7 @@ const CouncilChangePasswordVerifyCode = ({ navigation, route }) => {
     }
 
     setVerificationClicked(true);
-    const result = await verifyCouncilSignUpAuthCode(email, code);
-    console.log('verifyCouncilSignUpAuthCode result', result);
+    const result = await verifyCouncilPasswordFindEmailCode(email, code);
     setIsValid(result.isValid);
 
     if (result.isValid) {
@@ -103,13 +96,12 @@ const CouncilChangePasswordVerifyCode = ({ navigation, route }) => {
       setVerificationClicked(false);
       setIsValid(null);
     }
-  }, [code]);
+  }, [code, verificationClicked]);
 
   const handleResendAuthCode = async () => {
     setIsValid(null);
     setLoadingSpinnerVisible(true);
-    const result = await resendCouncilSignUpAuthCode(email);
-    console.log('resendCouncilSignUpAuthCode result', result);
+    const result = await resendCouncilPasswordFindEmailCode(email);
     if (result.isSuccess) {
       // 기존 타이머 정리
       if (intervalRef.current) {
@@ -149,7 +141,7 @@ const CouncilChangePasswordVerifyCode = ({ navigation, route }) => {
       />
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={styles.scrollContent}
       >
         {/* <View style={{ width: '100%', height: 20 }}></View> */}
         <View style={styles.contents}>
@@ -185,23 +177,10 @@ const CouncilChangePasswordVerifyCode = ({ navigation, route }) => {
               //   disabled={isButtonDisabled}
               disabled={!code}
               isOrange={true}
-              style={{
-                width: '100%',
-                height: 50,
-                paddingHorizontal: 10,
-                paddingVertical: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: colors.orange[400],
-                borderRadius: 10,
-              }}
-              textStyle={{
-                color: colors.common.white,
-                ...typography.heading6,
-              }}
+              style={styles.button}
+              textStyle={styles.buttonText}
               title="인증하기"
-              onPress={() => navigation.navigate('CouncilResetPassword')}
-              //   onPress={handleVerify}
+              onPress={handleVerify}
             />
           </View>
         </View>
@@ -219,14 +198,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#fff',
-    // backgroundColor: 'red',
+    backgroundColor: colors.common.white,
   },
-  statusBar: {
-    height: 5,
-    width: '100%',
-    flexDirection: 'row',
-    marginTop: 10,
+  scrollContent: {
+    flexGrow: 1,
   },
   contents: {
     width: '100%',
@@ -264,6 +239,20 @@ const styles = StyleSheet.create({
     color: colors.common.error,
     marginTop: 4,
     marginBottom: -4,
+  },
+  button: {
+    width: '100%',
+    height: 50,
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.orange[400],
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: colors.common.white,
+    ...typography.heading6,
   },
   buttonContainer: {
     width: '100%',
