@@ -62,6 +62,26 @@ export async function changeCouncilProfileImage(image) {
   }
 }
 
+// 학생회 회원탈퇴 ( PATCH /auth/council/withdraw )
+export async function withdrawCouncil(password) {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    const response = await api.patch(
+      '/auth/council/withdraw',
+      { precaution: true, password },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    const code = response.data.code;
+    if (code === 200 || code === 201 || code === 0) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('withdrawCouncil error:', error);
+    return false;
+  }
+}
+
 // 학생회 계정 비밀번호 변경 ( patch council/change/password )
 
 export async function changeCouncilPassword(

@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Alert,
+  TextInput,
+} from 'react-native';
 import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
@@ -6,9 +14,43 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CheckIcon from '../../../../assets/check.svg';
 import { useState } from 'react';
 import Button from '../../../components/Button';
+import useAuthStore from '../../../store/authStore';
+import { withdrawCouncil } from '../../../api/councilMyPage';
 
 const CouncilCancelMembershipScreen = ({ navigation }) => {
   const [isChecked, setIsChecked] = useState(false);
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleWithdraw = async () => {
+    try {
+      setIsLoading(true);
+      const isSuccess = await withdrawCouncil(password);
+
+      if (isSuccess) {
+        Alert.alert('알림', '회원 탈퇴가 완료되었습니다.', [
+          {
+            text: '확인',
+            onPress: () => {
+              logout();
+            },
+          },
+        ]);
+      } else {
+        Alert.alert(
+          '실패',
+          '회원 탈퇴에 실패했습니다. 비밀번호를 확인해주세요.'
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('오류', '알 수 없는 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
@@ -23,7 +65,7 @@ const CouncilCancelMembershipScreen = ({ navigation }) => {
         <View style={styles.mainContentWrapper}>
           <Text style={styles.mainContentTitle}>회원 탈퇴 전</Text>
           <Text style={styles.mainContentDescription}>
-            아래 유의사항을 확인해주세요
+            아래 유의사항을 확인해주세요.
           </Text>
           <View style={styles.noticeItemWrapper}>
             <View style={styles.noticeItem}>
@@ -67,15 +109,21 @@ const CouncilCancelMembershipScreen = ({ navigation }) => {
               탈퇴 시 유의사항을 모두 확인하였습니다.
             </Text>
           </View>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="비밀번호를 입력해주세요"
+            placeholderTextColor={colors.gray[400]}
+            secureTextEntry={true}
+            value={password}
+            onChangeText={setPassword}
+          />
         </View>
         <View style={styles.buttonWrapper}>
           <Button
             isOrange={true}
-            title="탈퇴하기"
-            onPress={() => {
-              navigation.goBack();
-            }}
-            disabled={!isChecked}
+            title={isLoading ? '처리 중...' : '탈퇴하기'}
+            onPress={handleWithdraw}
+            disabled={!isChecked || !password || isLoading}
             style={{
               width: '100%',
               height: 50,
@@ -83,7 +131,10 @@ const CouncilCancelMembershipScreen = ({ navigation }) => {
               paddingVertical: 15,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.orange[400],
+              backgroundColor:
+                !isChecked || !password || isLoading
+                  ? colors.gray[400]
+                  : colors.orange[400],
               borderRadius: 10,
             }}
           />
@@ -101,7 +152,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    // paddingVertical: 28,
   },
   contentContainer: {
     flexGrow: 1,
@@ -160,6 +210,16 @@ const styles = StyleSheet.create({
   noticCheckText: {
     ...typography.body4Bold,
     color: colors.gray[850],
+  },
+  passwordInput: {
+    ...typography.body3Regular,
+    color: colors.gray[850],
+    marginTop: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.gray[250],
   },
   buttonWrapper: {
     marginTop: 'auto',
