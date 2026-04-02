@@ -28,7 +28,8 @@ export const createInquiry = async (title, content) => {
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
 
-    if (response.data.code === 200 || response.data.code === 0) {
+    const code = response.data.code;
+    if (code === 200 || code === 201 || code === 0) {
       return response.data.data;
     }
     return false;
