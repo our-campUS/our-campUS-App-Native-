@@ -51,9 +51,7 @@ const FindRepresentativePassword = ({ navigation }) => {
         onPressBack={() => navigation.goBack()}
       />
       <View style={styles.statusBar}>
-        <View
-          style={{ backgroundColor: colors.gray[100], width: '100%' }}
-         />
+        <View style={{ backgroundColor: colors.gray[100], width: '100%' }} />
       </View>
       <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
         <ScrollView>

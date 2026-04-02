@@ -178,10 +178,10 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
         <View style={[styles.statusBar]}>
           <View
             style={{ backgroundColor: colors.orange[400], width: '16.67%' }}
-           />
+          />
           <View
             style={{ backgroundColor: colors.gray[100], width: '83.33%' }}
-           />
+          />
         </View>
         <ScrollView
           keyboardShouldPersistTaps="handled"

@@ -154,10 +154,10 @@ const ReceiveAuthCode = ({ navigation, route }) => {
         <View style={[styles.statusBar]}>
           <View
             style={{ backgroundColor: colors.orange[400], width: '33.33%' }}
-           />
+          />
           <View
             style={{ backgroundColor: colors.gray[100], width: '66.67%' }}
-           />
+          />
         </View>
         <View style={styles.contents}>
           <View style={styles.inputWrapper}>

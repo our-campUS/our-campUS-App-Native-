@@ -161,9 +161,7 @@ const VerifyRepresentativeIdCode = ({ navigation, route }) => {
       >
         <View style={{ width: '100%', height: 20 }} />
         <View style={[styles.statusBar]}>
-          <View
-            style={{ backgroundColor: colors.gray[100], width: '100%' }}
-           />
+          <View style={{ backgroundColor: colors.gray[100], width: '100%' }} />
         </View>
         <View style={styles.contents}>
           <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>

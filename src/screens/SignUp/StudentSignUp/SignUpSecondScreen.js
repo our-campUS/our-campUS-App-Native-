@@ -65,9 +65,7 @@ const SignUpSecondScreen = ({ navigation, route }) => {
       />
       <View style={{ width: '100%', height: 20 }} />
       <View style={[styles.statusBar]}>
-        <View
-          style={{ backgroundColor: colors.blue[400], width: '100%' }}
-         />
+        <View style={{ backgroundColor: colors.blue[400], width: '100%' }} />
       </View>
       <View style={styles.container}>
         <View style={styles.mainContent}>

@@ -98,12 +98,8 @@ const SignUpFirstScreen = ({ navigation, route }) => {
           contentContainerStyle={{ flexGrow: 1 }}
         >
           <View style={[styles.statusBar]}>
-            <View
-              style={{ backgroundColor: colors.blue[400], width: '50%' }}
-             />
-            <View
-              style={{ backgroundColor: colors.gray[100], width: '50%' }}
-             />
+            <View style={{ backgroundColor: colors.blue[400], width: '50%' }} />
+            <View style={{ backgroundColor: colors.gray[100], width: '50%' }} />
           </View>
           <View style={styles.greetingContainer}>
             <Text style={styles.greetingTitle}>

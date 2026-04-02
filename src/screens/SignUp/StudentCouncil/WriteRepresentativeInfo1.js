@@ -124,12 +124,8 @@ const WriteRepresentativeInfo1 = ({ navigation, route }) => {
         />
         <View style={{ width: '100%', height: 20 }} />
         <View style={[styles.statusBar]}>
-          <View
-            style={{ backgroundColor: colors.orange[400], width: '50%' }}
-           />
-          <View
-            style={{ backgroundColor: colors.gray[100], width: '50%' }}
-           />
+          <View style={{ backgroundColor: colors.orange[400], width: '50%' }} />
+          <View style={{ backgroundColor: colors.gray[100], width: '50%' }} />
         </View>
         <ScrollView
           keyboardShouldPersistTaps="handled"

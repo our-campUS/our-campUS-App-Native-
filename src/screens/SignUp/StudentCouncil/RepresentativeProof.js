@@ -124,12 +124,8 @@ const RepresentativeProof = ({ navigation, route }) => {
       />
       <View style={{ width: '100%', height: 20 }} />
       <View style={styles.statusBar}>
-        <View
-          style={{ backgroundColor: colors.orange[400], width: '75%' }}
-         />
-        <View
-          style={{ backgroundColor: colors.gray[100], width: '25%' }}
-         />
+        <View style={{ backgroundColor: colors.orange[400], width: '75%' }} />
+        <View style={{ backgroundColor: colors.gray[100], width: '25%' }} />
       </View>
       <View style={styles.contentContainer}>
         <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>
