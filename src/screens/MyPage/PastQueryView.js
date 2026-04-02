@@ -1,17 +1,71 @@
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import { PAST_QUERY_DATA } from '../../constants/DummyData';
+import { getMyInquiries } from '../../api/inquiry';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import ArrowDownIcon from '../../../assets/ArrowDown.svg';
 import ArrowUpIcon from '../../../assets/ArrowUp.svg';
 import PendingInqueryIcon from '../../../assets/PendingInqueryIcon.svg';
 import AnsweredInqueryIcon from '../../../assets/AnsweredInqueryIcon.svg';
 import useAuthStore from '../../store/authStore';
+import EmptyResult from '../../components/common/EmptyResult';
+import LoadingFooter from '../../components/common/LoadingFooter';
 
-const PastQueryView = () => {
+const PAGE_SIZE = 20;
+
+const formatDate = (isoString) => {
+  if (!isoString) {
+    return '';
+  }
+  return isoString.slice(0, 10).replace(/-/g, '.');
+};
+
+const PastQueryView = ({ refreshKey }) => {
   const [expandedItems, setExpandedItems] = useState({});
+  const [inquiries, setInquiries] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
+
+  const fetchInquiries = useCallback(async (pageNum = 0, isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+
+    const result = await getMyInquiries(pageNum, PAGE_SIZE);
+
+    if (result) {
+      const newItems = result.content || [];
+      if (isRefresh || pageNum === 0) {
+        setInquiries(newItems);
+      } else {
+        setInquiries((prev) => [...prev, ...newItems]);
+      }
+      setPage(pageNum);
+      setHasMore(pageNum + 1 < result.totalPages);
+    }
+
+    setLoading(false);
+    setRefreshing(false);
+  }, []);
+
+  useEffect(() => {
+    fetchInquiries(0, true);
+  }, [fetchInquiries, refreshKey]);
+
+  const handleRefresh = useCallback(() => {
+    fetchInquiries(0, true);
+  }, [fetchInquiries]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      fetchInquiries(page + 1);
+    }
+  }, [loading, hasMore, page, fetchInquiries]);
 
   const toggleItem = (itemId) => {
     setExpandedItems((prev) => ({
@@ -22,9 +76,18 @@ const PastQueryView = () => {
 
   return (
     <FlatList
-      data={PAST_QUERY_DATA}
+      data={inquiries}
+      onRefresh={handleRefresh}
+      refreshing={refreshing}
+      onEndReached={handleLoadMore}
+      onEndReachedThreshold={0.4}
+      ListEmptyComponent={
+        !loading ? <EmptyResult message="등록된 문의가 없습니다." /> : null
+      }
+      ListFooterComponent={<LoadingFooter loading={loading} />}
       renderItem={({ item }) => {
         const isExpanded = expandedItems[item.id] || false;
+        const isAnswered = item.status !== 'WAITING';
         return (
           <View style={styles.itemContainer}>
             <View style={styles.itemHeaderWrapper}>
@@ -34,7 +97,7 @@ const PastQueryView = () => {
                   <Text style={styles.inqueryContent}>{item.content}</Text>
                 )}
                 <View style={styles.itemDateWrapper}>
-                  {item.answerStatus ? (
+                  {isAnswered ? (
                     <AnsweredInqueryIcon
                       width={45}
                       height={17}
@@ -43,7 +106,9 @@ const PastQueryView = () => {
                   ) : (
                     <PendingInqueryIcon width={45} height={17} />
                   )}
-                  <Text style={styles.itemDate}>{item.date}</Text>
+                  <Text style={styles.itemDate}>
+                    {formatDate(item.createdAt)}
+                  </Text>
                 </View>
               </View>
               <Pressable onPress={() => toggleItem(item.id)}>
@@ -54,7 +119,7 @@ const PastQueryView = () => {
                 )}
               </Pressable>
             </View>
-            {isExpanded && item.answerStatus && (
+            {isExpanded && isAnswered && (
               <View
                 style={[
                   styles.inqueryAnswerWrapper,
@@ -66,22 +131,20 @@ const PastQueryView = () => {
                 ]}
               >
                 <Text style={styles.inqueryAnswerContent}>{item.answer}</Text>
-                <Text style={styles.answeredDate}>{item.answeredDate}</Text>
+                <Text style={styles.answeredDate}>
+                  {formatDate(item.answeredAt)}
+                </Text>
               </View>
             )}
           </View>
         );
       }}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => String(item.id)}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
   itemContainer: {
     padding: 20,
     borderBottomWidth: 1,
@@ -109,23 +172,6 @@ const styles = StyleSheet.create({
     ...typography.caption1Regular,
     color: colors.gray[600],
     marginLeft: 11,
-  },
-  itemContent: {
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: colors.gray[200],
-  },
-  contentLabel: {
-    ...typography.body4Bold,
-    color: colors.gray[850],
-    marginBottom: 8,
-  },
-  contentText: {
-    ...typography.body3Regular,
-    color: colors.gray[700],
-    marginBottom: 16,
-    lineHeight: 20,
   },
   inqueryContent: {
     ...typography.body4Regular,

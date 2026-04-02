@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LabelTitle from '../../components/LabelTitle';
-import typography from '../../style/typography';
 import colors from '../../style/colors';
 import InquerySelectTab from '../../components/MyPage/InquerySelectTab';
 import { useState } from 'react';
@@ -12,7 +11,9 @@ import useAuthStore from '../../store/authStore';
 const InqueryMainScreen = ({ navigation }) => {
   const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
   const [activeTab, setActiveTab] = useState('pastInquery');
+  const [refreshKey, setRefreshKey] = useState(0);
   const handleCreateQuery = () => {
+    setRefreshKey((prev) => prev + 1);
     setActiveTab('pastInquery');
   };
 
@@ -26,7 +27,7 @@ const InqueryMainScreen = ({ navigation }) => {
       {/* <View style={{ width: '100%', height: 20 }} /> */}
       <InquerySelectTab activeTab={activeTab} setActiveTab={setActiveTab} />
       {activeTab === 'pastInquery' ? (
-        <PastQueryView />
+        <PastQueryView refreshKey={refreshKey} />
       ) : (
         <CreateNewQueryView handleCreateQuery={handleCreateQuery} />
       )}
@@ -37,7 +38,7 @@ const InqueryMainScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.common.white,
   },
 });
 
