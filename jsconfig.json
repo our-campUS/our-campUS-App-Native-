@@ -8,7 +8,8 @@
       "@api/*": ["src/api/*"],
       "@style/*": ["src/style/*"],
       "@constants/*": ["src/constants/*"],
-      "@assets/*": ["assets/*"]
+      "@assets/*": ["assets/*"],
+      "@store/*": ["src/store/*"]
     },
     "jsx": "react-native",
     "target": "ES6",
