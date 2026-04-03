@@ -11,9 +11,16 @@ import ListItem from '../../../components/common/ListItem';
 import CouncilDefaultImage from '../../../../assets/councilDefaultImage.png';
 import MY_PAGE_MENU_LINKS from '../../../constants/myPageMenuLinks';
 import useAuthStore from '../../../store/authStore';
+import { getCouncilProfile } from '../../../api/councilMyPage';
+import { useEffect } from 'react';
 
 const CouncilMyPageDefaultScreen = ({ navigation }) => {
   const { user } = useAuthStore();
+
+  useEffect(() => {
+    getCouncilProfile();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <View style={styles.councilIdentityContainer}>
