@@ -176,7 +176,7 @@ const CouncilSendProof = ({ navigation, route }) => {
           isOrange={true}
           disabled={!selectedImage}
           title="다음"
-          //   onPress={() => handleFinalSubmit()}
+          // TODO: 백엔드와 증빙 재제출 API 확인 후 handleFinalSubmit 연결
           onPress={() => {
             navigation.navigate('CouncilProfileScreen', {
               showToast: true,
