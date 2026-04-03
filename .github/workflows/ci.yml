@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  android-build:
+    name: Android Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 17
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-
+
+      - run: npm ci
+
+      - name: Create .env
+        run: |
+          cat <<'EOF' > .env
+          KAKAO_NATIVE_APP_KEY=ci_dummy_key
+          NAVER_CLIENT_ID=ci_dummy_id
+          API_BASE_URL=https://localhost
+          KAKAO_REST_API_KEY=ci_dummy_rest
+          KAKAO_JAVASCRIPT_KEY=ci_dummy_js
+          EOF
+
+      - name: Create local.properties
+        run: |
+          cat <<'EOF' > android/local.properties
+          sdk.dir=${{ env.ANDROID_HOME }}
+          KAKAO_NATIVE_APP_KEY=ci_dummy_key
+          EOF
+
+      - name: Build Android Debug
+        working-directory: android
+        run: ./gradlew assembleDebug -Dorg.gradle.java.home=$JAVA_HOME --no-daemon -PreactNativeArchitectures=x86_64
+
+  ios-build:
+    name: iOS Build
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Create .env
+        run: |
+          cat <<'EOF' > .env
+          KAKAO_NATIVE_APP_KEY=ci_dummy_key
+          NAVER_CLIENT_ID=ci_dummy_id
+          API_BASE_URL=https://localhost
+          KAKAO_REST_API_KEY=ci_dummy_rest
+          KAKAO_JAVASCRIPT_KEY=ci_dummy_js
+          EOF
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: pods-
+
+      - name: Install CocoaPods
+        working-directory: ios
+        run: bundle exec pod install
+
+      - name: Build iOS Simulator
+        run: |
+          xcodebuild \
+            -workspace ios/ourCampusApp.xcworkspace \
+            -scheme ourCampusApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            | tail -50
