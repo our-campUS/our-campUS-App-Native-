@@ -1,6 +1,29 @@
 import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
 
+// 학생회 프로필 조회 ( GET /council/profile )
+export async function getCouncilProfile() {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    const response = await api.get('/council/profile', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (response.data.code === 200 || response.data.code === 0) {
+      const { councilNickname, councilProfileImageUrl } = response.data.data;
+      useAuthStore.getState().updateUser({
+        councilNickname,
+        councilProfileImageUrl,
+      });
+      return response.data.data;
+    }
+    return false;
+  } catch (error) {
+    console.error('getCouncilProfile error:', error);
+    return false;
+  }
+}
+
 // 학생회 닉네임 수정 ( patch council/change/nickname )
 export async function changeCouncilNickname(nickname) {
   try {
