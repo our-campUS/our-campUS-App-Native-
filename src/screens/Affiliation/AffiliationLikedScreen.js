@@ -80,10 +80,12 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
       }
     };
     fetchStudentAffiliateDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params?.item]);
 
   useEffect(() => {
     console.log('councilType', councilType);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params?.councilType]);
 
   useEffect(() => {
@@ -103,21 +105,23 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
       setImagesLoaded({});
       setIsFirstImageLoaded(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detailData?.images]);
 
-  //   useEffect(() => {
-  //     const fetchStudentAffiliateRecommendList = async () => {
-  //       let category = detailData?.category;
-  //       const response = await getStudentAffiliateRecommendList(
-  //         accessToken,
-  //         councilType,
-  //         item?.id,
-  //         detailData?.category
-  //       );
-  //       setRecommendData(response?.data?.data?.content || []);
-  //     };
-  //     fetchStudentAffiliateRecommendList();
-  //   }, [detailData]);
+  useEffect(() => {
+    if (!councilType) return;
+    const fetchStudentAffiliateRecommendList = async () => {
+      const data = await getStudentAffiliateRecommendList(
+        accessToken,
+        councilType,
+        item?.id,
+        detailData?.category
+      );
+      setRecommendData(data?.content || []);
+    };
+    fetchStudentAffiliateRecommendList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailData]);
 
   useEffect(() => {
     console.log('recommendData', recommendData);
