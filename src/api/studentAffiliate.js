@@ -2,134 +2,134 @@ import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
 
 // 학교 총학생회 제휴 게시글 목록 조회
-export const getStudentSchoolAffiliateList = async (accessToken) => {
+export const getStudentSchoolAffiliateList = async (accessToken, page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
         councilType: 'SCHOOL_COUNCIL',
         category: 'PARTNERSHIP',
         size: 10,
-        page: 1,
+        page,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentSchoolAffiliateList response', response);
-    return response.data.data.content;
+    return response.data.data;
   } catch (error) {
     console.error('getStudentSchoolAffiliateList error', error.response);
-    return [];
+    return null;
   }
 };
 
 // 학교 총학생회 행사 게시글 목록 조회
-export const getStudentSchoolEventList = async (accessToken) => {
+export const getStudentSchoolEventList = async (accessToken, page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
         councilType: 'SCHOOL_COUNCIL',
         category: 'EVENT',
         size: 10,
-        page: 1,
+        page,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentSchoolEventList response', response);
-    return response.data.data.content;
+    return response.data.data;
   } catch (error) {
     console.error('getStudentSchoolEventList error', error.response);
-    return [];
+    return null;
   }
 };
 
 // 전공 학생회 제휴 게시글 목록 조회
-export const getStudentMajorAffiliateList = async (accessToken) => {
+export const getStudentMajorAffiliateList = async (accessToken, page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
         councilType: 'MAJOR_COUNCIL',
         category: 'PARTNERSHIP',
         size: 10,
-        page: 1,
+        page,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentMajorAffiliateList response', response);
-    return response.data.data.content;
+    return response.data.data;
   } catch (error) {
     console.error('getStudentMajorAffiliateList error', error.response);
-    return [];
+    return null;
   }
 };
 
 // 전공 학생회 행사 게시글 목록 조회
-export const getStudentMajorEventList = async (accessToken) => {
+export const getStudentMajorEventList = async (accessToken, page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
         councilType: 'MAJOR_COUNCIL',
         category: 'EVENT',
         size: 10,
-        page: 1,
+        page,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentMajorEventList response', response);
-    return response.data.data.content;
+    return response.data.data;
   } catch (error) {
     console.error('getStudentMajorEventList error', error.response);
-    return [];
+    return null;
   }
 };
 
 // 단과대 제휴 게시글 목록 조회
-export const getStudentCollegeAffiliateList = async (accessToken) => {
+export const getStudentCollegeAffiliateList = async (accessToken, page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
         councilType: 'COLLEGE_COUNCIL',
         category: 'PARTNERSHIP',
         size: 10,
-        page: 1,
+        page,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentCollegeAffiliateList response', response);
-    return response.data.data.content;
+    return response.data.data;
   } catch (error) {
     console.error('getStudentCollegeAffiliateList error', error.response);
-    return [];
+    return null;
   }
 };
 
 // 단과대 행사 게시글 목록 조회
-export const getStudentCollegeEventList = async (accessToken) => {
+export const getStudentCollegeEventList = async (accessToken, page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
         councilType: 'COLLEGE_COUNCIL',
         category: 'EVENT',
         size: 10,
-        page: 1,
+        page,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentCollegeEventList response', response);
-    return response.data.data.content;
+    return response.data.data;
   } catch (error) {
     console.error('getStudentCollegeEventList error', error.response);
-    return [];
+    return null;
   }
 };
 
