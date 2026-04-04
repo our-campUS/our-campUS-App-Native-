@@ -89,11 +89,11 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       }
     };
     fetchStudentAffiliateDetail();
-  }, [route.params?.item]);
+  }, [route.params?.item, accessToken]);
 
   useEffect(() => {
     console.log('councilType', councilType);
-  }, [route.params?.councilType]);
+  }, [councilType]);
 
   useEffect(() => {
     console.log('detailData', detailData);
@@ -112,7 +112,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       setImagesLoaded({});
       setIsFirstImageLoaded(false);
     }
-  }, [detailData?.images]);
+  }, [detailData?.images, detailData, detailImages]);
 
   useEffect(() => {
     if (!councilType) return;
@@ -126,7 +126,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       setRecommendData(data?.content || []);
     };
     fetchStudentAffiliateRecommendList();
-  }, [detailData]);
+  }, [detailData, accessToken, councilType, item?.id]);
 
   useEffect(() => {
     console.log('recommendData', recommendData);
@@ -339,7 +339,22 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
               contentContainerStyle={{ gap: 10 }}
               style={{ marginTop: 20 }}
               showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => <RecommendStoreCard item={item} />}
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => {
+                    navigation.push('AffiliationDetailScreen', {
+                      councilType,
+                      item: {
+                        ...item,
+                        id: item.postId || item.id,
+                        placeName: item.place || item.placeName,
+                      },
+                    });
+                  }}
+                >
+                  <RecommendStoreCard item={item} />
+                </Pressable>
+              )}
               keyExtractor={(item) => item.id}
             />
           </View>
