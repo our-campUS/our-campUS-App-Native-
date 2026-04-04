@@ -19,9 +19,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
 import { useNavigation } from '@react-navigation/native';
-import { getTodayEvent } from '../../api/studentAffiliate';
+import { getUpcomingEventsAll } from '../../api/studentAffiliate';
 import { checkUnreadNotification } from '../../api/notification';
-import { formatKoreanTime } from '../../utils/dateTime';
+import VerticalEventTicker from '../../components/home/VerticalEventTicker';
 
 const HomeSection = ({
   title,
@@ -51,7 +51,7 @@ const HomeScreen = () => {
 
   const user = useAuthStore((state) => state.user);
   const navigation = useNavigation();
-  const [todayEvent, setTodayEvent] = useState(null);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const { accessToken } = useAuthStore();
 
   useEffect(() => {
@@ -64,18 +64,13 @@ const HomeScreen = () => {
   }, [accessToken]);
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchUpcomingEvents = async () => {
       if (!accessToken) return;
-
-      const response = await getTodayEvent(accessToken);
-      if (response?.code === 0 && response?.data) {
-        setTodayEvent(response.data);
-      } else {
-        setTodayEvent(null);
-      }
+      const events = await getUpcomingEventsAll();
+      setUpcomingEvents(events);
     };
 
-    fetchEvent();
+    fetchUpcomingEvents();
   }, [accessToken]);
 
   useEffect(() => {
@@ -86,6 +81,13 @@ const HomeScreen = () => {
 
     fetchData();
   }, []);
+
+  const handleEventPress = (event) => {
+    navigation.navigate('AffiliationDetailScreen', {
+      item: event,
+      councilType: event.councilType,
+    });
+  };
 
   if (!user) {
     return (
@@ -119,25 +121,10 @@ const HomeScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {todayEvent ? (
-              <TouchableOpacity style={styles.eventBox}>
-                <Text
-                  style={styles.eventText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  <Text style={styles.boldText}>오늘의 행사</Text>
-                  {todayEvent.placeName} ‘{todayEvent.title}’가{' '}
-                  {formatKoreanTime(todayEvent.startDateTime)}에 있습니다 🎉
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <View style={[styles.eventBox, { backgroundColor: '#F5F5F5' }]}>
-                <Text style={[styles.eventText, { color: '#999' }]}>
-                  오늘은 예정된 행사가 없습니다 😴
-                </Text>
-              </View>
-            )}
+            <VerticalEventTicker
+              events={upcomingEvents}
+              onEventPress={handleEventPress}
+            />
           </View>
 
           {/* 캐러셀 */}
@@ -225,17 +212,6 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 3,
     backgroundColor: theme.colors.primary2,
-  },
-  eventBox: {
-    backgroundColor: theme.colors.primary1Light,
-    padding: 10,
-    borderRadius: 8,
-  },
-  eventText: { ...theme.typography.body4Regular, color: theme.colors.text },
-  boldText: {
-    ...theme.typography.body4Bold,
-    marginRight: 8,
-    color: theme.colors.text,
   },
   carouselWrapper: {
     marginTop: 20,
