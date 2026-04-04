@@ -1,4 +1,5 @@
 import api from './axiosInstance';
+import useAuthStore from '../store/authStore';
 
 // 학교 총학생회 제휴 게시글 목록 조회
 export const getStudentSchoolAffiliateList = async (accessToken) => {
@@ -306,5 +307,29 @@ export const getTodayEvent = async (accessToken) => {
   } catch (error) {
     console.error('오늘의 행사 조회 실패:', error);
     return null;
+  }
+};
+
+// 전체 학생회 타입 72시간 이내 행사 통합 조회 (우선순위: school → college → major)
+export const getUpcomingEventsAll = async () => {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    const [schoolEvents, collegeEvents, majorEvents] = await Promise.all([
+      getStudentSchoolUpcomingEventList(accessToken),
+      getStudentCollegeUpcomingEventList(accessToken),
+      getStudentMajorUpcomingEventList(accessToken),
+    ]);
+
+    const tag = (events, councilType) =>
+      events.map((e) => ({ ...e, councilType }));
+
+    return [
+      ...tag(schoolEvents, 'school'),
+      ...tag(collegeEvents, 'college'),
+      ...tag(majorEvents, 'major'),
+    ];
+  } catch (error) {
+    console.error('getUpcomingEventsAll error', error);
+    return [];
   }
 };
