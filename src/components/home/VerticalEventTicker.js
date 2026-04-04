@@ -51,8 +51,16 @@ const VerticalEventTicker = ({ events, onEventPress }) => {
 
         if (nextIndex >= displayEvents.length) {
           translateY.setValue(0);
-          indexRef.current = 0;
-          animate();
+          indexRef.current = 1;
+          Animated.timing(translateY, {
+            toValue: -ITEM_HEIGHT,
+            duration: ANIM_MS,
+            useNativeDriver: true,
+          }).start(({ finished }) => {
+            if (finished && active) {
+              animate();
+            }
+          });
           return;
         }
 
