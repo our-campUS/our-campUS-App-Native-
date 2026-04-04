@@ -145,6 +145,26 @@ export async function resendCouncilChangeEmailCode(email) {
   }
 }
 
+// 학생회 이메일 변경 요청 ( PATCH /council/change/email )
+export async function changeCouncilEmail(email, electionImageUrl) {
+  try {
+    const accessToken = useAuthStore.getState().accessToken;
+    const response = await api.patch(
+      '/council/change/email',
+      { email, electionImageUrl },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    const code = response.data.code;
+    if (code === 200 || code === 201 || code === 0) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('changeCouncilEmail error:', error);
+    return false;
+  }
+}
+
 // 학생회 회원탈퇴 ( PATCH /auth/council/withdraw )
 export async function withdrawCouncil(password) {
   try {

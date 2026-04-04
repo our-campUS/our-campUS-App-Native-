@@ -5,24 +5,22 @@ import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
 import CheckerboardPlaceholder from '../../../components/common/CheckerboardPlaceholder';
 import UploadButton from '../../../components/common/UploadButton';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import Button from '../../../components/Button';
-import { submitCouncilSignUp } from '../../../api/councilSignUp';
+import { changeCouncilEmail } from '../../../api/councilMyPage';
 import {
   getCommonImagePresignedUrl,
   convertToPng,
   uploadImageToPresignedUrl,
 } from '../../../api/uploadImage';
-import useToastStore from '../../../store/toastStore';
 
 const CouncilSendProof = ({ navigation, route }) => {
-  const finalData = route.params?.finalData;
+  const email = route.params?.email;
   const [selectedImage, setSelectedImage] = useState(null);
-  const showToast = useToastStore((state) => state.showToast);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleImagePicker = () => {
-    console.log('finalData', finalData);
     Alert.alert(
       '이미지 선택',
       '이미지를 선택하는 방법을 선택해주세요',
@@ -90,29 +88,33 @@ const CouncilSendProof = ({ navigation, route }) => {
   };
 
   const handleFinalSubmit = async () => {
-    console.log('finalData', finalData);
-    console.log('selectedImage', selectedImage);
-    const convertedImage = await convertToPng(selectedImage);
-    console.log('convertedImage', convertedImage);
-    const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
-      convertedImage
-    );
-    console.log('imageUrl', imageUrl);
-    console.log('uploadUrl', uploadUrl);
+    if (isLoading) {
+      return;
+    }
+    setIsLoading(true);
 
-    await uploadImageToPresignedUrl(uploadUrl, convertedImage);
+    try {
+      const convertedImage = await convertToPng(selectedImage);
+      const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(
+        convertedImage
+      );
+      await uploadImageToPresignedUrl(uploadUrl, convertedImage);
 
-    const finalDataReady = {
-      ...finalData,
-      electionImageUrl: imageUrl,
-    };
-    console.log('finalDataReady', finalDataReady);
-    const response = await submitCouncilSignUp(finalDataReady);
-    console.log('response', response);
-    if (response.isSuccess) {
-      navigation.navigate('RepresentativeSuccess');
-    } else {
-      Alert.alert('오류', response.message);
+      const isSuccess = await changeCouncilEmail(email, imageUrl);
+
+      if (isSuccess) {
+        navigation.navigate('CouncilProfileScreen', {
+          showToast: true,
+          toastType: 'black',
+          toastMessage: '변경사항 확인 후 자동으로 변경됩니다',
+        });
+      } else {
+        Alert.alert('실패', '이메일 변경 요청에 실패했습니다.');
+      }
+    } catch (error) {
+      Alert.alert('오류', '이미지 업로드 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,18 +126,11 @@ const CouncilSendProof = ({ navigation, route }) => {
         onPressBack={() => navigation.goBack()}
         navigation={navigation}
       />
-      {/* <View style={{ width: '100%', height: 20 }}></View> */}
       <View style={styles.contentContainer}>
-        <Text style={{ ...typography.body3Regular, color: colors.gray[800] }}>
+        <Text style={styles.subtitleText}>
           학생회 구성원을 인증하는 단계에요
         </Text>
-        <Text
-          style={{
-            ...typography.heading4,
-            color: colors.gray[850],
-            marginTop: 4,
-          }}
-        >
+        <Text style={styles.titleText}>
           당선 여부를 확인할 수 있는 자료를{'\n'}업로드 해주세요.
         </Text>
         <Pressable
@@ -160,13 +155,7 @@ const CouncilSendProof = ({ navigation, route }) => {
             </>
           )}
         </Pressable>
-        <Text
-          style={{
-            ...typography.caption1Regular,
-            color: colors.gray[600],
-            marginTop: 8,
-          }}
-        >
+        <Text style={styles.captionText}>
           학과,학번,실명이 포함된 공식자료를 첨부해 주세요.{'\n'}예시:
           실물/모바일 학생증
         </Text>
@@ -174,26 +163,10 @@ const CouncilSendProof = ({ navigation, route }) => {
       <View style={styles.buttonContainer}>
         <Button
           isOrange={true}
-          disabled={!selectedImage}
-          title="다음"
-          // TODO: 백엔드와 증빙 재제출 API 확인 후 handleFinalSubmit 연결
-          onPress={() => {
-            navigation.navigate('CouncilProfileScreen', {
-              showToast: true,
-              toastType: 'black',
-              toastMessage: '변경사항 확인 후 자동으로 변경됩니다',
-            });
-          }}
-          style={{
-            width: '100%',
-            height: 50,
-            paddingHorizontal: 10,
-            paddingVertical: 15,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: colors.orange[400],
-            borderRadius: 10,
-          }}
+          disabled={!selectedImage || isLoading}
+          title={isLoading ? '처리 중...' : '다음'}
+          onPress={handleFinalSubmit}
+          style={styles.button}
         />
       </View>
     </SafeAreaView>
@@ -205,16 +178,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.common.white,
   },
-  statusBar: {
-    height: 5,
-    width: '100%',
-    flexDirection: 'row',
-    marginTop: 10,
-  },
   contentContainer: {
     flex: 1,
     paddingHorizontal: 20,
     marginTop: 24,
+  },
+  subtitleText: {
+    ...typography.body3Regular,
+    color: colors.gray[800],
+  },
+  titleText: {
+    ...typography.heading4,
+    color: colors.gray[850],
+    marginTop: 4,
+  },
+  captionText: {
+    ...typography.caption1Regular,
+    color: colors.gray[600],
+    marginTop: 8,
   },
   imageUploadWrapper: {
     width: '100%',
@@ -233,6 +214,16 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 12,
     resizeMode: 'cover',
+  },
+  button: {
+    width: '100%',
+    height: 50,
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.orange[400],
+    borderRadius: 10,
   },
   buttonContainer: {
     width: '100%',
