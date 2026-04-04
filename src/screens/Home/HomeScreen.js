@@ -89,6 +89,12 @@ const HomeScreen = () => {
     });
   };
 
+  const handleCarouselPress = (item) => {
+    if (item.id === '1') {
+      navigation.navigate('Partnership');
+    }
+  };
+
   if (!user) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -129,7 +135,10 @@ const HomeScreen = () => {
 
           {/* 캐러셀 */}
           <View style={styles.carouselWrapper}>
-            <MainCarousel data={CAROUSEL_DATA} />
+            <MainCarousel
+              data={CAROUSEL_DATA}
+              onItemPress={handleCarouselPress}
+            />
           </View>
         </View>
 
