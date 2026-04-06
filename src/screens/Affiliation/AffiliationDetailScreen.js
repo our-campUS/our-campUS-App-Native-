@@ -123,7 +123,18 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
         item?.id,
         detailData?.category
       );
-      setRecommendData(data?.content || []);
+      const content = data?.content || [];
+      setRecommendData(
+        content.map((post) => ({
+          ...post,
+          id: post.postId || post.id,
+          type: post.category === 'PARTNERSHIP' ? '제휴' : '행사',
+          placeName: post.place || post.placeName,
+          placeType: post.placeType || null,
+          detail: post.title,
+          category: post.placeType || null,
+        }))
+      );
     };
     fetchStudentAffiliateRecommendList();
   }, [detailData, accessToken, councilType, item?.id]);
