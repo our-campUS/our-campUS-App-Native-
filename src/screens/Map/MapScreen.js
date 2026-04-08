@@ -6,7 +6,6 @@ import {
   Dimensions,
   TouchableOpacity,
   Platform,
-  Text,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import KakaoMapWebView from '../../components/map/KakaoMapWebView';
@@ -16,15 +15,13 @@ import CategoryList from '../../components/map/CategoryList';
 import { normalizeCategory } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import LocationIcon from '../../../assets/icons/location.svg';
-import CloseIcon from '../../../assets/icons/common/close.svg';
+import LocationTooltip from '../../components/map/LocationTooltip';
 import theme from '../../style';
-import typography from '../../style/typography';
 import colors from '../../style/colors';
 
 import { useMapLogic } from '../../hooks/useMapLogic';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const TRANSPARENT = 'transparent';
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
 const HEIGHT_ITEM = 280;
 const HEIGHT_HIDDEN = 0;
@@ -188,19 +185,7 @@ const MapScreen = () => {
           pointerEvents="box-none"
         >
           {tooltipVisible && (
-            <View style={styles.tooltipWrapper}>
-              <View style={styles.tooltip}>
-                <Text style={styles.tooltipText}>내 주변 제휴를 바로 볼 수 있어요</Text>
-                <TouchableOpacity
-                  onPress={() => setTooltipVisible(false)}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  style={styles.tooltipCloseButton}
-                >
-                  <CloseIcon width={5} height={5} color={theme.colors.primary1} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.tooltipArrow} />
-            </View>
+            <LocationTooltip text="내 주변 제휴를 바로 볼 수 있어요" onClose={() => setTooltipVisible(false)} />
           )}
           <TouchableOpacity
             style={styles.myLocationButton}
@@ -257,37 +242,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...theme.shadows.level1,
     elevation: 5,
-  },
-  tooltipWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  tooltip: {
-    backgroundColor: theme.colors.primary1Light,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  tooltipText: {
-    ...typography.caption2Regular,
-    color: theme.colors.primary1,
-  },
-  tooltipCloseButton: {
-    padding: 2,
-  },
-  tooltipArrow: {
-    width: 0,
-    height: 0,
-    borderTopWidth: 6,
-    borderBottomWidth: 6,
-    borderLeftWidth: 8,
-    borderTopColor: TRANSPARENT,
-    borderBottomColor: TRANSPARENT,
-    borderLeftColor: theme.colors.primary1Light,
   },
 });
 
