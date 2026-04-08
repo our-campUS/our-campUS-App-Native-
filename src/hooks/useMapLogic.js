@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Keyboard } from 'react-native';
+import useLocation, { DEFAULT_LOCATION } from './useLocation';
+import useToastStore from '../store/toastStore';
 
 const LAT_OFFSET_LIST = 0.0025;
 const LAT_OFFSET_ITEM = 0.001;
@@ -33,14 +35,12 @@ export const useMapLogic = (mapRef) => {
   const [nextCursor, setNextCursor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
-  const [userLocation] = useState({
-    latitude: 37.505,
-    longitude: 126.957,
-  });
+  const { userLocation, requestAndGetLocation } = useLocation();
+  const showToast = useToastStore((state) => state.showToast);
 
   const lastCameraRef = useRef({
-    latitude: 37.505,
-    longitude: 126.957,
+    latitude: DEFAULT_LOCATION.latitude,
+    longitude: DEFAULT_LOCATION.longitude,
   });
   useFocusEffect(
     useCallback(() => {
@@ -51,7 +51,7 @@ export const useMapLogic = (mapRef) => {
   );
 
   // --- 데이터 가공 헬퍼 ---
-  const processSearchData = async (rawData, shouldFetchDetails = false) => {
+  const processSearchData = async (rawData) => {
     if (!rawData) return [];
 
     const processedData = rawData.map((item) => {
@@ -86,38 +86,22 @@ export const useMapLogic = (mapRef) => {
     const enrichedData = await Promise.all(
       processedData.map(async (item) => {
         try {
-          // A. 제휴 상세 정보 (기존 로직)
-          const detailData = {};
-          if (shouldFetchDetails && item.postId) {
-            // ... (기존 getPartnershipDetail 호출 로직) ...
-            // detailData = ...
-          }
-
-          // B. [추가] 좋아요/제휴 상태 확인 (GET /places/detail)
-          // placeId가 없으면(네이버 검색 결과 등) 조회가 안 될 수도 있음 -> 서버 로직 확인 필요
-          // 만약 서버가 위도/경도로도 찾아준다면 OK.
           const status = await getPlaceStatus(
-            item.placeId, // 서버 ID (없으면 null일 수도)
+            item.placeId,
             item.latitude,
             item.longitude
           );
 
-          // C. 데이터 병합
-          const merged = {
-            ...item, // 1. 기본 정보
-            ...detailData, // 2. 제휴 상세 정보 (있으면)
-
-            // 3. API에서 isLiked를 명시적으로 제공하면 우선 신뢰, 없으면 getPlaceStatus 결과 사용
+          return {
+            ...item,
             isLiked:
               item.isLiked !== undefined
                 ? item.isLiked
                 : status
                 ? status.isLiked
                 : false,
-
             isPartner: status ? status.isPartnership : item.isPartner,
           };
-          return merged;
         } catch (err) {
           console.warn(`아이템 처리 중 에러: ${item.name}`);
           return item; // 에러나면 기본 정보만 반환
@@ -181,8 +165,7 @@ export const useMapLogic = (mapRef) => {
 
           if (response?.code === 200) {
             newData = await processSearchData(
-              response.data.map((item) => ({ ...item, type: 'PARTNER' })),
-              true
+              response.data.map((item) => ({ ...item, type: 'PARTNER' }))
             );
           }
         } else {
@@ -192,7 +175,7 @@ export const useMapLogic = (mapRef) => {
             lng
           );
 
-          newData = await processSearchData(rawData, true);
+          newData = await processSearchData(rawData);
         }
       }
       // B. 키워드 검색
@@ -203,7 +186,7 @@ export const useMapLogic = (mapRef) => {
         }
 
         const rawData = await getPlacesSearchInfo(searchKeyword, lat, lng);
-        newData = await processSearchData(rawData, true);
+        newData = await processSearchData(rawData);
       }
 
       // 상태 업데이트
@@ -393,13 +376,17 @@ export const useMapLogic = (mapRef) => {
     setPartnerships([]);
   };
 
-  const handleCurrentLocation = () => {
-    const TARGET_LAT = 37.505;
-    const TARGET_LNG = 126.957;
+  const handleCurrentLocation = async () => {
+    const location = await requestAndGetLocation();
+
+    if (!location) {
+      showToast('위치 권한이 없어 현재 위치 기준으로 볼 수 없어요', 'black');
+      return;
+    }
 
     mapRef.current?.animateCameraTo({
-      latitude: TARGET_LAT,
-      longitude: TARGET_LNG,
+      latitude: location.latitude,
+      longitude: location.longitude,
       zoom: 16,
       duration: 500,
     });

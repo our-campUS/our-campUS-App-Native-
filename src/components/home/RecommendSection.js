@@ -4,17 +4,20 @@ import { useNavigation } from '@react-navigation/native';
 import StoreCard from '../common/StoreCard';
 import { getRandomPlaces } from '../../api/place';
 import { calculateDistance } from '../../utils/distance';
+import useLocation, { DEFAULT_LOCATION } from '../../hooks/useLocation';
 const DEFAULT_STORE_IMAGE = require('../../../assets/images/default_image.webp');
 
 const RecommendSection = () => {
   const navigation = useNavigation();
   const [recommendList, setRecommendList] = useState([]);
+  const { getLocationIfPermitted } = useLocation();
 
   useEffect(() => {
     const fetchData = async () => {
-      // 내 위치 (기준점)
-      const myLat = 37.505;
-      const myLng = 126.957;
+      // 이미 권한이 있으면 실제 위치 사용, 없으면 기본 위치(중앙대) 유지
+      const location = await getLocationIfPermitted();
+      const myLat = (location ?? DEFAULT_LOCATION).latitude;
+      const myLng = (location ?? DEFAULT_LOCATION).longitude;
 
       const data = await getRandomPlaces(myLat, myLng);
 
@@ -68,7 +71,7 @@ const RecommendSection = () => {
     };
 
     fetchData();
-  }, []);
+  }, [getLocationIfPermitted]);
 
   const handlePressCard = (item) => {
     navigation.navigate('StoreDetailScreen', { store: item });

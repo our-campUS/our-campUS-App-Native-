@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import {
   View,
   Animated,
@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Platform,
+  Text,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import KakaoMapWebView from '../../components/map/KakaoMapWebView';
@@ -15,11 +16,15 @@ import CategoryList from '../../components/map/CategoryList';
 import { normalizeCategory } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import LocationIcon from '../../../assets/icons/location.svg';
+import CloseIcon from '../../../assets/icons/common/close.svg';
 import theme from '../../style';
+import typography from '../../style/typography';
+import colors from '../../style/colors';
 
 import { useMapLogic } from '../../hooks/useMapLogic';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+const TRANSPARENT = 'transparent';
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
 const HEIGHT_ITEM = 280;
 const HEIGHT_HIDDEN = 0;
@@ -27,6 +32,7 @@ const HEIGHT_HIDDEN = 0;
 const MapScreen = () => {
   const mapRef = useRef(null);
   const insets = useSafeAreaInsets();
+  const [tooltipVisible, setTooltipVisible] = useState(true);
 
   const { state, actions, displayedMarkers, navigation } = useMapLogic(mapRef);
 
@@ -54,6 +60,12 @@ const MapScreen = () => {
   const topHeaderHeight = insets.top + 60 + 20;
   const sheetMaxHeight = SCREEN_HEIGHT - topHeaderHeight;
 
+  const buttonBottom = sheetHeightAnimated.interpolate({
+    inputRange: [HEIGHT_HIDDEN, HEIGHT_ITEM, HEIGHT_LIST],
+    outputRange: [HEIGHT_HIDDEN + 12, HEIGHT_ITEM + 12, HEIGHT_LIST + 12],
+    extrapolate: 'clamp',
+  });
+
   useEffect(() => {
     let targetHeight = HEIGHT_HIDDEN;
     if (selectedMarkerId) targetHeight = HEIGHT_ITEM;
@@ -65,13 +77,8 @@ const MapScreen = () => {
       friction: 8,
       tension: 40,
     }).start();
-  }, [selectedMarkerId, searchKeyword, selectedCategory]);
+  }, [selectedMarkerId, searchKeyword, selectedCategory, sheetHeightAnimated]);
 
-  const buttonTranslateY = sheetHeightAnimated.interpolate({
-    inputRange: [HEIGHT_HIDDEN, HEIGHT_ITEM, HEIGHT_LIST],
-    outputRange: [0, -20, -20],
-    extrapolate: 'clamp',
-  });
 
   const uniqueMarkers = useMemo(() => {
     const seen = new Set();
@@ -174,22 +181,39 @@ const MapScreen = () => {
         )}
       </View>
 
-      {/* 현위치 버튼 */}
-      <Animated.View
-        style={[
-          styles.myLocationButtonWrapper,
-          { transform: [{ translateY: buttonTranslateY }] },
-        ]}
-        pointerEvents="box-none"
-      >
-        <TouchableOpacity
-          style={styles.myLocationButton}
-          onPress={handleCurrentLocation}
-          activeOpacity={0.8}
+      {/* 현위치 버튼 + 툴팁: 바텀시트가 올라왔을 때만 노출 */}
+      {(selectedCategory || searchKeyword) && (
+        <Animated.View
+          style={[styles.myLocationButtonWrapper, { bottom: buttonBottom }]}
+          pointerEvents="box-none"
         >
-          <LocationIcon width={24} height={24} color={theme.colors.textDim} />
-        </TouchableOpacity>
-      </Animated.View>
+          {tooltipVisible && (
+            <View style={styles.tooltipWrapper}>
+              <View style={styles.tooltip}>
+                <Text style={styles.tooltipText}>내 주변 제휴를 바로 볼 수 있어요</Text>
+                <TouchableOpacity
+                  onPress={() => setTooltipVisible(false)}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  style={styles.tooltipCloseButton}
+                >
+                  <CloseIcon width={5} height={5} color={theme.colors.primary1} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.tooltipArrow} />
+            </View>
+          )}
+          <TouchableOpacity
+            style={styles.myLocationButton}
+            onPress={() => {
+              setTooltipVisible(false);
+              handleCurrentLocation();
+            }}
+            activeOpacity={0.8}
+          >
+            <LocationIcon width={24} height={24} color={theme.colors.textDim} />
+          </TouchableOpacity>
+        </Animated.View>
+      )}
 
       {/* 바텀시트 */}
       <BottomSheet
@@ -219,19 +243,51 @@ const styles = StyleSheet.create({
   },
   myLocationButtonWrapper: {
     position: 'absolute',
-    bottom: 30,
     right: 20,
     zIndex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   myLocationButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'white',
+    backgroundColor: colors.common.white,
     justifyContent: 'center',
     alignItems: 'center',
     ...theme.shadows.level1,
     elevation: 5,
+  },
+  tooltipWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  tooltip: {
+    backgroundColor: theme.colors.primary1Light,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  tooltipText: {
+    ...typography.caption2Regular,
+    color: theme.colors.primary1,
+  },
+  tooltipCloseButton: {
+    padding: 2,
+  },
+  tooltipArrow: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 6,
+    borderBottomWidth: 6,
+    borderLeftWidth: 8,
+    borderTopColor: TRANSPARENT,
+    borderBottomColor: TRANSPARENT,
+    borderLeftColor: theme.colors.primary1Light,
   },
 });
 

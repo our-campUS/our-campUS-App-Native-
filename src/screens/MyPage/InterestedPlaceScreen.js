@@ -7,9 +7,7 @@ import EmptyResult from '../../components/common/EmptyResult';
 import { useState, useCallback, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { getLikedPlaces } from '../../api/place';
-
-const USER_LAT = 37.505;
-const USER_LNG = 126.957;
+import useLocation, { DEFAULT_LOCATION } from '../../hooks/useLocation';
 
 const mapToStoreItem = (item) => ({
   ...item,
@@ -27,15 +25,18 @@ const InterestedPlaceScreen = ({ navigation }) => {
   const [hasNext, setHasNext] = useState(true);
   const [loading, setLoading] = useState(false);
   const loadingRef = useRef(false);
+  const { userLocation, getLocationIfPermitted } = useLocation();
 
   const fetchPlaces = useCallback(async (cursor = null) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
     setLoading(true);
     try {
+      const location = await getLocationIfPermitted();
+      const { latitude: lat, longitude: lng } = location ?? DEFAULT_LOCATION;
       const data = await getLikedPlaces({
-        lat: USER_LAT,
-        lng: USER_LNG,
+        lat,
+        lng,
         cursor,
         size: 5,
       });
@@ -49,7 +50,7 @@ const InterestedPlaceScreen = ({ navigation }) => {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, []);
+  }, [getLocationIfPermitted]);
 
   useFocusEffect(
     useCallback(() => {
@@ -79,7 +80,7 @@ const InterestedPlaceScreen = ({ navigation }) => {
         renderItem={({ item }) => (
           <StoreListItem
             item={item}
-            userLocation={{ latitude: USER_LAT, longitude: USER_LNG }}
+            userLocation={userLocation}
             onPress={() =>
               navigation.navigate('StoreDetailScreen', { store: item })
             }

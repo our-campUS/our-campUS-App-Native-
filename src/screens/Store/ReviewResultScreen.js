@@ -23,6 +23,7 @@ import BannerCard from '@components/common/BannerCard';
 import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { getPartnershipList } from '@api/partnership';
+import useLocation, { DEFAULT_LOCATION } from '../../hooks/useLocation';
 
 const formatDistance = (meters) => {
   if (meters == null) return null;
@@ -66,9 +67,12 @@ const ReviewResultScreen = () => {
 
   const [partnerRequested, setPartnerRequested] = useState(false);
   const [partnerStores, setPartnerStores] = useState([]);
+  const { getLocationIfPermitted } = useLocation();
 
   useEffect(() => {
-    const fetchStores = (lat, lng) => {
+    const fetchStores = async () => {
+      const location = await getLocationIfPermitted();
+      const { latitude: lat, longitude: lng } = location ?? DEFAULT_LOCATION;
       getPartnershipList(lat, lng)
         .then((data) => {
           setPartnerStores(
@@ -83,11 +87,11 @@ const ReviewResultScreen = () => {
             }))
           );
         })
-        .catch((e) => console.error('제휴 매장 목록 오류:', e));
+        .catch(() => {});
     };
 
-    fetchStores(37.505, 126.957);
-  }, []);
+    fetchStores();
+  }, [getLocationIfPermitted]);
 
   const handleClose = () => {
     navigation.popToTop();
