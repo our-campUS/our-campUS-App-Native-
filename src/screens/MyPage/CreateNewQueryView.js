@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
   },
   titleInputWrapper: {
+    backgroundColor: colors.common.white,
     borderRadius: 14,
     ...shadows.level2,
     paddingHorizontal: 20,
@@ -105,10 +106,11 @@ const styles = StyleSheet.create({
   inqueryInput: {
     ...typography.body3Regular,
     color: colors.gray[850],
-    height: 100,
+    flex: 1,
     width: '100%',
   },
   textInputWrapper: {
+    backgroundColor: colors.common.white,
     width: '100%',
     height: 166,
     padding: 20,
@@ -117,7 +119,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   inqueryContentLength: {
-    ...typography.body3Regular,
+    ...typography.caption1Regular,
     color: colors.gray[400],
     textAlign: 'right',
     marginTop: 'auto',
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     marginTop: 'auto',
-    marginBottom: 17,
+    marginBottom: 28,
   },
 });
 
