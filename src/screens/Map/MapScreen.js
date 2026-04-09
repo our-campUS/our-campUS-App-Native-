@@ -16,6 +16,7 @@ import { normalizeCategory } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import LocationIcon from '../../../assets/icons/location.svg';
 import LocationTooltip from '../../components/map/LocationTooltip';
+import CustomToast from '../../components/CustomToast';
 import theme from '../../style';
 import colors from '../../style/colors';
 
@@ -212,6 +213,7 @@ const MapScreen = () => {
         onUpdateStore={actions.updatePlaceState}
         userLocation={userLocation}
       />
+      <CustomToast />
     </View>
   );
 };
