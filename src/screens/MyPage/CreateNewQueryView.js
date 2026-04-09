@@ -11,19 +11,45 @@ import typography from '@style/typography';
 import shadows from '@style/shadow';
 import { useEffect, useState } from 'react';
 import Button from '@components/Button';
-import useAuthStore from '@store/authStore';
+import { createInquiry, createCouncilInquiry } from '../../api/inquiry';
+import useToastStore from '../../store/toastStore';
 
-const CreateNewQueryView = ({ handleCreateQuery }) => {
-  const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
+const CreateNewQueryView = ({ handleCreateQuery, isCouncil }) => {
   const [inqueryTitle, setInqueryTitle] = useState('');
   const [inqueryContent, setInqueryContent] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     setIsButtonDisabled(
-      inqueryContent.length < 10 || inqueryTitle.trim().length === 0
+      inqueryContent.length < 10 ||
+        inqueryTitle.trim().length === 0 ||
+        submitting
     );
-  }, [inqueryContent, inqueryTitle]);
+  }, [inqueryContent, inqueryTitle, submitting]);
+
+  const handleSubmit = async () => {
+    if (submitting) {
+      return;
+    }
+    setSubmitting(true);
+    const submitFn = isCouncil ? createCouncilInquiry : createInquiry;
+    const result = await submitFn(inqueryTitle.trim(), inqueryContent);
+    setSubmitting(false);
+
+    if (result) {
+      useToastStore.getState().showToast('문의가 등록되었습니다.', 'success');
+      setInqueryTitle('');
+      setInqueryContent('');
+      setTimeout(() => {
+        handleCreateQuery();
+      }, 800);
+    } else {
+      useToastStore
+        .getState()
+        .showToast('문의 등록에 실패하였습니다.', 'error');
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -77,7 +103,7 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
                 : colors.blue[400],
               borderRadius: 16,
             }}
-            onPress={handleCreateQuery}
+            onPress={handleSubmit}
           />
         </View>
       </View>

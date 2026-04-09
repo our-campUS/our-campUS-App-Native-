@@ -105,6 +105,7 @@ const RepresentativeProof = ({ navigation, route }) => {
       electionImageUrl: imageUrl,
     };
     console.log('finalDataReady', finalDataReady);
+    // TODO: 백엔드와 증빙 업로드 API 응답 구조 확인
     const response = await submitCouncilSignUp(finalDataReady);
     console.log('response', response);
     if (response.isSuccess) {

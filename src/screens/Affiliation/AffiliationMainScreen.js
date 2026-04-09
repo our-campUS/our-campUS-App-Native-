@@ -2,8 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  KeyboardAvoidingView,
-  ScrollView,
   FlatList,
   Pressable,
   TextInput,
@@ -20,12 +18,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import HostByTab from '../../components/Affiliation/HostByTab';
 import AffiliationCarousel from '../../components/Affiliation/AffiliationCarousel';
-import AffiliationColumnList from '../../components/Affiliation/AffiliationColumnList';
-import {
-  AFFILIATION_COLUMN_LIST_DATA_AFFILIATION,
-  AFFILIATION_COLUMN_LIST_DATA_EVENT,
-} from '../../constants/DummyData';
 import AffiliationColumnListItem from '../../components/Affiliation/AffiliationColumnListItem';
+import LoadingFooter from '../../components/common/LoadingFooter';
 import {
   getStudentSchoolAffiliateList,
   getStudentSchoolEventList,
@@ -115,126 +109,159 @@ const styles = StyleSheet.create({
   },
 });
 
+const AFFILIATE_FETCH_MAP = {
+  school: getStudentSchoolAffiliateList,
+  major: getStudentMajorAffiliateList,
+  college: getStudentCollegeAffiliateList,
+};
+
+const EVENT_FETCH_MAP = {
+  school: getStudentSchoolEventList,
+  major: getStudentMajorEventList,
+  college: getStudentCollegeEventList,
+};
+
+const UPCOMING_FETCH_MAP = {
+  school: getStudentSchoolUpcomingEventList,
+  major: getStudentMajorUpcomingEventList,
+  college: getStudentCollegeUpcomingEventList,
+};
+
 const AffiliationMainScreen = ({ navigation }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [searchText, setSearchText] = useState('');
   const { accessToken } = useAuthStore();
-  const [affiliatePosts, setAffiliatePosts] = useState([]);
-  const [eventPosts, setEventPosts] = useState([]);
-  const [majorAffiliatePosts, setMajorAffiliatePosts] = useState([]);
-  const [majorEventPosts, setMajorEventPosts] = useState([]);
-  const [schoolAffiliatePosts, setSchoolAffiliatePosts] = useState([]);
-  const [schoolEventPosts, setSchoolEventPosts] = useState([]);
-  const [collegeAffiliatePosts, setCollegeAffiliatePosts] = useState([]);
-  const [collegeEventPosts, setCollegeEventPosts] = useState([]);
   const [selectedTab, setSelectedTab] = useState('school');
-  const [upcomingSchoolEvents, setUpcomingSchoolEvents] = useState([]);
-  const [upcomingMajorEvents, setUpcomingMajorEvents] = useState([]);
-  const [upcomingCollegeEvents, setUpcomingCollegeEvents] = useState([]);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
-  const [loadedTabs, setLoadedTabs] = useState(new Set()); // 이미 로드된 탭 추적
-  const [isLoading, setIsLoading] = useState(false);
   const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
-  // 특정 탭의 데이터를 fetch하는 함수
-  const fetchTabData = async (tab) => {
-    if (!accessToken) return;
+  // 제휴 페이지네이션
+  const [affiliatePosts, setAffiliatePosts] = useState([]);
+  const [affiliatePage, setAffiliatePage] = useState(1);
+  const [affiliateHasMore, setAffiliateHasMore] = useState(true);
+  const [affiliateLoading, setAffiliateLoading] = useState(false);
+  const [affiliateRefreshing, setAffiliateRefreshing] = useState(false);
 
-    setIsLoading(true);
-    try {
-      if (tab === 'school') {
-        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
-          getStudentSchoolAffiliateList(accessToken),
-          getStudentSchoolEventList(accessToken),
-          getStudentSchoolUpcomingEventList(accessToken),
-        ]);
-        setSchoolAffiliatePosts(fetched);
-        setSchoolEventPosts(fetchedEvents);
-        setUpcomingSchoolEvents(fetchedUpcoming);
-        setAffiliatePosts(fetched);
-        setEventPosts(fetchedEvents);
-        setUpcomingEvents(fetchedUpcoming);
-      } else if (tab === 'major') {
-        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
-          getStudentMajorAffiliateList(accessToken),
-          getStudentMajorEventList(accessToken),
-          getStudentMajorUpcomingEventList(accessToken),
-        ]);
-        setMajorAffiliatePosts(fetched);
-        setMajorEventPosts(fetchedEvents);
-        setUpcomingMajorEvents(fetchedUpcoming);
-        setAffiliatePosts(fetched);
-        setEventPosts(fetchedEvents);
-        setUpcomingEvents(fetchedUpcoming);
-      } else if (tab === 'college') {
-        const [fetched, fetchedEvents, fetchedUpcoming] = await Promise.all([
-          getStudentCollegeAffiliateList(accessToken),
-          getStudentCollegeEventList(accessToken),
-          getStudentCollegeUpcomingEventList(accessToken),
-        ]);
-        setCollegeAffiliatePosts(fetched);
-        setCollegeEventPosts(fetchedEvents);
-        setUpcomingCollegeEvents(fetchedUpcoming);
-        setAffiliatePosts(fetched);
-        setEventPosts(fetchedEvents);
-        setUpcomingEvents(fetchedUpcoming);
+  // 행사 페이지네이션
+  const [eventPosts, setEventPosts] = useState([]);
+  const [eventPage, setEventPage] = useState(1);
+  const [eventHasMore, setEventHasMore] = useState(true);
+  const [eventLoading, setEventLoading] = useState(false);
+  const [eventRefreshing, setEventRefreshing] = useState(false);
+
+  // 다가오는 행사 (캐러셀용, 페이지네이션 불필요)
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+
+  const fetchAffiliatePosts = useCallback(
+    async (pageNum = 1, isRefresh = false) => {
+      if (!accessToken) return;
+      if (isRefresh) {
+        setAffiliateRefreshing(true);
+      } else {
+        setAffiliateLoading(true);
       }
-      // 로드된 탭 추가
-      setLoadedTabs((prev) => new Set([...prev, tab]));
-    } catch (error) {
-      console.error(`fetchTabData error for ${tab}:`, error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  // 초기 로드 시 기본 탭(school) 데이터만 fetch
-  useEffect(() => {
-    if (accessToken) {
-      fetchTabData('school');
-    }
-  }, [accessToken]);
+      const fetchFn = AFFILIATE_FETCH_MAP[selectedTab];
+      const result = await fetchFn(accessToken, pageNum);
 
-  const handleSelectTab = (tab) => {
-    console.log('tab', tab);
-    setSelectedTab(tab);
-  };
+      if (result) {
+        const newItems = result.content || [];
+        if (isRefresh || pageNum === 1) {
+          setAffiliatePosts(newItems);
+        } else {
+          setAffiliatePosts((prev) => [...prev, ...newItems]);
+        }
+        setAffiliatePage(pageNum);
+        setAffiliateHasMore(pageNum < (result.totalPages || 1));
+      }
 
-  // 탭 변경 시 해당 탭의 데이터 fetch (이미 로드된 경우는 재사용)
+      setAffiliateLoading(false);
+      setAffiliateRefreshing(false);
+    },
+    [accessToken, selectedTab]
+  );
+
+  const fetchEventPosts = useCallback(
+    async (pageNum = 1, isRefresh = false) => {
+      if (!accessToken) return;
+      if (isRefresh) {
+        setEventRefreshing(true);
+      } else {
+        setEventLoading(true);
+      }
+
+      const fetchFn = EVENT_FETCH_MAP[selectedTab];
+      const result = await fetchFn(accessToken, pageNum);
+
+      if (result) {
+        const newItems = result.content || [];
+        if (isRefresh || pageNum === 1) {
+          setEventPosts(newItems);
+        } else {
+          setEventPosts((prev) => [...prev, ...newItems]);
+        }
+        setEventPage(pageNum);
+        setEventHasMore(pageNum < (result.totalPages || 1));
+      }
+
+      setEventLoading(false);
+      setEventRefreshing(false);
+    },
+    [accessToken, selectedTab]
+  );
+
+  const fetchUpcomingEvents = useCallback(async () => {
+    if (!accessToken) return;
+    const fetchFn = UPCOMING_FETCH_MAP[selectedTab];
+    const result = await fetchFn(accessToken);
+    setUpcomingEvents(result || []);
+  }, [accessToken, selectedTab]);
+
+  // 초기 로드 + 탭 변경 시 리셋
   useEffect(() => {
     if (!accessToken) return;
+    setAffiliatePosts([]);
+    setEventPosts([]);
+    setAffiliatePage(1);
+    setEventPage(1);
+    setAffiliateHasMore(true);
+    setEventHasMore(true);
+    fetchAffiliatePosts(1, true);
+    fetchEventPosts(1, true);
+    fetchUpcomingEvents();
+  }, [
+    selectedTab,
+    accessToken,
+    fetchAffiliatePosts,
+    fetchEventPosts,
+    fetchUpcomingEvents,
+  ]);
 
-    // 이미 로드된 탭이면 캐시된 데이터 사용
-    if (loadedTabs.has(selectedTab)) {
-      if (selectedTab === 'school') {
-        setAffiliatePosts(schoolAffiliatePosts);
-        setEventPosts(schoolEventPosts);
-        setUpcomingEvents(upcomingSchoolEvents);
-      } else if (selectedTab === 'major') {
-        setAffiliatePosts(majorAffiliatePosts);
-        setEventPosts(majorEventPosts);
-        setUpcomingEvents(upcomingMajorEvents);
-      } else if (selectedTab === 'college') {
-        setAffiliatePosts(collegeAffiliatePosts);
-        setEventPosts(collegeEventPosts);
-        setUpcomingEvents(upcomingCollegeEvents);
-      }
-    } else {
-      // 아직 로드되지 않은 탭이면 fetch
-      fetchTabData(selectedTab);
-    }
-  }, [selectedTab]);
-
-  // 화면이 포커스될 때마다 현재 탭의 데이터를 새로고침 (DetailScreen에서 좋아요 변경 반영)
+  // 화면 포커스 시 새로고침 (좋아요 변경 반영)
   useFocusEffect(
     useCallback(() => {
       if (!accessToken) return;
-
-      // 현재 탭의 데이터를 다시 fetch하여 최신 상태 유지
-      fetchTabData(selectedTab);
-    }, [selectedTab, accessToken])
+      fetchAffiliatePosts(1, true);
+      fetchEventPosts(1, true);
+      fetchUpcomingEvents();
+    }, [accessToken, fetchAffiliatePosts, fetchEventPosts, fetchUpcomingEvents])
   );
+
+  const handleSelectTab = (tab) => {
+    setSelectedTab(tab);
+  };
+
+  const handleAffiliateLoadMore = useCallback(() => {
+    if (!affiliateLoading && affiliateHasMore) {
+      fetchAffiliatePosts(affiliatePage + 1);
+    }
+  }, [affiliateLoading, affiliateHasMore, affiliatePage, fetchAffiliatePosts]);
+
+  const handleEventLoadMore = useCallback(() => {
+    if (!eventLoading && eventHasMore) {
+      fetchEventPosts(eventPage + 1);
+    }
+  }, [eventLoading, eventHasMore, eventPage, fetchEventPosts]);
 
   const handleLike = async (postId) => {
     try {
@@ -243,15 +270,13 @@ const AffiliationMainScreen = ({ navigation }) => {
         eventPosts.find((p) => p.id === postId || p.postId === postId);
       const wasLiked = currentPost?.liked;
 
-      const response = await toggleStudentAffiliateLike(accessToken, postId);
-      console.log('handleLike response', response);
+      await toggleStudentAffiliateLike(accessToken, postId);
 
       showToast(
         wasLiked ? '관심 목록에서 삭제되었어요.' : '관심 목록에 추가되었어요!'
       );
 
-      // 좋아요 상태 업데이트 함수
-      const updateLikeStatus = (posts, setPosts) => {
+      const updateLikeStatus = (setPosts) => {
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
             post.id === postId || post.postId === postId
@@ -261,21 +286,8 @@ const AffiliationMainScreen = ({ navigation }) => {
         );
       };
 
-      // 현재 선택된 탭의 데이터 업데이트
-      updateLikeStatus(affiliatePosts, setAffiliatePosts);
-      updateLikeStatus(eventPosts, setEventPosts);
-
-      // 캐시된 데이터도 업데이트
-      if (selectedTab === 'school') {
-        updateLikeStatus(schoolAffiliatePosts, setSchoolAffiliatePosts);
-        updateLikeStatus(schoolEventPosts, setSchoolEventPosts);
-      } else if (selectedTab === 'major') {
-        updateLikeStatus(majorAffiliatePosts, setMajorAffiliatePosts);
-        updateLikeStatus(majorEventPosts, setMajorEventPosts);
-      } else if (selectedTab === 'college') {
-        updateLikeStatus(collegeAffiliatePosts, setCollegeAffiliatePosts);
-        updateLikeStatus(collegeEventPosts, setCollegeEventPosts);
-      }
+      updateLikeStatus(setAffiliatePosts);
+      updateLikeStatus(setEventPosts);
     } catch (error) {
       console.error('handleLike error', error);
     }
@@ -396,8 +408,15 @@ const AffiliationMainScreen = ({ navigation }) => {
               councilType={selectedTab}
             />
           )}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={<EmptyResult paddingTop={100} />}
+          keyExtractor={(item) => String(item.id)}
+          ListEmptyComponent={
+            !affiliateLoading ? <EmptyResult paddingTop={100} /> : null
+          }
+          ListFooterComponent={<LoadingFooter loading={affiliateLoading} />}
+          onEndReached={handleAffiliateLoadMore}
+          onEndReachedThreshold={0.4}
+          onRefresh={() => fetchAffiliatePosts(1, true)}
+          refreshing={affiliateRefreshing}
         />
       )}
       {selectedActivityType === '행사' && (
@@ -422,8 +441,15 @@ const AffiliationMainScreen = ({ navigation }) => {
               councilType={selectedTab}
             />
           )}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={<EmptyResult paddingTop={100} />}
+          keyExtractor={(item) => String(item.id)}
+          ListEmptyComponent={
+            !eventLoading ? <EmptyResult paddingTop={100} /> : null
+          }
+          ListFooterComponent={<LoadingFooter loading={eventLoading} />}
+          onEndReached={handleEventLoadMore}
+          onEndReachedThreshold={0.4}
+          onRefresh={() => fetchEventPosts(1, true)}
+          refreshing={eventRefreshing}
         />
       )}
       <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} />
