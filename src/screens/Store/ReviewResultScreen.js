@@ -87,7 +87,8 @@ const ReviewResultScreen = () => {
             }))
           );
         })
-        .catch(() => {});
+        // eslint-disable-next-line no-console
+        .catch((e) => console.error('제휴 매장 목록 오류:', e));
     };
 
     fetchStores();

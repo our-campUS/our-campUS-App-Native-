@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+  useState,
+} from 'react';
 import {
   View,
   Animated,
@@ -30,7 +36,7 @@ const HEIGHT_HIDDEN = 0;
 const MapScreen = () => {
   const mapRef = useRef(null);
   const insets = useSafeAreaInsets();
-  const [tooltipVisible, setTooltipVisible] = useState(true);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const { state, actions, displayedMarkers, navigation } = useMapLogic(mapRef);
 
@@ -77,6 +83,12 @@ const MapScreen = () => {
     }).start();
   }, [selectedMarkerId, searchKeyword, selectedCategory, sheetHeightAnimated]);
 
+  // 카테고리/검색 바뀔 때마다 툴팁 다시 노출
+  useEffect(() => {
+    if (selectedCategory || searchKeyword) {
+      setTooltipVisible(true);
+    }
+  }, [selectedCategory, searchKeyword]);
 
   const uniqueMarkers = useMemo(() => {
     const seen = new Set();
@@ -186,7 +198,10 @@ const MapScreen = () => {
           pointerEvents="box-none"
         >
           {tooltipVisible && (
-            <LocationTooltip text="내 주변 제휴를 바로 볼 수 있어요" onClose={() => setTooltipVisible(false)} />
+            <LocationTooltip
+              text="내 주변 제휴를 바로 볼 수 있어요"
+              onClose={() => setTooltipVisible(false)}
+            />
           )}
           <TouchableOpacity
             style={styles.myLocationButton}

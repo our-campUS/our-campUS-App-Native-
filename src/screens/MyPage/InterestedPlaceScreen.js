@@ -25,6 +25,7 @@ const InterestedPlaceScreen = ({ navigation }) => {
   const [hasNext, setHasNext] = useState(true);
   const [loading, setLoading] = useState(false);
   const loadingRef = useRef(false);
+  const cachedLocationRef = useRef(null);
   const { userLocation, getLocationIfPermitted } = useLocation();
 
   const fetchPlaces = useCallback(async (cursor = null) => {
@@ -32,8 +33,11 @@ const InterestedPlaceScreen = ({ navigation }) => {
     loadingRef.current = true;
     setLoading(true);
     try {
-      const location = await getLocationIfPermitted();
-      const { latitude: lat, longitude: lng } = location ?? DEFAULT_LOCATION;
+      // 첫 로드 시에만 GPS 호출, 이후 페이지네이션에선 캐시 사용
+      if (!cursor) {
+        cachedLocationRef.current = await getLocationIfPermitted();
+      }
+      const { latitude: lat, longitude: lng } = cachedLocationRef.current ?? DEFAULT_LOCATION;
       const data = await getLikedPlaces({
         lat,
         lng,
@@ -54,11 +58,12 @@ const InterestedPlaceScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      cachedLocationRef.current = null;
       setPlaces([]);
       setNextCursor(null);
       setHasNext(true);
       fetchPlaces(null);
-    }, [])
+    }, [fetchPlaces])
   );
 
   const handleEndReached = () => {

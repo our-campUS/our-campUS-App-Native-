@@ -14,20 +14,16 @@ const useLocation = () => {
   // 내 위치 버튼 클릭 시 호출
   // 권한 동의 → 실제 위치 반환 (위치도 상태에 저장)
   // 권한 거부 → null 반환 (호출부에서 토스트 처리)
-  const requestAndGetLocation = useCallback(() => {
-    return new Promise(async (resolve) => {
-      const permission = Platform.select({
-        ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-        android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-      });
+  const requestAndGetLocation = useCallback(async () => {
+    const permission = Platform.select({
+      ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+      android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+    });
 
-      const result = await request(permission);
+    const result = await request(permission);
+    if (result !== RESULTS.GRANTED) return null;
 
-      if (result !== RESULTS.GRANTED) {
-        resolve(null);
-        return;
-      }
-
+    return new Promise((resolve) => {
       Geolocation.getCurrentPosition(
         (position) => {
           const location = {
@@ -37,9 +33,7 @@ const useLocation = () => {
           setUserLocation(location);
           resolve(location);
         },
-        () => {
-          resolve(null);
-        },
+        () => resolve(null),
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
     });
