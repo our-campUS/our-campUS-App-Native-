@@ -1,16 +1,9 @@
 import api from './axiosInstance';
-import useAuthStore from '../store/authStore';
 
 // 미확인 알림 조회
 export const checkUnreadNotification = async () => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
-    const response = await api.get('/notifications/unread/exists', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get('/notifications/unread/exists');
 
     if (response.data.code === 200 || response.data.code === 0) {
       return response.data.data; // boolean
@@ -29,17 +22,12 @@ export const getNotifications = async (
   cursorId = null
 ) => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
     const params = { limit };
     if (cursorCreatedAt) params.cursorCreatedAt = cursorCreatedAt;
     if (cursorId) params.cursorId = cursorId;
 
     const response = await api.get('/notifications', {
       params,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
 
     return response.data;
@@ -52,16 +40,9 @@ export const getNotifications = async (
 // 특정 알림 읽음 처리
 export const markNotificationRead = async (notificationId) => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
     const response = await api.patch(
       `/notifications/${notificationId}/read`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      {}
     );
 
     if (response.data.code === 200 || response.data.code === 0) {

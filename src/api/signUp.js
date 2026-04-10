@@ -118,23 +118,12 @@ export async function searchCollege(schoolId, keyword) {
 // 최초 로그인 마지막 완료 단계 api 호출 (jwt 토큰 사용) + authStore 업데이트
 export async function sendUserProfile(schoolId, majorId) {
   try {
-    const accessToken = useAuthStore.getState().accessToken;
-    console.log('✅ Access Token:', accessToken);
     console.log('✅ School ID:', schoolId);
     console.log('✅ Major ID:', majorId);
-    const response = await api.patch(
-      'users/profile',
-      {
-        schoolId: schoolId,
-        majorId: majorId,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await api.patch('users/profile', {
+      schoolId: schoolId,
+      majorId: majorId,
+    });
     if (response.data.code === 200) {
       console.log('✅ Send User Profile Success:', response.data);
       useAuthStore.getState().updateUser({

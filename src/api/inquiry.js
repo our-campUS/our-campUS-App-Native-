@@ -1,11 +1,8 @@
 import api from './axiosInstance';
-import useAuthStore from '../store/authStore';
 
 export const getMyInquiries = async (page = 0, size = 20) => {
   try {
-    const accessToken = useAuthStore.getState().accessToken;
     const response = await api.get('/users/inquiries/me', {
-      headers: { Authorization: `Bearer ${accessToken}` },
       params: { page, size, sort: 'createdAt,desc' },
     });
 
@@ -21,12 +18,7 @@ export const getMyInquiries = async (page = 0, size = 20) => {
 
 export const createInquiry = async (title, content) => {
   try {
-    const accessToken = useAuthStore.getState().accessToken;
-    const response = await api.post(
-      '/users/inquiries',
-      { title, content },
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
+    const response = await api.post('/users/inquiries', { title, content });
 
     const code = response.data.code;
     if (code === 200 || code === 201 || code === 0) {
@@ -42,9 +34,7 @@ export const createInquiry = async (title, content) => {
 // 총학 문의 내역 조회
 export const getCouncilInquiries = async (page = 0, size = 20) => {
   try {
-    const accessToken = useAuthStore.getState().accessToken;
     const response = await api.get('/student-councils/inquiries/me', {
-      headers: { Authorization: `Bearer ${accessToken}` },
       params: { page, size, sort: 'createdAt,desc' },
     });
 
@@ -61,12 +51,10 @@ export const getCouncilInquiries = async (page = 0, size = 20) => {
 // 총학 문의 등록
 export const createCouncilInquiry = async (title, content) => {
   try {
-    const accessToken = useAuthStore.getState().accessToken;
-    const response = await api.post(
-      '/student-councils/inquiries',
-      { title, content },
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
+    const response = await api.post('/student-councils/inquiries', {
+      title,
+      content,
+    });
 
     const code = response.data.code;
     if (code === 200 || code === 201 || code === 0) {

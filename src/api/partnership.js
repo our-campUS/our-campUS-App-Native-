@@ -1,12 +1,9 @@
 import api from './axiosInstance';
-import useAuthStore from '../store/authStore';
 
 export const getPartnershipList = async (lat, lng) => {
   try {
-    const token = useAuthStore.getState().accessToken;
     const response = await api.get('/reviews/partnership-list', {
       params: { lat, lng },
-      headers: { Authorization: `Bearer ${token}` },
     });
     if (response.data.code === 200 || response.data.code === 0) {
       return response.data.data;
@@ -20,16 +17,11 @@ export const getPartnershipList = async (lat, lng) => {
 
 export const getActivePartnerships = async (councilType) => {
   try {
-    const accessToken = useAuthStore.getState().accessToken;
-
     const response = await api.get(
       '/users/student-council/posts/partnerships/active',
       {
         params: {
           councilType: councilType,
-        },
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
         },
       }
     );

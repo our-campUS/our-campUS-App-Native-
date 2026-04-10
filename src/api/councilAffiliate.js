@@ -1,14 +1,9 @@
 import api from './axiosInstance';
 
 // 학생회 전용 제휴 / 행사 등록 Api
-
-export const createCouncilPost = async (data, accessToken) => {
+export const createCouncilPost = async (data) => {
   try {
-    const response = await api.post('/student-councils/posts', data, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await api.post('/student-councils/posts', data);
     if (response.data.code === 201) {
       console.log('createCouncilAffiliate success');
       console.log(response.data);
@@ -26,16 +21,12 @@ export const createCouncilPost = async (data, accessToken) => {
 };
 
 // 학생회 전용 제휴 게시글 조회 api
-export const getCouncilAffiliatePosts = async (accessToken) => {
-  console.log('accessToken at getCouncilAffiliatePosts', accessToken);
+export const getCouncilAffiliatePosts = async () => {
   try {
     const response = await api.get('/student-councils/posts', {
       params: {
         category: 'PARTNERSHIP',
         size: 100,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     if (response.data.code === 200) {
@@ -55,16 +46,12 @@ export const getCouncilAffiliatePosts = async (accessToken) => {
 };
 
 // 학생회 전용 행사 게시글 조회 api
-export const getCouncilEventPosts = async (accessToken) => {
-  console.log('accessToken at getCouncilEventPosts', accessToken);
+export const getCouncilEventPosts = async () => {
   try {
     const response = await api.get('/student-councils/posts', {
       params: {
         category: 'EVENT',
         size: 100,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     if (response.data.code === 200) {
@@ -84,13 +71,9 @@ export const getCouncilEventPosts = async (accessToken) => {
 };
 
 // 학생회 전용 제휴 게시글 상세 조회 api
-export const getCouncilAffiliatePostDetail = async (postId, accessToken) => {
+export const getCouncilAffiliatePostDetail = async (postId) => {
   try {
-    const response = await api.get(`/student-councils/posts/${postId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await api.get(`/student-councils/posts/${postId}`);
     if (response.data.code === 200) {
       console.log('getCouncilAffiliatePostDetail success');
       console.log(response.data);
@@ -108,17 +91,9 @@ export const getCouncilAffiliatePostDetail = async (postId, accessToken) => {
 };
 
 // 학생회 전용 제휴 게시글 수정 api
-export const EditCouncilPost = async (data, accessToken, postId) => {
+export const EditCouncilPost = async (data, postId) => {
   try {
-    const response = await api.patch(
-      `/student-councils/posts/${postId}`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await api.patch(`/student-councils/posts/${postId}`, data);
     if (response.data.code === 200) {
       console.log('EditCouncilPost success');
       console.log(response.data);
@@ -136,14 +111,10 @@ export const EditCouncilPost = async (data, accessToken, postId) => {
 };
 
 // 학생회 전용 제휴 게시글 삭제 api
-export const deleteCouncilPost = async (postId, accessToken) => {
+export const deleteCouncilPost = async (postId) => {
   console.log('postId at deleteCouncilPost', postId);
   try {
-    const response = await api.delete(`/student-councils/posts/${postId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await api.delete(`/student-councils/posts/${postId}`);
     if (response.data.code === 200) {
       console.log('deleteCouncilPost success');
       console.log(response.data);
@@ -161,14 +132,11 @@ export const deleteCouncilPost = async (postId, accessToken) => {
 };
 
 // 제휴 게시글 장소 검색 api
-export const searchCouncilAffiliatePlace = async (keyword, accessToken) => {
+export const searchCouncilAffiliatePlace = async (keyword) => {
   try {
     const response = await api.get('places/search/keyword', {
       params: {
         keyword: keyword,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     if (response.data.code === 200) {
@@ -188,14 +156,11 @@ export const searchCouncilAffiliatePlace = async (keyword, accessToken) => {
 };
 
 // 학생회 전용 72시간 내에 다가오는 행사 조회 api
-export const getAvailableEvents = async (accessToken) => {
+export const getAvailableEvents = async () => {
   try {
     const response = await api.get('/student-councils/posts/events/upcoming', {
       params: {
         size: 100,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     if (response.data.code === 200) {
