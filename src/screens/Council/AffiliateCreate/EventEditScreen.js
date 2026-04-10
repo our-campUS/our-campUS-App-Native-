@@ -29,7 +29,6 @@ import {
   createTimeOnly,
   toISODateTimeString,
 } from '../../../utils/dateTime';
-import useAuthStore from '../../../store/authStore';
 import {
   getCouncilAffiliatePostDetail,
   EditCouncilPost,
@@ -42,7 +41,6 @@ import {
 import Toast from 'react-native-toast-message';
 
 const EventEditScreen = ({ navigation, route }) => {
-  const { accessToken } = useAuthStore();
   const [placeInfo, setPlaceInfo] = useState(null);
   const colorScheme = Appearance.getColorScheme();
   const eventType = route.params?.type;
@@ -81,8 +79,7 @@ const EventEditScreen = ({ navigation, route }) => {
     if (previousPostDataId) {
       const fetchPreviousPostData = async () => {
         const response = await getCouncilAffiliatePostDetail(
-          previousPostDataId,
-          accessToken
+          previousPostDataId
         );
         setPreviousPostData(response.data.data);
       };
@@ -238,8 +235,7 @@ const EventEditScreen = ({ navigation, route }) => {
     const presignedUrls = await Promise.all(
       pngConvertedImages.map(async (image) => {
         const { uploadUrl, imageUrl } = await getCouncilImagePresignedUrl(
-          image,
-          accessToken
+          image
         );
         return { uploadUrl, imageUrl, image: image };
       })
@@ -284,7 +280,6 @@ const EventEditScreen = ({ navigation, route }) => {
     console.log('finalSubmitEventData', finalSubmitEventData);
     const response = await EditCouncilPost(
       finalSubmitEventData,
-      accessToken,
       previousPostDataId
     );
     console.log('response at handleSubmitEvent', response);

@@ -37,7 +37,7 @@ import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [labelTitle, setLabelTitle] = useState('');
-  const { user, accessToken } = useAuthStore();
+  const { user } = useAuthStore();
   const [detailData, setDetailData] = useState(null);
   const [recommendData, setRecommendData] = useState(null);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -67,7 +67,7 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
     setIsDeleteModalVisible(false);
     setIsDeleting(true);
     try {
-      await deleteCouncilPost(postId, accessToken);
+      await deleteCouncilPost(postId);
       navigation.goBack();
     } catch (error) {
       console.error('deleteCouncilPost error', error);
@@ -82,24 +82,21 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   useEffect(() => {
     if (postId) {
       const fetchPostDetail = async () => {
-        const response = await getCouncilAffiliatePostDetail(
-          postId,
-          accessToken
-        );
+        const response = await getCouncilAffiliatePostDetail(postId);
         // console.log('response', response);
         setDetailData(response.data.data);
       };
       fetchPostDetail();
       const fetchRecommendData = async () => {
         if (route.params?.item?.category === 'PARTNERSHIP') {
-          const response = await getCouncilAffiliatePosts(accessToken);
+          const response = await getCouncilAffiliatePosts();
           console.log('response', response.data.data?.content);
           const filteredData = response.data.data?.content.filter(
             (item) => item.postId !== postId
           );
           setRecommendData(filteredData);
         } else {
-          const response = await getCouncilEventPosts(accessToken);
+          const response = await getCouncilEventPosts();
           console.log('response', response.data.data?.content);
           const filteredData = response.data.data?.content.filter(
             (item) => item.postId !== postId
@@ -109,6 +106,7 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
       };
       fetchRecommendData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId]);
 
   useEffect(() => {

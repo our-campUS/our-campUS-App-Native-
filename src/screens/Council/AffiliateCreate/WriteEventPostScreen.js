@@ -23,7 +23,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import useFormDraftStore from '../../../store/formDraftStore';
 import { Appearance } from 'react-native';
 import { createCouncilPost } from '../../../api/councilAffiliate';
-import useAuthStore from '../../../store/authStore';
 import {
   convertToPng,
   getCouncilImagePresignedUrl,
@@ -53,11 +52,11 @@ const WriteEventPostScreen = ({ navigation, route }) => {
   const [startTime, setStartTime] = useState(null);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [placeInfo, setPlaceInfo] = useState(null);
-  const { accessToken } = useAuthStore();
   const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   useEffect(() => {
     handleImagePicker();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     if (formDraft?.placeInfo) {
@@ -153,8 +152,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
     const presignedUrls = await Promise.all(
       pngConvertedImages.map(async (image) => {
         const { uploadUrl, imageUrl } = await getCouncilImagePresignedUrl(
-          image,
-          accessToken
+          image
         );
         return { uploadUrl, imageUrl, image: image };
       })
@@ -205,7 +203,7 @@ const WriteEventPostScreen = ({ navigation, route }) => {
       thumbnailImageUrl: finalImages[0],
     };
     console.log('finalSubmitEventData', finalSubmitEventData);
-    const response = await createCouncilPost(finalSubmitEventData, accessToken);
+    const response = await createCouncilPost(finalSubmitEventData);
     console.log('response at handleSubmit', response);
     if (response.data.code === 201) {
       showToast('게시글이 등록되었어요!');

@@ -28,12 +28,10 @@ import {
   getStudentAffiliateRecommendList,
   toggleStudentAffiliateLike,
 } from '../../api/studentAffiliate';
-import useAuthStore from '../../store/authStore';
 import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 
 const AffiliationDetailScreen = ({ navigation, route }) => {
   const [isLiked, setIsLiked] = useState(route.params?.item?.liked || false);
-  const { accessToken } = useAuthStore();
   const [item, setItem] = useState(route.params?.item);
   const [councilType, setCouncilType] = useState(route.params?.councilType);
   const [detailData, setDetailData] = useState();
@@ -66,10 +64,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
   useEffect(() => {
     console.log('route.params?.item', route.params?.item);
     const fetchStudentAffiliateDetail = async () => {
-      const data = await getStudentAffiliateDetail(
-        accessToken,
-        route.params?.item?.id
-      );
+      const data = await getStudentAffiliateDetail(route.params?.item?.id);
       console.log('fetchStudentAffiliateDetail data', data);
       setDetailData(data);
       // API 데이터로 item state 보완 (알림 진입 시 id만 전달되므로)
@@ -89,7 +84,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       }
     };
     fetchStudentAffiliateDetail();
-  }, [route.params?.item, accessToken]);
+  }, [route.params?.item]);
 
   useEffect(() => {
     console.log('councilType', councilType);
@@ -118,7 +113,6 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
     if (!councilType) return;
     const fetchStudentAffiliateRecommendList = async () => {
       const data = await getStudentAffiliateRecommendList(
-        accessToken,
         councilType,
         item?.id,
         detailData?.category
@@ -137,7 +131,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       );
     };
     fetchStudentAffiliateRecommendList();
-  }, [detailData, accessToken, councilType, item?.id]);
+  }, [detailData, councilType, item?.id]);
 
   useEffect(() => {
     console.log('recommendData', recommendData);
@@ -272,7 +266,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
                   setIsLiked(newLikedState);
                   try {
                     const postId = item?.id || item?.postId || detailData?.id;
-                    await toggleStudentAffiliateLike(accessToken, postId);
+                    await toggleStudentAffiliateLike(postId);
                     // 성공 시 detailData도 업데이트
                     if (detailData) {
                       setDetailData({ ...detailData, liked: newLikedState });

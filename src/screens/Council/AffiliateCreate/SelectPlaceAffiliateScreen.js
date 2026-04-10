@@ -21,20 +21,14 @@ import AffiliatePlaceItem from '../../../components/Council/AffiliatePlaceItem';
 import useFormDraftStore from '../../../store/formDraftStore';
 import MagnifyingGlass from '../../../../assets/input-tool.svg';
 import { searchCouncilAffiliatePlace } from '../../../api/councilAffiliate';
-import useAuthStore from '../../../store/authStore';
 
 const SelectPlaceAffiliateScreen = ({ navigation }) => {
   const [affiliationPlaceData, setAffiliationPlaceData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const { setFormDraft } = useFormDraftStore();
-  const { accessToken } = useAuthStore();
-
   const handleSearch = async () => {
     console.log('handleSearch');
-    const response = await searchCouncilAffiliatePlace(
-      searchQuery,
-      accessToken
-    );
+    const response = await searchCouncilAffiliatePlace(searchQuery);
     console.log('response at handleSearch', response);
     setAffiliationPlaceData(response.data.data);
   };

@@ -12,7 +12,6 @@ import {
   getCouncilImagePresignedUrl,
   uploadImageToPresignedUrl,
 } from '../../../api/uploadImage';
-import useAuthStore from '../../../store/authStore';
 import {
   createCouncilPost,
   EditCouncilPost,
@@ -72,7 +71,6 @@ const LOGO_CATEGORIES = [
 ];
 
 const SelectAffiliationLogoScreen = ({ navigation, route }) => {
-  const accessToken = useAuthStore((state) => state?.accessToken);
   const [selectedLogo, setSelectedLogo] = useState(null);
   const [selectedLogoType, setSelectedLogoType] = useState(null);
   const isButtonDisabled = !selectedLogo;
@@ -145,8 +143,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     const presignedUrls = await Promise.all(
       pngConvertedImages.map(async (image) => {
         const { uploadUrl, imageUrl } = await getCouncilImagePresignedUrl(
-          image,
-          accessToken
+          image
         );
         return { uploadUrl, imageUrl, image: image };
       })
@@ -170,7 +167,6 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
   };
 
   const handleSubmit = async () => {
-    console.log('accessToken', accessToken);
     console.log('handleSubmit');
     console.log('dataFromPreviousScreen', dataFromPreviousScreen);
     const finalImages = await handleImagesBeforeSubmit();
@@ -187,7 +183,7 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
       thumbnailImageUrl: finalImages[0],
     };
     console.log('finalData', finalData);
-    const response = await createCouncilPost(finalData, accessToken);
+    const response = await createCouncilPost(finalData);
     console.log('response at handleSubmit', response);
     if (response.data.code === 201) {
       showToast('게시글이 등록되었어요!');
@@ -226,7 +222,6 @@ const SelectAffiliationLogoScreen = ({ navigation, route }) => {
     console.log('finalDataEdit', finalData);
     const response = await EditCouncilPost(
       finalData,
-      accessToken,
       dataFromPreviousScreen?.postId
     );
     console.log('response at handleEditSubmit', response);

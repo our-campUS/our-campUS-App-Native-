@@ -22,7 +22,6 @@ const EditNicknameScreen = ({ navigation }) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const user = useAuthStore((state) => state.user);
-  const { accessToken } = useAuthStore();
   useEffect(() => {
     const fetchLatestInfo = async () => {
       await getUserInfo();
@@ -47,7 +46,7 @@ const EditNicknameScreen = ({ navigation }) => {
   // };
 
   const handleSave = async () => {
-    const response = await editNickname(nickname, accessToken);
+    const response = await editNickname(nickname);
     if (response) {
       await getUserInfo();
       navigation.goBack();
