@@ -14,6 +14,7 @@ import EditIcon from '@assets/darkPencilIcon.svg';
 import DeleteIcon from '@assets/trashIcon.svg';
 
 const DRAG_THRESHOLD = 100;
+const OVERLAY_BG = 'rgba(0, 0, 0, 0.6)';
 
 const ReviewEditBottomSheet = ({
   isVisible,
@@ -33,7 +34,7 @@ const ReviewEditBottomSheet = ({
       translateY.setValue(0);
       overlayOpacity.setValue(1);
     }
-  }, [isVisible]);
+  }, [isVisible, overlayOpacity, translateY]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -102,11 +103,23 @@ const ReviewEditBottomSheet = ({
             <View style={styles.handleBar} />
           </View>
           <View style={styles.content}>
-            <Pressable style={styles.actionItem} onPress={onSelectEdit}>
+            <Pressable
+              style={styles.actionItem}
+              onPress={() => {
+                closeSheet();
+                onSelectEdit();
+              }}
+            >
               <EditIcon width={24} height={24} />
               <Text style={styles.editText}>리뷰 수정하기</Text>
             </Pressable>
-            <Pressable style={styles.actionItem} onPress={onSelectDelete}>
+            <Pressable
+              style={styles.actionItem}
+              onPress={() => {
+                closeSheet();
+                onSelectDelete();
+              }}
+            >
               <DeleteIcon width={24} height={24} />
               <Text style={styles.deleteText}>삭제하기</Text>
             </Pressable>
@@ -131,7 +144,7 @@ const styles = StyleSheet.create({
   },
   overlayPressable: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: OVERLAY_BG,
   },
   bottomSheet: {
     position: 'absolute',
