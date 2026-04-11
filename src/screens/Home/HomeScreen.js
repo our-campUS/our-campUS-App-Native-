@@ -90,8 +90,10 @@ const HomeScreen = () => {
   };
 
   const handleCarouselPress = (item) => {
-    if (item.id === '1') {
-      navigation.navigate('Partnership');
+    if (item.id === '1' || item.id === '2') {
+      navigation.navigate('Partnership', {
+        screen: 'AffiliationMainScreen',
+      });
     }
   };
 
@@ -171,13 +173,17 @@ const HomeScreen = () => {
               title="좋은 제휴 아이디어 공유해주실래요?"
               subtitle="원하는 제휴 혜택을 학생회에게 직접 제안해요"
               imageSource={require('../../../assets/images/home/banner_03.webp')}
-              onPress={() => console.log('제안하기 클릭')}
+              onPress={() => navigation.navigate('Map')}
             />
             <BannerCard
               title="제휴 이용하고 혜택 받아가세요!"
               subtitle="리뷰만 작성해도 혜택이 팡팡"
               imageSource={require('../../../assets/images/home/banner_04.webp')}
-              onPress={() => navigation.navigate('Affiliation')}
+              onPress={() =>
+                navigation.navigate('Partnership', {
+                  screen: 'AffiliationMainScreen',
+                })
+              }
             />
           </View>
         </HomeSection>
