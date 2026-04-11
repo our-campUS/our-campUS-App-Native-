@@ -8,6 +8,8 @@ export const DEFAULT_LOCATION = {
 const useLocationStore = create((set) => ({
   userLocation: DEFAULT_LOCATION,
   setUserLocation: (location) => set({ userLocation: location }),
+  locationTooltipDismissed: false,
+  dismissLocationTooltip: () => set({ locationTooltipDismissed: true }),
 }));
 
 export default useLocationStore;

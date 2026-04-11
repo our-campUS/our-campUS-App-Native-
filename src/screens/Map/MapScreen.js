@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useRef,
   useMemo,
-  useState,
 } from 'react';
 import {
   View,
@@ -28,6 +27,7 @@ import colors from '../../style/colors';
 
 import { useMapLogic } from '../../hooks/useMapLogic';
 import { DEFAULT_LOCATION } from '../../hooks/useLocation';
+import useLocationStore from '../../store/locationStore';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
@@ -37,7 +37,8 @@ const HEIGHT_HIDDEN = 0;
 const MapScreen = () => {
   const mapRef = useRef(null);
   const insets = useSafeAreaInsets();
-  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const tooltipDismissed = useLocationStore((s) => s.locationTooltipDismissed);
+  const dismissTooltip = useLocationStore((s) => s.dismissLocationTooltip);
 
   const { state, actions, displayedMarkers, navigation } = useMapLogic(mapRef);
 
@@ -67,9 +68,10 @@ const MapScreen = () => {
 
   const buttonBottom = sheetHeightAnimated.interpolate({
     inputRange: [HEIGHT_HIDDEN, HEIGHT_ITEM, HEIGHT_LIST],
-    outputRange: [HEIGHT_HIDDEN + 12, HEIGHT_ITEM + 12, HEIGHT_LIST + 12],
+    outputRange: [20, HEIGHT_ITEM + 12, HEIGHT_LIST + 12],
     extrapolate: 'clamp',
   });
+
 
   useEffect(() => {
     let targetHeight = HEIGHT_HIDDEN;
@@ -84,12 +86,6 @@ const MapScreen = () => {
     }).start();
   }, [selectedMarkerId, searchKeyword, selectedCategory, sheetHeightAnimated]);
 
-  // 카테고리/검색 바뀔 때마다 툴팁 다시 노출
-  useEffect(() => {
-    if (selectedCategory || searchKeyword) {
-      setTooltipVisible(true);
-    }
-  }, [selectedCategory, searchKeyword]);
 
   const uniqueMarkers = useMemo(() => {
     const seen = new Set();
@@ -192,30 +188,28 @@ const MapScreen = () => {
         )}
       </View>
 
-      {/* 현위치 버튼 + 툴팁: 바텀시트가 올라왔을 때만 노출 */}
-      {(selectedCategory || searchKeyword) && (
-        <Animated.View
-          style={[styles.myLocationButtonWrapper, { bottom: buttonBottom }]}
-          pointerEvents="box-none"
+      {/* 현위치 버튼 + 툴팁: 항상 노출, 바텀시트와 함께 이동 */}
+      <Animated.View
+        style={[styles.myLocationButtonWrapper, { bottom: buttonBottom }]}
+        pointerEvents="box-none"
+      >
+        {!tooltipDismissed && (
+          <LocationTooltip
+            text="내 주변 제휴를 바로 볼 수 있어요"
+            onClose={dismissTooltip}
+          />
+        )}
+        <TouchableOpacity
+          style={styles.myLocationButton}
+          onPress={() => {
+            dismissTooltip();
+            handleCurrentLocation();
+          }}
+          activeOpacity={0.8}
         >
-          {tooltipVisible && (
-            <LocationTooltip
-              text="내 주변 제휴를 바로 볼 수 있어요"
-              onClose={() => setTooltipVisible(false)}
-            />
-          )}
-          <TouchableOpacity
-            style={styles.myLocationButton}
-            onPress={() => {
-              setTooltipVisible(false);
-              handleCurrentLocation();
-            }}
-            activeOpacity={0.8}
-          >
             <LocationIcon width={24} height={24} color={theme.colors.textDim} />
           </TouchableOpacity>
-        </Animated.View>
-      )}
+      </Animated.View>
 
       {/* 바텀시트 */}
       <BottomSheet
