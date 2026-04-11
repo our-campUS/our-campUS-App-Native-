@@ -71,24 +71,25 @@ const ReviewResultScreen = () => {
 
   useEffect(() => {
     const fetchStores = async () => {
-      const location = await getLocationIfPermitted();
-      const { latitude: lat, longitude: lng } = location ?? DEFAULT_LOCATION;
-      getPartnershipList(lat, lng)
-        .then((data) => {
-          setPartnerStores(
-            data.map((item) => ({
-              id: item.placeId,
-              placeName: item.placeName,
-              category: item.category,
-              benefit: item.partnership,
-              thumbnailImageUrl: item.thumbnailUrl,
-              distance: formatDistance(item.distance),
-              type: '제휴',
-            }))
-          );
-        })
+      try {
+        const location = await getLocationIfPermitted();
+        const { latitude: lat, longitude: lng } = location ?? DEFAULT_LOCATION;
+        const data = await getPartnershipList(lat, lng);
+        setPartnerStores(
+          data.map((item) => ({
+            id: item.placeId,
+            placeName: item.placeName,
+            category: item.category,
+            benefit: item.partnership,
+            thumbnailImageUrl: item.thumbnailUrl,
+            distance: formatDistance(item.distance),
+            type: '제휴',
+          }))
+        );
+      } catch (e) {
         // eslint-disable-next-line no-console
-        .catch((e) => console.error('제휴 매장 목록 오류:', e));
+        console.error('제휴 매장 목록 오류:', e);
+      }
     };
 
     fetchStores();

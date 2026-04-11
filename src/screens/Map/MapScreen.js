@@ -27,6 +27,7 @@ import theme from '../../style';
 import colors from '../../style/colors';
 
 import { useMapLogic } from '../../hooks/useMapLogic';
+import { DEFAULT_LOCATION } from '../../hooks/useLocation';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
@@ -130,8 +131,8 @@ const MapScreen = () => {
         ref={mapRef}
         style={{ flex: 1 }}
         initialCamera={{
-          latitude: 37.505,
-          longitude: 126.957,
+          latitude: DEFAULT_LOCATION.latitude,
+          longitude: DEFAULT_LOCATION.longitude,
           zoom: 16,
         }}
         markers={markersWithPinType}
