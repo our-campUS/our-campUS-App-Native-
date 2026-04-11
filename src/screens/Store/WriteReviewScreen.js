@@ -154,6 +154,7 @@ const WriteReviewScreen = () => {
           imageUrls,
           place: store
             ? {
+                placeId: store.placeId || null,
                 placeName: store.name || store.placeName || '',
                 placeKey: store.placeKey || '',
                 address: store.address || '',

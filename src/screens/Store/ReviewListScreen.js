@@ -26,7 +26,7 @@ const ReviewListScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { storeName, star, placeId, reviewSize } = route.params;
+  const { storeName, star, placeId, reviewSize, store } = route.params;
 
   // const [modalVisible, setModalVisible] = useState(false); // TODO: 스캔 플로우 복구 시 주석 해제
   const [filter, setFilter] = useState('LATEST');
@@ -48,7 +48,7 @@ const ReviewListScreen = () => {
 
   useEffect(() => {
     fetchReviews();
-  }, []);
+  }, [fetchReviews]);
 
   const renderHeader = () => (
     <View style={styles.listHeader}>
@@ -159,6 +159,7 @@ const ReviewListScreen = () => {
               placeId: placeId,
               storeName: storeName,
               rating: star,
+              store: store,
             });
           }}
         >
