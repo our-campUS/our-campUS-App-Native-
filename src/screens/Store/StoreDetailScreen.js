@@ -40,7 +40,7 @@ import LikedIcon from '@assets/Liked.svg';
 import UnlikedIcon from '@assets/Unliked.svg';
 import ShareIcon from '@assets/share.svg';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
-import CloseIcon from '@assets/icons/common/close.svg';
+import LocationTooltip from '@components/map/LocationTooltip';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -372,30 +372,14 @@ const StoreDetailScreen = () => {
                   )}
                 </TouchableOpacity>
                 {isTooltipVisible && (
-                  <View style={styles.tooltip}>
-                    <View style={styles.tooltipArrow} />
-
-                    <View style={styles.tooltipTextContainer}>
-                      <Text style={styles.tooltipText}>
-                        아직 이용할 수 있는 제휴가 없는 매장이에요.
-                      </Text>
-                      <Text style={styles.tooltipText}>
-                        학생회에게 제휴를 요청하실래요?
-                      </Text>
-                    </View>
-
-                    <TouchableOpacity
-                      onPress={() => setIsTooltipVisible(false)}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                      style={styles.closeButton}
-                    >
-                      <CloseIcon
-                        width={10}
-                        height={10}
-                        color={theme.colors.primary1}
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <LocationTooltip
+                    text={[
+                      '아직 이용할 수 있는 제휴가 없는 매장이에요.',
+                      '학생회에게 제휴를 요청하실래요?',
+                    ]}
+                    arrowDirection="left"
+                    onClose={() => setIsTooltipVisible(false)}
+                  />
                 )}
               </View>
             )}
@@ -643,48 +627,6 @@ const styles = StyleSheet.create({
   },
   requestButtonTextDone: {
     color: colors.blue[300],
-  },
-  tooltip: {
-    backgroundColor: theme.colors.primary1Light,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 20,
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-
-    position: 'relative',
-  },
-  tooltipTextContainer: {
-    flex: 1,
-    marginLeft: 10,
-    marginRight: 8,
-  },
-
-  tooltipText: {
-    ...typography.caption2Regular,
-    color: theme.colors.primary1,
-  },
-
-  closeButton: {
-    padding: 4,
-  },
-
-  tooltipArrow: {
-    position: 'absolute',
-    left: -6,
-    top: 15,
-    width: 0,
-    height: 0,
-    borderTopWidth: 6,
-    borderBottomWidth: 6,
-    borderRightWidth: 8,
-    borderStyle: 'solid',
-    backgroundColor: 'transparent',
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-    borderRightColor: theme.colors.primary1Light,
   },
   detailList: {
     gap: 8,

@@ -23,6 +23,7 @@ import BannerCard from '@components/common/BannerCard';
 import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { getPartnershipList } from '@api/partnership';
+import useLocation, { DEFAULT_LOCATION } from '../../hooks/useLocation';
 import { suggestPartnership } from '@api/place';
 
 const formatDistance = (meters) => {
@@ -91,28 +92,33 @@ const ReviewResultScreen = () => {
     }
   };
   const [partnerStores, setPartnerStores] = useState([]);
+  const { getLocationIfPermitted } = useLocation();
 
   useEffect(() => {
-    const fetchStores = (lat, lng) => {
-      getPartnershipList(lat, lng)
-        .then((data) => {
-          setPartnerStores(
-            data.map((item) => ({
-              id: item.placeId,
-              placeName: item.placeName,
-              category: item.category,
-              benefit: item.partnership,
-              thumbnailImageUrl: item.thumbnailUrl,
-              distance: formatDistance(item.distance),
-              type: '제휴',
-            }))
-          );
-        })
-        .catch((e) => console.error('제휴 매장 목록 오류:', e));
+    const fetchStores = async () => {
+      try {
+        const location = await getLocationIfPermitted();
+        const { latitude: lat, longitude: lng } = location ?? DEFAULT_LOCATION;
+        const data = await getPartnershipList(lat, lng);
+        setPartnerStores(
+          data.map((item) => ({
+            id: item.placeId,
+            placeName: item.placeName,
+            category: item.category,
+            benefit: item.partnership,
+            thumbnailImageUrl: item.thumbnailUrl,
+            distance: formatDistance(item.distance),
+            type: '제휴',
+          }))
+        );
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('제휴 매장 목록 오류:', e);
+      }
     };
 
-    fetchStores(37.505, 126.957);
-  }, []);
+    fetchStores();
+  }, [getLocationIfPermitted]);
 
   const handleClose = () => {
     navigation.popToTop();

@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useRef, useMemo } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+} from 'react';
 import {
   View,
   Animated,
@@ -15,9 +20,14 @@ import CategoryList from '../../components/map/CategoryList';
 import { normalizeCategory } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import LocationIcon from '../../../assets/icons/location.svg';
+import LocationTooltip from '../../components/map/LocationTooltip';
+import CustomToast from '../../components/CustomToast';
 import theme from '../../style';
+import colors from '../../style/colors';
 
 import { useMapLogic } from '../../hooks/useMapLogic';
+import { DEFAULT_LOCATION } from '../../hooks/useLocation';
+import useLocationStore from '../../store/locationStore';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
@@ -27,6 +37,8 @@ const HEIGHT_HIDDEN = 0;
 const MapScreen = () => {
   const mapRef = useRef(null);
   const insets = useSafeAreaInsets();
+  const tooltipDismissed = useLocationStore((s) => s.locationTooltipDismissed);
+  const dismissTooltip = useLocationStore((s) => s.dismissLocationTooltip);
 
   const { state, actions, displayedMarkers, navigation } = useMapLogic(mapRef);
 
@@ -54,6 +66,13 @@ const MapScreen = () => {
   const topHeaderHeight = insets.top + 60 + 20;
   const sheetMaxHeight = SCREEN_HEIGHT - topHeaderHeight;
 
+  const buttonBottom = sheetHeightAnimated.interpolate({
+    inputRange: [HEIGHT_HIDDEN, HEIGHT_ITEM, HEIGHT_LIST],
+    outputRange: [20, HEIGHT_ITEM + 12, HEIGHT_LIST + 12],
+    extrapolate: 'clamp',
+  });
+
+
   useEffect(() => {
     let targetHeight = HEIGHT_HIDDEN;
     if (selectedMarkerId) targetHeight = HEIGHT_ITEM;
@@ -65,13 +84,8 @@ const MapScreen = () => {
       friction: 8,
       tension: 40,
     }).start();
-  }, [selectedMarkerId, searchKeyword, selectedCategory]);
+  }, [selectedMarkerId, searchKeyword, selectedCategory, sheetHeightAnimated]);
 
-  const buttonTranslateY = sheetHeightAnimated.interpolate({
-    inputRange: [HEIGHT_HIDDEN, HEIGHT_ITEM, HEIGHT_LIST],
-    outputRange: [0, -20, -20],
-    extrapolate: 'clamp',
-  });
 
   const uniqueMarkers = useMemo(() => {
     const seen = new Set();
@@ -113,8 +127,8 @@ const MapScreen = () => {
         ref={mapRef}
         style={{ flex: 1 }}
         initialCamera={{
-          latitude: 37.505,
-          longitude: 126.957,
+          latitude: DEFAULT_LOCATION.latitude,
+          longitude: DEFAULT_LOCATION.longitude,
           zoom: 16,
         }}
         markers={markersWithPinType}
@@ -174,21 +188,27 @@ const MapScreen = () => {
         )}
       </View>
 
-      {/* 현위치 버튼 */}
+      {/* 현위치 버튼 + 툴팁: 항상 노출, 바텀시트와 함께 이동 */}
       <Animated.View
-        style={[
-          styles.myLocationButtonWrapper,
-          { transform: [{ translateY: buttonTranslateY }] },
-        ]}
+        style={[styles.myLocationButtonWrapper, { bottom: buttonBottom }]}
         pointerEvents="box-none"
       >
+        {!tooltipDismissed && (
+          <LocationTooltip
+            text="내 주변 제휴를 바로 볼 수 있어요"
+            onClose={dismissTooltip}
+          />
+        )}
         <TouchableOpacity
           style={styles.myLocationButton}
-          onPress={handleCurrentLocation}
+          onPress={() => {
+            dismissTooltip();
+            handleCurrentLocation();
+          }}
           activeOpacity={0.8}
         >
-          <LocationIcon width={24} height={24} color={theme.colors.textDim} />
-        </TouchableOpacity>
+            <LocationIcon width={24} height={24} color={theme.colors.textDim} />
+          </TouchableOpacity>
       </Animated.View>
 
       {/* 바텀시트 */}
@@ -203,6 +223,7 @@ const MapScreen = () => {
         onUpdateStore={actions.updatePlaceState}
         userLocation={userLocation}
       />
+      <CustomToast />
     </View>
   );
 };
@@ -219,15 +240,16 @@ const styles = StyleSheet.create({
   },
   myLocationButtonWrapper: {
     position: 'absolute',
-    bottom: 30,
     right: 20,
     zIndex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   myLocationButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'white',
+    backgroundColor: colors.common.white,
     justifyContent: 'center',
     alignItems: 'center',
     ...theme.shadows.level1,
