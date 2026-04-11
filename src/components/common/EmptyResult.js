@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
   text: {
     marginTop: 20,
     color: colors.gray[300],
+    textAlign: 'center',
     ...typography.body2Bold,
   },
 });
