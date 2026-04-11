@@ -90,10 +90,10 @@ const HomeScreen = () => {
   };
 
   const handleCarouselPress = (item) => {
-    if (item.id === '1') {
-      navigation.navigate('Partnership');
-    } else if (item.id === '2') {
-      navigation.navigate('Partnership');
+    if (item.id === '1' || item.id === '2') {
+      navigation.navigate('Partnership', {
+        screen: 'AffiliationMainScreen',
+      });
     }
   };
 
@@ -179,7 +179,11 @@ const HomeScreen = () => {
               title="제휴 이용하고 혜택 받아가세요!"
               subtitle="리뷰만 작성해도 혜택이 팡팡"
               imageSource={require('../../../assets/images/home/banner_04.webp')}
-              onPress={() => navigation.navigate('Affiliation')}
+              onPress={() =>
+                navigation.navigate('Partnership', {
+                  screen: 'AffiliationMainScreen',
+                })
+              }
             />
           </View>
         </HomeSection>
