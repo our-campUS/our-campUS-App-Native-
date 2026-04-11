@@ -220,6 +220,30 @@ const ReviewResultScreen = () => {
 
   const renderMiddleAction = () => {
     if (caseType === 3) {
+      /* TODO: 스탬프 기능 구현 시 아래 주석 해제
+      return (
+        <View style={styles.middleActionContainer}>
+          <Text style={styles.middleTitle}>캠어스를 100% 이용하는 법</Text>
+          <Text style={styles.middleSubtitle}>
+            다음에는 제휴 혜택을 이용해보세요!
+          </Text>
+          <BannerCard
+            title="제휴 이용하고 스탬프 받아가세요!"
+            subtitle="제휴만 이용해도 혜택이 팡팡"
+            imageSource={require('../../../assets/images/home/banner_04.webp')}
+            style={styles.bannerCard}
+          />
+          <Button
+            title="스탬프 채울 수 있는 제휴 보러가기"
+            onPress={() =>
+              navigation.navigate('MainTab', { screen: 'Partnership' })
+            }
+            style={[styles.blueButton, styles.blueButtonAfterBanner]}
+            textStyle={styles.blueButtonText}
+          />
+        </View>
+      );
+      */
       return null;
     } else if (caseType === 4) {
       return (
