@@ -5,10 +5,11 @@ import {
   Image,
   Text,
   StyleSheet,
+  TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
 
-const MainCarousel = ({ data }) => {
+const MainCarousel = ({ data, onItemPress }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { width } = useWindowDimensions();
 
@@ -40,12 +41,17 @@ const MainCarousel = ({ data }) => {
         viewabilityConfig={viewabilityConfig}
         snapToInterval={ITEM_WIDTH}
         decelerationRate="fast"
-        renderItem={({ item }) => (
-          <View style={{ width: ITEM_WIDTH, paddingHorizontal: ITEM_GAP }}>
+        renderItem={({ item, index }) => (
+          <TouchableOpacity
+            testID={`carousel-item-${index}`}
+            activeOpacity={0.9}
+            style={{ width: ITEM_WIDTH, paddingHorizontal: ITEM_GAP }}
+            onPress={() => onItemPress?.(item)}
+          >
             <View style={styles.imageWrapper}>
               <Image source={item.image} style={styles.image} />
             </View>
-          </View>
+          </TouchableOpacity>
         )}
       />
 

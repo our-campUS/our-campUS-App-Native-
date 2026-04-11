@@ -187,6 +187,7 @@ const WriteReviewScreen = () => {
         reviewResult: result,
         caseType: reviewCaseType,
         placeName: storePlaceName,
+        store,
       });
     } catch (error) {
       Toast.show({

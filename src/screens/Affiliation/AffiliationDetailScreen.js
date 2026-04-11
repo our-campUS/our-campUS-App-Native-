@@ -89,11 +89,11 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       }
     };
     fetchStudentAffiliateDetail();
-  }, [route.params?.item]);
+  }, [route.params?.item, accessToken]);
 
   useEffect(() => {
     console.log('councilType', councilType);
-  }, [route.params?.councilType]);
+  }, [councilType]);
 
   useEffect(() => {
     console.log('detailData', detailData);
@@ -112,7 +112,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       setImagesLoaded({});
       setIsFirstImageLoaded(false);
     }
-  }, [detailData?.images]);
+  }, [detailData?.images, detailData, detailImages]);
 
   useEffect(() => {
     if (!councilType) return;
@@ -123,10 +123,21 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
         item?.id,
         detailData?.category
       );
-      setRecommendData(data?.content || []);
+      const content = data?.content || [];
+      setRecommendData(
+        content.map((post) => ({
+          ...post,
+          id: post.postId || post.id,
+          type: post.category === 'PARTNERSHIP' ? '제휴' : '행사',
+          placeName: post.place || post.placeName,
+          placeType: post.placeType || null,
+          detail: post.title,
+          category: post.placeType || null,
+        }))
+      );
     };
     fetchStudentAffiliateRecommendList();
-  }, [detailData]);
+  }, [detailData, accessToken, councilType, item?.id]);
 
   useEffect(() => {
     console.log('recommendData', recommendData);
@@ -339,7 +350,22 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
               contentContainerStyle={{ gap: 10 }}
               style={{ marginTop: 20 }}
               showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => <RecommendStoreCard item={item} />}
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => {
+                    navigation.push('AffiliationDetailScreen', {
+                      councilType,
+                      item: {
+                        ...item,
+                        id: item.postId || item.id,
+                        placeName: item.place || item.placeName,
+                      },
+                    });
+                  }}
+                >
+                  <RecommendStoreCard item={item} />
+                </Pressable>
+              )}
               keyExtractor={(item) => item.id}
             />
           </View>

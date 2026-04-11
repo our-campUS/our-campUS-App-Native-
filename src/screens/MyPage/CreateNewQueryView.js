@@ -11,19 +11,45 @@ import typography from '@style/typography';
 import shadows from '@style/shadow';
 import { useEffect, useState } from 'react';
 import Button from '@components/Button';
-import useAuthStore from '@store/authStore';
+import { createInquiry, createCouncilInquiry } from '../../api/inquiry';
+import useToastStore from '../../store/toastStore';
 
-const CreateNewQueryView = ({ handleCreateQuery }) => {
-  const isCouncil = useAuthStore((state) => state.user.role === 'COUNCIL');
+const CreateNewQueryView = ({ handleCreateQuery, isCouncil }) => {
   const [inqueryTitle, setInqueryTitle] = useState('');
   const [inqueryContent, setInqueryContent] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     setIsButtonDisabled(
-      inqueryContent.length < 10 || inqueryTitle.trim().length === 0
+      inqueryContent.length < 10 ||
+        inqueryTitle.trim().length === 0 ||
+        submitting
     );
-  }, [inqueryContent, inqueryTitle]);
+  }, [inqueryContent, inqueryTitle, submitting]);
+
+  const handleSubmit = async () => {
+    if (submitting) {
+      return;
+    }
+    setSubmitting(true);
+    const submitFn = isCouncil ? createCouncilInquiry : createInquiry;
+    const result = await submitFn(inqueryTitle.trim(), inqueryContent);
+    setSubmitting(false);
+
+    if (result) {
+      useToastStore.getState().showToast('문의가 등록되었습니다.', 'success');
+      setInqueryTitle('');
+      setInqueryContent('');
+      setTimeout(() => {
+        handleCreateQuery();
+      }, 800);
+    } else {
+      useToastStore
+        .getState()
+        .showToast('문의 등록에 실패하였습니다.', 'error');
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -77,7 +103,7 @@ const CreateNewQueryView = ({ handleCreateQuery }) => {
                 : colors.blue[400],
               borderRadius: 16,
             }}
-            onPress={handleCreateQuery}
+            onPress={handleSubmit}
           />
         </View>
       </View>
@@ -93,6 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
   },
   titleInputWrapper: {
+    backgroundColor: colors.common.white,
     borderRadius: 14,
     ...shadows.level2,
     paddingHorizontal: 20,
@@ -105,10 +132,11 @@ const styles = StyleSheet.create({
   inqueryInput: {
     ...typography.body3Regular,
     color: colors.gray[850],
-    height: 100,
+    flex: 1,
     width: '100%',
   },
   textInputWrapper: {
+    backgroundColor: colors.common.white,
     width: '100%',
     height: 166,
     padding: 20,
@@ -117,7 +145,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   inqueryContentLength: {
-    ...typography.body3Regular,
+    ...typography.caption1Regular,
     color: colors.gray[400],
     textAlign: 'right',
     marginTop: 'auto',
@@ -125,7 +153,7 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     marginTop: 'auto',
-    marginBottom: 17,
+    marginBottom: 28,
   },
 });
 

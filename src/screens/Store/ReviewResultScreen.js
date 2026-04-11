@@ -24,6 +24,7 @@ import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { getPartnershipList } from '@api/partnership';
 import useLocation, { DEFAULT_LOCATION } from '../../hooks/useLocation';
+import { suggestPartnership } from '@api/place';
 
 const formatDistance = (meters) => {
   if (meters == null) return null;
@@ -59,13 +60,37 @@ const ReviewResultScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { reviewResult, caseType = 3, placeName = '' } = route.params || {};
+  const {
+    reviewResult,
+    caseType = 3,
+    placeName = '',
+    store,
+  } = route.params || {};
 
   const reviewData = reviewResult?.review;
   const resultData = reviewResult?.result;
   const rankingData = reviewResult?.ranking;
 
   const [partnerRequested, setPartnerRequested] = useState(false);
+  const [isSuggesting, setIsSuggesting] = useState(false);
+
+  const handleSuggestPartnership = async () => {
+    if (isSuggesting || partnerRequested) return;
+    setIsSuggesting(true);
+    try {
+      const result = await suggestPartnership({
+        ...store,
+        placeId: store?.backendPlaceId || store?.placeId || null,
+      });
+      if (result === 'SUCCESS' || result === 'ALREADY_REQUESTED') {
+        setPartnerRequested(true);
+      }
+    } catch {
+      // 실패 시 무시
+    } finally {
+      setIsSuggesting(false);
+    }
+  };
   const [partnerStores, setPartnerStores] = useState([]);
   const { getLocationIfPermitted } = useLocation();
 
@@ -258,8 +283,8 @@ const ReviewResultScreen = () => {
                 styles.outlineButton,
                 partnerRequested && styles.outlineButtonDone,
               ]}
-              onPress={() => setPartnerRequested(true)}
-              disabled={partnerRequested}
+              onPress={handleSuggestPartnership}
+              disabled={isSuggesting || partnerRequested}
             >
               <Text
                 style={[

@@ -44,18 +44,20 @@ const InquerySelectTab = ({ activeTab, setActiveTab }) => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 36,
     backgroundColor: colors.common.white,
     flexDirection: 'row',
   },
   button: {
     flex: 1,
-    height: 36,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.common.white,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[250],
   },
   activeButton: {
+    borderBottomWidth: 1.5,
     borderBottomColor: colors.gray[850],
   },
   buttonText: {

@@ -4,7 +4,6 @@ import CouncilAffiliateDetailScreen from '../../screens/Council/CouncilAffiliate
 import WriteAffiliatePostScreen from '../../screens/Council/AffiliateCreate/WriteAffiliatePostScreen';
 import SelectPlaceAffiliateScreen from '../../screens/Council/AffiliateCreate/SelectPlaceAffiliateScreen';
 import SelectAffiliationLogoScreen from '../../screens/Council/AffiliateCreate/SelectAffiliationLogoScreen';
-import PostFinishScreen from '../../screens/Council/AffiliateCreate/PostFinishScreen';
 import WriteEventPostScreen from '../../screens/Council/AffiliateCreate/WriteEventPostScreen';
 import AffiliateEditScreen from '../../screens/Council/AffiliateCreate/AffiliateEditScreen';
 import EventEditScreen from '../../screens/Council/AffiliateCreate/EventEditScreen';
@@ -37,11 +36,6 @@ const CouncilAffiliateStack = () => {
       <Stack.Screen
         name="SelectAffiliationLogoScreen"
         component={SelectAffiliationLogoScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PostFinishScreen"
-        component={PostFinishScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
