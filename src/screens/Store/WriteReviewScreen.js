@@ -265,7 +265,12 @@ const WriteReviewScreen = () => {
               }}
             />
 
-            <Text style={[styles.charCount, reviewText.length >= 20]}>
+            <Text
+              style={[
+                styles.charCount,
+                reviewText.length >= 20 && styles.charCountValid,
+              ]}
+            >
               {reviewText.length === 0
                 ? '최소 20자 이상'
                 : `${reviewText.length}/1000`}
@@ -390,6 +395,9 @@ const styles = StyleSheet.create({
     color: theme.colors.textDisabled,
     textAlign: 'right',
     marginTop: 8,
+  },
+  charCountValid: {
+    color: theme.colors.text,
   },
 
   photoScroll: {
