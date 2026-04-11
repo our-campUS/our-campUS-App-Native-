@@ -19,7 +19,6 @@ import typography from '@style/typography';
 import colors from '@style/colors';
 import RankingIcon from '@assets/icons/trophy.svg';
 import LinearGradient from 'react-native-linear-gradient';
-import BannerCard from '@components/common/BannerCard';
 import RecommendStoreCard from '@components/Affiliation/RecommendStoreCard';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { getPartnershipList } from '@api/partnership';
@@ -34,19 +33,8 @@ const formatDistance = (meters) => {
 };
 
 const getOrdinal = (n) => {
-  const ordinals = [
-    '첫번째',
-    '두번째',
-    '세번째',
-    '네번째',
-    '다섯번째',
-    '여섯번째',
-    '일곱번째',
-    '여덟번째',
-    '아홉번째',
-    '열번째',
-  ];
-  return n >= 1 && n <= 10 ? ordinals[n - 1] : `${n}번째`;
+  if (n === 1) return '첫번째';
+  return `${n}번째`;
 };
 
 const getJosa = (str) => {
@@ -184,7 +172,8 @@ const ReviewResultScreen = () => {
       <View style={styles.reviewSection}>
         <View style={{ alignItems: 'center', marginBottom: 20 }}>
           <Text style={styles.reviewCompleteTitle}>
-            <Text style={{ color: '#6BAAF9' }}>{ordinal}</Text> 리뷰 작성 완료!
+            <Text style={{ color: colors.blue[400] }}>{ordinal}</Text> 리뷰 작성
+            완료!
           </Text>
           <Text style={styles.reviewCompleteSub}>
             {placeName}의 {ordinal} 리뷰 작성 완료
@@ -231,30 +220,7 @@ const ReviewResultScreen = () => {
 
   const renderMiddleAction = () => {
     if (caseType === 3) {
-      return (
-        <View style={styles.middleActionContainer}>
-          <Text style={styles.middleTitle}>캠어스를 100% 이용하는 법</Text>
-          <Text style={styles.middleSubtitle}>
-            다음에는 제휴 혜택을 이용해보세요!
-          </Text>
-
-          <BannerCard
-            title="제휴 이용하고 스탬프 받아가세요!"
-            subtitle="제휴만 이용해도 혜택이 팡팡"
-            imageSource={require('../../../assets/images/home/banner_04.webp')}
-            style={styles.bannerCard}
-          />
-
-          <Button
-            title="스탬프 채울 수 있는 제휴 보러가기"
-            onPress={() =>
-              navigation.navigate('MainTab', { screen: 'Partnership' })
-            }
-            style={[styles.blueButton, styles.blueButtonAfterBanner]}
-            textStyle={styles.blueButtonText}
-          />
-        </View>
-      );
+      return null;
     } else if (caseType === 4) {
       return (
         <View
@@ -264,7 +230,7 @@ const ReviewResultScreen = () => {
           ]}
         >
           <LinearGradient
-            colors={['#FFFFFF', '#E6F5FF']}
+            colors={[colors.common.white, colors.blue['050']]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.requestBoxWrapper}
@@ -310,8 +276,6 @@ const ReviewResultScreen = () => {
   };
 
   const renderBottomList = () => {
-    if (caseType === 3) return <View />;
-
     const isBlueBackground = caseType === 1 || caseType === 2;
 
     return (
@@ -326,7 +290,9 @@ const ReviewResultScreen = () => {
           <Text style={styles.bottomSubtitle}>
             {isBlueBackground
               ? '최근 한달 간 제휴 이용수가 많았던 매장을 살펴보세요.'
-              : '다음에는 제휴 매장 이용하고\n스탬프를 모아보세요!'}
+              : caseType === 3
+              ? '다른 제휴 매장도 이용해보세요!'
+              : '다음에는 제휴 매장을 이용해보세요!'}
           </Text>
         </View>
 
@@ -376,7 +342,7 @@ const ReviewResultScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.common.white,
   },
   header: {
     alignItems: 'flex-end',
@@ -428,7 +394,7 @@ const styles = StyleSheet.create({
     marginBottom: 42,
   },
   cardContainer: {
-    backgroundColor: 'white',
+    backgroundColor: colors.common.white,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.gray[200],
@@ -510,10 +476,6 @@ const styles = StyleSheet.create({
     ...typography.body4Regular,
     color: theme.colors.textDim,
     textAlign: 'center',
-  },
-  bannerCard: {
-    marginTop: 32,
-    marginBottom: 0,
   },
   blueButton: {
     width: '100%',
