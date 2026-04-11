@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,8 +15,9 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Toast from 'react-native-toast-message';
 import LabelTitle from '@components/LabelTitle';
+import Toast from '@components/common/Toast';
+import useToast from '@/hooks/useToast';
 import { editReview, createReview, createPartnershipReview } from '@api/review';
 import {
   convertToPng,
@@ -25,7 +26,7 @@ import {
 } from '@api/uploadImage';
 import theme from '@style';
 import typography from '@style/typography';
-import shadow from '@style/shadow';
+
 import colors from '@style/colors';
 import RatingIcon from '@assets/icons/rating.svg';
 
@@ -49,9 +50,19 @@ const WriteReviewScreen = () => {
   const existingReview = route.params?.review || null;
   const storeName =
     route.params?.store?.name ||
+    route.params?.storeName ||
     existingReview?.place ||
     existingReview?.name ||
-    '스타벅스 상도역점';
+    '';
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
+
+  useEffect(() => {
+    if (!editMode && !storeName) {
+      showToast('매장 정보를 불러올 수 없습니다.');
+      const timer = setTimeout(() => navigation.goBack(), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [editMode, storeName, showToast, navigation]);
 
   const [rating, setRating] = useState(
     editMode && existingReview
@@ -118,16 +129,10 @@ const WriteReviewScreen = () => {
           star: rating,
           imageUrls: existingReview.imageUrls || [],
         });
-        Toast.show({
-          type: 'success',
-          text1: '리뷰가 수정되었습니다.',
-        });
+        showToast('리뷰가 수정되었습니다.');
         navigation.goBack();
       } catch (error) {
-        Toast.show({
-          type: 'error',
-          text1: '리뷰 수정에 실패하였습니다.',
-        });
+        showToast('리뷰 수정에 실패하였습니다.');
       }
       return;
     }
@@ -191,10 +196,7 @@ const WriteReviewScreen = () => {
         store,
       });
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: '리뷰 등록에 실패하였습니다.',
-      });
+      showToast('리뷰 등록에 실패하였습니다.');
     }
   };
 
@@ -314,6 +316,12 @@ const WriteReviewScreen = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={false}
+      />
     </SafeAreaView>
   );
 };
