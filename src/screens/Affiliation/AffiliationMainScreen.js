@@ -162,7 +162,7 @@ const AffiliationMainScreen = ({ navigation }) => {
       }
 
       const fetchFn = AFFILIATE_FETCH_MAP[selectedTab];
-      const result = await fetchFn(accessToken, pageNum);
+      const result = await fetchFn(pageNum);
 
       if (result) {
         const newItems = result.content || [];
@@ -191,7 +191,7 @@ const AffiliationMainScreen = ({ navigation }) => {
       }
 
       const fetchFn = EVENT_FETCH_MAP[selectedTab];
-      const result = await fetchFn(accessToken, pageNum);
+      const result = await fetchFn(pageNum);
 
       if (result) {
         const newItems = result.content || [];
@@ -213,7 +213,7 @@ const AffiliationMainScreen = ({ navigation }) => {
   const fetchUpcomingEvents = useCallback(async () => {
     if (!accessToken) return;
     const fetchFn = UPCOMING_FETCH_MAP[selectedTab];
-    const result = await fetchFn(accessToken);
+    const result = await fetchFn();
     setUpcomingEvents(result || []);
   }, [accessToken, selectedTab]);
 
@@ -270,7 +270,7 @@ const AffiliationMainScreen = ({ navigation }) => {
         eventPosts.find((p) => p.id === postId || p.postId === postId);
       const wasLiked = currentPost?.liked;
 
-      await toggleStudentAffiliateLike(accessToken, postId);
+      await toggleStudentAffiliateLike(postId);
 
       showToast(
         wasLiked ? '관심 목록에서 삭제되었어요.' : '관심 목록에 추가되었어요!'

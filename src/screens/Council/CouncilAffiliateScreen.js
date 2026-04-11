@@ -61,10 +61,10 @@ const CouncilAffiliateScreen = ({ navigation }) => {
       setIsLoading(true);
       try {
         if (activityType === '제휴') {
-          const response = await getCouncilAffiliatePosts(accessToken);
+          const response = await getCouncilAffiliatePosts();
           setCouncilAffiliatePosts(response.data.data.content);
         } else if (activityType === '행사') {
-          const responseEvent = await getCouncilEventPosts(accessToken);
+          const responseEvent = await getCouncilEventPosts();
           setCouncilEventPosts(responseEvent.data.data.content);
         }
         // 로드된 활동 타입 추가
@@ -85,7 +85,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
   const fetchAvailableEvents = useCallback(async () => {
     if (!accessToken) return;
     try {
-      const responseAvailableEvents = await getAvailableEvents(accessToken);
+      const responseAvailableEvents = await getAvailableEvents();
       setAvailabeEvents(responseAvailableEvents.data.data.content);
     } catch (error) {
       console.error('fetchAvailableEvents error:', error);
@@ -334,10 +334,7 @@ const CouncilAffiliateScreen = ({ navigation }) => {
           onSelectDelete={async () => {
             console.log('onSelectDelete');
             setIsThreeDotIconPressed(false);
-            const response = await deleteCouncilPost(
-              threeDotIconItem.postId,
-              accessToken
-            );
+            const response = await deleteCouncilPost(threeDotIconItem.postId);
             console.log('response at onSelectDelete', response);
             // 현재 선택된 활동 타입의 데이터를 다시 불러오기
             await fetchActivityTypeData(selectedActivityType);

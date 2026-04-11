@@ -1,8 +1,7 @@
 import api from './axiosInstance';
-import useAuthStore from '../store/authStore';
 
 // 학교 총학생회 제휴 게시글 목록 조회
-export const getStudentSchoolAffiliateList = async (accessToken, page = 1) => {
+export const getStudentSchoolAffiliateList = async (page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
@@ -10,9 +9,6 @@ export const getStudentSchoolAffiliateList = async (accessToken, page = 1) => {
         category: 'PARTNERSHIP',
         size: 10,
         page,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentSchoolAffiliateList response', response);
@@ -24,7 +20,7 @@ export const getStudentSchoolAffiliateList = async (accessToken, page = 1) => {
 };
 
 // 학교 총학생회 행사 게시글 목록 조회
-export const getStudentSchoolEventList = async (accessToken, page = 1) => {
+export const getStudentSchoolEventList = async (page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
@@ -32,9 +28,6 @@ export const getStudentSchoolEventList = async (accessToken, page = 1) => {
         category: 'EVENT',
         size: 10,
         page,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentSchoolEventList response', response);
@@ -46,7 +39,7 @@ export const getStudentSchoolEventList = async (accessToken, page = 1) => {
 };
 
 // 전공 학생회 제휴 게시글 목록 조회
-export const getStudentMajorAffiliateList = async (accessToken, page = 1) => {
+export const getStudentMajorAffiliateList = async (page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
@@ -54,9 +47,6 @@ export const getStudentMajorAffiliateList = async (accessToken, page = 1) => {
         category: 'PARTNERSHIP',
         size: 10,
         page,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentMajorAffiliateList response', response);
@@ -68,7 +58,7 @@ export const getStudentMajorAffiliateList = async (accessToken, page = 1) => {
 };
 
 // 전공 학생회 행사 게시글 목록 조회
-export const getStudentMajorEventList = async (accessToken, page = 1) => {
+export const getStudentMajorEventList = async (page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
@@ -76,9 +66,6 @@ export const getStudentMajorEventList = async (accessToken, page = 1) => {
         category: 'EVENT',
         size: 10,
         page,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentMajorEventList response', response);
@@ -90,7 +77,7 @@ export const getStudentMajorEventList = async (accessToken, page = 1) => {
 };
 
 // 단과대 제휴 게시글 목록 조회
-export const getStudentCollegeAffiliateList = async (accessToken, page = 1) => {
+export const getStudentCollegeAffiliateList = async (page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
@@ -98,9 +85,6 @@ export const getStudentCollegeAffiliateList = async (accessToken, page = 1) => {
         category: 'PARTNERSHIP',
         size: 10,
         page,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentCollegeAffiliateList response', response);
@@ -112,7 +96,7 @@ export const getStudentCollegeAffiliateList = async (accessToken, page = 1) => {
 };
 
 // 단과대 행사 게시글 목록 조회
-export const getStudentCollegeEventList = async (accessToken, page = 1) => {
+export const getStudentCollegeEventList = async (page = 1) => {
   try {
     const response = await api.get('/users/student-council/posts', {
       params: {
@@ -120,9 +104,6 @@ export const getStudentCollegeEventList = async (accessToken, page = 1) => {
         category: 'EVENT',
         size: 10,
         page,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     console.log('getStudentCollegeEventList response', response);
@@ -134,15 +115,10 @@ export const getStudentCollegeEventList = async (accessToken, page = 1) => {
 };
 
 // 제휴 / 행사 게시글 상세 조회
-export const getStudentAffiliateDetail = async (accessToken, postId) => {
+export const getStudentAffiliateDetail = async (postId) => {
   console.log('getStudentAffiliateDetail postId', postId);
-  console.log('getStudentAffiliateDetail accessToken', accessToken);
   try {
-    const response = await api.get(`/users/student-council/posts/${postId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await api.get(`/users/student-council/posts/${postId}`);
     console.log('getStudentAffiliateDetail response', response);
     if (response.data.code === 200 || response.data.code === 0) {
       return response.data.data;
@@ -163,7 +139,6 @@ const COUNCIL_TYPE_MAP = {
 
 // 제휴 / 행사 추천 게시글 목록 조회
 export const getStudentAffiliateRecommendList = async (
-  accessToken,
   councilType,
   excludeId,
   category
@@ -173,9 +148,6 @@ export const getStudentAffiliateRecommendList = async (
   console.log('getStudentAffiliateRecommendList category', category);
   try {
     const response = await api.get('/users/student-council/posts', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
       params: {
         councilType: COUNCIL_TYPE_MAP[councilType] || councilType,
         excludePostId: excludeId,
@@ -196,14 +168,11 @@ export const getStudentAffiliateRecommendList = async (
 };
 
 // 총학생회 72시간 이내 행사 목록 조회
-export const getStudentSchoolUpcomingEventList = async (accessToken) => {
+export const getStudentSchoolUpcomingEventList = async () => {
   try {
     const response = await api.get(
       '/users/student-council/posts/events/upcoming',
       {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
         params: {
           councilType: 'SCHOOL_COUNCIL',
           page: 1,
@@ -220,14 +189,11 @@ export const getStudentSchoolUpcomingEventList = async (accessToken) => {
 };
 
 // 전공 학생회 72시간 이내 행사 목록 조회
-export const getStudentMajorUpcomingEventList = async (accessToken) => {
+export const getStudentMajorUpcomingEventList = async () => {
   try {
     const response = await api.get(
       '/users/student-council/posts/events/upcoming',
       {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
         params: {
           councilType: 'MAJOR_COUNCIL',
           page: 1,
@@ -244,14 +210,11 @@ export const getStudentMajorUpcomingEventList = async (accessToken) => {
 };
 
 // 단과대 72시간 이내 행사 목록 조회
-export const getStudentCollegeUpcomingEventList = async (accessToken) => {
+export const getStudentCollegeUpcomingEventList = async () => {
   try {
     const response = await api.get(
       '/users/student-council/posts/events/upcoming',
       {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
         params: {
           councilType: 'COLLEGE_COUNCIL',
           page: 1,
@@ -268,18 +231,12 @@ export const getStudentCollegeUpcomingEventList = async (accessToken) => {
 };
 
 // 제휴 / 행사 게시글 좋아요 토글
-export const toggleStudentAffiliateLike = async (accessToken, postId) => {
+export const toggleStudentAffiliateLike = async (postId) => {
   console.log('toggleStudentAffiliateLike postId', postId);
-  console.log('toggleStudentAffiliateLike accessToken', accessToken);
   try {
     const response = await api.post(
       `/users/student-council/posts/${postId}/like`,
-      null,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+      null
     );
     console.log('toggleStudentAffiliateLike response', response);
     if (response.data.code === 200 || response.data.code === 0) {
@@ -292,16 +249,9 @@ export const toggleStudentAffiliateLike = async (accessToken, postId) => {
   }
 };
 
-export const getTodayEvent = async (accessToken) => {
+export const getTodayEvent = async () => {
   try {
-    const response = await api.get(
-      '/users/student-council/posts/events/today',
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await api.get('/users/student-council/posts/events/today');
     console.log('오늘의 행사 성공:', response.data);
     return response.data;
   } catch (error) {
@@ -313,11 +263,10 @@ export const getTodayEvent = async (accessToken) => {
 // 전체 학생회 타입 72시간 이내 행사 통합 조회 (우선순위: school → college → major)
 export const getUpcomingEventsAll = async () => {
   try {
-    const accessToken = useAuthStore.getState().accessToken;
     const [schoolEvents, collegeEvents, majorEvents] = await Promise.all([
-      getStudentSchoolUpcomingEventList(accessToken),
-      getStudentCollegeUpcomingEventList(accessToken),
-      getStudentMajorUpcomingEventList(accessToken),
+      getStudentSchoolUpcomingEventList(),
+      getStudentCollegeUpcomingEventList(),
+      getStudentMajorUpcomingEventList(),
     ]);
 
     const tag = (events, councilType) =>

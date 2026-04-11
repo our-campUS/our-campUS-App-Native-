@@ -22,7 +22,6 @@ import Button from '../../../components/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import useFormDraftStore from '../../../store/formDraftStore';
 import { Appearance } from 'react-native';
-import useAuthStore from '../../../store/authStore';
 import { getCouncilAffiliatePostDetail } from '../../../api/councilAffiliate';
 import {
   formatDotDate,
@@ -31,7 +30,6 @@ import {
 } from '../../../utils/dateTime';
 
 const AffiliateEditScreen = ({ navigation, route }) => {
-  const { accessToken } = useAuthStore();
   const [placeInfo, setPlaceInfo] = useState(null);
   const colorScheme = Appearance.getColorScheme();
   const eventType = route.params?.type;
@@ -69,8 +67,7 @@ const AffiliateEditScreen = ({ navigation, route }) => {
     if (previousPostDataId) {
       const fetchPreviousPostData = async () => {
         const response = await getCouncilAffiliatePostDetail(
-          previousPostDataId,
-          accessToken
+          previousPostDataId
         );
         setPreviousPostData(response.data.data);
       };

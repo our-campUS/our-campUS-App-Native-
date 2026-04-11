@@ -1,5 +1,4 @@
 import api from './axiosInstance';
-import useAuthStore from '../store/authStore';
 
 export const getReviewList = async (
   placeId,
@@ -8,8 +7,6 @@ export const getReviewList = async (
   size = 10
 ) => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
     const params = {
       size,
     };
@@ -19,9 +16,6 @@ export const getReviewList = async (
 
     const response = await api.get(`/reviews/list/${placeId}`, {
       params,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
 
     console.log('리뷰 목록 조회 성공:', response.data);
@@ -34,13 +28,7 @@ export const getReviewList = async (
 
 export const deleteReview = async (reviewId) => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
-    const response = await api.delete(`/reviews/${reviewId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.delete(`/reviews/${reviewId}`);
 
     console.log('리뷰 삭제 성공:', response.data);
     return response.data;
@@ -53,13 +41,7 @@ export const deleteReview = async (reviewId) => {
 // 리뷰 작성 - 제휴 아닌 장소
 export const createReview = async (reviewData) => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
-    const response = await api.post('/reviews', reviewData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.post('/reviews', reviewData);
 
     if (
       response.data.code === 200 ||
@@ -79,16 +61,9 @@ export const createReview = async (reviewData) => {
 // 리뷰 작성 - 제휴 장소
 export const createPartnershipReview = async (placeId, reviewData) => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
     const response = await api.post(
       `/reviews/partnership/${placeId}`,
-      reviewData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      reviewData
     );
 
     if (
@@ -109,13 +84,8 @@ export const createPartnershipReview = async (placeId, reviewData) => {
 // 내가 쓴 리뷰 목록 조회
 export const getMyReviews = async (page = 1, size = 10) => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
     const response = await api.get('/reviews/mine', {
       params: { page, size },
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
 
     if (response.data.code === 200 || response.data.code === 0) {
@@ -130,13 +100,7 @@ export const getMyReviews = async (page = 1, size = 10) => {
 
 export const editReview = async (reviewId, reviewData) => {
   try {
-    const token = useAuthStore.getState().accessToken;
-
-    const response = await api.patch(`/reviews/${reviewId}`, reviewData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.patch(`/reviews/${reviewId}`, reviewData);
 
     console.log('리뷰 수정 성공:', response.data);
     return response.data;

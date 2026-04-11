@@ -24,21 +24,13 @@ export const getCommonImagePresignedUrl = async (image) => {
 };
 
 // 이미지 업로드를 위한 url 발급 api (학생회 전용)
-export const getCouncilImagePresignedUrl = async (image, accessToken) => {
+export const getCouncilImagePresignedUrl = async (image) => {
   console.log('image', image);
   console.log('imageType', image.type);
   try {
-    const response = await api.post(
-      'storage/posts/images/presigned',
-      {
-        contentType: image.type,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await api.post('storage/posts/images/presigned', {
+      contentType: image.type,
+    });
 
     console.log('response', response.data.data);
     return response.data.data;
@@ -54,6 +46,7 @@ export const getCouncilImagePresignedUrl = async (image, accessToken) => {
     };
   }
 };
+
 // png 변환
 export const convertToPng = async (asset) => {
   console.log('asset input for convertToPng', asset);

@@ -30,12 +30,10 @@ import {
   getStudentAffiliateRecommendList,
   toggleStudentAffiliateLike,
 } from '../../api/studentAffiliate';
-import useAuthStore from '../../store/authStore';
 import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 
 const AffiliationLikedScreen = ({ navigation, route }) => {
   const [isLiked, setIsLiked] = useState(true);
-  const { accessToken } = useAuthStore();
   const [item, setItem] = useState(route.params?.item);
   const [councilType, setCouncilType] = useState(route.params?.councilType);
   const [detailData, setDetailData] = useState();
@@ -69,7 +67,6 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
     console.log('route.params?.item', route.params?.item);
     const fetchStudentAffiliateDetail = async () => {
       const data = await getStudentAffiliateDetail(
-        accessToken,
         route.params?.item?.id || route.params?.item?.postId
       );
       console.log('fetchStudentAffiliateDetail data', data);
@@ -80,7 +77,6 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
       }
     };
     fetchStudentAffiliateDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params?.item]);
 
   useEffect(() => {
@@ -112,7 +108,6 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
     if (!councilType) return;
     const fetchStudentAffiliateRecommendList = async () => {
       const data = await getStudentAffiliateRecommendList(
-        accessToken,
         councilType,
         item?.id,
         detailData?.category
@@ -256,7 +251,7 @@ const AffiliationLikedScreen = ({ navigation, route }) => {
                   setIsLiked(newLikedState);
                   try {
                     const postId = item?.id || item?.postId || detailData?.id;
-                    await toggleStudentAffiliateLike(accessToken, postId);
+                    await toggleStudentAffiliateLike(postId);
                     // 성공 시 detailData도 업데이트
                     if (detailData) {
                       setDetailData({ ...detailData, liked: newLikedState });
