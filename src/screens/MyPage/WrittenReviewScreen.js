@@ -30,8 +30,11 @@ const WrittenReviewScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    fetchMyReviews();
-  }, [fetchMyReviews]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchMyReviews();
+    });
+    return unsubscribe;
+  }, [navigation, fetchMyReviews]);
 
   const handleMorePress = (item) => {
     setSelectedReview(item);
