@@ -51,6 +51,9 @@ jobs:
           KAKAO_NATIVE_APP_KEY=ci_dummy_key
           EOF
 
+      - name: Create gradle.properties from example
+        run: cp android/gradle.properties.example android/gradle.properties
+
       - name: Build Android Debug
         working-directory: android
         run: ./gradlew assembleDebug -Dorg.gradle.java.home=$JAVA_HOME --no-daemon -PreactNativeArchitectures=x86_64
