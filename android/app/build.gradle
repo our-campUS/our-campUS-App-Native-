@@ -90,7 +90,7 @@ android {
         applicationId "com.ourcampusapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 2
         versionName "1.0"
 
         def kakaoKey = localProperties['KAKAO_NATIVE_APP_KEY'] ?: ""
@@ -106,15 +106,26 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            def storeFileName = project.findProperty('OURCAMPUS_UPLOAD_STORE_FILE') ?: System.getenv('OURCAMPUS_UPLOAD_STORE_FILE')
+            def storePass = project.findProperty('OURCAMPUS_UPLOAD_STORE_PASSWORD') ?: System.getenv('OURCAMPUS_UPLOAD_STORE_PASSWORD')
+            def keyAliasName = project.findProperty('OURCAMPUS_UPLOAD_KEY_ALIAS') ?: System.getenv('OURCAMPUS_UPLOAD_KEY_ALIAS')
+            def keyPass = project.findProperty('OURCAMPUS_UPLOAD_KEY_PASSWORD') ?: System.getenv('OURCAMPUS_UPLOAD_KEY_PASSWORD')
+
+            if (storeFileName) {
+                storeFile file(storeFileName)
+                storePassword storePass
+                keyAlias keyAliasName
+                keyPassword keyPass
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig = signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
             minifyEnabled = enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

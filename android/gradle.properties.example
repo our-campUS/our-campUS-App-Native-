@@ -48,3 +48,9 @@ org.gradle.caching=true
 
 # Project-level JDK 17 (글로벌 설정 의존 제거)
 org.gradle.java.home=C:/Program Files/Java/jdk-17
+
+# Android 서명
+OURCAMPUS_UPLOAD_STORE_FILE=our-campus-release.jks
+OURCAMPUS_UPLOAD_KEY_ALIAS=ourcampus
+OURCAMPUS_UPLOAD_STORE_PASSWORD=
+OURCAMPUS_UPLOAD_KEY_PASSWORD=
