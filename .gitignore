@@ -78,3 +78,4 @@ yarn-error.log
 
 안드로이드 서명
 android/app/our-campus-release.jks
+android/gradle.properties
