@@ -450,6 +450,7 @@ const StoreDetailScreen = () => {
                     star: storeData.averageStar ?? storeData.star,
                     placeId: currentPlaceId,
                     reviewSize: reviewSize,
+                    store: storeData,
                   })
                 }
               >

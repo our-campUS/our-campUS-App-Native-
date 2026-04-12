@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,8 +15,9 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Toast from 'react-native-toast-message';
 import LabelTitle from '@components/LabelTitle';
+import Toast from '@components/common/Toast';
+import useToast from '@/hooks/useToast';
 import { editReview, createReview, createPartnershipReview } from '@api/review';
 import {
   convertToPng,
@@ -25,7 +26,7 @@ import {
 } from '@api/uploadImage';
 import theme from '@style';
 import typography from '@style/typography';
-import shadow from '@style/shadow';
+
 import colors from '@style/colors';
 import RatingIcon from '@assets/icons/rating.svg';
 
@@ -49,9 +50,18 @@ const WriteReviewScreen = () => {
   const existingReview = route.params?.review || null;
   const storeName =
     route.params?.store?.name ||
-    existingReview?.place ||
-    existingReview?.name ||
-    '스타벅스 상도역점';
+    route.params?.storeName ||
+    existingReview?.placeName ||
+    '';
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
+
+  useEffect(() => {
+    if (!editMode && !storeName) {
+      showToast('매장 정보를 불러올 수 없습니다.');
+      const timer = setTimeout(() => navigation.goBack(), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [editMode, storeName, showToast, navigation]);
 
   const [rating, setRating] = useState(
     editMode && existingReview
@@ -65,7 +75,7 @@ const WriteReviewScreen = () => {
   );
   const [photos, setPhotos] = useState(
     editMode && existingReview?.imageUrls?.length
-      ? existingReview.imageUrls
+      ? existingReview.imageUrls.map((url) => ({ uri: url, isExisting: true }))
       : []
   );
   const [selection, setSelection] = useState(
@@ -78,20 +88,22 @@ const WriteReviewScreen = () => {
       selectionLimit: 10,
     });
     if (!result.didCancel && result.assets?.length) {
-      setPhotos(
-        result.assets.map((a) => ({
+      setPhotos((prev) => [
+        ...prev,
+        ...result.assets.map((a) => ({
           uri: a.uri,
           width: a.width,
           height: a.height,
           type: a.type,
-        }))
-      );
+        })),
+      ]);
     }
   };
 
-  const uploadPhotos = async () => {
-    if (photos.length === 0) return [];
-    const pngImages = await Promise.all(photos.map(convertToPng));
+  const uploadPhotos = async (targetPhotos) => {
+    const items = targetPhotos || photos;
+    if (items.length === 0) return [];
+    const pngImages = await Promise.all(items.map(convertToPng));
     const presignedUrls = await Promise.all(
       pngImages.map(async (image) => {
         const { uploadUrl, imageUrl } = await getCommonImagePresignedUrl(image);
@@ -107,27 +119,39 @@ const WriteReviewScreen = () => {
   };
 
   const isValid = reviewText.length >= 20 && rating > 0;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!isValid) return;
+    if (!isValid || isSubmitting) return;
+    setIsSubmitting(true);
 
     if (editMode && existingReview) {
       try {
+        const existingUrls = photos
+          .filter((p) => p.isExisting)
+          .map((p) => p.uri);
+        const newPhotos = photos.filter((p) => !p.isExisting);
+        const uploadedUrls =
+          newPhotos.length > 0 ? await uploadPhotos(newPhotos) : [];
+        const allImageUrls = [...existingUrls, ...uploadedUrls];
+
         await editReview(existingReview.reviewId || existingReview.id, {
           content: reviewText,
           star: rating,
-          imageUrls: existingReview.imageUrls || [],
+          imageUrls: allImageUrls,
+          place: {
+            placeId: existingReview.placeId,
+            placeName: existingReview.placeName,
+            placeKey: existingReview.placeKey,
+            coordinate: existingReview.coordinate,
+          },
         });
-        Toast.show({
-          type: 'success',
-          text1: '리뷰가 수정되었습니다.',
-        });
+        showToast('리뷰가 수정되었습니다.');
         navigation.goBack();
       } catch (error) {
-        Toast.show({
-          type: 'error',
-          text1: '리뷰 수정에 실패하였습니다.',
-        });
+        showToast('리뷰 수정에 실패하였습니다.');
+      } finally {
+        setIsSubmitting(false);
       }
       return;
     }
@@ -154,6 +178,7 @@ const WriteReviewScreen = () => {
           imageUrls,
           place: store
             ? {
+                placeId: store.placeId || null,
                 placeName: store.name || store.placeName || '',
                 placeKey: store.placeKey || '',
                 address: store.address || '',
@@ -190,10 +215,9 @@ const WriteReviewScreen = () => {
         store,
       });
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: '리뷰 등록에 실패하였습니다.',
-      });
+      showToast('리뷰 등록에 실패하였습니다.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -241,7 +265,12 @@ const WriteReviewScreen = () => {
               }}
             />
 
-            <Text style={[styles.charCount, reviewText.length >= 20]}>
+            <Text
+              style={[
+                styles.charCount,
+                reviewText.length >= 20 && styles.charCountValid,
+              ]}
+            >
               {reviewText.length === 0
                 ? '최소 20자 이상'
                 : `${reviewText.length}/1000`}
@@ -297,22 +326,28 @@ const WriteReviewScreen = () => {
               styles.submitButton,
               isValid ? styles.activeButton : styles.disabledButton,
             ]}
-            disabled={!isValid}
+            disabled={!isValid || isSubmitting}
             onPress={handleSubmit}
           >
             <Text
               style={[
                 styles.submitButtonText,
-                isValid
+                isValid && !isSubmitting
                   ? { color: colors.gray[100] }
                   : { color: theme.colors.background },
               ]}
             >
-              {editMode ? '수정하기' : '작성하기'}
+              {isSubmitting ? '처리 중...' : editMode ? '수정하기' : '작성하기'}
             </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={false}
+      />
     </SafeAreaView>
   );
 };
@@ -360,6 +395,9 @@ const styles = StyleSheet.create({
     color: theme.colors.textDisabled,
     textAlign: 'right',
     marginTop: 8,
+  },
+  charCountValid: {
+    color: theme.colors.text,
   },
 
   photoScroll: {
