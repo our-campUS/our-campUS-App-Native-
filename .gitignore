@@ -75,3 +75,6 @@ yarn-error.log
 !.yarn/versions
 
 .env
+
+안드로이드 서명
+android/app/our-campus-release.jks
