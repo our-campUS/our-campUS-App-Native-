@@ -95,8 +95,9 @@ android {
 
         def kakaoKey = localProperties['KAKAO_NATIVE_APP_KEY'] ?: ""
         manifestPlaceholders = [
-            KAKAO_NATIVE_APP_KEY: kakaoKey,
-            KAKAO_APP_SCHEME    : "kakao${kakaoKey}"
+            KAKAO_NATIVE_APP_KEY    : kakaoKey,
+            KAKAO_APP_SCHEME        : "kakao${kakaoKey}",
+            usesCleartextTraffic    : false
         ]
     }
     signingConfigs {
