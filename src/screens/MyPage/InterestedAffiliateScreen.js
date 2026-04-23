@@ -3,6 +3,7 @@ import LabelTitle from '../../components/LabelTitle';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import AffiliationColumnListItem from '../../components/Affiliation/AffiliationColumnListItem';
+import EmptyResult from '../../components/common/EmptyResult';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
@@ -115,7 +116,10 @@ const InterestedAffiliateScreen = ({ navigation }) => {
               alwaysShowLiked={true}
             />
           )}
-          keyExtractor={(item) => item?.id || item?.postId}
+          keyExtractor={(item) => String(item?.id || item?.postId)}
+          ListEmptyComponent={
+            <EmptyResult message="관심 게시글이 없습니다." paddingTop={100} />
+          }
         />
       )}
       {selectedActivityType === '행사' && (
@@ -132,7 +136,10 @@ const InterestedAffiliateScreen = ({ navigation }) => {
               alwaysShowLiked={true}
             />
           )}
-          keyExtractor={(item) => item?.id || item?.postId}
+          keyExtractor={(item) => String(item?.id || item?.postId)}
+          ListEmptyComponent={
+            <EmptyResult message="관심 게시글이 없습니다." paddingTop={100} />
+          }
         />
       )}
     </SafeAreaView>
