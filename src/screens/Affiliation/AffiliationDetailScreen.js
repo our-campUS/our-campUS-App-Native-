@@ -326,7 +326,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
             </View>
           </View>
         )}
-        {!isEmpty && !isFirstImageLoaded ? null : (
+        {!isEmpty && !isFirstImageLoaded ? null : recommendData.length > 0 ? (
           <View style={styles.recommendContainer}>
             {detailData?.category === 'PARTNERSHIP' ? (
               <Text style={styles.recommendTitle}>
@@ -347,12 +347,16 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
               renderItem={({ item }) => (
                 <Pressable
                   onPress={() => {
-                    navigation.push('AffiliationDetailScreen', {
-                      councilType,
-                      item: {
+                    navigation.push('StoreDetailScreen', {
+                      store: {
                         ...item,
-                        id: item.postId || item.id,
-                        placeName: item.place || item.placeName,
+                        name: item.placeName || item.place || item.name,
+                        imgUrls: item.imgUrls || (item.thumbnailImageUrl ? [item.thumbnailImageUrl] : []),
+                        isPartnership: item.type === '제휴',
+                        partnerships:
+                          item.type === '제휴' && detailData?.writerName
+                            ? [{ councilName: detailData.writerName }]
+                            : [],
                       },
                     });
                   }}
@@ -360,10 +364,10 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
                   <RecommendStoreCard item={item} />
                 </Pressable>
               )}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => String(item.id || item.postId)}
             />
           </View>
-        )}
+        ) : null}
       </ScrollView>
       <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} />
     </SafeAreaView>

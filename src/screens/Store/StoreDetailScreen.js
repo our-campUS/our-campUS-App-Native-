@@ -115,6 +115,8 @@ const StoreDetailScreen = () => {
   );
   const [reviews, setReviews] = useState(storeData.reviews);
   const [reviewSize, setReviewSize] = useState(storeData.reviewSize);
+  const [isPartner, setIsPartner] = useState(storeData.isPartner);
+  const [partnerTags, setPartnerTags] = useState(storeData.partnerTags);
 
   useEffect(() => {
     if (!storeData.backendPlaceId || storeData.reviews?.length > 0) return;
@@ -189,6 +191,16 @@ const StoreDetailScreen = () => {
             setIsLiked(status.isLiked);
             if (status.placeId && !currentPlaceId) {
               setCurrentPlaceId(status.placeId);
+            }
+            const fetchedIsPartner =
+              status.isPartnership || status.partnerships?.length > 0;
+            if (fetchedIsPartner !== undefined) {
+              setIsPartner(!!fetchedIsPartner);
+            }
+            if (status.partnerships?.length > 0) {
+              setPartnerTags(
+                status.partnerships.map((p) => p.councilName).filter(Boolean)
+              );
             }
           }
         } catch (error) {
@@ -330,9 +342,9 @@ const StoreDetailScreen = () => {
               </View>
             </View>
 
-            {storeData.isPartner ? (
+            {isPartner ? (
               <View style={styles.partnerTagRow}>
-                {storeData.partnerTags?.map((tag, index) => (
+                {partnerTags?.map((tag, index) => (
                   <TouchableOpacity key={index} style={styles.partnerTag}>
                     <Text style={styles.partnerTagText}>{tag}</Text>
                     <ArrowRightIcon
