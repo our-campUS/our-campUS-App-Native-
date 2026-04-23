@@ -24,6 +24,8 @@ import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import { getPartnershipList } from '@api/partnership';
 import useLocation, { DEFAULT_LOCATION } from '../../hooks/useLocation';
 import { suggestPartnership } from '@api/place';
+import Toast from '@components/common/Toast';
+import useToast from '@/hooks/useToast';
 
 const formatDistance = (meters) => {
   if (meters == null) return null;
@@ -61,6 +63,7 @@ const ReviewResultScreen = () => {
 
   const [partnerRequested, setPartnerRequested] = useState(false);
   const [isSuggesting, setIsSuggesting] = useState(false);
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   const handleSuggestPartnership = async () => {
     if (isSuggesting || partnerRequested) return;
@@ -68,13 +71,19 @@ const ReviewResultScreen = () => {
     try {
       const result = await suggestPartnership({
         ...store,
-        placeId: store?.backendPlaceId || store?.placeId || null,
+        placeId: store?.backendPlaceId || null,
       });
-      if (result === 'SUCCESS' || result === 'ALREADY_REQUESTED') {
+      if (result === 'SUCCESS') {
         setPartnerRequested(true);
+        showToast('제휴 요청을 완료했어요!');
+      } else if (result === 'ALREADY_REQUESTED') {
+        setPartnerRequested(true);
+        showToast('이미 제휴 신청이 완료된 장소예요.');
+      } else {
+        showToast('제휴 요청에 실패했어요. 다시 시도해주세요.');
       }
     } catch {
-      // 실패 시 무시
+      showToast('제휴 요청에 실패했어요. 다시 시도해주세요.');
     } finally {
       setIsSuggesting(false);
     }
@@ -320,10 +329,10 @@ const ReviewResultScreen = () => {
           </Text>
         </View>
 
-        {partnerStores.map((store, index) => (
+        {partnerStores.map((partnerStore, index) => (
           <RecommendStoreCard
-            key={store.id}
-            item={store}
+            key={`${partnerStore.id}-${index}`}
+            item={partnerStore}
             variant="long"
             rank={index + 1}
           />
@@ -359,6 +368,12 @@ const ReviewResultScreen = () => {
         {renderMiddleAction()}
         {renderBottomList()}
       </ScrollView>
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={false}
+      />
     </SafeAreaView>
   );
 };

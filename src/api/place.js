@@ -256,7 +256,11 @@ export const suggestPartnership = async (placeData) => {
 
     const response = await api.post('/places/suggest-partnership', body);
 
-    if (response.data.code === 200 || response.data.code === 0) {
+    if (
+      response.data.code === 200 ||
+      response.data.code === 201 ||
+      response.data.code === 0
+    ) {
       return 'SUCCESS';
     }
     return null;
