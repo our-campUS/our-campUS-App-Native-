@@ -69,6 +69,12 @@ const InterestedPlaceScreen = ({ navigation }) => {
     }, [fetchPlaces])
   );
 
+  const handleLikeToggle = useCallback((placeId, newData) => {
+    if (!newData.isLiked) {
+      setPlaces((prev) => prev.filter((item) => item.placeId !== placeId));
+    }
+  }, []);
+
   const handleEndReached = () => {
     if (hasNext && !loading && nextCursor) {
       fetchPlaces(nextCursor);
@@ -93,6 +99,7 @@ const InterestedPlaceScreen = ({ navigation }) => {
               navigation.navigate('StoreDetailScreen', { store: item })
             }
             showToast={showToast}
+            onLikeToggle={handleLikeToggle}
           />
         )}
         onEndReached={handleEndReached}
