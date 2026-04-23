@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
+import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 import {
   AFFILIATION_COLUMN_LIST_DATA_AFFILIATION,
   AFFILIATION_COLUMN_LIST_DATA_EVENT,
@@ -17,7 +19,10 @@ import {
   getUserInterestedAffiliatePosts,
   getUserInterestedEventPosts,
 } from '../../api/user';
+import { toggleStudentAffiliateLike } from '../../api/studentAffiliate';
+
 const InterestedAffiliateScreen = ({ navigation }) => {
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
   const [isOrange, setIsOrange] = useState(false);
   const [interestedAffiliatePosts, setInterestedAffiliatePosts] = useState([]);
@@ -26,12 +31,28 @@ const InterestedAffiliateScreen = ({ navigation }) => {
   // 데이터를 다시 fetch하는 함수
   const fetchInterestedPosts = useCallback(() => {
     getUserInterestedAffiliatePosts().then((data) => {
-      setInterestedAffiliatePosts(data || []);
+      setInterestedAffiliatePosts((data || []).map((item) => ({ ...item, liked: true })));
     });
     getUserInterestedEventPosts().then((data) => {
-      setInterestedEventPosts(data || []);
+      setInterestedEventPosts((data || []).map((item) => ({ ...item, liked: true })));
     });
   }, []);
+
+  const handleAffiliateLike = useCallback(async (postId) => {
+    await toggleStudentAffiliateLike(postId);
+    setInterestedAffiliatePosts((prev) =>
+      prev.filter((item) => (item.id || item.postId) !== postId)
+    );
+    showToast('관심 목록에서 삭제되었어요');
+  }, [showToast]);
+
+  const handleEventLike = useCallback(async (postId) => {
+    await toggleStudentAffiliateLike(postId);
+    setInterestedEventPosts((prev) =>
+      prev.filter((item) => (item.id || item.postId) !== postId)
+    );
+    showToast('관심 목록에서 삭제되었어요');
+  }, [showToast]);
 
   // 초기 로드
   useEffect(() => {
@@ -113,7 +134,7 @@ const InterestedAffiliateScreen = ({ navigation }) => {
               item={item}
               navigation={navigation}
               isLikedScreen={true}
-              alwaysShowLiked={true}
+              handleLike={handleAffiliateLike}
             />
           )}
           keyExtractor={(item) => String(item?.id || item?.postId)}
@@ -133,7 +154,7 @@ const InterestedAffiliateScreen = ({ navigation }) => {
               item={item}
               navigation={navigation}
               isLikedScreen={true}
-              alwaysShowLiked={true}
+              handleLike={handleEventLike}
             />
           )}
           keyExtractor={(item) => String(item?.id || item?.postId)}
@@ -142,6 +163,12 @@ const InterestedAffiliateScreen = ({ navigation }) => {
           }
         />
       )}
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={false}
+      />
     </SafeAreaView>
   );
 };
