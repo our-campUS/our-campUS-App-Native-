@@ -8,6 +8,8 @@ import { useState, useCallback, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { getLikedPlaces } from '../../api/place';
 import useLocation, { DEFAULT_LOCATION } from '../../hooks/useLocation';
+import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 
 const mapToStoreItem = (item) => ({
   ...item,
@@ -20,6 +22,7 @@ const mapToStoreItem = (item) => ({
 });
 
 const InterestedPlaceScreen = ({ navigation }) => {
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
   const [places, setPlaces] = useState([]);
   const [nextCursor, setNextCursor] = useState(null);
   const [hasNext, setHasNext] = useState(true);
@@ -66,6 +69,12 @@ const InterestedPlaceScreen = ({ navigation }) => {
     }, [fetchPlaces])
   );
 
+  const handleLikeToggle = useCallback((placeId, newData) => {
+    if (!newData.isLiked) {
+      setPlaces((prev) => prev.filter((item) => item.placeId !== placeId));
+    }
+  }, []);
+
   const handleEndReached = () => {
     if (hasNext && !loading && nextCursor) {
       fetchPlaces(nextCursor);
@@ -89,6 +98,8 @@ const InterestedPlaceScreen = ({ navigation }) => {
             onPress={() =>
               navigation.navigate('StoreDetailScreen', { store: item })
             }
+            showToast={showToast}
+            onLikeToggle={handleLikeToggle}
           />
         )}
         onEndReached={handleEndReached}
@@ -103,6 +114,12 @@ const InterestedPlaceScreen = ({ navigation }) => {
             </View>
           ) : null
         }
+      />
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={false}
       />
     </SafeAreaView>
   );

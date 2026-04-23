@@ -22,6 +22,8 @@ import BottomSheet from '../../components/map/BottomSheet';
 import LocationIcon from '../../../assets/icons/location.svg';
 import LocationTooltip from '../../components/map/LocationTooltip';
 import CustomToast from '../../components/CustomToast';
+import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 import theme from '../../style';
 import colors from '../../style/colors';
 
@@ -39,6 +41,7 @@ const MapScreen = () => {
   const insets = useSafeAreaInsets();
   const tooltipDismissed = useLocationStore((s) => s.locationTooltipDismissed);
   const dismissTooltip = useLocationStore((s) => s.dismissLocationTooltip);
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   const { state, actions, displayedMarkers, navigation } = useMapLogic(mapRef);
 
@@ -222,8 +225,15 @@ const MapScreen = () => {
         isLoading={loading}
         onUpdateStore={actions.updatePlaceState}
         userLocation={userLocation}
+        showToast={showToast}
       />
       <CustomToast />
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={true}
+      />
     </View>
   );
 };

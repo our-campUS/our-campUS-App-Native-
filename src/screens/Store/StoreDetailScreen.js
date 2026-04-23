@@ -140,8 +140,8 @@ const StoreDetailScreen = () => {
 
   const handleLikePress = async () => {
     const previousState = isLiked;
-    const newLikedState = !isLiked; // 바뀔 상태 미리 계산
-    setIsLiked(newLikedState); // 1. 낙관적 업데이트
+    const newLikedState = !isLiked;
+    setIsLiked(newLikedState);
 
     try {
       const requestBody = {
@@ -152,20 +152,20 @@ const StoreDetailScreen = () => {
       const response = await togglePlaceLike(requestBody);
       const newPlaceId = response?.data?.placeId || response?.placeId;
 
+      showToast(newLikedState ? '관심 목록에 추가되었어요!' : '관심 목록에서 삭제되었어요');
+
       if (!currentPlaceId && newPlaceId) {
         setCurrentPlaceId(newPlaceId);
       }
 
       if (onUpdatePlace) {
         const targetId = currentPlaceId || newPlaceId || storeData.placeKey;
-
         onUpdatePlace(targetId, {
           isLiked: newLikedState,
           placeId: newPlaceId || currentPlaceId,
         });
       }
     } catch (error) {
-      console.error('좋아요 실패:', error);
       setIsLiked(previousState);
       if (onUpdatePlace) {
         const targetId = currentPlaceId || storeData.placeKey;
@@ -537,7 +537,7 @@ const StoreDetailScreen = () => {
       />
       */}
 
-      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} />
+      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} hasNavBar={false} />
     </View>
   );
 };
