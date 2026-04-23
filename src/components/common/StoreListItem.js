@@ -25,6 +25,7 @@ const StoreListItem = ({
   showImages = true,
   showDiscountDetail = false,
   onLikeToggle,
+  showToast,
 }) => {
   const [isLiked, setIsLiked] = useState(!!item.isLiked);
 
@@ -34,7 +35,8 @@ const StoreListItem = ({
 
   const handleLikePress = async () => {
     const previousState = isLiked;
-    setIsLiked(!isLiked);
+    const newLikedState = !isLiked;
+    setIsLiked(newLikedState);
 
     try {
       const responseData = await togglePlaceLike(item);
@@ -44,6 +46,8 @@ const StoreListItem = ({
         return;
       }
 
+      showToast?.(newLikedState ? '관심 목록에 추가되었어요!' : '관심 목록에서 삭제되었어요');
+
       if (onLikeToggle) {
         onLikeToggle(item.placeId, {
           placeId: responseData.placeId || item.placeId,
@@ -52,7 +56,6 @@ const StoreListItem = ({
       }
     } catch (error) {
       setIsLiked(previousState);
-      console.error('좋아요 토글 실패, 롤백함');
     }
   };
 

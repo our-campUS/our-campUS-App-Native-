@@ -30,6 +30,7 @@ const BottomSheet = ({
   isLoading,
   onUpdateStore,
   userLocation,
+  showToast,
 }) => {
   const navigation = useNavigation();
   const HEIGHT_MAX = maxHeight * 0.75;
@@ -124,6 +125,7 @@ const BottomSheet = ({
             onLikeToggle={(placeId, newData) => {
               if (onUpdateStore) onUpdateStore(placeId, newData);
             }}
+            showToast={showToast}
           />
         )}
         ListEmptyComponent={!isLoading ? <EmptyResult paddingTop={60} /> : null}
