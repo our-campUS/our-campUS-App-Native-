@@ -38,7 +38,7 @@ import {
   getCouncilImagePresignedUrl,
   uploadImageToPresignedUrl,
 } from '../../../api/uploadImage';
-import Toast from 'react-native-toast-message';
+import Toast from '../../../components/common/Toast';
 
 const EventEditScreen = ({ navigation, route }) => {
   const [placeInfo, setPlaceInfo] = useState(null);
@@ -119,6 +119,7 @@ const EventEditScreen = ({ navigation, route }) => {
   const scrollViewRef = useRef(null);
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [toastVisible, setToastVisible] = useState(false);
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -284,21 +285,7 @@ const EventEditScreen = ({ navigation, route }) => {
     );
     console.log('response at handleSubmitEvent', response);
     if (response.data.code === 200) {
-      Toast.show({
-        type: 'success',
-        text1: '행사 글 수정 성공',
-        text2: '행사 글이 성공적으로 수정되었습니다.',
-        position: 'top',
-        topOffset: 100,
-        visibilityTime: 1000,
-        autoHide: true,
-      });
-      setTimeout(() => {
-        navigation?.reset({
-          index: 0,
-          routes: [{ name: 'CouncilAffiliateScreen' }],
-        });
-      }, 1000);
+      setToastVisible(true);
     } else {
       Alert.alert('행사 글 수정에 실패했습니다.', response.data.message);
     }
@@ -456,7 +443,19 @@ const EventEditScreen = ({ navigation, route }) => {
           />
         </View>
       </ScrollView>
-      <Toast />
+      <Toast
+        message="행사 글이 성공적으로 수정되었습니다."
+        visible={toastVisible}
+        duration={1000}
+        hasNavBar={false}
+        onHide={() => {
+          setToastVisible(false);
+          navigation?.reset({
+            index: 0,
+            routes: [{ name: 'CouncilAffiliateScreen' }],
+          });
+        }}
+      />
       {showStartPicker && Platform.OS === 'ios' && (
         <View style={styles.datePickerContainer}>
           <DateTimePicker

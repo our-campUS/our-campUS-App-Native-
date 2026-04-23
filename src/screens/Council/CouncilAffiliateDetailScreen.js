@@ -52,9 +52,15 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
   const handleEdit = () => {
     setIsMenuVisible(false);
     if (category === 'PARTNERSHIP') {
-      navigation.navigate('AffiliateEditScreen', { postId });
+      navigation.navigate('AffiliateEditScreen', {
+        type: 'affiliate',
+        item: route.params?.item,
+      });
     } else {
-      navigation.navigate('EventEditScreen', { postId });
+      navigation.navigate('EventEditScreen', {
+        type: 'event',
+        item: route.params?.item,
+      });
     }
   };
 
