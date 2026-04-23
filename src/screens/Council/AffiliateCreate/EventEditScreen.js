@@ -164,7 +164,7 @@ const EventEditScreen = ({ navigation, route }) => {
                 quality: 0.8,
                 maxWidth: 1000,
                 maxHeight: 1000,
-                selectionLimit: 0, // ⭐ 여러 장 선택 (0 = 무제한)
+                selectionLimit: 10,
               },
               (response) => {
                 if (response.didCancel) return;
