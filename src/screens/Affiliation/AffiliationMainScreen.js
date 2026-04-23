@@ -13,9 +13,8 @@ import EmptyResult from '../../components/common/EmptyResult';
 import useToast from '../../hooks/useToast';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
 import HostByTab from '../../components/Affiliation/HostByTab';
 import AffiliationCarousel from '../../components/Affiliation/AffiliationCarousel';
 import AffiliationColumnListItem from '../../components/Affiliation/AffiliationColumnListItem';
@@ -127,12 +126,19 @@ const UPCOMING_FETCH_MAP = {
   college: getStudentCollegeUpcomingEventList,
 };
 
-const AffiliationMainScreen = ({ navigation }) => {
+const AffiliationMainScreen = ({ navigation, route }) => {
   const [selectedActivityType, setSelectedActivityType] = useState('제휴');
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [searchText, setSearchText] = useState('');
   const { accessToken } = useAuthStore();
-  const [selectedTab, setSelectedTab] = useState('school');
+  const [selectedTab, setSelectedTab] = useState(route?.params?.initialTab || 'school');
+
+  useEffect(() => {
+    const initialTab = route?.params?.initialTab;
+    if (initialTab && initialTab !== selectedTab) {
+      setSelectedTab(initialTab);
+    }
+  }, [route?.params?.initialTab]);
   const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   // 제휴 페이지네이션
@@ -297,10 +303,8 @@ const AffiliationMainScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={{ marginTop: 9.5 }}>
         <HostByTab
-          // school={'중앙대학교'}
-          // college={'사회과학대'}
-          // major={'정치국제'}
           onSelectTab={handleSelectTab}
+          selectedTab={selectedTab}
         />
       </View>
       {upcomingEvents.length > 0 && (

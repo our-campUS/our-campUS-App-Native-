@@ -101,7 +101,6 @@ const AffiliateSection = () => {
             onPress={() => {
               navigation.navigate('AffiliationDetailScreen', {
                 councilType: selectedTabId.toLowerCase(),
-
                 item: {
                   ...item,
                   id: item.postId,
@@ -135,7 +134,12 @@ const AffiliateSection = () => {
 
       <TouchableOpacity
         style={styles.moreButton}
-        onPress={() => navigation.navigate('Partnership')}
+        onPress={() =>
+          navigation.navigate('Partnership', {
+            screen: 'AffiliationMainScreen',
+            params: { initialTab: selectedTabId.toLowerCase() },
+          })
+        }
       >
         <Text style={styles.moreText}>이용 가능한 제휴 더보기</Text>
       </TouchableOpacity>

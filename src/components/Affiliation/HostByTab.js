@@ -40,15 +40,16 @@ const styles = StyleSheet.create({
 
 const HostByTab = ({
   navigation,
-  // school,
-  // college,
-  // major,
   isOrange = false,
   onSelectTab = null,
   selectedTab = 'school',
 }) => {
   const [activeTab, setActiveTab] = useState(selectedTab);
   const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    setActiveTab(selectedTab);
+  }, [selectedTab]);
   return (
     <View style={styles.container}>
       <Pressable
