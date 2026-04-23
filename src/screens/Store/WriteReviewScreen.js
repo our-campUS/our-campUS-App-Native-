@@ -134,8 +134,7 @@ const WriteReviewScreen = () => {
         const uploadedUrls =
           newPhotos.length > 0 ? await uploadPhotos(newPhotos) : [];
         const allImageUrls = [...existingUrls, ...uploadedUrls];
-
-        await editReview(existingReview.reviewId || existingReview.id, {
+        const editPayload = {
           content: reviewText,
           star: rating,
           imageUrls: allImageUrls,
@@ -145,7 +144,9 @@ const WriteReviewScreen = () => {
             placeKey: existingReview.placeKey,
             coordinate: existingReview.coordinate,
           },
-        });
+        };
+
+        await editReview(existingReview.reviewId || existingReview.id, editPayload);
         showToast('리뷰가 수정되었습니다.');
         navigation.goBack();
       } catch (error) {
@@ -158,27 +159,28 @@ const WriteReviewScreen = () => {
 
     try {
       const store = route.params?.store;
-      const placeId = route.params?.placeId;
+      const rawPlaceId = route.params?.placeId;
+      const placeId = rawPlaceId && !String(rawPlaceId).startsWith('temp_') ? rawPlaceId : null;
       const isPartnership = store?.isPartnership || store?.isPartner;
-
       const imageUrls = await uploadPhotos();
 
       let result;
       if (isPartnership && placeId) {
-        result = await createPartnershipReview(placeId, {
+        const partnerPayload = {
           content: reviewText,
           star: rating,
           isVerified: false,
           imageUrls,
-        });
+        };
+        result = await createPartnershipReview(placeId, partnerPayload);
       } else {
-        result = await createReview({
+        const reviewPayload = {
           content: reviewText,
           star: rating,
           imageUrls,
           place: store
             ? {
-                placeId: store.placeId || null,
+                placeId: store.backendPlaceId || null,
                 placeName: store.name || store.placeName || '',
                 placeKey: store.placeKey || '',
                 address: store.address || '',
@@ -202,7 +204,8 @@ const WriteReviewScreen = () => {
                 coordinate: { latitude: 0, longitude: 0 },
                 imgUrls: [],
               },
-        });
+        };
+        result = await createReview(reviewPayload);
       }
 
       const reviewCaseType = isPartnership && placeId ? 3 : 4;

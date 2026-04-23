@@ -498,7 +498,7 @@ const StoreDetailScreen = () => {
               // }
               navigation.navigate('WriteReviewScreen', {
                 store: storeData,
-                placeId: storeData.placeId,
+                placeId: storeData.backendPlaceId || null,
                 placeKey: storeData.placeKey,
                 storeName: storeData.name,
                 rating: storeData.star,
