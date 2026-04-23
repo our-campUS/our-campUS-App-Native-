@@ -11,14 +11,26 @@ import theme from '@style';
 
 const RecommendStoreCard = ({ item, variant = 'short', rank }) => {
   const isLong = variant === 'long';
-  const isEvent = item?.type === '행사';
-  const isPartner = item?.type === '제휴';
+  const isEvent = item?.type === '행사' || item?.activityType === '행사';
+  const isPartner = item?.type === '제휴' || item?.activityType === '제휴';
   const iconSize = isLong ? 20 : 15;
 
-  const name = item?.placeName ?? item?.place ?? item?.name;
+  // 1. 카드 메인 제목 (title 최우선)
+  const name = item?.title || item?.name || item?.placeName;
   const category = item?.placeType ?? item?.category;
-  const benefit = item?.detail ?? item?.benefit ?? item?.title;
-  const distance = item?.distance;
+
+  // 2. 📍 공통: 장소 정보 (제휴, 행사 둘 다 사용)
+  const place = item?.placeName || item?.place;
+
+  // 3. 🎫 제휴 전용 데이터 (혜택 상세)
+  const benefit = item?.detail ?? item?.benefit;
+
+  // 4. 📅 행사 전용 데이터 (날짜)
+  let eventDate = item?.date;
+  if (!eventDate && (item?.endDateTime || item?.startDateTime)) {
+    const targetDate = item?.endDateTime || item?.startDateTime;
+    eventDate = targetDate.split('T')[0].replace(/-/g, '.');
+  }
 
   const detailTextStyle = isLong
     ? styles.detailTextLong
@@ -50,37 +62,46 @@ const RecommendStoreCard = ({ item, variant = 'short', rank }) => {
             {category}
           </Text>
         </View>
+
         <View style={styles.detailWrapper}>
-          {isPartner && benefit && (
-            <View style={styles.detailRow}>
-              <CouponIcon width={iconSize} height={iconSize} />
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                textBreakStrategy="balanced"
-                style={[detailTextStyle, styles.detailRowText]}
-              >
-                {benefit}
-              </Text>
-            </View>
-          )}
-          {isEvent && item?.date && (
-            <View style={styles.detailRow}>
-              <CalendarIcon width={iconSize} height={iconSize} />
-              <Text style={[detailTextStyle, styles.detailRowText]}>
-                {item.date}
-              </Text>
-            </View>
-          )}
-          {distance && (
+          {/* ✅ 1. 공통: 장소 정보 (제휴든 행사든 무조건 띄움) */}
+          {place && (
             <View style={styles.detailRow}>
               <PlaceIcon
                 width={iconSize}
                 height={iconSize}
                 color={colors.gray[300]}
               />
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={[detailTextStyle, styles.detailRowText]}
+              >
+                {place}
+              </Text>
+            </View>
+          )}
+
+          {/* ✅ 2. 제휴일 경우: 쿠폰 아이콘 (상세 혜택 내용) */}
+          {isPartner && benefit && (
+            <View style={styles.detailRow}>
+              <CouponIcon width={iconSize} height={iconSize} />
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={[detailTextStyle, styles.detailRowText]}
+              >
+                {benefit}
+              </Text>
+            </View>
+          )}
+
+          {/* ✅ 3. 행사일 경우: 달력 아이콘 (날짜) */}
+          {isEvent && eventDate && (
+            <View style={styles.detailRow}>
+              <CalendarIcon width={iconSize} height={iconSize} />
               <Text style={[detailTextStyle, styles.detailRowText]}>
-                {distance}
+                {eventDate}
               </Text>
             </View>
           )}

@@ -330,8 +330,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
           <View style={styles.recommendContainer}>
             {detailData?.category === 'PARTNERSHIP' ? (
               <Text style={styles.recommendTitle}>
-                {detailData?.writerName}에서 진행하는 {'\n'}다른 제휴 매장
-                둘러보기
+                {detailData?.writerName}에서 진행하는 다른 제휴 매장 둘러보기
               </Text>
             ) : (
               <Text style={styles.recommendTitle}>
@@ -340,28 +339,38 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
             )}
             <FlatList
               data={recommendData}
-              horizontal
-              contentContainerStyle={{ gap: 10 }}
-              style={{ marginTop: 20 }}
+              horizontal={true} // 무조건 가로 스크롤
               showsHorizontalScrollIndicator={false}
+              style={{ marginTop: 20 }}
+              contentContainerStyle={{ gap: 10 }}
               renderItem={({ item }) => (
                 <Pressable
                   onPress={() => {
-                    navigation.push('StoreDetailScreen', {
-                      store: {
-                        ...item,
-                        name: item.placeName || item.place || item.name,
-                        imgUrls: item.imgUrls || (item.thumbnailImageUrl ? [item.thumbnailImageUrl] : []),
-                        isPartnership: item.type === '제휴',
-                        partnerships:
-                          item.type === '제휴' && detailData?.writerName
-                            ? [{ councilName: detailData.writerName }]
+                    if (detailData?.category === 'PARTNERSHIP') {
+                      navigation.push('StoreDetailScreen', {
+                        store: {
+                          ...item,
+                          name: item.placeName || item.place || item.name,
+                          imgUrls: item.thumbnailImageUrl
+                            ? [item.thumbnailImageUrl]
                             : [],
-                      },
-                    });
+                          isPartnership: true,
+                          tag: detailData?.writerName,
+                        },
+                      });
+                    } else {
+                      navigation.push('AffiliationDetailScreen', {
+                        item: {
+                          ...item,
+                          id: item.postId || item.id,
+                          placeName: item.place || item.placeName,
+                        },
+                        councilType,
+                      });
+                    }
                   }}
                 >
-                  <RecommendStoreCard item={item} />
+                  <RecommendStoreCard item={item} variant="short" />
                 </Pressable>
               )}
               keyExtractor={(item) => String(item.id || item.postId)}

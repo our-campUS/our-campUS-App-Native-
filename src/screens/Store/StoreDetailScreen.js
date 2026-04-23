@@ -88,6 +88,7 @@ const StoreDetailScreen = () => {
     isPartner:
       paramStore.isPartnership ||
       paramStore.type === 'PARTNER' ||
+      paramStore.category === 'PARTNER' ||
       paramStore.partnerships?.length > 0,
     partnerTags:
       paramStore.partnerships?.length > 0
@@ -195,7 +196,7 @@ const StoreDetailScreen = () => {
             const fetchedIsPartner =
               status.isPartnership || status.partnerships?.length > 0;
             if (fetchedIsPartner !== undefined) {
-              setIsPartner(!!fetchedIsPartner);
+              setIsPartner((prev) => prev || !!fetchedIsPartner);
             }
             if (status.partnerships?.length > 0) {
               setPartnerTags(
