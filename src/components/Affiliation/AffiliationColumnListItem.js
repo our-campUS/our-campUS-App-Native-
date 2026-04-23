@@ -160,13 +160,6 @@ const AffiliationColumnListItem = ({
         onPress={handleItemPress}
         disabled={shouldShowSkeleton}
       >
-        <View style={styles.threeDotIconContainer}>
-          {isCouncil && (
-            <Pressable onPress={() => handleThreeDotIconPress?.(item)}>
-              <ThreeDotIcon width={20} height={20} color={colors.gray[300]} />
-            </Pressable>
-          )}
-        </View>
         {item?.thumbnailImageUrl ? (
           <View style={styles.imageContainer}>
             <Image
@@ -236,6 +229,13 @@ const AffiliationColumnListItem = ({
           </View>
         </View>
       </Pressable>
+      {isCouncil && (
+        <View style={[styles.threeDotIconContainer, { zIndex: 2 }]}>
+          <Pressable onPress={() => handleThreeDotIconPress?.(item)}>
+            <ThreeDotIcon width={20} height={20} color={colors.gray[300]} />
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 };
