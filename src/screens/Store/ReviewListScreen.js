@@ -101,6 +101,11 @@ const ReviewListScreen = () => {
     </View>
   );
 
+  const sortedReviews =
+    filter === 'RATING'
+      ? [...reviews].sort((a, b) => b.star - a.star)
+      : reviews;
+
   const renderItem = ({ item }) => {
     const reviewData = {
       id: item.id,
@@ -135,7 +140,7 @@ const ReviewListScreen = () => {
       />
 
       <FlatList
-        data={reviews}
+        data={sortedReviews}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         ListHeaderComponent={renderHeader}
