@@ -90,24 +90,30 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
       const fetchPostDetail = async () => {
         const response = await getCouncilAffiliatePostDetail(postId);
         // console.log('response', response);
-        setDetailData(response.data.data);
+        if (response) {
+          setDetailData(response.data.data);
+        }
       };
       fetchPostDetail();
       const fetchRecommendData = async () => {
         if (route.params?.item?.category === 'PARTNERSHIP') {
           const response = await getCouncilAffiliatePosts();
-          console.log('response', response.data.data?.content);
-          const filteredData = response.data.data?.content.filter(
-            (item) => item.postId !== postId
-          );
-          setRecommendData(filteredData);
+          if (response) {
+            console.log('response', response.data.data?.content);
+            const filteredData = response.data.data?.content.filter(
+              (item) => item.postId !== postId
+            );
+            setRecommendData(filteredData);
+          }
         } else {
           const response = await getCouncilEventPosts();
-          console.log('response', response.data.data?.content);
-          const filteredData = response.data.data?.content.filter(
-            (item) => item.postId !== postId
-          );
-          setRecommendData(filteredData);
+          if (response) {
+            console.log('response', response.data.data?.content);
+            const filteredData = response.data.data?.content.filter(
+              (item) => item.postId !== postId
+            );
+            setRecommendData(filteredData);
+          }
         }
       };
       fetchRecommendData();
@@ -142,8 +148,10 @@ const CouncilAffiliateDetailScreen = ({ navigation, route }) => {
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title={
-          detailData?.writerName +
-          (detailData?.category === 'PARTNERSHIP' ? ' 제휴' : ' 행사')
+          detailData
+            ? detailData.writerName +
+              (detailData.category === 'PARTNERSHIP' ? ' 제휴' : ' 행사')
+            : ''
         }
         navigation={navigation}
         useBackButton={true}

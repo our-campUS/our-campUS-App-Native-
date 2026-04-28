@@ -18,6 +18,7 @@ import {
   togglePlaceLike,
   getPlaceStatus,
   suggestPartnership,
+  getPlacesByKeyword,
 } from '@api/place';
 import Toast from '@components/common/Toast';
 import useToast from '../../hooks/useToast';
@@ -118,6 +119,26 @@ const StoreDetailScreen = () => {
   const [reviewSize, setReviewSize] = useState(storeData.reviewSize);
   const [isPartner, setIsPartner] = useState(storeData.isPartner);
   const [partnerTags, setPartnerTags] = useState(storeData.partnerTags);
+  const [phone, setPhone] = useState(storeData.phone);
+  const [address, setAddress] = useState(storeData.address);
+
+  useEffect(() => {
+    if (storeData.phone || !storeData.name) return;
+    getPlacesByKeyword(storeData.name)
+      .then((results) => {
+        if (results && results.length > 0) {
+          const match = results[0];
+          if (match.telephone || match.phone) {
+            setPhone(match.telephone || match.phone);
+          }
+          if (match.address && !storeData.address) {
+            setAddress(match.address);
+          }
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!storeData.backendPlaceId || storeData.reviews?.length > 0) return;
@@ -202,6 +223,12 @@ const StoreDetailScreen = () => {
               setPartnerTags(
                 status.partnerships.map((p) => p.councilName).filter(Boolean)
               );
+            }
+            if (status.telephone || status.phone) {
+              setPhone(status.telephone || status.phone);
+            }
+            if (status.address) {
+              setAddress(status.address);
             }
           }
         } catch (error) {
@@ -415,20 +442,20 @@ const StoreDetailScreen = () => {
                   </Text>
                 )}
               </View>
-              {storeData.address ? (
+              {address ? (
                 <View style={styles.detailRow}>
                   <PinIcon width={24} height={24} style={{ marginRight: 4 }} />
-                  <Text style={styles.detailText}>{storeData.address}</Text>
+                  <Text style={styles.detailText}>{address}</Text>
                 </View>
               ) : null}
-              {storeData.phone ? (
+              {phone ? (
                 <View style={styles.detailRow}>
                   <PhoneIcon
                     width={24}
                     height={24}
                     style={{ marginRight: 4 }}
                   />
-                  <Text style={styles.detailText}>{storeData.phone}</Text>
+                  <Text style={styles.detailText}>{phone}</Text>
                 </View>
               ) : null}
               {storeData.hours && storeData.hours.length > 0 ? (
