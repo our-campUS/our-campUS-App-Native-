@@ -121,6 +121,9 @@ const StoreDetailScreen = () => {
   const [partnerTags, setPartnerTags] = useState(storeData.partnerTags);
   const [phone, setPhone] = useState(storeData.phone);
   const [address, setAddress] = useState(storeData.address);
+  const [averageStar, setAverageStar] = useState(
+    storeData.averageStar ?? storeData.star ?? 0
+  );
 
   useEffect(() => {
     if (storeData.phone || !storeData.name) return;
@@ -154,6 +157,12 @@ const StoreDetailScreen = () => {
         }));
         setReviews(items);
         setReviewSize(items.length);
+        if (res?.data?.averageStar != null) {
+          setAverageStar(res.data.averageStar);
+        } else if (items.length > 0) {
+          const avg = items.reduce((sum, r) => sum + r.star, 0) / items.length;
+          setAverageStar(Math.round(avg * 10) / 10);
+        }
       })
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -430,7 +439,7 @@ const StoreDetailScreen = () => {
                 {reviewSize > 0 ? (
                   <>
                     <Text style={styles.detailText}>
-                      {storeData.averageStar ?? storeData.star}
+                      {averageStar}
                     </Text>
                     <Text style={styles.detailTextSub}>({reviewSize})</Text>
                   </>
@@ -487,7 +496,7 @@ const StoreDetailScreen = () => {
                 onPress={() =>
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
-                    star: storeData.averageStar ?? storeData.star,
+                    star: averageStar,
                     placeId: currentPlaceId,
                     reviewSize: reviewSize,
                     store: storeData,
