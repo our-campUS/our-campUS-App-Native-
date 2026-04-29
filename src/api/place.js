@@ -198,7 +198,7 @@ export const getRandomPlaces = async (lat, lng) => {
     });
 
     if (response.data.code === 200) {
-      console.log(response.data.data);
+      console.log(response.data.message);
       return response.data.data;
     }
     return null;

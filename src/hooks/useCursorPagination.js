@@ -10,6 +10,7 @@ const useCursorPagination = (fetchFn) => {
   const hasNextRef = useRef(false);
   const nextCursorCreatedAtRef = useRef(null);
   const nextCursorIdRef = useRef(null);
+  const nextCursorStarRef = useRef(null);
 
   const fetchData = useCallback(
     async (isLoadMore = false) => {
@@ -22,7 +23,8 @@ const useCursorPagination = (fetchFn) => {
 
         const response = await fetchFn(
           isLoadMore ? nextCursorCreatedAtRef.current : null,
-          isLoadMore ? nextCursorIdRef.current : null
+          isLoadMore ? nextCursorIdRef.current : null,
+          isLoadMore ? nextCursorStarRef.current : null
         );
 
         if (response?.code === 200 || response?.code === 0 || response?.data) {
@@ -39,6 +41,7 @@ const useCursorPagination = (fetchFn) => {
             data.nextCursorCreatedAt || data.nextCursor?.createdAt || null;
           nextCursorIdRef.current =
             data.nextCursorId || data.nextCursor?.id || null;
+          nextCursorStarRef.current = data.nextCursorStar ?? null;
         }
       } catch (error) {
         console.error('데이터 조회 실패:', error);
@@ -55,6 +58,7 @@ const useCursorPagination = (fetchFn) => {
     setRefreshing(true);
     nextCursorCreatedAtRef.current = null;
     nextCursorIdRef.current = null;
+    nextCursorStarRef.current = null;
     fetchData(false);
   }, [fetchData]);
 

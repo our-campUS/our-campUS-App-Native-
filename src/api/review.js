@@ -4,15 +4,16 @@ export const getReviewList = async (
   placeId,
   cursorCreatedAt = null,
   cursorId = null,
+  cursorStar = null,
+  sortType = 'LATEST',
   size = 10
 ) => {
   try {
-    const params = {
-      size,
-    };
+    const params = { sortType, size };
 
     if (cursorCreatedAt) params.cursorCreatedAt = cursorCreatedAt;
     if (cursorId) params.cursorId = cursorId;
+    if (sortType === 'STAR' && cursorStar != null) params.cursorStar = cursorStar;
 
     const response = await api.get(`/reviews/list/${placeId}`, {
       params,

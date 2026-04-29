@@ -35,6 +35,7 @@ const BottomSheet = ({
   const navigation = useNavigation();
   const HEIGHT_MAX = maxHeight * 0.75;
   const sheetHeight = sheetHeightAnimated;
+  const isPinSelected = !!selectedMarkerId && displayedMarkers.length === 1;
 
   const startHeight = useRef(0);
   const [isScrollable, setIsScrollable] = useState(false);
@@ -103,43 +104,60 @@ const BottomSheet = ({
         <View style={styles.handleBar} />
       </View>
 
-      <FlatList
-        data={displayedMarkers}
-        keyExtractor={(item) => item.placeId.toString()}
-        renderItem={({ item }) => (
-          <StoreListItem
-            item={item}
-            userLocation={userLocation}
-            onPress={() => {
-              onItemPress(item.placeId);
-
-              navigation.navigate('StoreDetailScreen', {
-                store: item,
-                onUpdatePlace: (oldId, newData) => {
-                  if (onUpdateStore) {
-                    onUpdateStore(oldId, newData);
-                  }
-                },
-              });
-            }}
-            onLikeToggle={(placeId, newData) => {
-              if (onUpdateStore) onUpdateStore(placeId, newData);
-            }}
-            showToast={showToast}
-          />
-        )}
-        ListEmptyComponent={!isLoading ? <EmptyResult paddingTop={60} /> : null}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          isLoading ? (
-            <View style={styles.loaderStyle}>
-              <ActivityIndicator size="small" color={theme.colors.primary} />
-            </View>
-          ) : null
-        }
-        scrollEnabled={true}
-      />
+      {isPinSelected ? (
+        <StoreListItem
+          item={displayedMarkers[0]}
+          userLocation={userLocation}
+          onPress={() => {
+            onItemPress(displayedMarkers[0].placeId);
+            navigation.navigate('StoreDetailScreen', {
+              store: displayedMarkers[0],
+              onUpdatePlace: (oldId, newData) => {
+                if (onUpdateStore) onUpdateStore(oldId, newData);
+              },
+            });
+          }}
+          onLikeToggle={(placeId, newData) => {
+            if (onUpdateStore) onUpdateStore(placeId, newData);
+          }}
+          showToast={showToast}
+        />
+      ) : (
+        <FlatList
+          data={displayedMarkers}
+          keyExtractor={(item) => item.placeId.toString()}
+          renderItem={({ item }) => (
+            <StoreListItem
+              item={item}
+              userLocation={userLocation}
+              onPress={() => {
+                onItemPress(item.placeId);
+                navigation.navigate('StoreDetailScreen', {
+                  store: item,
+                  onUpdatePlace: (oldId, newData) => {
+                    if (onUpdateStore) onUpdateStore(oldId, newData);
+                  },
+                });
+              }}
+              onLikeToggle={(placeId, newData) => {
+                if (onUpdateStore) onUpdateStore(placeId, newData);
+              }}
+              showToast={showToast}
+            />
+          )}
+          ListEmptyComponent={!isLoading ? <EmptyResult paddingTop={60} /> : null}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            isLoading ? (
+              <View style={styles.loaderStyle}>
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+              </View>
+            ) : null
+          }
+          scrollEnabled={true}
+        />
+      )}
     </Animated.View>
   );
 };

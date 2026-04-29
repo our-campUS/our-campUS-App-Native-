@@ -18,6 +18,7 @@ import {
   togglePlaceLike,
   getPlaceStatus,
   suggestPartnership,
+  getPlacesByKeyword,
 } from '@api/place';
 import Toast from '@components/common/Toast';
 import useToast from '../../hooks/useToast';
@@ -118,6 +119,29 @@ const StoreDetailScreen = () => {
   const [reviewSize, setReviewSize] = useState(storeData.reviewSize);
   const [isPartner, setIsPartner] = useState(storeData.isPartner);
   const [partnerTags, setPartnerTags] = useState(storeData.partnerTags);
+  const [phone, setPhone] = useState(storeData.phone);
+  const [address, setAddress] = useState(storeData.address);
+  const [averageStar, setAverageStar] = useState(
+    storeData.averageStar ?? storeData.star ?? 0
+  );
+
+  useEffect(() => {
+    if (storeData.phone || !storeData.name) return;
+    getPlacesByKeyword(storeData.name)
+      .then((results) => {
+        if (results && results.length > 0) {
+          const match = results[0];
+          if (match.telephone || match.phone) {
+            setPhone(match.telephone || match.phone);
+          }
+          if (match.address && !storeData.address) {
+            setAddress(match.address);
+          }
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!storeData.backendPlaceId || storeData.reviews?.length > 0) return;
@@ -133,6 +157,12 @@ const StoreDetailScreen = () => {
         }));
         setReviews(items);
         setReviewSize(items.length);
+        if (res?.data?.averageStar != null) {
+          setAverageStar(res.data.averageStar);
+        } else if (items.length > 0) {
+          const avg = items.reduce((sum, r) => sum + r.star, 0) / items.length;
+          setAverageStar(Math.round(avg * 10) / 10);
+        }
       })
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -202,6 +232,12 @@ const StoreDetailScreen = () => {
               setPartnerTags(
                 status.partnerships.map((p) => p.councilName).filter(Boolean)
               );
+            }
+            if (status.telephone || status.phone) {
+              setPhone(status.telephone || status.phone);
+            }
+            if (status.address) {
+              setAddress(status.address);
             }
           }
         } catch (error) {
@@ -403,7 +439,7 @@ const StoreDetailScreen = () => {
                 {reviewSize > 0 ? (
                   <>
                     <Text style={styles.detailText}>
-                      {storeData.averageStar ?? storeData.star}
+                      {averageStar}
                     </Text>
                     <Text style={styles.detailTextSub}>({reviewSize})</Text>
                   </>
@@ -415,20 +451,20 @@ const StoreDetailScreen = () => {
                   </Text>
                 )}
               </View>
-              {storeData.address ? (
+              {address ? (
                 <View style={styles.detailRow}>
                   <PinIcon width={24} height={24} style={{ marginRight: 4 }} />
-                  <Text style={styles.detailText}>{storeData.address}</Text>
+                  <Text style={styles.detailText}>{address}</Text>
                 </View>
               ) : null}
-              {storeData.phone ? (
+              {phone ? (
                 <View style={styles.detailRow}>
                   <PhoneIcon
                     width={24}
                     height={24}
                     style={{ marginRight: 4 }}
                   />
-                  <Text style={styles.detailText}>{storeData.phone}</Text>
+                  <Text style={styles.detailText}>{phone}</Text>
                 </View>
               ) : null}
               {storeData.hours && storeData.hours.length > 0 ? (
@@ -460,7 +496,7 @@ const StoreDetailScreen = () => {
                 onPress={() =>
                   navigation.navigate('ReviewListScreen', {
                     storeName: storeData.name,
-                    star: storeData.averageStar ?? storeData.star,
+                    star: averageStar,
                     placeId: currentPlaceId,
                     reviewSize: reviewSize,
                     store: storeData,

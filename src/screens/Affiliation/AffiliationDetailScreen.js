@@ -28,6 +28,7 @@ import {
   getStudentAffiliateRecommendList,
   toggleStudentAffiliateLike,
 } from '../../api/studentAffiliate';
+
 import { formatKoreanDate, formatKoreanDateTime } from '../../utils/dateTime';
 
 const AffiliationDetailScreen = ({ navigation, route }) => {
@@ -64,7 +65,9 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
   useEffect(() => {
     console.log('route.params?.item', route.params?.item);
     const fetchStudentAffiliateDetail = async () => {
-      const data = await getStudentAffiliateDetail(route.params?.item?.id);
+      const data = await getStudentAffiliateDetail(
+        route.params?.item?.id || route.params?.item?.postId
+      );
       console.log('fetchStudentAffiliateDetail data', data);
       setDetailData(data);
       // API 데이터로 item state 보완 (알림 진입 시 id만 전달되므로)
@@ -158,9 +161,10 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title={
-          detailData?.category === 'PARTNERSHIP'
-            ? detailData?.writerName + ' 제휴'
-            : detailData?.writerName + ' 행사'
+          detailData
+            ? detailData.writerName +
+              (detailData.category === 'PARTNERSHIP' ? ' 제휴' : ' 행사')
+            : ''
         }
         navigation={navigation}
         useBackButton={true}
@@ -347,10 +351,11 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
                 <Pressable
                   onPress={() => {
                     if (detailData?.category === 'PARTNERSHIP') {
+                      const placeName = item.placeName || item.place;
                       navigation.push('StoreDetailScreen', {
                         store: {
                           ...item,
-                          name: item.placeName || item.place || item.name,
+                          name: placeName || item.name,
                           imgUrls: item.thumbnailImageUrl
                             ? [item.thumbnailImageUrl]
                             : [],
