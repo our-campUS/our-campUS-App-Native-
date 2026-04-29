@@ -70,6 +70,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // 403 → 세션 만료, 강제 로그아웃
+    if (error.response?.status === 403) {
+      useAuthStore.getState().logout();
+      return Promise.reject(error);
+    }
+
     // 401이 아니거나 이미 재시도한 요청이면 그대로 reject
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
