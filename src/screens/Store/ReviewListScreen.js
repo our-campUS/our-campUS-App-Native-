@@ -26,15 +26,22 @@ const ReviewListScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { storeName, star, placeId, reviewSize, store } = route.params;
+  const { storeName, star: rawStar, placeId, reviewSize, store } = route.params;
+  const star = rawStar ?? 0;
 
   // const [modalVisible, setModalVisible] = useState(false); // TODO: 스캔 플로우 복구 시 주석 해제
   const [filter, setFilter] = useState('LATEST');
 
   const fetchReviewsFn = useCallback(
-    (cursorCreatedAt, cursorId) =>
-      getReviewList(placeId, cursorCreatedAt, cursorId, 10),
-    [placeId]
+    (cursorCreatedAt, cursorId, cursorStar) =>
+      getReviewList(
+        placeId,
+        cursorCreatedAt,
+        cursorId,
+        cursorStar,
+        filter === 'RATING' ? 'STAR' : 'LATEST'
+      ),
+    [placeId, filter]
   );
 
   const {
@@ -101,10 +108,7 @@ const ReviewListScreen = () => {
     </View>
   );
 
-  const sortedReviews =
-    filter === 'RATING'
-      ? [...reviews].sort((a, b) => b.star - a.star)
-      : reviews;
+  const sortedReviews = reviews;
 
   const renderItem = ({ item }) => {
     const reviewData = {
