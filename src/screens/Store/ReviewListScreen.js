@@ -18,7 +18,7 @@ import LoadingFooter from '../../components/common/LoadingFooter';
 import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-import RatingIcon from '../../../assets/icons/rating.svg';
+import PartialStar from '../../components/review/PartialStar';
 
 import { getReviewList } from '../../api/review';
 
@@ -62,18 +62,11 @@ const ReviewListScreen = () => {
       <View style={styles.ratingSummary}>
         <View style={styles.starsRow}>
           {[...Array(5)].map((_, i) => (
-            <RatingIcon
-              key={i}
-              width={16}
-              height={16}
-              color={
-                i < Math.floor(star) ? theme.colors.primary2 : colors.gray[200]
-              }
-            />
+            <PartialStar key={i} fill={star - i} size={16} />
           ))}
         </View>
         <Text style={styles.ratingScore}>
-          {star} <Text style={styles.ratingMax}>/ 5</Text>
+          {Number(star).toFixed(1)} <Text style={styles.ratingMax}>/ 5</Text>
         </Text>
       </View>
 

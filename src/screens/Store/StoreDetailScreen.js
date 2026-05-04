@@ -439,7 +439,7 @@ const StoreDetailScreen = () => {
                 {reviewSize > 0 ? (
                   <>
                     <Text style={styles.detailText}>
-                      {averageStar}
+                      {Number(averageStar).toFixed(1)}
                     </Text>
                     <Text style={styles.detailTextSub}>({reviewSize})</Text>
                   </>
