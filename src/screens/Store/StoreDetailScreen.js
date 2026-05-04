@@ -11,6 +11,7 @@ import {
   Image,
   Dimensions,
   FlatList,
+  Modal,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -43,7 +44,7 @@ import ShareIcon from '@assets/share.svg';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import LocationTooltip from '@components/map/LocationTooltip';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
@@ -109,6 +110,8 @@ const StoreDetailScreen = () => {
   const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [imageViewerIndex, setImageViewerIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isPartnershipRequested, setIsPartnershipRequested] = useState(false);
@@ -315,12 +318,20 @@ const StoreDetailScreen = () => {
                   keyExtractor={(item, index) => index.toString()}
                   onViewableItemsChanged={onViewableItemsChanged}
                   viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-                  renderItem={({ item }) => (
-                    <Image
-                      source={{ uri: item }}
-                      style={{ width: SCREEN_WIDTH, height: 250 }}
-                      resizeMode="cover"
-                    />
+                  renderItem={({ item, index }) => (
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={() => {
+                        setImageViewerIndex(index);
+                        setImageViewerVisible(true);
+                      }}
+                    >
+                      <Image
+                        source={{ uri: item }}
+                        style={[styles.bannerImage, { width: SCREEN_WIDTH }]}
+                        resizeMode="cover"
+                      />
+                    </TouchableOpacity>
                   )}
                 />
 
@@ -573,10 +584,49 @@ const StoreDetailScreen = () => {
       />
       */}
 
+      <Modal
+        visible={imageViewerVisible}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setImageViewerVisible(false)}
+      >
+        <View style={styles.imageViewerContainer}>
+          <FlatList
+            data={storeData.imgUrls}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            initialScrollIndex={imageViewerIndex}
+            getItemLayout={(_, index) => ({
+              length: SCREEN_WIDTH,
+              offset: SCREEN_WIDTH * index,
+              index,
+            })}
+            keyExtractor={(_, index) => `viewer-${index}`}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: item }}
+                style={[styles.imageViewerImage, { width: SCREEN_WIDTH }]}
+                resizeMode="contain"
+              />
+            )}
+          />
+          <TouchableOpacity
+            style={styles.imageViewerClose}
+            onPress={() => setImageViewerVisible(false)}
+          >
+            <Ionicons name="close" size={28} color="white" />
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
       <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} hasNavBar={false} />
     </View>
   );
 };
+
+const IMAGE_VIEWER_BG = 'rgba(0, 0, 0, 0.95)';
 
 const styles = StyleSheet.create({
   container: {
@@ -766,6 +816,24 @@ const styles = StyleSheet.create({
   bannerContainer: {
     height: 250,
     position: 'relative',
+  },
+  bannerImage: {
+    height: 250,
+  },
+  imageViewerContainer: {
+    flex: 1,
+    backgroundColor: IMAGE_VIEWER_BG,
+    justifyContent: 'center',
+  },
+  imageViewerImage: {
+    height: SCREEN_HEIGHT,
+  },
+  imageViewerClose: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    padding: 8,
   },
   emptyBanner: {
     width: '100%',
