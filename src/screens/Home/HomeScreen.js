@@ -18,7 +18,8 @@ import { CAROUSEL_DATA } from '../../constants/DummyData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import { getUpcomingEventsAll } from '../../api/studentAffiliate';
 import { checkUnreadNotification } from '../../api/notification';
 import VerticalEventTicker from '../../components/home/VerticalEventTicker';
@@ -54,14 +55,16 @@ const HomeScreen = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const { accessToken } = useAuthStore();
 
-  useEffect(() => {
-    const fetchUnread = async () => {
+  useFocusEffect(
+    useCallback(() => {
       if (!accessToken) return;
-      const hasUnread = await checkUnreadNotification();
-      setHasNewNotification(hasUnread);
-    };
-    fetchUnread();
-  }, [accessToken]);
+      const fetchUnread = async () => {
+        const hasUnread = await checkUnreadNotification();
+        setHasNewNotification(hasUnread);
+      };
+      fetchUnread();
+    }, [accessToken])
+  );
 
   useEffect(() => {
     const fetchUpcomingEvents = async () => {
