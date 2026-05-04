@@ -33,6 +33,7 @@ import typography from '@style/typography';
 // import ReviewActionModal from '@components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
 import ReviewItem from '@components/review/ReviewItem';
 
+import BadgeIcon from '@assets/badgeIcon.svg';
 import StarIcon from '@assets/icons/common/star.svg';
 import PinIcon from '@assets/icons/common/pin.svg';
 import PhoneIcon from '@assets/icons/common/phone.svg';
@@ -297,6 +298,7 @@ const StoreDetailScreen = () => {
     <View style={styles.container}>
       <LabelTitle
         title={storeData.name}
+        titleIcon={isPartner ? <BadgeIcon width={18} height={18} /> : null}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
         additionalStyle={styles.headerStyle}

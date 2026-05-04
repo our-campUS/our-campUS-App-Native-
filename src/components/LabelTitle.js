@@ -52,11 +52,26 @@ const styles = StyleSheet.create({
     ...typography.body3Regular,
     color: colors.orange[500],
   },
+  titleWithIcon: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  titleInline: {
+    ...typography.heading6,
+    color: colors.gray[700],
+    flexShrink: 1,
+  },
 });
 
 const LabelTitle = ({
   navigation,
   title,
+  titleIcon = null,
   additionalStyle = null,
   onPressBack,
   useBackButton = false,
@@ -78,9 +93,16 @@ const LabelTitle = ({
           }}
         />
       )}
-      <Text style={styles.title} pointerEvents="none">
-        {title}
-      </Text>
+      {titleIcon ? (
+        <View style={styles.titleWithIcon} pointerEvents="none">
+          {titleIcon}
+          <Text style={styles.titleInline} numberOfLines={1}>{title}</Text>
+        </View>
+      ) : (
+        <Text style={styles.title} pointerEvents="none">
+          {title}
+        </Text>
+      )}
       {useRightButton && (
         <Pressable onPress={onPressRight} style={styles.rightButton}>
           <Text style={[styles.rightButtonText, rightButtonTextStyle]}>
