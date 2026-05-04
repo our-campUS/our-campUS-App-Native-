@@ -117,7 +117,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
     const fetchStudentAffiliateRecommendList = async () => {
       const data = await getStudentAffiliateRecommendList(
         councilType,
-        item?.id,
+        item?.postId || item?.id,
         detailData?.category
       );
       const content = data?.content || [];
@@ -134,7 +134,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
       );
     };
     fetchStudentAffiliateRecommendList();
-  }, [detailData, councilType, item?.id]);
+  }, [detailData, councilType, item?.id, item?.postId]);
 
   useEffect(() => {
     console.log('recommendData', recommendData);

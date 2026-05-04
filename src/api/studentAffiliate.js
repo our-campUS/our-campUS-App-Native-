@@ -153,7 +153,7 @@ export const getStudentAffiliateRecommendList = async (
         excludePostId: excludeId,
         category: category,
         page: 1,
-        size: 10,
+        size: 3,
       },
     });
     console.log('getStudentAffiliateRecommendList response', response);
