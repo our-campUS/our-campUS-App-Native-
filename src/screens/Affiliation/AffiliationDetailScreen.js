@@ -252,12 +252,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
         {!isEmpty && !isFirstImageLoaded ? null : (
           <View style={styles.detailInfoContainer}>
             <View style={styles.topLayer}>
-              <Text
-                style={styles.title}
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                textBreakStrategy="balanced"
-              >
+              <Text style={styles.title}>
                 {item?.title}
               </Text>
             </View>
