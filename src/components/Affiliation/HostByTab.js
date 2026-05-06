@@ -7,17 +7,16 @@ import useAuthStore from '../../store/authStore';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 36,
     backgroundColor: colors.common.white,
     flexDirection: 'row',
   },
   button: {
-    // maxWidth: 125,
     flex: 1,
-    height: 36,
     backgroundColor: colors.common.white,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[300],
+    paddingVertical: 15,
+    paddingHorizontal: 16,
   },
   activeButton: {
     borderBottomColor: colors.blue[600],

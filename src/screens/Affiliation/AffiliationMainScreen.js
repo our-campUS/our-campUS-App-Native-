@@ -39,6 +39,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.common.white,
     alignItems: 'center',
   },
+  divider: {
+    width: '100%',
+    height: 1.25,
+    backgroundColor: colors.gray[100],
+  },
   activityTypeSelector: {
     width: '100%',
     paddingVertical: 12,
@@ -390,11 +395,12 @@ const AffiliationMainScreen = ({ navigation, route }) => {
           </Pressable>
         </View>
       )}
+      <View style={styles.divider} />
       {selectedActivityType === '제휴' && (
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20, gap: 12 }}
           data={
             isSearchMode && searchText
               ? affiliatePosts.filter(
@@ -427,7 +433,7 @@ const AffiliationMainScreen = ({ navigation, route }) => {
         <FlatList
           style={{ width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20, gap: 12 }}
           data={
             isSearchMode && searchText
               ? eventPosts.filter(
