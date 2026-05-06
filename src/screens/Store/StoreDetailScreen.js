@@ -39,6 +39,7 @@ import PinIcon from '@assets/icons/common/pin-detail.svg';
 import PhoneIcon from '@assets/icons/common/phone.svg';
 import ClockIcon from '@assets/icons/common/clock.svg';
 
+import PencilIcon from '@assets/icons/pencil.svg';
 import LikedIcon from '@assets/Liked.svg';
 import UnlikedIcon from '@assets/Unliked.svg';
 import ShareIcon from '@assets/share.svg';
@@ -577,7 +578,7 @@ const StoreDetailScreen = () => {
             style={styles.customButtonStyle}
             textStyle={styles.customButtonText}
           >
-            <Ionicons name="pencil" size={16} color="white" />
+            <PencilIcon width={16} height={16} color="white" />
           </Button>
         </View>
       </View>
