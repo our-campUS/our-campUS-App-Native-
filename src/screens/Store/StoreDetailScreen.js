@@ -110,6 +110,7 @@ const StoreDetailScreen = () => {
 
   const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
+  const [requestButtonWidth, setRequestButtonWidth] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageViewerIndex, setImageViewerIndex] = useState(0);
@@ -414,6 +415,7 @@ const StoreDetailScreen = () => {
                   ]}
                   onPress={handleSuggestPartnership}
                   disabled={isSuggesting || isPartnershipRequested}
+                  onLayout={(e) => setRequestButtonWidth(e.nativeEvent.layout.width)}
                 >
                   <Text
                     style={[
@@ -433,15 +435,18 @@ const StoreDetailScreen = () => {
                     />
                   )}
                 </TouchableOpacity>
-                {isTooltipVisible && (
-                  <LocationTooltip
-                    text={[
-                      '아직 이용할 수 있는 제휴가 없는 매장이에요.',
-                      '학생회에게 제휴를 요청하실래요?',
-                    ]}
-                    arrowDirection="left"
-                    onClose={() => setIsTooltipVisible(false)}
-                  />
+                {isTooltipVisible && requestButtonWidth > 0 && (
+                  <View style={[styles.tooltipFloat, { left: requestButtonWidth + 10 }]}>
+                    <LocationTooltip
+                      text={[
+                        '아직 이용할 수 있는 제휴가 없는 매장이에요.',
+                        '학생회에게 제휴를 요청하실래요?',
+                      ]}
+                      arrowDirection="left"
+                      gap={14}
+                      onClose={() => setIsTooltipVisible(false)}
+                    />
+                  </View>
                 )}
               </View>
             )}
@@ -707,6 +712,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 16,
+    zIndex: 10,
+  },
+  tooltipFloat: {
+    position: 'absolute',
+    top: -4,
+    zIndex: 10,
   },
   requestButton: {
     borderWidth: 1,
@@ -714,7 +725,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 6,
-    marginRight: 21,
+    marginRight: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
