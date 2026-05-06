@@ -35,7 +35,7 @@ import ReviewItem from '@components/review/ReviewItem';
 
 import BadgeIcon from '@assets/badgeIcon.svg';
 import StarIcon from '@assets/icons/common/star.svg';
-import PinIcon from '@assets/icons/common/pin.svg';
+import PinIcon from '@assets/icons/common/pin-detail.svg';
 import PhoneIcon from '@assets/icons/common/phone.svg';
 import ClockIcon from '@assets/icons/common/clock.svg';
 
@@ -187,7 +187,11 @@ const StoreDetailScreen = () => {
       const response = await togglePlaceLike(requestBody);
       const newPlaceId = response?.data?.placeId || response?.placeId;
 
-      showToast(newLikedState ? '관심 목록에 추가되었어요!' : '관심 목록에서 삭제되었어요');
+      showToast(
+        newLikedState
+          ? '관심 목록에 추가되었어요!'
+          : '관심 목록에서 삭제되었어요'
+      );
 
       if (!currentPlaceId && newPlaceId) {
         setCurrentPlaceId(newPlaceId);
@@ -302,7 +306,6 @@ const StoreDetailScreen = () => {
         titleIcon={isPartner ? <BadgeIcon width={18} height={18} /> : null}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
-        additionalStyle={styles.headerStyle}
       />
 
       <View style={styles.contentContainer}>
@@ -415,7 +418,9 @@ const StoreDetailScreen = () => {
                   ]}
                   onPress={handleSuggestPartnership}
                   disabled={isSuggesting || isPartnershipRequested}
-                  onLayout={(e) => setRequestButtonWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setRequestButtonWidth(e.nativeEvent.layout.width)
+                  }
                 >
                   <Text
                     style={[
@@ -436,7 +441,12 @@ const StoreDetailScreen = () => {
                   )}
                 </TouchableOpacity>
                 {isTooltipVisible && requestButtonWidth > 0 && (
-                  <View style={[styles.tooltipFloat, { left: requestButtonWidth + 10 }]}>
+                  <View
+                    style={[
+                      styles.tooltipFloat,
+                      { left: requestButtonWidth + 10 },
+                    ]}
+                  >
                     <LocationTooltip
                       text={[
                         '아직 이용할 수 있는 제휴가 없는 매장이에요.',
@@ -453,7 +463,7 @@ const StoreDetailScreen = () => {
 
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
-                <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
+                <StarIcon style={styles.detailIcon} />
                 {reviewSize > 0 ? (
                   <>
                     <Text style={styles.detailText}>
@@ -471,26 +481,19 @@ const StoreDetailScreen = () => {
               </View>
               {address ? (
                 <View style={styles.detailRow}>
-                  <PinIcon width={24} height={24} style={{ marginRight: 4 }} />
+                  <PinIcon style={styles.detailIcon} color={colors.gray[300]} />
                   <Text style={styles.detailText}>{address}</Text>
                 </View>
               ) : null}
               {phone ? (
                 <View style={styles.detailRow}>
-                  <PhoneIcon
-                    width={24}
-                    height={24}
-                    style={{ marginRight: 4 }}
-                  />
+                  <PhoneIcon style={styles.detailIcon} />
                   <Text style={styles.detailText}>{phone}</Text>
                 </View>
               ) : null}
               {storeData.hours && storeData.hours.length > 0 ? (
                 <View style={styles.detailRow}>
-                  <ClockIcon
-                    width={24}
-                    height={24}
-                    style={{ marginRight: 4 }}
+                  <ClockIcon style={styles.detailIcon}
                   />
                   <View>
                     {storeData.hours.map((time, idx) => (
@@ -628,7 +631,12 @@ const StoreDetailScreen = () => {
         </View>
       </Modal>
 
-      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} hasNavBar={false} />
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={false}
+      />
     </View>
   );
 };
@@ -639,9 +647,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-  },
-  headerStyle: {
-    marginBottom: 10,
   },
   contentContainer: {
     flex: 1,
@@ -689,7 +694,8 @@ const styles = StyleSheet.create({
   partnerTagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginVertical: 10,
+    marginTop: 16,
+    marginBottom: 16,
     gap: 8,
   },
   partnerTag: {
@@ -711,7 +717,8 @@ const styles = StyleSheet.create({
   nonPartnerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 16,
+    marginTop: 16,
+    marginBottom: 16,
     zIndex: 10,
   },
   tooltipFloat: {
@@ -748,12 +755,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
+  detailIcon: {
+    width: 23,
+    height: 23,
+    marginRight: 4,
+  },
   detailText: {
-    ...typography.body4Regular,
+    ...typography.body3Regular,
     color: theme.colors.text,
   },
   detailTextSub: {
-    ...typography.body4Regular,
+    ...typography.body3Regular,
     color: theme.colors.textDisabled,
     marginLeft: 4,
   },
