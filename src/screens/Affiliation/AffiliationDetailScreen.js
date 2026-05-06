@@ -252,9 +252,7 @@ const AffiliationDetailScreen = ({ navigation, route }) => {
         {!isEmpty && !isFirstImageLoaded ? null : (
           <View style={styles.detailInfoContainer}>
             <View style={styles.topLayer}>
-              <Text style={styles.title}>
-                {item?.title}
-              </Text>
+              <Text style={styles.title}>{item?.title}</Text>
             </View>
             <View style={styles.buttonWrapper}>
               <Pressable
@@ -516,7 +514,7 @@ const styles = StyleSheet.create({
     paddingVertical: 28,
   },
   recommendTitle: {
-    ...typography.heading4,
+    ...typography.heading5,
     color: colors.gray[850],
   },
 });

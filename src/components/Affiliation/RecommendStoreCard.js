@@ -48,7 +48,7 @@ const RecommendStoreCard = ({ item, variant = 'short', rank }) => {
       </View>
       <View style={[styles.infoWrapper, isLong && styles.infoWrapperLong]}>
         <View style={styles.titleWrapper}>
-          {item?.approved && (
+          {isPartner && (
             <BadgeIcon width={20} height={20} style={styles.badgeIcon} />
           )}
           <Text
