@@ -33,7 +33,7 @@ const RecommendSection = () => {
             name: item.placeName,
             category: '제휴 매장',
             discount: item.partnershipTitle,
-            tag: [item.councilName],
+            tag: ['추천'],
             image: item.imageUrl ? { uri: item.imageUrl } : DEFAULT_STORE_IMAGE,
             imgUrls: item.imageUrl,
             rating: 4.8,

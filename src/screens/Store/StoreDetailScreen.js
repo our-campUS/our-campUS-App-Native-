@@ -65,6 +65,18 @@ const StoreDetailScreen = () => {
     PARTNER: '제휴',
   };
 
+  const COUNCIL_NAME_MAP = {
+    SCHOOL_COUNCIL: '총학생회',
+    COLLEGE_COUNCIL: '단과대 학생회',
+    MAJOR_COUNCIL: '학과 학생회',
+  };
+
+  const COUNCIL_TYPE_TO_TAB = {
+    SCHOOL_COUNCIL: 'school',
+    COLLEGE_COUNCIL: 'college',
+    MAJOR_COUNCIL: 'major',
+  };
+
   const storeData = {
     ...paramStore,
     name: paramStore.name || '이름 없음',
@@ -93,12 +105,15 @@ const StoreDetailScreen = () => {
       paramStore.isPartnership ||
       paramStore.type === 'PARTNER' ||
       paramStore.category === 'PARTNER' ||
-      paramStore.partnerships?.length > 0,
+      paramStore.partnerships?.length > 0 ||
+      !!paramStore.councilType,
     partnerTags:
       paramStore.partnerships?.length > 0
-        ? paramStore.partnerships.map((p) => p.councilName).filter(Boolean)
-        : paramStore.tag
-        ? [paramStore.tag]
+        ? paramStore.partnerships
+            .filter((p) => p.councilName)
+            .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
+        : paramStore.councilType
+        ? [{ councilName: COUNCIL_NAME_MAP[paramStore.councilType] || '학생회', councilType: paramStore.councilType }]
         : [],
 
     backendPlaceId:
@@ -240,7 +255,9 @@ const StoreDetailScreen = () => {
             }
             if (status.partnerships?.length > 0) {
               setPartnerTags(
-                status.partnerships.map((p) => p.councilName).filter(Boolean)
+                status.partnerships
+                  .filter((p) => p.councilName)
+                  .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
               );
             }
             if (status.telephone || status.phone) {
@@ -400,8 +417,21 @@ const StoreDetailScreen = () => {
             {isPartner ? (
               <View style={styles.partnerTagRow}>
                 {partnerTags?.map((tag, index) => (
-                  <TouchableOpacity key={index} style={styles.partnerTag}>
-                    <Text style={styles.partnerTagText}>{tag}</Text>
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.partnerTag}
+                    onPress={() => {
+                      const tabId = COUNCIL_TYPE_TO_TAB[tag.councilType] || 'school';
+                      navigation.navigate('MainTab', {
+                        screen: 'Partnership',
+                        params: {
+                          screen: 'AffiliationMainScreen',
+                          params: { initialTab: tabId },
+                        },
+                      });
+                    }}
+                  >
+                    <Text style={styles.partnerTagText}>{tag.councilName}</Text>
                     <ArrowRightIcon
                       width={5}
                       height={8}
