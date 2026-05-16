@@ -35,8 +35,8 @@ const StoreCard = ({
       {/* 하단 정보 */}
       <View style={styles.infoContainer}>
         <View style={styles.titleRow}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.category}>{category}</Text>
+          <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
+          <Text style={styles.category} numberOfLines={1}>{category}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -46,7 +46,7 @@ const StoreCard = ({
 
         <View style={styles.infoRow}>
           <TicketIcon width={20} height={20} style={{ marginRight: 4 }} />
-          <Text style={styles.infoText}>{discount}</Text>
+          <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">{discount}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -104,14 +104,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    gap: 6,
   },
   name: {
     ...theme.typography.body3Bold,
-    marginRight: 6,
+    flexShrink: 1,
   },
   category: {
     ...theme.typography.caption2Bold,
     color: theme.colors.textDim,
+    flexShrink: 0,
   },
   infoRow: {
     flexDirection: 'row',
@@ -125,6 +127,7 @@ const styles = StyleSheet.create({
   infoText: {
     ...theme.typography.body4Regular,
     color: theme.colors.text,
+    flex: 1,
   },
 });
 

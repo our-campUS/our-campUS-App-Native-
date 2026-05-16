@@ -21,6 +21,7 @@ import { getUserInfo } from '../../api/user';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { getUpcomingEventsAll } from '../../api/studentAffiliate';
+import { getRecommendTitle } from '../../constants/recommendTitles';
 import { checkUnreadNotification } from '../../api/notification';
 import VerticalEventTicker from '../../components/home/VerticalEventTicker';
 
@@ -49,6 +50,7 @@ const HomeSection = ({
 
 const HomeScreen = () => {
   const [hasNewNotification, setHasNewNotification] = useState(false);
+  const [recommendTitle] = useState(getRecommendTitle);
 
   const user = useAuthStore((state) => state.user);
   const navigation = useNavigation();
@@ -154,7 +156,7 @@ const HomeScreen = () => {
 
         {/* 공간 추천 */}
         <HomeSection
-          title="🚀 3시간 공강, 이런 공간은 어때요?"
+          title={recommendTitle}
           hasDivider={true}
           fullWidthContent={true}
         >

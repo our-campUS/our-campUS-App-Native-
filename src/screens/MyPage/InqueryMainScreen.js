@@ -21,7 +21,7 @@ const InqueryMainScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
-        title="1:1 문의계시판"
+        title="1:1 문의게시판"
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
       />
