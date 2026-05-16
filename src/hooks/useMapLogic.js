@@ -189,6 +189,13 @@ export const useMapLogic = (mapRef) => {
         newData = await processSearchData(rawData);
       }
 
+      // 거리순 정렬
+      newData.sort((a, b) => {
+        const distA = (a.latitude - lat) ** 2 + (a.longitude - lng) ** 2;
+        const distB = (b.latitude - lat) ** 2 + (b.longitude - lng) ** 2;
+        return distA - distB;
+      });
+
       // 상태 업데이트
       if (!isLoadMore) {
         const uniqueMarkers = Array.from(

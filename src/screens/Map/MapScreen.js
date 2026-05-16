@@ -138,6 +138,7 @@ const MapScreen = () => {
         onCameraIdle={handleCameraIdle}
         onMarkerTap={handleMarkerTap}
         onMapTap={handleMapTap}
+        onOutOfBounds={() => showToast('서울·경기 지역만 탐색할 수 있어요')}
       />
 
       {/* 상단 검색바 영역 */}
