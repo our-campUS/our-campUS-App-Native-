@@ -22,7 +22,7 @@ const RecommendSection = () => {
       const data = await getRandomPlaces(myLat, myLng);
 
       if (data) {
-        const partners = (data.partnershipPosts || []).map((item) => {
+const partners = (data.partnershipPosts || []).map((item) => {
           const itemLat = item.coordinate?.latitude;
           const itemLng = item.coordinate?.longitude;
 
@@ -36,7 +36,7 @@ const RecommendSection = () => {
             tag: ['추천'],
             image: item.imageUrl ? { uri: item.imageUrl } : DEFAULT_STORE_IMAGE,
             imgUrls: item.imageUrl,
-            rating: 4.8,
+            rating: item.averageStar || '-',
             distance:
               calculateDistance(myLat, myLng, itemLat, itemLng) ||
               '거리 정보 없음',
@@ -59,7 +59,7 @@ const RecommendSection = () => {
             tag: ['추천'],
             image: hasImages ? { uri: item.imgUrls[0] } : DEFAULT_STORE_IMAGE,
             imgUrls: item.imgUrls || [],
-            rating: 4.0,
+            rating: item.averageStar || '-',
             distance: calculateDistance(myLat, myLng, itemLat, itemLng),
             type: 'DEFAULT',
             isPartner: false,
