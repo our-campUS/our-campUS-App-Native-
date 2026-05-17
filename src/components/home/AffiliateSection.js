@@ -31,23 +31,11 @@ const AffiliateSection = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // TODO 단과대 제휴 안뜸
-      console.log('👉 [DEBUG] 현재 탭:', selectedTabId);
-
-      console.log('👉 [DEBUG] 유저 정보:', user);
-      if (selectedTabId === 'COLLEGE' && !user?.collegeName) {
-        console.warn(
-          '⚠️ [WARNING] 유저의 단과대 정보(collegeName)가 없습니다!'
-        );
-      }
-
       const apiParam = {
         SCHOOL: 'SCHOOL_COUNCIL',
         COLLEGE: 'COLLEGE_COUNCIL',
         MAJOR: 'MAJOR_COUNCIL',
       }[selectedTabId];
-
-      console.log('👉 [DEBUG] API 요청 파라미터:', apiParam);
 
       if (apiParam) {
         const data = await getActivePartnerships(apiParam);
