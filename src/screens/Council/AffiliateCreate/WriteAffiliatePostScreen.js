@@ -121,12 +121,12 @@ const WriteAffiliatePostScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    if (title && place && startDate && endDate) {
+    if (title && place && startDate && endDate && selectedImages.length > 0) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
-  }, [title, place, startDate, endDate]);
+  }, [title, place, startDate, endDate, selectedImages]);
 
   const handleSubmit = () => {
     if (eventType === 'affiliate') {

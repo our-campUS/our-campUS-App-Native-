@@ -87,7 +87,7 @@ const FindRepresentativeId = ({ navigation }) => {
               학교 이메일(.ac.kr 또는 .edu)로 입력해주세요.
             </Text>
           )}
-          {/* {emailError && (
+          {emailError && (
             <Text
               style={{
                 ...typography.caption1Regular,
@@ -97,7 +97,7 @@ const FindRepresentativeId = ({ navigation }) => {
             >
               해당 이메일로 가입된 아이디가 없습니다.
             </Text>
-          )} */}
+          )}
         </ScrollView>
         <View style={styles.buttonContainer}>
           <Button

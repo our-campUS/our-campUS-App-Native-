@@ -10,6 +10,7 @@ const ConfirmModal = ({
   description,
   confirmText = '확인',
   cancelText = '취소',
+  confirmButtonColor = colors.orange[400],
 }) => {
   return (
     <Modal
@@ -24,7 +25,7 @@ const ConfirmModal = ({
           {description ? (
             <Text style={styles.description}>{description}</Text>
           ) : null}
-          <Pressable style={styles.confirmButton} onPress={onConfirm}>
+          <Pressable style={[styles.confirmButton, { backgroundColor: confirmButtonColor }]} onPress={onConfirm}>
             <Text style={styles.confirmText}>{confirmText}</Text>
           </Pressable>
           <Pressable style={styles.cancelButton} onPress={onClose}>
@@ -68,7 +69,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: colors.blue[400],
     alignItems: 'center',
     marginBottom: 12,
   },

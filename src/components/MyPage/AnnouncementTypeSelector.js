@@ -34,19 +34,6 @@ const AnnouncementTypeSelector = ({ navigation }) => {
           {'이벤트 안내'}
         </Text>
       </Pressable>
-      <Pressable
-        style={[styles.button, activeTab === 'event2' && styles.activeButton]}
-        onPress={() => setActiveTab('event2')}
-      >
-        <Text
-          style={[
-            styles.buttonText,
-            activeTab === 'event2' && styles.activeButtonText,
-          ]}
-        >
-          {'이벤트 안내'}
-        </Text>
-      </Pressable>
     </View>
   );
 };

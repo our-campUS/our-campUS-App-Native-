@@ -17,6 +17,8 @@ import useAuthStore from '@store/authStore';
 import { changeCouncilNickname } from '@api/councilMyPage';
 import { getUserInfo } from '@api/user';
 
+const NICKNAME_REGEX = /^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]*$/;
+
 const CouncilEditProfileScreen = ({ navigation }) => {
   const { user } = useAuthStore();
   const [nickname, setNickname] = useState('');
@@ -61,10 +63,33 @@ const CouncilEditProfileScreen = ({ navigation }) => {
             value={nickname}
             onChangeText={(text) => {
               setNickname(text);
+              if (!NICKNAME_REGEX.test(text)) {
+                setNicknameError(true);
+                setErrorMessage('영문, 한글, 숫자만 사용 가능해요');
+              } else if (text.length > 0 && text.length < 2) {
+                setNicknameError(true);
+                setErrorMessage('2자 이상 입력해주세요');
+              } else {
+                setNicknameError(false);
+                setErrorMessage('');
+              }
             }}
             useTitle={true}
             title="학생회 이름"
+            hasError={nicknameError}
+            maxLength={15}
           />
+          {nicknameError && errorMessage && (
+            <View style={styles.errorMessageWrapper}>
+              <CheckIcon
+                width={11}
+                height={15}
+                style={{ marginRight: 8 }}
+                color={colors.common.error}
+              />
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
+            </View>
+          )}
           {/* <Input
             disabled={true}
             isOrange={true}
@@ -79,7 +104,7 @@ const CouncilEditProfileScreen = ({ navigation }) => {
         <Button
           isOrange={true}
           title="다음"
-          disabled={!nickname}
+          disabled={!nickname || nickname.length < 2 || nicknameError}
           style={{
             width: '100%',
             height: 50,
