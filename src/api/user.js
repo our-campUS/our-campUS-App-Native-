@@ -69,15 +69,17 @@ export const editNickname = async (nickname) => {
     });
 
     if (response.data.code === 200) {
-      console.log('유저 닉네임 수정 성공:', response.data);
-      return true;
+      return { success: true };
     }
 
-    console.error('유저 닉네임 수정 실패:', response.data);
-    return false;
+    return { success: false, errorType: 'UNKNOWN' };
   } catch (error) {
     console.error('유저 닉네임 수정 에러:', error.response);
-    return false;
+    const status = error.response?.status;
+    if (status === 409) {
+      return { success: false, errorType: 'DUPLICATE' };
+    }
+    return { success: false, errorType: 'UNKNOWN' };
   }
 };
 

@@ -16,6 +16,8 @@ import CheckIcon from '../../../assets/check.svg';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo, editNickname } from '../../api/user';
 
+const NICKNAME_REGEX = /^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]*$/;
+
 const EditNicknameScreen = ({ navigation }) => {
   const [nickname, setNickname] = useState('');
   const [nicknameError, setNicknameError] = useState(false);
@@ -29,30 +31,28 @@ const EditNicknameScreen = ({ navigation }) => {
     fetchLatestInfo();
   }, []);
 
-  // const handleSave = async () => {
-  //   const response = await editNickname(nickname);
-  //   if (response.isValid) {
-  //     navigation.goBack();
-  //   } else {
-  //     if (response.errorType === 'NICKNAME_ALREADY_EXISTS') {
-  //       setNicknameError(true);
-  //       setErrorMessage('이미 존재하는 닉네임입니다.');
-  //     }
-  //     if (response.errorType === 'NICKNAME_LENGTH_INVALID') {
-  //       setNicknameError(true);
-  //       setErrorMessage('닉네임은 2~15자 이내로 작성해주세요.');
-  //     }
-  //   }
-  // };
+  const handleChangeNickname = (text) => {
+    setNickname(text);
+    if (!NICKNAME_REGEX.test(text)) {
+      setNicknameError(true);
+      setErrorMessage('영문, 한글, 숫자만 사용 가능해요');
+    } else {
+      setNicknameError(false);
+      setErrorMessage('');
+    }
+  };
 
   const handleSave = async () => {
-    const response = await editNickname(nickname);
-    if (response) {
+    const result = await editNickname(nickname);
+    if (result.success) {
       await getUserInfo();
       navigation.goBack();
+    } else if (result.errorType === 'DUPLICATE') {
+      setNicknameError(true);
+      setErrorMessage('이미 사용 중인 닉네임이예요');
     } else {
       setNicknameError(true);
-      setErrorMessage('닉네임 수정 실패');
+      setErrorMessage('닉네임 수정에 실패했어요');
     }
   };
 
@@ -69,16 +69,11 @@ const EditNicknameScreen = ({ navigation }) => {
           <Input
             placeholder={user?.name || '사용자'}
             value={nickname}
-            onChangeText={(text) => {
-              setNickname(text);
-              if (nicknameError) {
-                setNicknameError(false);
-                setErrorMessage('');
-              }
-            }}
+            onChangeText={handleChangeNickname}
             useTitle={true}
             title="닉네임"
             hasError={nicknameError}
+            maxLength={15}
           />
           {nicknameError && errorMessage && (
             <View style={styles.errorMessageWrapper}>
@@ -96,7 +91,7 @@ const EditNicknameScreen = ({ navigation }) => {
       <View style={styles.buttonWrapper}>
         <Button
           title="저장"
-          disabled={!nickname}
+          disabled={!nickname || nickname.length < 2 || nicknameError}
           style={{
             width: '100%',
             height: 50,

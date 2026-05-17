@@ -138,6 +138,7 @@ const MapScreen = () => {
         onCameraIdle={handleCameraIdle}
         onMarkerTap={handleMarkerTap}
         onMapTap={handleMapTap}
+        onOutOfBounds={() => showToast('서울·경기 지역만 탐색할 수 있어요')}
       />
 
       {/* 상단 검색바 영역 */}
@@ -210,7 +211,7 @@ const MapScreen = () => {
           }}
           activeOpacity={0.8}
         >
-            <LocationIcon width={24} height={24} color={theme.colors.textDim} />
+            <LocationIcon width={18} height={18} color={theme.colors.textDim} />
           </TouchableOpacity>
       </Animated.View>
 
@@ -256,9 +257,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   myLocationButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: colors.common.white,
     justifyContent: 'center',
     alignItems: 'center',

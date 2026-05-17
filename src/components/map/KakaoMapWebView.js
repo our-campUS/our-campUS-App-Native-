@@ -76,11 +76,32 @@ const getHtmlTemplate = (lat, lng, zoom, appKey) => {
       var overlays = [];
       var cameraTimer = null;
 
+      var ALLOWED_BOUNDS = { minLat: 36.85, maxLat: 38.30, minLng: 126.20, maxLng: 128.00 };
+
       function sendToRN(type, payload) {
         window.ReactNativeWebView.postMessage(JSON.stringify({ type: type, payload: payload || {} }));
       }
 
-      // 카메라 idle (300ms 디바운스)
+      function clampToBounds() {
+        var center = map.getCenter();
+        var lat = center.getLat();
+        var lng = center.getLng();
+        var clampedLat = Math.min(Math.max(lat, ALLOWED_BOUNDS.minLat), ALLOWED_BOUNDS.maxLat);
+        var clampedLng = Math.min(Math.max(lng, ALLOWED_BOUNDS.minLng), ALLOWED_BOUNDS.maxLng);
+        if (Math.abs(lat - clampedLat) > 0.0001 || Math.abs(lng - clampedLng) > 0.0001) {
+          map.panTo(new kakao.maps.LatLng(clampedLat, clampedLng));
+          sendToRN('OUT_OF_BOUNDS', {});
+          return true;
+        }
+        return false;
+      }
+
+      // 드래그 종료 시 범위 체크
+      kakao.maps.event.addListener(map, 'dragend', function() {
+        clampToBounds();
+      });
+
+      // 카메라 idle — CAMERA_IDLE 300ms 디바운스
       kakao.maps.event.addListener(map, 'idle', function() {
         clearTimeout(cameraTimer);
         cameraTimer = setTimeout(function() {
@@ -228,7 +249,7 @@ const getHtmlTemplate = (lat, lng, zoom, appKey) => {
 
 const KakaoMapWebView = forwardRef(
   (
-    { initialCamera, markers, onCameraIdle, onMarkerTap, onMapTap, style },
+    { initialCamera, markers, onCameraIdle, onMarkerTap, onMapTap, onOutOfBounds, style },
     ref
   ) => {
     const webViewRef = useRef(null);
@@ -260,6 +281,8 @@ const KakaoMapWebView = forwardRef(
           onMarkerTap?.(payload);
         } else if (type === 'MAP_TAP') {
           onMapTap?.();
+        } else if (type === 'OUT_OF_BOUNDS') {
+          onOutOfBounds?.();
         }
       } catch (e) {}
     };

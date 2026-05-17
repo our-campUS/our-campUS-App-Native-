@@ -148,10 +148,8 @@ const MyPageProfileEditScreen = ({ navigation, route }) => {
             title="닉네임"
             onPress={() => navigation.navigate('EditNicknameScreen')}
           />
-          {/* TODO: 인증 완료 시 표시할 텍스트 분기 처리 필요 */}
           <ListItem
             title="학적정보"
-            rightText="인증 전"
             onPress={() => navigation.navigate('ChangeScholarInfoScreen')}
           />
           <ListItem title="연결된 계정" rightText="카카오" showArrow={false} />

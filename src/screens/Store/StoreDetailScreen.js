@@ -11,6 +11,7 @@ import {
   Image,
   Dimensions,
   FlatList,
+  Modal,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -32,18 +33,20 @@ import typography from '@style/typography';
 // import ReviewActionModal from '@components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
 import ReviewItem from '@components/review/ReviewItem';
 
+import BadgeIcon from '@assets/badgeIcon.svg';
 import StarIcon from '@assets/icons/common/star.svg';
-import PinIcon from '@assets/icons/common/pin.svg';
+import PinIcon from '@assets/icons/common/pin-detail.svg';
 import PhoneIcon from '@assets/icons/common/phone.svg';
 import ClockIcon from '@assets/icons/common/clock.svg';
 
+import PencilIcon from '@assets/icons/pencil.svg';
 import LikedIcon from '@assets/Liked.svg';
 import UnlikedIcon from '@assets/Unliked.svg';
 import ShareIcon from '@assets/share.svg';
 import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
 import LocationTooltip from '@components/map/LocationTooltip';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const StoreDetailScreen = () => {
   const navigation = useNavigation();
@@ -60,6 +63,18 @@ const StoreDetailScreen = () => {
     PUB: '술집',
     STORE: '편의점',
     PARTNER: '제휴',
+  };
+
+  const COUNCIL_NAME_MAP = {
+    SCHOOL_COUNCIL: '총학생회',
+    COLLEGE_COUNCIL: '단과대 학생회',
+    MAJOR_COUNCIL: '학과 학생회',
+  };
+
+  const COUNCIL_TYPE_TO_TAB = {
+    SCHOOL_COUNCIL: 'school',
+    COLLEGE_COUNCIL: 'college',
+    MAJOR_COUNCIL: 'major',
   };
 
   const storeData = {
@@ -90,12 +105,15 @@ const StoreDetailScreen = () => {
       paramStore.isPartnership ||
       paramStore.type === 'PARTNER' ||
       paramStore.category === 'PARTNER' ||
-      paramStore.partnerships?.length > 0,
+      paramStore.partnerships?.length > 0 ||
+      !!paramStore.councilType,
     partnerTags:
       paramStore.partnerships?.length > 0
-        ? paramStore.partnerships.map((p) => p.councilName).filter(Boolean)
-        : paramStore.tag
-        ? [paramStore.tag]
+        ? paramStore.partnerships
+            .filter((p) => p.councilName)
+            .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
+        : paramStore.councilType
+        ? [{ councilName: COUNCIL_NAME_MAP[paramStore.councilType] || '학생회', councilType: paramStore.councilType }]
         : [],
 
     backendPlaceId:
@@ -108,7 +126,10 @@ const StoreDetailScreen = () => {
 
   const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
+  const [requestButtonWidth, setRequestButtonWidth] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [imageViewerIndex, setImageViewerIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(storeData.isLiked || false);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isPartnershipRequested, setIsPartnershipRequested] = useState(false);
@@ -182,7 +203,11 @@ const StoreDetailScreen = () => {
       const response = await togglePlaceLike(requestBody);
       const newPlaceId = response?.data?.placeId || response?.placeId;
 
-      showToast(newLikedState ? '관심 목록에 추가되었어요!' : '관심 목록에서 삭제되었어요');
+      showToast(
+        newLikedState
+          ? '관심 목록에 추가되었어요!'
+          : '관심 목록에서 삭제되었어요'
+      );
 
       if (!currentPlaceId && newPlaceId) {
         setCurrentPlaceId(newPlaceId);
@@ -230,7 +255,9 @@ const StoreDetailScreen = () => {
             }
             if (status.partnerships?.length > 0) {
               setPartnerTags(
-                status.partnerships.map((p) => p.councilName).filter(Boolean)
+                status.partnerships
+                  .filter((p) => p.councilName)
+                  .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
               );
             }
             if (status.telephone || status.phone) {
@@ -294,9 +321,9 @@ const StoreDetailScreen = () => {
     <View style={styles.container}>
       <LabelTitle
         title={storeData.name}
+        titleIcon={isPartner ? <BadgeIcon width={18} height={18} /> : null}
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
-        additionalStyle={styles.headerStyle}
       />
 
       <View style={styles.contentContainer}>
@@ -315,12 +342,20 @@ const StoreDetailScreen = () => {
                   keyExtractor={(item, index) => index.toString()}
                   onViewableItemsChanged={onViewableItemsChanged}
                   viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-                  renderItem={({ item }) => (
-                    <Image
-                      source={{ uri: item }}
-                      style={{ width: SCREEN_WIDTH, height: 250 }}
-                      resizeMode="cover"
-                    />
+                  renderItem={({ item, index }) => (
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={() => {
+                        setImageViewerIndex(index);
+                        setImageViewerVisible(true);
+                      }}
+                    >
+                      <Image
+                        source={{ uri: item }}
+                        style={[styles.bannerImage, { width: SCREEN_WIDTH }]}
+                        resizeMode="cover"
+                      />
+                    </TouchableOpacity>
                   )}
                 />
 
@@ -382,8 +417,21 @@ const StoreDetailScreen = () => {
             {isPartner ? (
               <View style={styles.partnerTagRow}>
                 {partnerTags?.map((tag, index) => (
-                  <TouchableOpacity key={index} style={styles.partnerTag}>
-                    <Text style={styles.partnerTagText}>{tag}</Text>
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.partnerTag}
+                    onPress={() => {
+                      const tabId = COUNCIL_TYPE_TO_TAB[tag.councilType] || 'school';
+                      navigation.navigate('MainTab', {
+                        screen: 'Partnership',
+                        params: {
+                          screen: 'AffiliationMainScreen',
+                          params: { initialTab: tabId },
+                        },
+                      });
+                    }}
+                  >
+                    <Text style={styles.partnerTagText}>{tag.councilName}</Text>
                     <ArrowRightIcon
                       width={5}
                       height={8}
@@ -401,6 +449,9 @@ const StoreDetailScreen = () => {
                   ]}
                   onPress={handleSuggestPartnership}
                   disabled={isSuggesting || isPartnershipRequested}
+                  onLayout={(e) =>
+                    setRequestButtonWidth(e.nativeEvent.layout.width)
+                  }
                 >
                   <Text
                     style={[
@@ -420,26 +471,34 @@ const StoreDetailScreen = () => {
                     />
                   )}
                 </TouchableOpacity>
-                {isTooltipVisible && (
-                  <LocationTooltip
-                    text={[
-                      '아직 이용할 수 있는 제휴가 없는 매장이에요.',
-                      '학생회에게 제휴를 요청하실래요?',
+                {isTooltipVisible && requestButtonWidth > 0 && (
+                  <View
+                    style={[
+                      styles.tooltipFloat,
+                      { left: requestButtonWidth + 10 },
                     ]}
-                    arrowDirection="left"
-                    onClose={() => setIsTooltipVisible(false)}
-                  />
+                  >
+                    <LocationTooltip
+                      text={[
+                        '아직 이용할 수 있는 제휴가 없는 매장이에요.',
+                        '학생회에게 제휴를 요청하실래요?',
+                      ]}
+                      arrowDirection="left"
+                      gap={14}
+                      onClose={() => setIsTooltipVisible(false)}
+                    />
+                  </View>
                 )}
               </View>
             )}
 
             <View style={styles.detailList}>
               <View style={styles.detailRow}>
-                <StarIcon width={24} height={24} style={{ marginRight: 4 }} />
+                <StarIcon style={styles.detailIcon} />
                 {reviewSize > 0 ? (
                   <>
                     <Text style={styles.detailText}>
-                      {averageStar}
+                      {Number(averageStar).toFixed(1)}
                     </Text>
                     <Text style={styles.detailTextSub}>({reviewSize})</Text>
                   </>
@@ -453,26 +512,19 @@ const StoreDetailScreen = () => {
               </View>
               {address ? (
                 <View style={styles.detailRow}>
-                  <PinIcon width={24} height={24} style={{ marginRight: 4 }} />
+                  <PinIcon style={styles.detailIcon} color={colors.gray[300]} />
                   <Text style={styles.detailText}>{address}</Text>
                 </View>
               ) : null}
               {phone ? (
                 <View style={styles.detailRow}>
-                  <PhoneIcon
-                    width={24}
-                    height={24}
-                    style={{ marginRight: 4 }}
-                  />
+                  <PhoneIcon style={styles.detailIcon} />
                   <Text style={styles.detailText}>{phone}</Text>
                 </View>
               ) : null}
               {storeData.hours && storeData.hours.length > 0 ? (
                 <View style={styles.detailRow}>
-                  <ClockIcon
-                    width={24}
-                    height={24}
-                    style={{ marginRight: 4 }}
+                  <ClockIcon style={styles.detailIcon}
                   />
                   <View>
                     {storeData.hours.map((time, idx) => (
@@ -556,7 +608,7 @@ const StoreDetailScreen = () => {
             style={styles.customButtonStyle}
             textStyle={styles.customButtonText}
           >
-            <Ionicons name="pencil" size={16} color="white" />
+            <PencilIcon width={16} height={16} color="white" />
           </Button>
         </View>
       </View>
@@ -573,18 +625,59 @@ const StoreDetailScreen = () => {
       />
       */}
 
-      <Toast message={toastMessage} visible={toastVisible} onHide={hideToast} hasNavBar={false} />
+      <Modal
+        visible={imageViewerVisible}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setImageViewerVisible(false)}
+      >
+        <View style={styles.imageViewerContainer}>
+          <FlatList
+            data={storeData.imgUrls}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            initialScrollIndex={imageViewerIndex}
+            getItemLayout={(_, index) => ({
+              length: SCREEN_WIDTH,
+              offset: SCREEN_WIDTH * index,
+              index,
+            })}
+            keyExtractor={(_, index) => `viewer-${index}`}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: item }}
+                style={[styles.imageViewerImage, { width: SCREEN_WIDTH }]}
+                resizeMode="contain"
+              />
+            )}
+          />
+          <TouchableOpacity
+            style={styles.imageViewerClose}
+            onPress={() => setImageViewerVisible(false)}
+          >
+            <Ionicons name="close" size={28} color="white" />
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={false}
+      />
     </View>
   );
 };
+
+const IMAGE_VIEWER_BG = 'rgba(0, 0, 0, 0.95)';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-  },
-  headerStyle: {
-    marginBottom: 10,
   },
   contentContainer: {
     flex: 1,
@@ -632,7 +725,8 @@ const styles = StyleSheet.create({
   partnerTagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginVertical: 10,
+    marginTop: 16,
+    marginBottom: 16,
     gap: 8,
   },
   partnerTag: {
@@ -654,7 +748,14 @@ const styles = StyleSheet.create({
   nonPartnerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 16,
+    marginTop: 16,
+    marginBottom: 16,
+    zIndex: 10,
+  },
+  tooltipFloat: {
+    position: 'absolute',
+    top: -4,
+    zIndex: 10,
   },
   requestButton: {
     borderWidth: 1,
@@ -662,7 +763,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 6,
-    marginRight: 21,
+    marginRight: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -685,12 +786,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
+  detailIcon: {
+    width: 23,
+    height: 23,
+    marginRight: 4,
+  },
   detailText: {
-    ...typography.body4Regular,
+    ...typography.body3Regular,
     color: theme.colors.text,
   },
   detailTextSub: {
-    ...typography.body4Regular,
+    ...typography.body3Regular,
     color: theme.colors.textDisabled,
     marginLeft: 4,
   },
@@ -766,6 +872,24 @@ const styles = StyleSheet.create({
   bannerContainer: {
     height: 250,
     position: 'relative',
+  },
+  bannerImage: {
+    height: 250,
+  },
+  imageViewerContainer: {
+    flex: 1,
+    backgroundColor: IMAGE_VIEWER_BG,
+    justifyContent: 'center',
+  },
+  imageViewerImage: {
+    height: SCREEN_HEIGHT,
+  },
+  imageViewerClose: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    padding: 8,
   },
   emptyBanner: {
     width: '100%',

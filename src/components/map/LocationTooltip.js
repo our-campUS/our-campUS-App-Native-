@@ -6,7 +6,7 @@ import typography from '../../style/typography';
 
 const TRANSPARENT = 'transparent';
 
-const LocationTooltip = ({ text, onClose, arrowDirection = 'right' }) => {
+const LocationTooltip = ({ text, onClose, arrowDirection = 'right', gap = 12 }) => {
   const arrowStyle =
     arrowDirection === 'right'
       ? styles.arrowRight
@@ -15,7 +15,7 @@ const LocationTooltip = ({ text, onClose, arrowDirection = 'right' }) => {
   return (
     <View style={styles.wrapper}>
       {arrowDirection === 'left' && <View style={arrowStyle} />}
-      <View style={styles.tooltip}>
+      <View style={[styles.tooltip, { gap }]}>
         {Array.isArray(text) ? (
           <View style={styles.textContainer}>
             {text.map((line, i) => (
@@ -43,18 +43,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 8,
+    flexShrink: 1,
   },
   tooltip: {
     backgroundColor: theme.colors.primary1Light,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   textContainer: {
     flexDirection: 'column',
+    flex: 1,
   },
   tooltipText: {
     ...typography.caption2Regular,
@@ -72,6 +73,7 @@ const styles = StyleSheet.create({
     borderTopColor: TRANSPARENT,
     borderBottomColor: TRANSPARENT,
     borderLeftColor: theme.colors.primary1Light,
+    marginLeft: -2,
   },
   arrowLeft: {
     width: 0,
@@ -82,6 +84,7 @@ const styles = StyleSheet.create({
     borderTopColor: TRANSPARENT,
     borderBottomColor: TRANSPARENT,
     borderRightColor: theme.colors.primary1Light,
+    marginRight: -2,
   },
 });
 
