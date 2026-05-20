@@ -10,7 +10,6 @@ import colors from '../../style/colors';
 import typography from '../../style/typography';
 import LabelTitle from '../../components/LabelTitle';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { red } from 'react-native-reanimated/lib/typescript/Colors';
 import CheckIcon from '../../../assets/check.svg';
 import { useState } from 'react';
 import Button from '../../components/Button';
@@ -52,7 +51,6 @@ const CancelMembershipScreen = ({ navigation }) => {
         );
       }
     } catch (error) {
-      console.error(error);
       Alert.alert('오류', '알 수 없는 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
@@ -98,10 +96,6 @@ const CancelMembershipScreen = ({ navigation }) => {
             <View style={styles.noticeItem}>
               <Text style={styles.noticeItemBullet}>•</Text>
               <Text style={styles.noticeItemText}>스탬프 소멸됩니다.</Text>
-            </View>
-            <View style={styles.noticeItem}>
-              <Text style={styles.noticeItemBullet}>•</Text>
-              <Text style={styles.noticeItemText}>등등</Text>
             </View>
           </View>
           <View style={styles.noticCheckWrapper}>

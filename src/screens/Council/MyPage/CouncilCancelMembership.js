@@ -84,16 +84,12 @@ const CouncilCancelMembershipScreen = ({ navigation }) => {
             <View style={styles.noticeItem}>
               <Text style={styles.noticeItemBullet}>•</Text>
               <Text style={styles.noticeItemText}>
-                탈퇴 즉시 00일 이내에는 동일 계정으로 다시 가입할 수 없습니다.
+                탈퇴 즉시 7일 이내에는 동일 계정으로 다시 가입할 수 없습니다.
               </Text>
             </View>
             <View style={styles.noticeItem}>
               <Text style={styles.noticeItemBullet}>•</Text>
               <Text style={styles.noticeItemText}>스탬프 소멸됩니다.</Text>
-            </View>
-            <View style={styles.noticeItem}>
-              <Text style={styles.noticeItemBullet}>•</Text>
-              <Text style={styles.noticeItemText}>등등</Text>
             </View>
           </View>
           <View style={styles.noticCheckWrapper}>

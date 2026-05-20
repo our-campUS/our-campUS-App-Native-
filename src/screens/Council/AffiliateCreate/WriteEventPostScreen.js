@@ -176,12 +176,12 @@ const WriteEventPostScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    if (title && place && startDate && startTime && detailPlace) {
+    if (title && place && startDate && startTime && detailPlace && selectedImages.length > 0) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
-  }, [title, place, startDate, startTime, detailPlace]);
+  }, [title, place, startDate, startTime, detailPlace, selectedImages]);
 
   const handleSubmitEvent = async () => {
     const startDateTime = toISODateTimeString(startDate, startTime);

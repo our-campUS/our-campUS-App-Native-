@@ -76,11 +76,7 @@ const LoginRepresentative = ({ navigation }) => {
         errorMessage.includes('loginId')
       ) {
         setIdError(true);
-      } else if (
-        errorMessage.includes('비밀번호') ||
-        errorMessage.includes('일치') ||
-        errorMessage.includes('password')
-      ) {
+      } else {
         setPasswordError(true);
       }
       return;
