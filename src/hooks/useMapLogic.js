@@ -362,6 +362,7 @@ export const useMapLogic = (mapRef) => {
           isLiked: item.isLiked,
           ...detail,
           placeId: item.placeId,
+          partnerships: item.partnerships,
         });
       }
     } else {

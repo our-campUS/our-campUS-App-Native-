@@ -12,11 +12,13 @@ import LikedIcon from '../../../assets/Liked.svg';
 import UnlikedIcon from '../../../assets/Unliked.svg';
 
 import { togglePlaceLike } from '../../api/place';
+import useAuthStore from '../../store/authStore';
 import {
   formatDistance,
   calculateWalkingTime,
   calculateDistanceInMeters,
 } from '../../utils/distance';
+
 
 const StoreListItem = ({
   item,
@@ -27,6 +29,7 @@ const StoreListItem = ({
   onLikeToggle,
   showToast,
 }) => {
+  const user = useAuthStore((state) => state.user);
   const [isLiked, setIsLiked] = useState(!!item.isLiked);
 
   useEffect(() => {
@@ -104,18 +107,30 @@ const StoreListItem = ({
           </Pressable>
         </View>
 
-        {(tags.length > 0 || item.partnerships?.length > 0) && (
+        {(tags.length > 0 || item.partnerships?.length > 0 || item.councilType) && (
           <View style={styles.tagRow}>
             {tags.map((tag, index) => (
               <View key={`tag-${index}`} style={styles.badge}>
                 <Text style={styles.badgeText}>{tag}</Text>
               </View>
             ))}
-            {item.partnerships?.map((p) => (
-              <View key={`partner-${p.postId}`} style={styles.badge}>
-                <Text style={styles.badgeText}>{p.councilName}</Text>
-              </View>
-            ))}
+            {item.partnerships?.length > 0
+              ? item.partnerships.map((p) => (
+                  <View key={`partner-${p.postId}`} style={styles.badge}>
+                    <Text style={styles.badgeText}>{p.councilName}</Text>
+                  </View>
+                ))
+              : item.councilType && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {item.councilType === 'MAJOR_COUNCIL'
+                        ? user?.majorName
+                        : item.councilType === 'COLLEGE_COUNCIL'
+                        ? user?.collegeName
+                        : user?.schoolName || '학생회'}
+                    </Text>
+                  </View>
+                )}
           </View>
         )}
 

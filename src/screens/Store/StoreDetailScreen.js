@@ -23,6 +23,7 @@ import {
 } from '@api/place';
 import Toast from '@components/common/Toast';
 import useToast from '../../hooks/useToast';
+import useAuthStore from '../../store/authStore';
 import { getReviewList } from '@api/review';
 
 import LabelTitle from '@components/LabelTitle';
@@ -65,11 +66,7 @@ const StoreDetailScreen = () => {
     PARTNER: '제휴',
   };
 
-  const COUNCIL_NAME_MAP = {
-    SCHOOL_COUNCIL: '총학생회',
-    COLLEGE_COUNCIL: '단과대 학생회',
-    MAJOR_COUNCIL: '학과 학생회',
-  };
+  const user = useAuthStore((state) => state.user);
 
   const COUNCIL_TYPE_TO_TAB = {
     SCHOOL_COUNCIL: 'school',
@@ -113,7 +110,15 @@ const StoreDetailScreen = () => {
             .filter((p) => p.councilName)
             .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
         : paramStore.councilType
-        ? [{ councilName: COUNCIL_NAME_MAP[paramStore.councilType] || '학생회', councilType: paramStore.councilType }]
+        ? [{
+            councilName:
+              paramStore.councilType === 'MAJOR_COUNCIL'
+                ? user?.majorName
+                : paramStore.councilType === 'COLLEGE_COUNCIL'
+                ? user?.collegeName
+                : user?.schoolName || '학생회',
+            councilType: paramStore.councilType,
+          }]
         : [],
 
     backendPlaceId:
