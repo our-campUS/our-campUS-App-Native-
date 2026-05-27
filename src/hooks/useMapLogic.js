@@ -362,6 +362,8 @@ export const useMapLogic = (mapRef) => {
           isLiked: item.isLiked,
           ...detail,
           placeId: item.placeId,
+          postId: item.postId,
+          councilType: item.councilType,
           partnerships: item.partnerships,
         });
       }

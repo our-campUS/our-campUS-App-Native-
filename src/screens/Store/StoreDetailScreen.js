@@ -108,7 +108,7 @@ const StoreDetailScreen = () => {
       paramStore.partnerships?.length > 0
         ? paramStore.partnerships
             .filter((p) => p.councilName)
-            .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
+            .map((p) => ({ councilName: p.councilName, councilType: p.councilType, postId: p.postId }))
         : paramStore.councilType
         ? [{
             councilName:
@@ -118,6 +118,7 @@ const StoreDetailScreen = () => {
                 ? user?.collegeName
                 : user?.schoolName || '학생회',
             councilType: paramStore.councilType,
+            postId: paramStore.postId,
           }]
         : [],
 
@@ -262,7 +263,7 @@ const StoreDetailScreen = () => {
               setPartnerTags(
                 status.partnerships
                   .filter((p) => p.councilName)
-                  .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
+                  .map((p) => ({ councilName: p.councilName, councilType: p.councilType, postId: p.postId }))
               );
             }
             if (status.telephone || status.phone) {
@@ -426,14 +427,22 @@ const StoreDetailScreen = () => {
                     key={index}
                     style={styles.partnerTag}
                     onPress={() => {
+                      const resolvedPostId = tag.postId || storeData.postId;
                       const tabId = COUNCIL_TYPE_TO_TAB[tag.councilType] || 'school';
-                      navigation.navigate('MainTab', {
-                        screen: 'Partnership',
-                        params: {
-                          screen: 'AffiliationMainScreen',
-                          params: { initialTab: tabId },
-                        },
-                      });
+                      if (resolvedPostId) {
+                        navigation.navigate('AffiliationDetailScreen', {
+                          item: { postId: resolvedPostId },
+                          councilType: tag.councilType,
+                        });
+                      } else {
+                        navigation.navigate('MainTab', {
+                          screen: 'Partnership',
+                          params: {
+                            screen: 'AffiliationMainScreen',
+                            params: { initialTab: tabId },
+                          },
+                        });
+                      }
                     }}
                   >
                     <Text style={styles.partnerTagText}>{tag.councilName}</Text>
