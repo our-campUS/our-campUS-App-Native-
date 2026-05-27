@@ -16,8 +16,7 @@ import { useState, useEffect } from 'react';
 import { parseISODate } from '../../utils/dateTime';
 import MajorInputModal from '../../components/majorInputModal';
 import Button from '../../components/Button';
-import UniversityInputModal from '../../components/UniversityInputModal';
-import { searchCollege } from '../../api/signUp';
+import { searchUniversity } from '../../api/signUp';
 import { editAcademicInfo } from '../../api/user';
 import ScholarChangeConfirmBottomSheet from '../../components/MyPage/ScholarChangeConfirmBottomSheet';
 import Toast from '../../components/common/Toast';
@@ -29,17 +28,29 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
   const { toastVisible, toastMessage, showToast, hideToast } = useToast();
   const [isMajorInputModalVisible, setIsMajorInputModalVisible] =
     useState(false);
-  const [isUniversityInputModalVisible, setIsUniversityInputModalVisible] =
-    useState(false);
-  const [major, setMajor] = useState(null);
+  const [major, setMajor] = useState(user?.majorName || null);
   const [majorId, setMajorId] = useState(null);
-  const [university, setUniversity] = useState(null);
+  const [university] = useState('중앙대학교');
   const [universityId, setUniversityId] = useState(null);
-  const [department, setDepartment] = useState(null);
+  const [department, setDepartment] = useState(user?.collegeName || null);
   const [departmentId, setDepartmentId] = useState(null);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [isConfirmBottomSheetVisible, setIsConfirmBottomSheetVisible] =
     useState(false);
+  useEffect(() => {
+    const fetchUniversityId = async () => {
+      try {
+        const result = await searchUniversity('중앙대학교');
+        if (result && result.length > 0) {
+          setUniversityId(result[0].schoolId);
+        }
+      } catch (error) {
+        // silent
+      }
+    };
+    fetchUniversityId();
+  }, []);
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -59,14 +70,6 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
       keyboardDidHideListener.remove();
     };
   }, []);
-
-  const matchCollege = async (schoolId, majorName) => {
-    console.log('matchCollege called');
-    console.log('schoolId:', schoolId);
-    console.log('majorName:', majorName);
-    const result = await searchCollege(schoolId, majorName);
-    console.log('✅ Match College Response:', result);
-  };
 
   // const handleFinalSignUpSubmit = async () => {
   //   const result = await editAcademicInfo(universityId, majorId);
@@ -139,12 +142,9 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
               title="대학교"
               useTitle={true}
               placeholder="학교 이름을 입력해주세요"
-              useMagnifyingGlass={true}
               value={university}
-              usePopUPModal={true}
-              onPressPopUPModal={() => {
-                setIsUniversityInputModalVisible(true);
-              }}
+              disabled={true}
+              additionalStyle={{ backgroundColor: colors.gray[250] }}
             />
             <Input
               title="단과 대학"
@@ -228,17 +228,6 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
             setDepartment(selectedMajor.collegeName);
             setDepartmentId(selectedMajor.collegeId);
             setIsMajorInputModalVisible(false);
-          }}
-        />
-      )}
-      {isUniversityInputModalVisible && (
-        <UniversityInputModal
-          onClose={() => setIsUniversityInputModalVisible(false)}
-          onSelect={(selectedUniversity) => {
-            console.log('✅ Selected University:', selectedUniversity);
-            setUniversity(selectedUniversity.schoolName);
-            setUniversityId(selectedUniversity.schoolId);
-            setIsUniversityInputModalVisible(false);
           }}
         />
       )}
