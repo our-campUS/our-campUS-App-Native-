@@ -42,6 +42,8 @@ const StarItem = ({ filled, onPress, size = 28 }) => (
   </TouchableOpacity>
 );
 
+const MAX_PHOTOS = 10;
+
 const WriteReviewScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -83,9 +85,14 @@ const WriteReviewScreen = () => {
   );
 
   const handleOpenGallery = async () => {
+    const remaining = MAX_PHOTOS - photos.length;
+    if (remaining <= 0) {
+      showToast('사진은 최대 10장까지 첨부할 수 있어요.');
+      return;
+    }
     const result = await launchImageLibrary({
       mediaType: 'photo',
-      selectionLimit: 10,
+      selectionLimit: remaining,
     });
     if (!result.didCancel && result.assets?.length) {
       setPhotos((prev) => [
@@ -118,7 +125,7 @@ const WriteReviewScreen = () => {
     return presignedUrls.map((p) => p.imageUrl);
   };
 
-  const isValid = reviewText.length >= 20 && rating > 0;
+  const isValid = rating > 0;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -268,15 +275,8 @@ const WriteReviewScreen = () => {
               }}
             />
 
-            <Text
-              style={[
-                styles.charCount,
-                reviewText.length >= 20 && styles.charCountValid,
-              ]}
-            >
-              {reviewText.length === 0
-                ? '최소 20자 이상'
-                : `${reviewText.length}/1000`}
+            <Text style={styles.charCount}>
+              {reviewText.length}/1000
             </Text>
           </View>
 
@@ -399,10 +399,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginTop: 8,
   },
-  charCountValid: {
-    color: theme.colors.text,
-  },
-
   photoScroll: {
     flexGrow: 0,
     marginBottom: 20,
