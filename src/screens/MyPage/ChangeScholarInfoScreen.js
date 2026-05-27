@@ -20,13 +20,13 @@ import UniversityInputModal from '../../components/UniversityInputModal';
 import { searchCollege } from '../../api/signUp';
 import { editAcademicInfo } from '../../api/user';
 import ScholarChangeConfirmBottomSheet from '../../components/MyPage/ScholarChangeConfirmBottomSheet';
-import useToastStore from '../../store/toastStore';
-import CustomToast from '../../components/CustomToast';
+import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 import useAuthStore from '../../store/authStore';
 
 const ChangeScholarInfoScreen = ({ navigation, route }) => {
   const { user } = useAuthStore();
-  const { showToast, hideToast } = useToastStore();
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
   const [isMajorInputModalVisible, setIsMajorInputModalVisible] =
     useState(false);
   const [isUniversityInputModalVisible, setIsUniversityInputModalVisible] =
@@ -82,19 +82,19 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
   const handleChangeScholarInfo = async () => {
     const result = await editAcademicInfo(universityId, majorId);
     if (result.success) {
-      showToast('학적정보 변경이 완료되었습니다.', 'success');
+      useAuthStore.getState().updateUser({
+        schoolName: university,
+        collegeName: department,
+        majorName: major,
+        nextUpdateAvailableDate: result.nextUpdateAvailableDate,
+      });
+      showToast('학적정보 변경이 완료되었습니다.');
       setTimeout(() => {
-        useAuthStore.getState().updateUser({
-          schoolName: university,
-          collegeName: department,
-          majorName: major,
-          nextUpdateAvailableDate: result.nextUpdateAvailableDate,
-        });
         hideToast();
         navigation.goBack();
-      }, 300);
+      }, 1500);
     } else {
-      showToast('학적정보 변경에 실패하였습니다.', 'error');
+      showToast('학적정보 변경에 실패하였습니다.');
     }
     setIsConfirmBottomSheetVisible(false);
   };
@@ -211,7 +211,12 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
             />
           </View>
         </ScrollView>
-        <CustomToast />
+        <Toast
+          message={toastMessage}
+          visible={toastVisible}
+          onHide={hideToast}
+          hasNavBar={false}
+        />
       </SafeAreaView>
       {isMajorInputModalVisible && (
         <MajorInputModal
