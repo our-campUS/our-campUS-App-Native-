@@ -1,19 +1,18 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-import Vector2 from '../../../assets/Vector2.svg';
-import CalendarIcon from '../../../assets/calendar.svg';
-import { useEffect } from 'react';
+import PinIcon from '@assets/icons/common/pin.svg';
+import ArrowRightIcon from '@assets/ArrowRightIcon.svg';
+import CalendarIcon from '@assets/calendar.svg';
 import useAuthStore from '../../store/authStore';
 import { parseISODate } from '../../utils/dateTime';
 
 const styles = StyleSheet.create({
   container: {
-    minWidth: 255,
-    height: 147,
+    width: 270,
     backgroundColor: colors.common.white,
     paddingHorizontal: 30,
-    paddingVertical: 20,
+    paddingVertical: 30,
     borderRadius: 20,
   },
   activityTypeContainer: {
@@ -36,41 +35,46 @@ const styles = StyleSheet.create({
   activeOrangeActivityType: {
     color: colors.orange[600],
   },
+  contentWrapper: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 8,
+    alignSelf: 'stretch',
+    marginTop: 12,
+  },
   title: {
     ...typography.heading5,
     color: colors.gray[850],
-    marginTop: 12,
   },
   bottomContainer: {
-    // backgroundColor: 'red',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'flex-start',
-    // gap: 4,
-    marginTop: 8,
+    gap: 4,
+    alignSelf: 'stretch',
   },
   placeContainer: {
-    // backgroundColor: 'blue',
-    // flex: 1,
+    flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
-    gap: 8,
+    gap: 4,
     alignItems: 'center',
   },
   place: {
+    flexShrink: 1,
     ...typography.body4Regular,
     color: colors.gray[700],
   },
   dateContainer: {
-    // backgroundColor: 'blue',
-    // flex: 1,
+    flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
-    gap: 8,
+    gap: 4,
     alignItems: 'center',
-    marginLeft: -4,
   },
   date: {
+    flexShrink: 1,
     ...typography.body4Regular,
     color: colors.gray[700],
-    marginLeft: -4,
   },
 });
 
@@ -81,10 +85,6 @@ const AffiliationCarouselItem = ({
   councilType = null,
 }) => {
   const { user } = useAuthStore();
-
-  useEffect(() => {
-    console.log('user', user);
-  }, [user]);
 
   return (
     <Pressable
@@ -114,42 +114,41 @@ const AffiliationCarouselItem = ({
         >
           {item.activityType || '행사'}
         </Text>
-        <Text
-          style={[
-            styles.activityType,
-            isOrange && styles.activeOrangeActivityType,
-          ]}
-        >
-          {'>'}
-        </Text>
+        <ArrowRightIcon
+          width={4}
+          height={7}
+          color={isOrange ? colors.orange[600] : colors.blue[600]}
+        />
       </View>
-      <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-        {item.title}
-      </Text>
-      <View style={styles.bottomContainer}>
-        <View style={styles.placeContainer}>
-          <Vector2 width={9.6} height={12.4} color={colors.gray[300]} />
-          <Text style={styles.place} numberOfLines={1} ellipsizeMode="tail">
-            {item.place || item.placeName} {item.detailedLocation}
-          </Text>
-        </View>
-        <View style={styles.dateContainer}>
-          <CalendarIcon width={18} height={18} color={colors.gray[300]} />
-          <Text style={styles.date} numberOfLines={1} ellipsizeMode="tail">
-            {(() => {
-              const p = parseISODate(item?.dateTime || item?.endDateTime);
-              if (!p) return '';
-              const mm = String(p.month).padStart(2, '0');
-              const dd = String(p.day).padStart(2, '0');
-              const time =
-                p.hour !== null
-                  ? ` ${String(p.hour).padStart(2, '0')}:${String(
-                      p.minute
-                    ).padStart(2, '0')}`
-                  : '';
-              return `${p.year}.${mm}.${dd}${time}`;
-            })()}
-          </Text>
+      <View style={styles.contentWrapper}>
+        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+          {item.title}
+        </Text>
+        <View style={styles.bottomContainer}>
+          <View style={styles.placeContainer}>
+            <PinIcon color={colors.gray[300]} />
+            <Text style={styles.place} numberOfLines={1} ellipsizeMode="tail">
+              {item.place || item.placeName} {item.detailedLocation}
+            </Text>
+          </View>
+          <View style={styles.dateContainer}>
+            <CalendarIcon width={18} height={18} color={colors.gray[300]} />
+            <Text style={styles.date} numberOfLines={1} ellipsizeMode="tail">
+              {(() => {
+                const p = parseISODate(item?.dateTime || item?.endDateTime);
+                if (!p) return '';
+                const mm = String(p.month).padStart(2, '0');
+                const dd = String(p.day).padStart(2, '0');
+                const time =
+                  p.hour !== null
+                    ? ` ${String(p.hour).padStart(2, '0')}:${String(
+                        p.minute
+                      ).padStart(2, '0')}`
+                    : '';
+                return `${p.year}.${mm}.${dd}${time}`;
+              })()}
+            </Text>
+          </View>
         </View>
       </View>
     </Pressable>
