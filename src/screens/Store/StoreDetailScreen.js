@@ -334,7 +334,7 @@ const StoreDetailScreen = () => {
       <View style={styles.contentContainer}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 50 }}
+          contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.bannerContainer}>
             {storeData.imgUrls && storeData.imgUrls.length > 0 ? (
@@ -856,6 +856,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
+  scrollContent: {
+    paddingBottom: 100,
+  },
   bottomButtonContainer: {
     position: 'absolute',
     bottom: 0,
