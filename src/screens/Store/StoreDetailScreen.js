@@ -23,6 +23,7 @@ import {
 } from '@api/place';
 import Toast from '@components/common/Toast';
 import useToast from '../../hooks/useToast';
+import useAuthStore from '../../store/authStore';
 import { getReviewList } from '@api/review';
 
 import LabelTitle from '@components/LabelTitle';
@@ -65,11 +66,7 @@ const StoreDetailScreen = () => {
     PARTNER: '제휴',
   };
 
-  const COUNCIL_NAME_MAP = {
-    SCHOOL_COUNCIL: '총학생회',
-    COLLEGE_COUNCIL: '단과대 학생회',
-    MAJOR_COUNCIL: '학과 학생회',
-  };
+  const user = useAuthStore((state) => state.user);
 
   const COUNCIL_TYPE_TO_TAB = {
     SCHOOL_COUNCIL: 'school',
@@ -111,9 +108,18 @@ const StoreDetailScreen = () => {
       paramStore.partnerships?.length > 0
         ? paramStore.partnerships
             .filter((p) => p.councilName)
-            .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
+            .map((p) => ({ councilName: p.councilName, councilType: p.councilType, postId: p.postId }))
         : paramStore.councilType
-        ? [{ councilName: COUNCIL_NAME_MAP[paramStore.councilType] || '학생회', councilType: paramStore.councilType }]
+        ? [{
+            councilName:
+              paramStore.councilType === 'MAJOR_COUNCIL'
+                ? user?.majorName
+                : paramStore.councilType === 'COLLEGE_COUNCIL'
+                ? user?.collegeName
+                : user?.schoolName || '학생회',
+            councilType: paramStore.councilType,
+            postId: paramStore.postId,
+          }]
         : [],
 
     backendPlaceId:
@@ -257,7 +263,7 @@ const StoreDetailScreen = () => {
               setPartnerTags(
                 status.partnerships
                   .filter((p) => p.councilName)
-                  .map((p) => ({ councilName: p.councilName, councilType: p.councilType }))
+                  .map((p) => ({ councilName: p.councilName, councilType: p.councilType, postId: p.postId }))
               );
             }
             if (status.telephone || status.phone) {
@@ -329,7 +335,7 @@ const StoreDetailScreen = () => {
       <View style={styles.contentContainer}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 50 }}
+          contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.bannerContainer}>
             {storeData.imgUrls && storeData.imgUrls.length > 0 ? (
@@ -421,14 +427,22 @@ const StoreDetailScreen = () => {
                     key={index}
                     style={styles.partnerTag}
                     onPress={() => {
+                      const resolvedPostId = tag.postId || storeData.postId;
                       const tabId = COUNCIL_TYPE_TO_TAB[tag.councilType] || 'school';
-                      navigation.navigate('MainTab', {
-                        screen: 'Partnership',
-                        params: {
-                          screen: 'AffiliationMainScreen',
-                          params: { initialTab: tabId },
-                        },
-                      });
+                      if (resolvedPostId) {
+                        navigation.navigate('AffiliationDetailScreen', {
+                          item: { postId: resolvedPostId },
+                          councilType: tag.councilType,
+                        });
+                      } else {
+                        navigation.navigate('MainTab', {
+                          screen: 'Partnership',
+                          params: {
+                            screen: 'AffiliationMainScreen',
+                            params: { initialTab: tabId },
+                          },
+                        });
+                      }
                     }}
                   >
                     <Text style={styles.partnerTagText}>{tag.councilName}</Text>
@@ -851,6 +865,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
+  scrollContent: {
+    paddingBottom: 100,
+  },
   bottomButtonContainer: {
     position: 'absolute',
     bottom: 0,

@@ -16,30 +16,41 @@ import { useState, useEffect } from 'react';
 import { parseISODate } from '../../utils/dateTime';
 import MajorInputModal from '../../components/majorInputModal';
 import Button from '../../components/Button';
-import UniversityInputModal from '../../components/UniversityInputModal';
-import { searchCollege } from '../../api/signUp';
+import { searchUniversity } from '../../api/signUp';
 import { editAcademicInfo } from '../../api/user';
 import ScholarChangeConfirmBottomSheet from '../../components/MyPage/ScholarChangeConfirmBottomSheet';
-import useToastStore from '../../store/toastStore';
-import CustomToast from '../../components/CustomToast';
+import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 import useAuthStore from '../../store/authStore';
 
 const ChangeScholarInfoScreen = ({ navigation, route }) => {
   const { user } = useAuthStore();
-  const { showToast, hideToast } = useToastStore();
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
   const [isMajorInputModalVisible, setIsMajorInputModalVisible] =
     useState(false);
-  const [isUniversityInputModalVisible, setIsUniversityInputModalVisible] =
-    useState(false);
-  const [major, setMajor] = useState(null);
+  const [major, setMajor] = useState(user?.majorName || null);
   const [majorId, setMajorId] = useState(null);
-  const [university, setUniversity] = useState(null);
+  const [university] = useState('중앙대학교');
   const [universityId, setUniversityId] = useState(null);
-  const [department, setDepartment] = useState(null);
+  const [department, setDepartment] = useState(user?.collegeName || null);
   const [departmentId, setDepartmentId] = useState(null);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [isConfirmBottomSheetVisible, setIsConfirmBottomSheetVisible] =
     useState(false);
+  useEffect(() => {
+    const fetchUniversityId = async () => {
+      try {
+        const result = await searchUniversity('중앙대학교');
+        if (result && result.length > 0) {
+          setUniversityId(result[0].schoolId);
+        }
+      } catch (error) {
+        showToast('학교 정보를 불러오지 못했습니다. 다시 시도해주세요.');
+      }
+    };
+    fetchUniversityId();
+  }, [showToast]);
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -60,14 +71,6 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
     };
   }, []);
 
-  const matchCollege = async (schoolId, majorName) => {
-    console.log('matchCollege called');
-    console.log('schoolId:', schoolId);
-    console.log('majorName:', majorName);
-    const result = await searchCollege(schoolId, majorName);
-    console.log('✅ Match College Response:', result);
-  };
-
   // const handleFinalSignUpSubmit = async () => {
   //   const result = await editAcademicInfo(universityId, majorId);
   //   console.log('✅ Final Sign Up Submit Response:', result);
@@ -82,19 +85,19 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
   const handleChangeScholarInfo = async () => {
     const result = await editAcademicInfo(universityId, majorId);
     if (result.success) {
-      showToast('학적정보 변경이 완료되었습니다.', 'success');
+      useAuthStore.getState().updateUser({
+        schoolName: university,
+        collegeName: department,
+        majorName: major,
+        nextUpdateAvailableDate: result.nextUpdateAvailableDate,
+      });
+      showToast('학적정보 변경이 완료되었습니다.');
       setTimeout(() => {
-        useAuthStore.getState().updateUser({
-          schoolName: university,
-          collegeName: department,
-          majorName: major,
-          nextUpdateAvailableDate: result.nextUpdateAvailableDate,
-        });
         hideToast();
         navigation.goBack();
-      }, 300);
+      }, 1500);
     } else {
-      showToast('학적정보 변경에 실패하였습니다.', 'error');
+      showToast('학적정보 변경에 실패하였습니다.');
     }
     setIsConfirmBottomSheetVisible(false);
   };
@@ -139,12 +142,9 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
               title="대학교"
               useTitle={true}
               placeholder="학교 이름을 입력해주세요"
-              useMagnifyingGlass={true}
               value={university}
-              usePopUPModal={true}
-              onPressPopUPModal={() => {
-                setIsUniversityInputModalVisible(true);
-              }}
+              disabled={true}
+              additionalStyle={{ backgroundColor: colors.gray[250] }}
             />
             <Input
               title="단과 대학"
@@ -211,7 +211,12 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
             />
           </View>
         </ScrollView>
-        <CustomToast />
+        <Toast
+          message={toastMessage}
+          visible={toastVisible}
+          onHide={hideToast}
+          hasNavBar={false}
+        />
       </SafeAreaView>
       {isMajorInputModalVisible && (
         <MajorInputModal
@@ -223,17 +228,6 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
             setDepartment(selectedMajor.collegeName);
             setDepartmentId(selectedMajor.collegeId);
             setIsMajorInputModalVisible(false);
-          }}
-        />
-      )}
-      {isUniversityInputModalVisible && (
-        <UniversityInputModal
-          onClose={() => setIsUniversityInputModalVisible(false)}
-          onSelect={(selectedUniversity) => {
-            console.log('✅ Selected University:', selectedUniversity);
-            setUniversity(selectedUniversity.schoolName);
-            setUniversityId(selectedUniversity.schoolId);
-            setIsUniversityInputModalVisible(false);
           }}
         />
       )}

@@ -19,6 +19,7 @@ import theme from '../../style';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import PartialStar from '../../components/review/PartialStar';
+import BadgeIcon from '@assets/badgeIcon.svg';
 
 import { getReviewList } from '../../api/review';
 
@@ -131,6 +132,9 @@ const ReviewListScreen = () => {
     <SafeAreaView style={styles.container}>
       <LabelTitle
         title={storeName}
+        titleIcon={
+          store?.isPartner ? <BadgeIcon width={18} height={18} /> : null
+        }
         useBackButton={true}
         onPressBack={() => navigation.goBack()}
         additionalStyle={{ marginBottom: 10 }}

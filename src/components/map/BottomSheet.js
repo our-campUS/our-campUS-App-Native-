@@ -19,6 +19,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEIGHT_LIST = SCREEN_HEIGHT * 0.45;
 const HEIGHT_ITEM = 280;
 const HEIGHT_HIDDEN = 0;
+const HANDLE_BAR_HEIGHT = 36;
 
 const BottomSheet = ({
   displayedMarkers,
@@ -39,6 +40,18 @@ const BottomSheet = ({
 
   const startHeight = useRef(0);
   const [isScrollable, setIsScrollable] = useState(false);
+  const [pinItemHeight, setPinItemHeight] = useState(0);
+
+  useEffect(() => {
+    if (isPinSelected && pinItemHeight > 0) {
+      Animated.spring(sheetHeight, {
+        toValue: pinItemHeight + HANDLE_BAR_HEIGHT,
+        useNativeDriver: false,
+        friction: 8,
+        tension: 40,
+      }).start();
+    }
+  }, [isPinSelected, pinItemHeight, sheetHeight]);
 
   const SNAP_POINTS = {
     HIDDEN: HEIGHT_HIDDEN,
@@ -105,23 +118,25 @@ const BottomSheet = ({
       </View>
 
       {isPinSelected ? (
-        <StoreListItem
-          item={displayedMarkers[0]}
-          userLocation={userLocation}
-          onPress={() => {
-            onItemPress(displayedMarkers[0].placeId);
-            navigation.navigate('StoreDetailScreen', {
-              store: displayedMarkers[0],
-              onUpdatePlace: (oldId, newData) => {
-                if (onUpdateStore) onUpdateStore(oldId, newData);
-              },
-            });
-          }}
-          onLikeToggle={(placeId, newData) => {
-            if (onUpdateStore) onUpdateStore(placeId, newData);
-          }}
-          showToast={showToast}
-        />
+        <View onLayout={(e) => setPinItemHeight(e.nativeEvent.layout.height)}>
+          <StoreListItem
+            item={displayedMarkers[0]}
+            userLocation={userLocation}
+            onPress={() => {
+              onItemPress(displayedMarkers[0].placeId);
+              navigation.navigate('StoreDetailScreen', {
+                store: displayedMarkers[0],
+                onUpdatePlace: (oldId, newData) => {
+                  if (onUpdateStore) onUpdateStore(oldId, newData);
+                },
+              });
+            }}
+            onLikeToggle={(placeId, newData) => {
+              if (onUpdateStore) onUpdateStore(placeId, newData);
+            }}
+            showToast={showToast}
+          />
+        </View>
       ) : (
         <FlatList
           data={displayedMarkers}
