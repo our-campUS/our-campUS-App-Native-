@@ -125,7 +125,7 @@ const WriteReviewScreen = () => {
     return presignedUrls.map((p) => p.imageUrl);
   };
 
-  const isValid = rating > 0;
+  const isValid = rating > 0 && reviewText.trim().length >= 1;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {

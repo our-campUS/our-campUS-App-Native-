@@ -45,11 +45,11 @@ const ChangeScholarInfoScreen = ({ navigation, route }) => {
           setUniversityId(result[0].schoolId);
         }
       } catch (error) {
-        // silent
+        showToast('학교 정보를 불러오지 못했습니다. 다시 시도해주세요.');
       }
     };
     fetchUniversityId();
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(

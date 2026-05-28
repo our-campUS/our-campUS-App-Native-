@@ -124,9 +124,9 @@ const StoreListItem = ({
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>
                       {item.councilType === 'MAJOR_COUNCIL'
-                        ? user?.majorName
+                        ? user?.majorName || '학과 학생회'
                         : item.councilType === 'COLLEGE_COUNCIL'
-                        ? user?.collegeName
+                        ? user?.collegeName || '단과대 학생회'
                         : user?.schoolName || '학생회'}
                     </Text>
                   </View>
