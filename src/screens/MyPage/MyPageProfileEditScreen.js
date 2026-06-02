@@ -25,13 +25,25 @@ import {
   convertToPng,
   uploadImageToPresignedUrl,
 } from '@api/uploadImage';
+import useImagePicker from '@/hooks/useImagePicker';
 
-const MyPageProfileEditScreen = ({ navigation, route }) => {
+const MyPageProfileEditScreen = ({ navigation }) => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const [iosProfileImage, setIosProfileImage] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const { pickImage } = useImagePicker({
+    onSelectImages: (images) => {
+      if (images && images.length > 0) {
+        setSelectedImage(images[0]);
+      }
+    },
+    useGallery: true,
+    useCamera: false,
+    selectionLimit: 1,
+  });
 
   useEffect(() => {
     const fetchLatestInfo = async () => {
@@ -51,15 +63,6 @@ const MyPageProfileEditScreen = ({ navigation, route }) => {
       setIosProfileImage(user.profileImage);
     }
   }, [user?.profileImage]);
-
-  // ProfileImageScreen에서 선택한 사진 받기
-  useEffect(() => {
-    if (route.params?.selectedPhoto) {
-      setSelectedImage(route.params.selectedPhoto);
-      // params 초기화 (재진입 시 중복 트리거 방지)
-      navigation.setParams({ selectedPhoto: undefined });
-    }
-  }, [route.params?.selectedPhoto]);
 
   // selectedImage가 변경될 때 이미지 업로드 처리
   useEffect(() => {
@@ -110,7 +113,7 @@ const MyPageProfileEditScreen = ({ navigation, route }) => {
   };
 
   const handleEditProfileImage = () => {
-    navigation.navigate('ProfileImageScreen');
+    pickImage();
   };
 
   return (
