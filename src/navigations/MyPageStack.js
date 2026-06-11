@@ -12,7 +12,6 @@ import InqueryMainScreen from '../screens/MyPage/InqueryMainScreen';
 import CancelMembershipScreen from '../screens/MyPage/CancelMembershipScreen';
 import ChangeScholarInfoScreen from '../screens/MyPage/ChangeScholarInfoScreen';
 import AffiliationLikedScreen from '../screens/Affiliation/AffiliationLikedScreen';
-import ProfileImageScreen from '../screens/MyPage/ProfileImageScreen';
 import WebViewScreen from '../screens/MyPage/WebViewScreen';
 
 const Stack = createNativeStackNavigator();
@@ -83,11 +82,6 @@ const MyPageStack = () => {
       <Stack.Screen
         name="ChangeScholarInfoScreen"
         component={ChangeScholarInfoScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ProfileImageScreen"
-        component={ProfileImageScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
