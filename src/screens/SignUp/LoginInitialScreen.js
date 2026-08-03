@@ -1,12 +1,17 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import Button from '../../components/Button';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
 import { onKakaoLogin } from '../../api/signUp';
+import { reviewerTestLogin } from '../../api/testLogin';
 import { Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../../store/authStore';
 import { useState } from 'react';
+import ReviewerLoginModal from '../../components/common/ReviewerLoginModal';
+
+// 리뷰어 로그인 진입 조건: 로고를 이 시간(ms) 이상 길게 눌러야 함
+const REVIEWER_TRIGGER_LONG_PRESS_MS = 5000;
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -37,6 +42,26 @@ const styles = StyleSheet.create({
 const LoginInitialScreen = ({ navigation }) => {
   const setAuthFromKakao = useAuthStore((state) => state.setAuthFromKakao);
   const [userName, setUserName] = useState(null);
+  const [isReviewerModalVisible, setIsReviewerModalVisible] = useState(false);
+
+  const handleReviewerLogin = async (email) => {
+    const result = await reviewerTestLogin(email);
+    if (result.isValid) {
+      setIsReviewerModalVisible(false);
+      if (result.isProfileNotCompleted) {
+        navigation.navigate('SignUpStack', {
+          screen: 'SignUpFirstScreen',
+          params: {
+            userName: result.nickname,
+          },
+        });
+      } else {
+        useAuthStore.getState().login();
+      }
+    }
+    return result;
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -45,15 +70,27 @@ const LoginInitialScreen = ({ navigation }) => {
       }}
     >
       <View style={{ alignItems: 'center', marginTop: 'auto' }}>
-        <Image
-          source={require('../../../assets/logo.png')}
-          style={{ width: 69.23, height: 82 }}
-        />
+        <Pressable
+          onLongPress={() => setIsReviewerModalVisible(true)}
+          delayLongPress={REVIEWER_TRIGGER_LONG_PRESS_MS}
+          testID="login-logo"
+        >
+          <Image
+            source={require('../../../assets/logo.png')}
+            style={{ width: 69.23, height: 82 }}
+          />
+        </Pressable>
         <Image
           source={require('../../../assets/mainLabel.png')}
           style={{ width: 148.86, height: 33, marginTop: 24 }}
         />
       </View>
+
+      <ReviewerLoginModal
+        visible={isReviewerModalVisible}
+        onClose={() => setIsReviewerModalVisible(false)}
+        onSubmit={handleReviewerLogin}
+      />
 
       <View style={styles.buttonContainer}>
         {Platform.OS === 'ios' && (
