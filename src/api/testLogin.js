@@ -2,7 +2,7 @@ import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
 
 // 앱 심사(리뷰어)용 카카오 우회 로그인 — 스토어 심사 계정 전용 엔드포인트
-const REVIEW_LOGIN_PATH = '/test/login/review-login-c1a2mp93u';
+const REVIEW_LOGIN_PATH = 'test/login/review-login-c1a2mp93u';
 
 export async function reviewerTestLogin(email) {
   try {

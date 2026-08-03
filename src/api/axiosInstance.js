@@ -16,13 +16,14 @@ const PUBLIC_PREFIXES = [
   'search/',
   'storage/presigned',
   'jwt/token/reissue',
+  'test/login',
 ];
 
 // --- 요청 인터셉터: Authorization 헤더 자동 주입 ---
 api.interceptors.request.use((config) => {
-  const isPublic = PUBLIC_PREFIXES.some((prefix) =>
-    config.url?.startsWith(prefix)
-  );
+  // 선행 슬래시 유무와 무관하게 prefix 매칭되도록 정규화
+  const url = config.url?.replace(/^\/+/, '') ?? '';
+  const isPublic = PUBLIC_PREFIXES.some((prefix) => url.startsWith(prefix));
 
   if (!isPublic) {
     const accessToken = useAuthStore.getState().accessToken;
