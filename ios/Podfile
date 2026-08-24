@@ -41,5 +41,17 @@ target 'ourCampusApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Xcode 26.4+ ships a stricter Clang whose consteval checking breaks the
+    # `fmt` headers vendored by glog when compiled as C++20 (fmtlib/fmt#4740).
+    # fmt's own header disables the broken consteval path under C++17
+    # (FMT_CPLUSPLUS < 201709L), so pin glog to C++17 instead of patching fmt.
+    installer.pods_project.targets.each do |target|
+      if ['glog', 'fmt'].include?(target.name)
+        target.build_configurations.each do |config|
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
+      end
+    end
   end
 end
