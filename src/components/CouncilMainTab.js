@@ -6,7 +6,7 @@ import HomeIcon from '../../assets/Vector1.svg';
 import MapIcon from '../../assets/Vector2.svg';
 import PartnershipIcon from '../../assets/Vector3.svg';
 import MyPageIcon from '../../assets/Vector5.svg';
-import ReportIcon from '../../assets/report.svg';
+// import ReportIcon from '../../assets/report.svg'; // TODO: 운영리포트 화면 정식 오픈 시 주석 해제 (#165)
 
 import colors from '../style/colors';
 import typography from '../style/typography';
@@ -22,13 +22,13 @@ import CouncilMainPageStack from '../navigations/Council/CouncilMainPageStack';
 
 const Tab = createBottomTabNavigator();
 
-import WIPScreen from './common/WIPScreen';
+// import WIPScreen from './common/WIPScreen'; // TODO: 운영리포트 화면 정식 오픈 시 주석 해제 (#165)
 
 const ICONS = {
   Home: HomeIcon,
   Map: MapIcon,
   Partnership: PartnershipIcon,
-  Report: ReportIcon,
+  // Report: ReportIcon, // TODO: 운영리포트 화면 정식 오픈 시 주석 해제 (#165)
   MyPage: MyPageIcon,
 };
 
@@ -118,11 +118,12 @@ const CouncilMainTab = () => {
           };
         }}
       />
-      <Tab.Screen
+      {/* TODO: 운영리포트 화면 정식 오픈 시 주석 해제 (iOS 심사 차단 항목, #165) */}
+      {/* <Tab.Screen
         name="Report"
         component={WIPScreen}
         options={{ title: '운영리포트' }}
-      />
+      /> */}
       <Tab.Screen
         name="MyPage"
         component={CouncilMainPageStack}

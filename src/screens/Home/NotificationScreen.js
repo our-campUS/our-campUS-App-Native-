@@ -60,7 +60,9 @@ const NotificationScreen = () => {
         });
         break;
       case 'REWARD_GRANTED':
-        navigation.navigate('MainTab', { screen: 'Stamp' });
+        // TODO: 스탬프 화면 정식 오픈 시 원복
+        // navigation.navigate('MainTab', { screen: 'Stamp' });
+        navigation.navigate('MainTab', { screen: 'Home' });
         break;
       case 'SYSTEM_NOTICE':
       default:
