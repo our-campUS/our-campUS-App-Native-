@@ -55,6 +55,7 @@ const SignUpSecondScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView
       style={{ flex: 1, width: '100%', backgroundColor: '#FFFFFF' }}
+      edges={['left', 'right', 'bottom']}
     >
       <StatusBar style="auto" />
       <LabelTitle

@@ -111,6 +111,7 @@ const VerifyRepresentativeIdCode = ({ navigation, route }) => {
       setVerificationClicked(false);
       setIsValid(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
   const handleResendAuthCode = async () => {
@@ -147,7 +148,7 @@ const VerifyRepresentativeIdCode = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <StatusBar style="auto" />
       <LabelTitle
         title="학생대표자 아이디 찾기"

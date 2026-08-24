@@ -116,7 +116,7 @@ const RepresentativeProof = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="학생회 인증하기"
         useBackButton={true}

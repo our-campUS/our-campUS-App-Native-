@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 import LabelTitle from '@components/LabelTitle';
@@ -105,7 +99,7 @@ const ScanConfirmScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <LabelTitle
         title="리뷰 작성"
         useBackButton={true}
@@ -113,7 +107,7 @@ const ScanConfirmScreen = () => {
       />
 
       {IS_ALREADY_REGISTERED ? renderDuplicateView() : renderSuccessView()}
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
 const FoundRepresentativeId = ({ navigation, route }) => {
   const loginId = route.params?.loginId;
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="학생대표자 아이디 찾기"
         useBackButton={true}

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -68,7 +67,7 @@ const SelectStoreScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={{ marginBottom: 20 }}>
         <LabelTitle
           title="리뷰 작성"
@@ -128,7 +127,7 @@ const SelectStoreScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

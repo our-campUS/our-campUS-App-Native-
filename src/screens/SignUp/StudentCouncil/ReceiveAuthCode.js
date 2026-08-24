@@ -103,6 +103,7 @@ const ReceiveAuthCode = ({ navigation, route }) => {
       setVerificationClicked(false);
       setIsValid(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
   const handleResendAuthCode = async () => {
@@ -139,7 +140,7 @@ const ReceiveAuthCode = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <StatusBar style="auto" />
       <LabelTitle
         title="본인 인증"
