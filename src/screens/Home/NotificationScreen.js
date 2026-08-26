@@ -92,7 +92,7 @@ const NotificationScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="알림함"
         useBackButton
