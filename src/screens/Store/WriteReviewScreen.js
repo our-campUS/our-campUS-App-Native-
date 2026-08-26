@@ -10,6 +10,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -237,7 +238,7 @@ const WriteReviewScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title={editMode ? '리뷰 수정' : '리뷰 작성'}
         useBackButton={true}
@@ -354,7 +355,7 @@ const WriteReviewScreen = () => {
         onHide={hideToast}
         hasNavBar={false}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
