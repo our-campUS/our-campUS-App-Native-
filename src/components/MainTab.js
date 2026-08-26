@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 import HomeIcon from '../../assets/Vector1.svg';
 import MapIcon from '../../assets/Vector2.svg';
 import PartnershipIcon from '../../assets/Vector3.svg';
-import StampIcon from '../../assets/Vector4.svg';
+// import StampIcon from '../../assets/Vector4.svg'; // TODO: 스탬프 화면 정식 오픈 시 주석 해제 (#165)
 import MyPageIcon from '../../assets/Vector5.svg';
 
 import colors from '../style/colors';
@@ -17,7 +17,7 @@ import MapScreen from '../screens/Map/MapScreen';
 import AffiliationSelectStack from '../navigations/AffiliationSelectStack';
 import MapStack from '../navigations/MapStack';
 import MyPageStack from '../navigations/MyPageStack';
-import WIPScreen from './common/WIPScreen';
+// import WIPScreen from './common/WIPScreen'; // TODO: 스탬프 화면 정식 오픈 시 주석 해제 (#165)
 
 const Tab = createBottomTabNavigator();
 
@@ -33,7 +33,7 @@ const ICONS = {
   Home: HomeIcon,
   Map: MapIcon,
   Partnership: PartnershipIcon,
-  Stamp: StampIcon,
+  // Stamp: StampIcon, // TODO: 스탬프 화면 정식 오픈 시 주석 해제 (#165)
   MyPage: MyPageIcon,
 };
 
@@ -116,11 +116,12 @@ const MainTab = () => {
         component={AffiliationSelectStack}
         options={{ title: '제휴 보기' }}
       />
-      <Tab.Screen
+      {/* TODO: 스탬프 화면 정식 오픈 시 주석 해제 (iOS 심사 차단 항목, #165) */}
+      {/* <Tab.Screen
         name="Stamp"
         component={WIPScreen}
         options={{ title: '스탬프' }}
-      />
+      /> */}
       <Tab.Screen
         name="MyPage"
         component={MyPageStack}

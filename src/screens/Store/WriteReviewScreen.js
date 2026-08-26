@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TextInput,
   TouchableOpacity,
   ScrollView,
@@ -11,6 +10,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -153,7 +153,10 @@ const WriteReviewScreen = () => {
           },
         };
 
-        await editReview(existingReview.reviewId || existingReview.id, editPayload);
+        await editReview(
+          existingReview.reviewId || existingReview.id,
+          editPayload
+        );
         showToast('리뷰가 수정되었습니다.');
         navigation.goBack();
       } catch (error) {
@@ -167,7 +170,10 @@ const WriteReviewScreen = () => {
     try {
       const store = route.params?.store;
       const rawPlaceId = route.params?.placeId;
-      const placeId = rawPlaceId && !String(rawPlaceId).startsWith('temp_') ? rawPlaceId : null;
+      const placeId =
+        rawPlaceId && !String(rawPlaceId).startsWith('temp_')
+          ? rawPlaceId
+          : null;
       const isPartnership = store?.isPartnership || store?.isPartner;
       const imageUrls = await uploadPhotos();
 
@@ -232,7 +238,7 @@ const WriteReviewScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title={editMode ? '리뷰 수정' : '리뷰 작성'}
         useBackButton={true}
@@ -275,9 +281,7 @@ const WriteReviewScreen = () => {
               }}
             />
 
-            <Text style={styles.charCount}>
-              {reviewText.length}/1000
-            </Text>
+            <Text style={styles.charCount}>{reviewText.length}/1000</Text>
           </View>
 
           <ScrollView

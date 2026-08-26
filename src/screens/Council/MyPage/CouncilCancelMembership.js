@@ -87,10 +87,11 @@ const CouncilCancelMembershipScreen = ({ navigation }) => {
                 탈퇴 즉시 7일 이내에는 동일 계정으로 다시 가입할 수 없습니다.
               </Text>
             </View>
+            {/* TODO: 스탬프 기능 복구 시 아래 주석 해제 (iOS 심사 차단 항목, #165)
             <View style={styles.noticeItem}>
               <Text style={styles.noticeItemBullet}>•</Text>
-              <Text style={styles.noticeItemText}>스탬프 소멸됩니다.</Text>
-            </View>
+              <Text style={styles.noticeItemText}>스탬프가 소멸됩니다.</Text>
+            </View> */}
           </View>
           <View style={styles.noticCheckWrapper}>
             <Pressable

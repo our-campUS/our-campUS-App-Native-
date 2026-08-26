@@ -60,7 +60,9 @@ const NotificationScreen = () => {
         });
         break;
       case 'REWARD_GRANTED':
-        navigation.navigate('MainTab', { screen: 'Stamp' });
+        // TODO: 스탬프 화면 정식 오픈 시 원복
+        // navigation.navigate('MainTab', { screen: 'Stamp' });
+        navigation.navigate('MainTab', { screen: 'Home' });
         break;
       case 'SYSTEM_NOTICE':
       default:
@@ -90,7 +92,7 @@ const NotificationScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="알림함"
         useBackButton

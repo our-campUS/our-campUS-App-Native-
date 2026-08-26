@@ -103,6 +103,7 @@ const ReceiveAuthCodeForPassword = ({ navigation, route }) => {
       setVerificationClicked(false);
       setIsValid(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
   // 인증번호 재전송 버튼 클릭 핸들러
@@ -140,7 +141,7 @@ const ReceiveAuthCodeForPassword = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <StatusBar style="auto" />
       <LabelTitle
         title="학생대표자 비밀번호 찾기"

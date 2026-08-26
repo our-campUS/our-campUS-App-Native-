@@ -44,7 +44,7 @@ const FindRepresentativePassword = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <LabelTitle
         title="학생대표자 비밀번호 찾기"
         useBackButton={true}

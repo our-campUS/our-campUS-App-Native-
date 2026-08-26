@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -129,7 +128,7 @@ const ReviewListScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <LabelTitle
         title={storeName}
         titleIcon={
@@ -190,7 +189,7 @@ const ReviewListScreen = () => {
         }}
       />
       */}
-    </SafeAreaView>
+    </View>
   );
 };
 

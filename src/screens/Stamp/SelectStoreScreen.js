@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -62,12 +61,13 @@ const SelectStoreScreen = () => {
 
   const handleNext = () => {
     if (selectedStoreId) {
-      navigation.navigate('CameraScanScreen', { storeId: selectedStoreId });
+      // TODO: OCR 미구현 - 스탬프/스캔 플로우 복구 시 아래 주석 해제 (iOS 심사 차단 항목, #165)
+      // navigation.navigate('CameraScanScreen', { storeId: selectedStoreId });
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={{ marginBottom: 20 }}>
         <LabelTitle
           title="리뷰 작성"
@@ -127,7 +127,7 @@ const SelectStoreScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
