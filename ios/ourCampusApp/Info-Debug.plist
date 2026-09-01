@@ -45,10 +45,21 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<!-- 개발 서버(158.179.193.224:8080)가 HTTP만 지원하여 Debug 빌드에서만 예외 허용. Release는 Info.plist(예외 없음) 사용 -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>158.179.193.224</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>학생회 인증을 위해 사진 촬영이 필요합니다.</string>
