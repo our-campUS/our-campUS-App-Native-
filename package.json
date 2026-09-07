@@ -12,6 +12,7 @@
     "start": "react-native start",
     "test": "jest",
     "version:bump:android": "node scripts/bump-android-version-code.js",
+    "version:bump:ios": "node scripts/bump-ios-build-number.js",
     "android:release": "node scripts/android-release.js",
     "prepare": "husky"
   },
