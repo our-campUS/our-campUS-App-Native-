@@ -14,6 +14,7 @@
     "version:bump:android": "node scripts/bump-android-version-code.js",
     "version:bump:ios": "node scripts/bump-ios-build-number.js",
     "android:release": "node scripts/android-release.js",
+    "check:ios-info-plist-sync": "node scripts/check-ios-info-plist-sync.js",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -23,6 +24,9 @@
     ],
     "*.{json,md}": [
       "prettier --write"
+    ],
+    "ios/ourCampusApp/Info{,-Debug}.plist": [
+      "node scripts/check-ios-info-plist-sync.js"
     ]
   },
   "dependencies": {
