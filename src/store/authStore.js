@@ -13,21 +13,36 @@ AsyncStorage.removeItem(LEGACY_ASYNC_STORAGE_KEY).catch(() => {});
 
 // zustand persist가 요구하는 StateStorage 인터페이스를 Keychain 위에 구현
 // (accessToken/refreshToken을 포함한 인증 상태 전체를 암호화 저장소에 보관)
+// Keychain 접근 자체가 실패해도(생체인증 미설정, 사용자 거부 등) hydration이
+// 멈추지 않도록 실패 시 로그아웃 상태로 취급한다.
 const keychainStorage = {
   getItem: async (name) => {
-    const credentials = await Keychain.getGenericPassword({
-      service: KEYCHAIN_SERVICE,
-    });
-    if (!credentials || credentials.username !== name) return null;
-    return credentials.password;
+    try {
+      const credentials = await Keychain.getGenericPassword({
+        service: KEYCHAIN_SERVICE,
+      });
+      if (!credentials || credentials.username !== name) return null;
+      return credentials.password;
+    } catch (error) {
+      console.error('Keychain getItem error:', error);
+      return null;
+    }
   },
   setItem: async (name, value) => {
-    await Keychain.setGenericPassword(name, value, {
-      service: KEYCHAIN_SERVICE,
-    });
+    try {
+      await Keychain.setGenericPassword(name, value, {
+        service: KEYCHAIN_SERVICE,
+      });
+    } catch (error) {
+      console.error('Keychain setItem error:', error);
+    }
   },
   removeItem: async () => {
-    await Keychain.resetGenericPassword({ service: KEYCHAIN_SERVICE });
+    try {
+      await Keychain.resetGenericPassword({ service: KEYCHAIN_SERVICE });
+    } catch (error) {
+      console.error('Keychain removeItem error:', error);
+    }
   },
 };
 
@@ -78,14 +93,16 @@ const useAuthStore = create(
           user: state.user ? { ...state.user, ...partialUser } : partialUser,
         })),
 
-      // 로그아웃
-      logout: () =>
+      // 로그아웃 (Keychain에 남은 인증 정보까지 완전히 삭제)
+      logout: () => {
         set(() => ({
           isLoggedIn: false,
           user: null,
           accessToken: null,
           refreshToken: null,
-        })),
+        }));
+        useAuthStore.persist.clearStorage();
+      },
     }),
     {
       name: 'auth-storage',
