@@ -11,7 +11,6 @@ import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
 import Input from '../../../components/Input';
-import { findRepresentativeEmailExist } from '../../../api/signUp';
 import { useState, useEffect } from 'react';
 import Button from '../../../components/Button';
 import { sendCouncilEmailCode } from '../../../api/councilLogin';

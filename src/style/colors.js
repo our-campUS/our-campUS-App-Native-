@@ -5,6 +5,7 @@ const colors = {
     white: '#FFFFFF',
     link: '#006BEB',
     error: '#E92525',
+    dim: 'rgba(0, 0, 0, 0.6)',
   },
   gray: {
     900: '#040505',

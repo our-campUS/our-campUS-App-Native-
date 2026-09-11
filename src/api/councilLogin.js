@@ -1,34 +1,53 @@
 import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
 
+export const COUNCIL_LOGIN_ERROR = {
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  INVALID_INPUT: 'INVALID_INPUT',
+  NETWORK: 'NETWORK',
+  UNKNOWN: 'UNKNOWN',
+};
+
+// 404(존재하지 않는 학생회)와 401(비밀번호 불일치)을 한 결과로 묶어 계정 존재 여부가 드러나지 않게 한다
+const toLoginError = (error) => {
+  const status = error.response?.status;
+  if (!status) {
+    return COUNCIL_LOGIN_ERROR.NETWORK;
+  }
+  if (status === 401 || status === 404) {
+    return COUNCIL_LOGIN_ERROR.INVALID_CREDENTIALS;
+  }
+  if (status === 400) {
+    return COUNCIL_LOGIN_ERROR.INVALID_INPUT;
+  }
+  return COUNCIL_LOGIN_ERROR.UNKNOWN;
+};
+
 // 학생회 로그인 api 호출
 export async function councilLogin(data) {
   try {
-    console.log('data', data);
-    const response = await api.post('/auth/council/login', data);
-    if (response.data.code === 200) {
-      console.log('성공 시 response', response);
-      const accessToken = response.data.data.accessToken;
-      const refreshToken = response.data.data.refreshToken;
-      const user = {
-        role: 'COUNCIL',
-        councilName: response.data.data.councilName,
-        councilId: response.data.data.councilId,
-        schoolName: response.data.data.schoolName,
-        majorName: response.data.data.majorName,
-        collegeName: response.data.data.collegeName,
-        loginId: response.data.data.loginId,
-        email: response.data.data.email,
-        councilNickname: response.data.data.councilNickname,
-        councilProfileImageUrl: response.data.data.councilProfileImageUrl,
-      };
-      useAuthStore.getState().loginCouncil({ user, accessToken, refreshToken });
-      return response.data;
-    } else {
-      return response.data;
+    const response = await api.post('auth/council/login', data);
+    if (response.data.code !== 200) {
+      return { success: false, error: COUNCIL_LOGIN_ERROR.UNKNOWN };
     }
+
+    const { accessToken, refreshToken } = response.data.data;
+    const user = {
+      role: 'COUNCIL',
+      councilName: response.data.data.councilName,
+      councilId: response.data.data.councilId,
+      schoolName: response.data.data.schoolName,
+      majorName: response.data.data.majorName,
+      collegeName: response.data.data.collegeName,
+      loginId: response.data.data.loginId,
+      email: response.data.data.email,
+      councilNickname: response.data.data.councilNickname,
+      councilProfileImageUrl: response.data.data.councilProfileImageUrl,
+    };
+    useAuthStore.getState().loginCouncil({ user, accessToken, refreshToken });
+    return { success: true };
   } catch (error) {
-    return error.response.data;
+    return { success: false, error: toLoginError(error) };
   }
 }
 
@@ -46,7 +65,7 @@ export async function sendCouncilEmailCode(email) {
       return response.data;
     }
   } catch (error) {
-    return error.response.data;
+    return error.response?.data ?? { code: null };
   }
 }
 
@@ -131,7 +150,7 @@ export async function findCouncilLoginId(email) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    return error.response.data;
+    return error.response?.data ?? { code: null };
   }
 }
 
@@ -192,7 +211,6 @@ export async function findCouncilPasswordValidateEmail({ loginId, email }) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
     return {
       isValid: false,
@@ -226,9 +244,8 @@ export async function sendCouncilPasswordFindEmailCode(email) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
-    return error.response.data;
+    return { isSuccess: false };
   }
 }
 
@@ -257,7 +274,6 @@ export async function verifyCouncilPasswordFindEmailCode(email, code) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
     return {
       isValid: false,
@@ -290,7 +306,6 @@ export async function resendCouncilPasswordFindEmailCode(email) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
     return {
       isSuccess: false,
@@ -330,7 +345,6 @@ export async function resetCouncilPassword(email, loginId, password) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
     return {
       isSuccess: false,

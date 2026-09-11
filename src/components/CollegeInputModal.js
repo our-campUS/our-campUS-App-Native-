@@ -1,60 +1,56 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import typography from '../style/typography';
-import colors from '../style/colors';
+import theme from '../style';
 import CloseIcon from '../../assets/proicons_cancel.svg';
 import Input from './Input';
-import collegeList from '../constants/collegeList';
 import { searchCollege } from '../api/signUp';
-import { useState } from 'react';
+import useDebouncedSearch from '../hooks/useDebouncedSearch';
 
 const styles = StyleSheet.create({
   layout: {
-    flex: 1,
-    backgroundColor: '#00000099',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'center',
-    alignItems: 'center',
   },
   container: {
-    borderRadius: 15,
+    alignSelf: 'stretch',
     marginHorizontal: 20,
-    width: '90%',
     height: 454,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
+    borderRadius: 15,
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 30,
-    paddingVertical: 20,
-    height: 60,
+    height: 59,
+    paddingLeft: 30,
+    paddingRight: 27,
   },
   headerTitle: {
-    ...typography.heading6,
-    color: colors.gray[850],
+    ...theme.typography.heading6,
+    color: theme.colors.text,
   },
   headerCloseButton: {
     width: 24,
     height: 24,
-  },
-  headerCloseButtonIcon: {
-    width: 18,
-    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   mainContent: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     paddingHorizontal: 30,
-    paddingVertical: 40,
-    gap: 16,
+    paddingTop: 40,
   },
+});
+
+const toCollegeItem = (college) => ({
+  id: college.collegeId,
+  label: college.collegeName,
+  value: college,
 });
 
 const CollegeInputModal = ({
@@ -63,32 +59,30 @@ const CollegeInputModal = ({
   universityId,
   isOrange = false,
 }) => {
-  const [dropdownData, setDropdownData] = useState([]);
+  const { items, onChangeText } = useDebouncedSearch(
+    (keyword) => searchCollege(universityId, keyword),
+    toCollegeItem
+  );
+
   return (
     <View style={styles.layout}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>단과대학 검색하기</Text>
           <Pressable style={styles.headerCloseButton} onPress={onClose}>
-            <CloseIcon style={styles.headerCloseButtonIcon} />
+            <CloseIcon width={18} height={18} />
           </Pressable>
         </View>
         <View style={styles.mainContent}>
           <Input
             isOrange={isOrange}
+            additionalStyle={{ height: 54 }}
             useMagnifyingGlass={true}
             useDropDown={true}
-            dropdownData={dropdownData}
             useKoreanOnly={true}
-            onChangeText={async (text) => {
-              const result = await searchCollege(universityId, text);
-              if (result && text.length > 0) {
-                setDropdownData(result);
-              }
-            }}
-            onSelectDropdownItem={(selectedCollege) => {
-              onSelect(selectedCollege);
-            }}
+            onChangeText={onChangeText}
+            dropdownData={items}
+            onSelectDropdownItem={onSelect}
           />
         </View>
       </View>

@@ -19,13 +19,14 @@ const PUBLIC_PREFIXES = [
   'test/login',
 ];
 
+const isPublicUrl = (url) => {
+  const normalized = url?.replace(/^\/+/, '') ?? '';
+  return PUBLIC_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+};
+
 // --- 요청 인터셉터: Authorization 헤더 자동 주입 ---
 api.interceptors.request.use((config) => {
-  // 선행 슬래시 유무와 무관하게 prefix 매칭되도록 정규화
-  const url = config.url?.replace(/^\/+/, '') ?? '';
-  const isPublic = PUBLIC_PREFIXES.some((prefix) => url.startsWith(prefix));
-
-  if (!isPublic) {
+  if (!isPublicUrl(config.url)) {
     const accessToken = useAuthStore.getState().accessToken;
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -73,6 +74,15 @@ api.interceptors.response.use(
 
     // 401이 아니거나 이미 재시도한 요청이면 그대로 reject
     if (error.response?.status !== 401 || originalRequest._retry) {
+      return Promise.reject(error);
+    }
+
+    // 공개 엔드포인트의 401은 토큰 만료가 아니라 인증 실패이므로 리프레시 대상이 아니다
+    if (isPublicUrl(originalRequest.url)) {
+      return Promise.reject(error);
+    }
+
+    if (!useAuthStore.getState().refreshToken) {
       return Promise.reject(error);
     }
 
