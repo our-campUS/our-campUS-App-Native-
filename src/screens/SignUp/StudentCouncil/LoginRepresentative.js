@@ -5,11 +5,25 @@ import { KeyboardAvoidingView } from 'react-native';
 import LabelTitle from '../../../components/LabelTitle';
 import colors from '../../../style/colors';
 import Input from '../../../components/Input';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Button from '../../../components/Button';
 import typography from '../../../style/typography';
-import { representativeLogin } from '../../../api/signUp';
-import { councilLogin } from '../../../api/councilLogin';
+import { councilLogin, COUNCIL_LOGIN_ERROR } from '../../../api/councilLogin';
+
+const LOGIN_ERROR_MESSAGE = {
+  [COUNCIL_LOGIN_ERROR.INVALID_CREDENTIALS]:
+    '아이디 또는 비밀번호가 일치하지 않습니다.',
+  [COUNCIL_LOGIN_ERROR.INVALID_INPUT]: '입력값을 다시 확인해주세요.',
+  [COUNCIL_LOGIN_ERROR.NETWORK]: '네트워크 연결을 확인해주세요.',
+  [COUNCIL_LOGIN_ERROR.UNKNOWN]:
+    '로그인에 실패했습니다. 잠시 후 다시 시도해주세요.',
+};
+
+// 입력값이 원인일 때만 테두리를 경고색으로 바꾼다
+const FIELD_ERRORS = [
+  COUNCIL_LOGIN_ERROR.INVALID_CREDENTIALS,
+  COUNCIL_LOGIN_ERROR.INVALID_INPUT,
+];
 
 const styles = StyleSheet.create({
   statusBar: {
@@ -50,40 +64,16 @@ const styles = StyleSheet.create({
 const LoginRepresentative = ({ navigation }) => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  const [idError, setIdError] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [loginError, setLoginError] = useState(null);
 
-  useEffect(() => {
-    if (userId.trim() && password.trim() && !idError && !passwordError) {
-      setIsButtonDisabled(false);
-    } else {
-      setIsButtonDisabled(true);
+  const isButtonDisabled = !userId.trim() || !password.trim();
+  const hasFieldError = FIELD_ERRORS.includes(loginError);
+
+  const handleLoginPress = async () => {
+    const result = await councilLogin({ loginId: userId, password: password });
+    if (!result.success) {
+      setLoginError(result.error);
     }
-  }, [userId, password]);
-
-  const handleLoginPress = async (data) => {
-    const response = await councilLogin(data);
-    console.log('response', response);
-
-    // councilLogin이 에러를 반환하는 경우 처리
-    if (response && (response.error || response.message)) {
-      const errorMessage = response.message || response.error || '';
-      // 아이디 관련 에러인지 비밀번호 관련 에러인지 판단하여 설정
-      if (
-        errorMessage.includes('아이디') ||
-        errorMessage.includes('존재') ||
-        errorMessage.includes('loginId')
-      ) {
-        setIdError(true);
-      } else {
-        setPasswordError(true);
-      }
-      return;
-    }
-
-    // 로그인 성공 시 처리 로직 추가 필요
-    // 예: navigation.navigate('Home') 등
   };
 
   return (
@@ -99,7 +89,6 @@ const LoginRepresentative = ({ navigation }) => {
           useBackButton={true}
           onPressBack={() => navigation.goBack()}
         />
-        {/* <View style={{ width: '100%', height: 20 }}></View> */}
         <View style={styles.statusBar}>
           <View style={{ backgroundColor: colors.gray[100], width: '100%' }} />
         </View>
@@ -115,13 +104,10 @@ const LoginRepresentative = ({ navigation }) => {
               value={userId}
               onChangeText={(text) => {
                 setUserId(text);
-                if (idError) setIdError(false);
+                setLoginError(null);
               }}
-              hasError={idError}
+              hasError={hasFieldError}
             />
-            {idError && (
-              <Text style={styles.errorText}>존재하지 않는 아이디입니다.</Text>
-            )}
             <Input
               isOrange={true}
               placeholder="비밀번호를 입력해주세요"
@@ -133,13 +119,13 @@ const LoginRepresentative = ({ navigation }) => {
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
-                if (passwordError) setPasswordError(false);
+                setLoginError(null);
               }}
-              hasError={passwordError}
+              hasError={hasFieldError}
             />
-            {passwordError && (
+            {loginError && (
               <Text style={styles.errorText}>
-                비밀번호가 일치하지 않습니다.
+                {LOGIN_ERROR_MESSAGE[loginError]}
               </Text>
             )}
           </View>
@@ -164,9 +150,7 @@ const LoginRepresentative = ({ navigation }) => {
             disabled={isButtonDisabled}
             isOrange={true}
             title="로그인하기"
-            onPress={() =>
-              handleLoginPress({ loginId: userId, password: password })
-            }
+            onPress={handleLoginPress}
             style={{
               width: '100%',
               height: 50,
