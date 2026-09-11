@@ -2,9 +2,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import theme from '../style';
 import CloseIcon from '../../assets/proicons_cancel.svg';
 import Input from './Input';
-import collegeList from '../constants/collegeList';
 import { searchCollege } from '../api/signUp';
-import { useState } from 'react';
+import useDebouncedSearch from '../hooks/useDebouncedSearch';
 
 const styles = StyleSheet.create({
   layout: {
@@ -48,13 +47,23 @@ const styles = StyleSheet.create({
   },
 });
 
+const toCollegeItem = (college) => ({
+  id: college.collegeId,
+  label: college.collegeName,
+  value: college,
+});
+
 const CollegeInputModal = ({
   onClose,
   onSelect,
   universityId,
   isOrange = false,
 }) => {
-  const [dropdownData, setDropdownData] = useState([]);
+  const { items, onChangeText } = useDebouncedSearch(
+    (keyword) => searchCollege(universityId, keyword),
+    toCollegeItem
+  );
+
   return (
     <View style={styles.layout}>
       <View style={styles.container}>
@@ -70,17 +79,10 @@ const CollegeInputModal = ({
             additionalStyle={{ height: 54 }}
             useMagnifyingGlass={true}
             useDropDown={true}
-            dropdownData={dropdownData}
             useKoreanOnly={true}
-            onChangeText={async (text) => {
-              const result = await searchCollege(universityId, text);
-              if (result && text.length > 0) {
-                setDropdownData(result);
-              }
-            }}
-            onSelectDropdownItem={(selectedCollege) => {
-              onSelect(selectedCollege);
-            }}
+            onChangeText={onChangeText}
+            dropdownData={items}
+            onSelectDropdownItem={onSelect}
           />
         </View>
       </View>

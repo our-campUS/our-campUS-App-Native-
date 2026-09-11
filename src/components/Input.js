@@ -12,7 +12,6 @@ import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import colors from '../style/colors';
 import typography from '../style/typography';
 import MagnifyingGlass from '../../assets/input-tool.svg';
-import { filterDropdownItems } from '../utils/searchLogic';
 import EyeSlashIcon from '../../assets/inputHidden.svg';
 import EyeIcon from '../../assets/inputUnhidden.svg';
 import ArrowDownIcon from '../../assets/ArrowDown.svg';
@@ -138,7 +137,6 @@ const Input = forwardRef(
       usePassWordIcon = false,
       onlyRead = false,
       useToggleIcon = false,
-      isMajorSelect = false,
       useEnglishOnly = false,
       useId = false,
       useEmail = false,
@@ -306,71 +304,28 @@ const Input = forwardRef(
         </Pressable>
         {useDropDown && isFocused && dropdownData.length > 0 && (
           <View style={styles.dropdownContainer}>
-            {isMajorSelect ? (
-              <FlatList
-                data={dropdownData}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={true}
-                keyExtractor={(item) => Object.values(item)[2]}
-                renderItem={({ item }) => {
-                  const name = Object.values(item)[3];
-                  const departmentId = Object.values(item)[2];
-                  const departmentName = Object.values(item)[3];
-
-                  return (
-                    <Pressable
-                      style={styles.dropdownItem}
-                      onPress={() => {
-                        if (!isControlled) {
-                          setInnerValue(name);
-                        }
-                        innerRef.current?.blur();
-                        Keyboard.dismiss();
-                        if (typeof onChangeText === 'function') {
-                          onChangeText(name);
-                        }
-                        if (typeof onSelectDropdownItem === 'function') {
-                          onSelectDropdownItem(item);
-                        }
-                      }}
-                    >
-                      <Text style={styles.dropdownItemText}>{name}</Text>
-                    </Pressable>
-                  );
-                }}
-              />
-            ) : (
-              <FlatList
-                data={dropdownData}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={true}
-                keyExtractor={(item) => Object.values(item)[0]}
-                renderItem={({ item }) => {
-                  const name = Object.values(item)[1];
-
-                  return (
-                    <Pressable
-                      style={styles.dropdownItem}
-                      onPress={() => {
-                        if (!isControlled) {
-                          setInnerValue(name);
-                        }
-                        innerRef.current?.blur();
-                        Keyboard.dismiss();
-                        if (typeof onChangeText === 'function') {
-                          onChangeText(name);
-                        }
-                        if (typeof onSelectDropdownItem === 'function') {
-                          onSelectDropdownItem(item);
-                        }
-                      }}
-                    >
-                      <Text style={styles.dropdownItemText}>{name}</Text>
-                    </Pressable>
-                  );
-                }}
-              />
-            )}
+            <FlatList
+              data={dropdownData}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={true}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item }) => (
+                <Pressable
+                  style={styles.dropdownItem}
+                  onPress={() => {
+                    if (!isControlled) {
+                      setInnerValue(item.label);
+                    }
+                    innerRef.current?.blur();
+                    Keyboard.dismiss();
+                    onChangeText?.(item.label);
+                    onSelectDropdownItem?.(item.value);
+                  }}
+                >
+                  <Text style={styles.dropdownItemText}>{item.label}</Text>
+                </Pressable>
+              )}
+            />
           </View>
         )}
       </View>

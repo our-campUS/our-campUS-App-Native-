@@ -2,9 +2,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import theme from '../style';
 import CloseIcon from '../../assets/proicons_cancel.svg';
 import Input from './Input';
-import majorList from '../constants/majorlist';
 import { searchMajor } from '../api/signUp';
-import { useState } from 'react';
+import useDebouncedSearch from '../hooks/useDebouncedSearch';
 
 const styles = StyleSheet.create({
   layout: {
@@ -48,13 +47,23 @@ const styles = StyleSheet.create({
   },
 });
 
+const toMajorItem = (major) => ({
+  id: major.majorId,
+  label: major.majorName,
+  value: major,
+});
+
 const MajorInputModal = ({
   onClose,
   onSelect,
   universityId,
   isOrange = false,
 }) => {
-  const [dropdownData, setDropdownData] = useState([]);
+  const { items, onChangeText } = useDebouncedSearch(
+    (keyword) => searchMajor(universityId, keyword),
+    toMajorItem
+  );
+
   return (
     <View style={styles.layout}>
       <View style={styles.container}>
@@ -70,25 +79,10 @@ const MajorInputModal = ({
             additionalStyle={{ height: 54 }}
             useMagnifyingGlass={true}
             useDropDown={true}
-            isMajorSelect={true}
             useKoreanOnly={true}
-            onChangeText={async (text) => {
-              console.log('✅ University ID:', universityId);
-              console.log('✅ Text:', text);
-              const result = await searchMajor(universityId, text);
-              if (result && text.length > 0) {
-                setDropdownData(result);
-              }
-              console.log('✅ Major Dropdown Data:', dropdownData);
-              console.log(
-                '✅ Major Dropdown Data Length:',
-                dropdownData.length
-              );
-            }}
-            dropdownData={dropdownData}
-            onSelectDropdownItem={(selectedMajor) => {
-              onSelect(selectedMajor);
-            }}
+            onChangeText={onChangeText}
+            dropdownData={items}
+            onSelectDropdownItem={onSelect}
           />
         </View>
       </View>
