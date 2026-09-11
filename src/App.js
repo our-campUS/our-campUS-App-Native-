@@ -6,6 +6,7 @@ import { initKakao } from './api/signUp';
 import { useEffect, useState } from 'react';
 import useAuthStore from './store/authStore';
 import MainStack from './navigations/MainStack';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 const App = () => {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
@@ -36,10 +37,12 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar style="auto" />
-      {isLoggedIn ? <MainStack /> : <AuthStack />}
-    </NavigationContainer>
+    <ErrorBoundary>
+      <NavigationContainer>
+        <StatusBar style="auto" />
+        {isLoggedIn ? <MainStack /> : <AuthStack />}
+      </NavigationContainer>
+    </ErrorBoundary>
   );
 };
 
