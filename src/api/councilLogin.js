@@ -65,7 +65,7 @@ export async function sendCouncilEmailCode(email) {
       return response.data;
     }
   } catch (error) {
-    return error.response.data;
+    return error.response?.data ?? { code: null };
   }
 }
 
@@ -150,7 +150,7 @@ export async function findCouncilLoginId(email) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    return error.response.data;
+    return error.response?.data ?? { code: null };
   }
 }
 
@@ -211,7 +211,6 @@ export async function findCouncilPasswordValidateEmail({ loginId, email }) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
     return {
       isValid: false,
@@ -245,9 +244,8 @@ export async function sendCouncilPasswordFindEmailCode(email) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
-    return error.response.data;
+    return { isSuccess: false };
   }
 }
 
@@ -276,7 +274,6 @@ export async function verifyCouncilPasswordFindEmailCode(email, code) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
     return {
       isValid: false,
@@ -309,7 +306,6 @@ export async function resendCouncilPasswordFindEmailCode(email) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
     return {
       isSuccess: false,
@@ -349,7 +345,6 @@ export async function resetCouncilPassword(email, loginId, password) {
     }
   } catch (error) {
     console.log('오류 시 error', error);
-    console.log('오류 시 error.response.data', error.response.data);
     console.log('오류 시 error.message', error.message);
     return {
       isSuccess: false,
