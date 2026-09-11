@@ -12,7 +12,6 @@ import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
 import Input from '../../../components/Input';
-import { findRepresentativeEmailExist } from '../../../api/signUp';
 import { useState, useEffect } from 'react';
 import Button from '../../../components/Button';
 import {
@@ -103,7 +102,7 @@ const UseEmailForPassword = ({ navigation, route }) => {
                 marginTop: 8,
               }}
             >
-              아이디에 해당하는 학생회 이메일이 아닙니다
+              아이디 또는 이메일이 일치하지 않습니다.
             </Text>
           )}
         </ScrollView>
