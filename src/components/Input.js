@@ -75,17 +75,16 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     marginTop: 16,
     gap: 8,
-    // borderColor: colors.gray[200],
-    // backgroundColor: colors.white,
-    maxHeight: 5 * 40, // 아이템 최대 5개 높이만큼만 보이게
+    maxHeight: 5 * 43 + 4 * 8, // 아이템 5개까지만 노출
     overflow: 'hidden',
   },
   dropdownItem: {
-    padding: 10,
-    borderBottomWidth: 0.5,
-    borderColor: colors.gray[250],
     width: '100%',
     height: 43,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    borderBottomWidth: 0.5,
+    borderColor: colors.gray[250],
   },
   dropdownItemText: {
     ...typography.body3Regular,

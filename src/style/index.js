@@ -21,6 +21,7 @@ const theme = {
     // 배경
     background: colors.common.white,
     backgroundSub: colors.gray['050'],
+    overlay: colors.common.dim,
 
     // 상태
     error: colors.common.error,
