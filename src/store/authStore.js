@@ -1,8 +1,35 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // 카카오 로그인/회원 인증 상태 전역 관리
+
+const KEYCHAIN_SERVICE = 'ourCampusApp.authStorage';
+const LEGACY_ASYNC_STORAGE_KEY = 'auth-storage';
+
+// Keychain 전환 이전 버전에서 AsyncStorage에 평문으로 남아있던 토큰 제거
+AsyncStorage.removeItem(LEGACY_ASYNC_STORAGE_KEY).catch(() => {});
+
+// zustand persist가 요구하는 StateStorage 인터페이스를 Keychain 위에 구현
+// (accessToken/refreshToken을 포함한 인증 상태 전체를 암호화 저장소에 보관)
+const keychainStorage = {
+  getItem: async (name) => {
+    const credentials = await Keychain.getGenericPassword({
+      service: KEYCHAIN_SERVICE,
+    });
+    if (!credentials || credentials.username !== name) return null;
+    return credentials.password;
+  },
+  setItem: async (name, value) => {
+    await Keychain.setGenericPassword(name, value, {
+      service: KEYCHAIN_SERVICE,
+    });
+  },
+  removeItem: async () => {
+    await Keychain.resetGenericPassword({ service: KEYCHAIN_SERVICE });
+  },
+};
 
 const useAuthStore = create(
   persist(
@@ -62,7 +89,7 @@ const useAuthStore = create(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => keychainStorage),
       partialize: (state) => ({
         isLoggedIn: state.isLoggedIn,
         user: state.user,
