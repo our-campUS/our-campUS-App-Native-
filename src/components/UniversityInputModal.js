@@ -74,7 +74,6 @@ const UniversityInputModal = ({ onClose, onSelect, isOrange = false }) => {
             additionalStyle={{ height: 54 }}
             useMagnifyingGlass={true}
             useDropDown={true}
-            useKoreanOnly={true}
             onChangeText={onChangeText}
             dropdownData={items}
             onSelectDropdownItem={onSelect}

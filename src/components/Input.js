@@ -140,7 +140,6 @@ const Input = forwardRef(
       useEnglishOnly = false,
       useId = false,
       useEmail = false,
-      useKoreanOnly = false,
     },
     ref
   ) => {
@@ -237,8 +236,6 @@ const Input = forwardRef(
                   );
                 } else if (useEmail) {
                   filteredText = text.replace(/[^a-zA-Z0-9@.]/g, '');
-                } else if (useKoreanOnly) {
-                  filteredText = text.replace(/[^ㄱ-ㅎㅏ-ㅣ가-힣]/g, '');
                 }
                 // maxLength 제한 적용
                 if (maxLength && filteredText.length > maxLength) {
