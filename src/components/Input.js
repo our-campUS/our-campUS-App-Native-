@@ -142,7 +142,6 @@ const Input = forwardRef(
       isMajorSelect = false,
       useEnglishOnly = false,
       useId = false,
-      useEmail = false,
     },
     ref
   ) => {
@@ -232,8 +231,6 @@ const Input = forwardRef(
                 }
                 if (useId) {
                   filteredText = text.replace(/[^a-zA-Z0-9]/g, '');
-                } else if (useEmail) {
-                  filteredText = text.replace(/[^a-zA-Z0-9@.]/g, '');
                 }
                 // maxLength 제한 적용
                 if (maxLength && filteredText.length > maxLength) {
