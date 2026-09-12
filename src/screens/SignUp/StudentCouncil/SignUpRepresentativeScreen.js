@@ -321,7 +321,6 @@ const SignUpRepresentativeScreen = ({ navigation }) => {
               <Input
                 isOrange={true}
                 ref={emailInputRef}
-                useEmail={true}
                 placeholder="메일주소를 입력해주세요"
                 useMagnifyingGlass={false}
                 keyboardType="email-address"
