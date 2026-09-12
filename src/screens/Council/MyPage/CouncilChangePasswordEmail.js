@@ -66,7 +66,6 @@ const CouncilChangePasswordEmail = ({ navigation }) => {
       <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
         <ScrollView>
           <Input
-            useEmail={true}
             isOrange={true}
             placeholder="qwer1234@cau.ac.kr"
             useTitle={true}

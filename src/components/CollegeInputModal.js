@@ -79,7 +79,6 @@ const CollegeInputModal = ({
             useMagnifyingGlass={true}
             useDropDown={true}
             dropdownData={dropdownData}
-            useKoreanOnly={true}
             onChangeText={async (text) => {
               const result = await searchCollege(universityId, text);
               if (result && text.length > 0) {

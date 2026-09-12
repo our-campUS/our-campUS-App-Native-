@@ -79,7 +79,6 @@ const MajorInputModal = ({
             useMagnifyingGlass={true}
             useDropDown={true}
             isMajorSelect={true}
-            useKoreanOnly={true}
             onChangeText={async (text) => {
               console.log('✅ University ID:', universityId);
               console.log('✅ Text:', text);

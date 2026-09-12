@@ -86,7 +86,6 @@ const UseEmailForPassword = ({ navigation, route }) => {
           </Text>
           <View style={{ marginTop: 56 }} />
           <Input
-            useEmail={true}
             isOrange={true}
             placeholder="메일주소를 입력해주세요."
             useTitle={true}

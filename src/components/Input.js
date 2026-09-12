@@ -142,8 +142,6 @@ const Input = forwardRef(
       isMajorSelect = false,
       useEnglishOnly = false,
       useId = false,
-      useEmail = false,
-      useKoreanOnly = false,
     },
     ref
   ) => {
@@ -233,15 +231,6 @@ const Input = forwardRef(
                 }
                 if (useId) {
                   filteredText = text.replace(/[^a-zA-Z0-9]/g, '');
-                } else if (usePassword) {
-                  filteredText = text.replace(
-                    /[^a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g,
-                    ''
-                  );
-                } else if (useEmail) {
-                  filteredText = text.replace(/[^a-zA-Z0-9@.]/g, '');
-                } else if (useKoreanOnly) {
-                  filteredText = text.replace(/[^ㄱ-ㅎㅏ-ㅣ가-힣]/g, '');
                 }
                 // maxLength 제한 적용
                 if (maxLength && filteredText.length > maxLength) {

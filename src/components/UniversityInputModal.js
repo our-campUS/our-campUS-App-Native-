@@ -73,7 +73,6 @@ const UniversityInputModal = ({ onClose, onSelect, isOrange = false }) => {
             isOrange={isOrange}
             useMagnifyingGlass={true}
             useDropDown={true}
-            useKoreanOnly={true}
             onChangeText={async (text) => {
               const result = await searchUniversity(text);
               if (result && text.length > 0) {
