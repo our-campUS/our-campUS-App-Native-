@@ -232,11 +232,6 @@ const Input = forwardRef(
                 }
                 if (useId) {
                   filteredText = text.replace(/[^a-zA-Z0-9]/g, '');
-                } else if (usePassword) {
-                  filteredText = text.replace(
-                    /[^a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g,
-                    ''
-                  );
                 } else if (useEmail) {
                   filteredText = text.replace(/[^a-zA-Z0-9@.]/g, '');
                 }
