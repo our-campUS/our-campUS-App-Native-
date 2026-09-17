@@ -4,7 +4,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,7 +11,6 @@ import colors from '../../../style/colors';
 import typography from '../../../style/typography';
 import LabelTitle from '../../../components/LabelTitle';
 import Input from '../../../components/Input';
-import { findRepresentativeEmailExist } from '../../../api/signUp';
 import { useState, useEffect } from 'react';
 import Button from '../../../components/Button';
 import {
@@ -20,10 +18,14 @@ import {
   sendCouncilPasswordFindEmailCode,
 } from '../../../api/councilLogin';
 
+const EMAIL_MISMATCH_MESSAGE = '아이디 또는 이메일이 일치하지 않습니다.';
+const SEND_FAILED_MESSAGE =
+  '인증번호 발송에 실패했습니다. 잠시 후 다시 시도해주세요.';
+
 const UseEmailForPassword = ({ navigation, route }) => {
   const loginId = route.params?.loginId;
   const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
@@ -36,28 +38,30 @@ const UseEmailForPassword = ({ navigation, route }) => {
 
   const handleEmailChange = (text) => {
     setEmail(text);
-    setEmailError(false);
+    setErrorMessage('');
   };
 
   const handleCheckEmailExistAndSendCode = async () => {
     const result = await findCouncilPasswordValidateEmail({ loginId, email });
-    if (result && result.isValid) {
-      setEmailError(false);
-      setIsLoading(true);
-      const sendResult = await sendCouncilPasswordFindEmailCode(email);
-      setIsLoading(false);
-      if (sendResult && sendResult.isSuccess) {
-        navigation.navigate('ReceiveAuthCodeForPassword', {
-          email: email,
-          loginId: loginId,
-        });
-      } else {
-        setEmailError(true);
-        Alert.alert(sendResult.message);
-      }
-    } else {
-      setEmailError(true);
+    if (!result?.isValid) {
+      setErrorMessage(EMAIL_MISMATCH_MESSAGE);
+      return;
     }
+
+    setErrorMessage('');
+    setIsLoading(true);
+    const sendResult = await sendCouncilPasswordFindEmailCode(email);
+    setIsLoading(false);
+
+    if (!sendResult?.isSuccess) {
+      setErrorMessage(SEND_FAILED_MESSAGE);
+      return;
+    }
+
+    navigation.navigate('ReceiveAuthCodeForPassword', {
+      email: email,
+      loginId: loginId,
+    });
   };
 
   return (
@@ -93,9 +97,9 @@ const UseEmailForPassword = ({ navigation, route }) => {
             title="메일 주소"
             value={email}
             onChangeText={handleEmailChange}
-            hasError={emailError}
+            hasError={errorMessage !== ''}
           />
-          {emailError && (
+          {errorMessage !== '' && (
             <Text
               style={{
                 ...typography.caption1Regular,
@@ -103,7 +107,7 @@ const UseEmailForPassword = ({ navigation, route }) => {
                 marginTop: 8,
               }}
             >
-              아이디에 해당하는 학생회 이메일이 아닙니다
+              {errorMessage}
             </Text>
           )}
         </ScrollView>
@@ -112,13 +116,7 @@ const UseEmailForPassword = ({ navigation, route }) => {
             disabled={isButtonDisabled}
             isOrange={true}
             title="인증번호 발송하기"
-            onPress={async () => {
-              if (!email.trim()) {
-                setEmailError(true);
-                return;
-              }
-              handleCheckEmailExistAndSendCode();
-            }}
+            onPress={handleCheckEmailExistAndSendCode}
             style={{
               width: '100%',
               height: 50,
@@ -158,7 +156,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 'auto',
-    // paddingHorizontal: 20,
     marginBottom: 30,
     alignItems: 'center',
   },

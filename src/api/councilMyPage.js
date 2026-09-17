@@ -167,6 +167,6 @@ export async function changeCouncilPassword(
     return { success: false, message: response.data.message };
   } catch (error) {
     console.log('changeCouncilPassword error', error.response);
-    return { success: false, message: error.response.data.message };
+    return { success: false, message: error.response?.data?.message };
   }
 }
