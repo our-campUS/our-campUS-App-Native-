@@ -12,6 +12,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import StoreListItem from '../common/StoreListItem';
 import EmptyResult from '../common/EmptyResult';
+import useHeldWhileHidden from '../../hooks/useHeldWhileHidden';
 import theme from '../../style';
 import colors from '../../style/colors';
 
@@ -23,6 +24,7 @@ const HANDLE_BAR_HEIGHT = 36;
 
 const BottomSheet = ({
   displayedMarkers,
+  isOpen,
   selectedMarkerId,
   onItemPress,
   maxHeight,
@@ -37,9 +39,12 @@ const BottomSheet = ({
   const HEIGHT_MAX = maxHeight * 0.75;
   const sheetHeight = sheetHeightAnimated;
   const isPinSelected = !!selectedMarkerId && displayedMarkers.length === 1;
+  const content = useHeldWhileHidden(
+    { markers: displayedMarkers, isPinSelected },
+    isOpen
+  );
 
   const startHeight = useRef(0);
-  const [isScrollable, setIsScrollable] = useState(false);
   const [pinItemHeight, setPinItemHeight] = useState(0);
 
   useEffect(() => {
@@ -59,13 +64,6 @@ const BottomSheet = ({
     MID: HEIGHT_LIST,
     MAX: HEIGHT_MAX,
   };
-
-  useEffect(() => {
-    const id = sheetHeight.addListener(({ value }) => {
-      setIsScrollable(value >= HEIGHT_MAX - 20);
-    });
-    return () => sheetHeight.removeListener(id);
-  }, []);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -106,6 +104,7 @@ const BottomSheet = ({
           useNativeDriver: false,
           friction: 8,
           tension: 40,
+          overshootClamping: target === SNAP_POINTS.HIDDEN,
         }).start();
       },
     })
@@ -117,15 +116,15 @@ const BottomSheet = ({
         <View style={styles.handleBar} />
       </View>
 
-      {isPinSelected ? (
+      {content.isPinSelected ? (
         <View onLayout={(e) => setPinItemHeight(e.nativeEvent.layout.height)}>
           <StoreListItem
-            item={displayedMarkers[0]}
+            item={content.markers[0]}
             userLocation={userLocation}
             onPress={() => {
-              onItemPress(displayedMarkers[0].placeId);
+              onItemPress(content.markers[0].placeId);
               navigation.navigate('StoreDetailScreen', {
-                store: displayedMarkers[0],
+                store: content.markers[0],
                 onUpdatePlace: (oldId, newData) => {
                   if (onUpdateStore) onUpdateStore(oldId, newData);
                 },
@@ -139,7 +138,7 @@ const BottomSheet = ({
         </View>
       ) : (
         <FlatList
-          data={displayedMarkers}
+          data={content.markers}
           keyExtractor={(item) => item.placeId.toString()}
           renderItem={({ item }) => (
             <StoreListItem
@@ -160,7 +159,9 @@ const BottomSheet = ({
               showToast={showToast}
             />
           )}
-          ListEmptyComponent={!isLoading ? <EmptyResult paddingTop={60} /> : null}
+          ListEmptyComponent={
+            !isLoading ? <EmptyResult paddingTop={60} /> : null
+          }
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={

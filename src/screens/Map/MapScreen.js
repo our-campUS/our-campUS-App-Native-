@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useMemo,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Animated,
@@ -75,20 +70,21 @@ const MapScreen = () => {
     extrapolate: 'clamp',
   });
 
+  let targetHeight = HEIGHT_HIDDEN;
+  if (selectedMarkerId) targetHeight = HEIGHT_ITEM;
+  else if (searchKeyword || selectedCategory) targetHeight = HEIGHT_LIST;
+  const isSheetOpen = targetHeight !== HEIGHT_HIDDEN;
 
   useEffect(() => {
-    let targetHeight = HEIGHT_HIDDEN;
-    if (selectedMarkerId) targetHeight = HEIGHT_ITEM;
-    else if (searchKeyword || selectedCategory) targetHeight = HEIGHT_LIST;
-
     Animated.spring(sheetHeightAnimated, {
       toValue: targetHeight,
       useNativeDriver: false,
       friction: 8,
       tension: 40,
+      // 0 아래로 튀면 음수 height가 되어 시트가 콘텐츠 높이로 순간 올라옴
+      overshootClamping: !isSheetOpen,
     }).start();
-  }, [selectedMarkerId, searchKeyword, selectedCategory, sheetHeightAnimated]);
-
+  }, [targetHeight, isSheetOpen, sheetHeightAnimated]);
 
   const uniqueMarkers = useMemo(() => {
     const seen = new Set();
@@ -211,13 +207,14 @@ const MapScreen = () => {
           }}
           activeOpacity={0.8}
         >
-            <LocationIcon width={18} height={18} color={theme.colors.textDim} />
-          </TouchableOpacity>
+          <LocationIcon width={18} height={18} color={theme.colors.textDim} />
+        </TouchableOpacity>
       </Animated.View>
 
       {/* 바텀시트 */}
       <BottomSheet
         displayedMarkers={displayedMarkers}
+        isOpen={isSheetOpen}
         selectedMarkerId={selectedMarkerId}
         onItemPress={(id) => setSelectedMarkerId(id)}
         maxHeight={sheetMaxHeight}
