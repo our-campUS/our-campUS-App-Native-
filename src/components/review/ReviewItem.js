@@ -126,19 +126,33 @@ const ReviewItem = ({
       <View style={styles.starRatingWrapper}>
         <View style={styles.listStarsRow}>{renderStars()}</View>
         {onMorePress && (
-          <View style={styles.moreActionsRow}>
+          <>
             {isMoreOpen && (
-              <Pressable
-                style={styles.reportPill}
-                onPress={() => onSelectReport(item)}
-              >
-                <Text style={styles.reportPillText}>신고하기</Text>
-              </Pressable>
+              <View style={styles.reportPillOverlay} pointerEvents="box-none">
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.reportPill,
+                    pressed && styles.reportPillTinted,
+                  ]}
+                  onPress={() => onSelectReport(item)}
+                >
+                  {({ pressed }) => (
+                    <Text
+                      style={[
+                        styles.reportPillText,
+                        pressed && styles.reportPillTextTinted,
+                      ]}
+                    >
+                      신고하기
+                    </Text>
+                  )}
+                </Pressable>
+              </View>
             )}
             <Pressable onPress={() => onMorePress(item)} hitSlop={8}>
               <ThreeDotIcon width={20} height={20} />
             </Pressable>
-          </View>
+          </>
         )}
       </View>
 
@@ -258,17 +272,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
   },
-  moreActionsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  reportPillOverlay: {
+    position: 'absolute',
+    top: '50%',
+    right: 28,
+    marginTop: -18,
+    zIndex: 10,
   },
   reportPill: {
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: colors.common.white,
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 18,
     ...theme.shadows.small,
+  },
+  reportPillTinted: {
+    backgroundColor: colors.blue[500],
+  },
+  reportPillTextTinted: {
+    color: colors.common.white,
   },
   reportPillText: {
     ...typography.heading6,
