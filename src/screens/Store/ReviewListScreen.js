@@ -12,6 +12,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LabelTitle from '../../components/LabelTitle';
 import ReviewItem from '../../components/review/ReviewItem';
 // import ReviewActionModal from '../../components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
+import ReportReasonBottomSheet from '../../components/review/ReportReasonBottomSheet';
+import CustomToast from '../../components/CustomToast';
 import useCursorPagination from '../../hooks/useCursorPagination';
 import LoadingFooter from '../../components/common/LoadingFooter';
 import theme from '../../style';
@@ -31,6 +33,9 @@ const ReviewListScreen = () => {
 
   // const [modalVisible, setModalVisible] = useState(false); // TODO: 스캔 플로우 복구 시 주석 해제
   const [filter, setFilter] = useState('LATEST');
+  const [activeReviewId, setActiveReviewId] = useState(null);
+  const [isReportSheetVisible, setIsReportSheetVisible] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState(null);
 
   const fetchReviewsFn = useCallback(
     (cursorCreatedAt, cursorId, cursorStar) =>
@@ -103,6 +108,16 @@ const ReviewListScreen = () => {
 
   const sortedReviews = reviews;
 
+  const handleMorePress = (item) => {
+    setActiveReviewId((prev) => (prev === item.id ? null : item.id));
+  };
+
+  const handleSelectReport = (item) => {
+    setActiveReviewId(null);
+    setSelectedReviewId(item.id);
+    setIsReportSheetVisible(true);
+  };
+
   const renderItem = ({ item }) => {
     const reviewData = {
       id: item.id,
@@ -115,7 +130,12 @@ const ReviewListScreen = () => {
 
     return (
       <View style={styles.reviewItemWrapper}>
-        <ReviewItem item={reviewData} />
+        <ReviewItem
+          item={reviewData}
+          onMorePress={handleMorePress}
+          isMoreOpen={activeReviewId === item.id}
+          onSelectReport={handleSelectReport}
+        />
       </View>
     );
   };
@@ -189,6 +209,16 @@ const ReviewListScreen = () => {
         }}
       />
       */}
+
+      <ReportReasonBottomSheet
+        isVisible={isReportSheetVisible}
+        onClose={() => {
+          setIsReportSheetVisible(false);
+          setSelectedReviewId(null);
+        }}
+        reviewId={selectedReviewId}
+      />
+      <CustomToast />
     </View>
   );
 };

@@ -17,7 +17,14 @@ import typography from '@style/typography';
 import theme from '@style';
 import { formatReviewDate } from '../../utils/dateTime';
 
-const ReviewItem = ({ item, variant = 'list', card = false, onMorePress }) => {
+const ReviewItem = ({
+  item,
+  variant = 'list',
+  card = false,
+  onMorePress,
+  isMoreOpen = false,
+  onSelectReport,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
   const [measured, setMeasured] = useState(false);
@@ -119,9 +126,19 @@ const ReviewItem = ({ item, variant = 'list', card = false, onMorePress }) => {
       <View style={styles.starRatingWrapper}>
         <View style={styles.listStarsRow}>{renderStars()}</View>
         {onMorePress && (
-          <Pressable onPress={() => onMorePress(item)} hitSlop={8}>
-            <ThreeDotIcon width={20} height={20} />
-          </Pressable>
+          <View style={styles.moreActionsRow}>
+            {isMoreOpen && (
+              <Pressable
+                style={styles.reportPill}
+                onPress={() => onSelectReport(item)}
+              >
+                <Text style={styles.reportPillText}>신고하기</Text>
+              </Pressable>
+            )}
+            <Pressable onPress={() => onMorePress(item)} hitSlop={8}>
+              <ThreeDotIcon width={20} height={20} />
+            </Pressable>
+          </View>
         )}
       </View>
 
@@ -240,6 +257,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
+  },
+  moreActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  reportPill: {
+    backgroundColor: colors.common.white,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    ...theme.shadows.small,
+  },
+  reportPillText: {
+    ...typography.heading6,
+    color: colors.gray[850],
   },
   imageScrollWrapper: {
     marginBottom: 12,
