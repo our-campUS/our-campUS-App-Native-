@@ -21,7 +21,6 @@ import { normalizeCategory } from '../../constants/MapData';
 import BottomSheet from '../../components/map/BottomSheet';
 import LocationIcon from '../../../assets/icons/location.svg';
 import LocationTooltip from '../../components/map/LocationTooltip';
-import CustomToast from '../../components/CustomToast';
 import Toast from '../../components/common/Toast';
 import useToast from '../../hooks/useToast';
 import theme from '../../style';
@@ -43,7 +42,10 @@ const MapScreen = () => {
   const dismissTooltip = useLocationStore((s) => s.dismissLocationTooltip);
   const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
-  const { state, actions, displayedMarkers, navigation } = useMapLogic(mapRef);
+  const { state, actions, displayedMarkers, navigation } = useMapLogic(
+    mapRef,
+    showToast
+  );
 
   const {
     selectedMarkerId,
@@ -228,7 +230,6 @@ const MapScreen = () => {
         userLocation={userLocation}
         showToast={showToast}
       />
-      <CustomToast />
       <Toast
         message={toastMessage}
         visible={toastVisible}

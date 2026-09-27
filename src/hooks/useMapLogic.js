@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Keyboard } from 'react-native';
 import useLocation, { DEFAULT_LOCATION } from './useLocation';
-import useToastStore from '../store/toastStore';
 
 const LAT_OFFSET_LIST = 0.0025;
 const LAT_OFFSET_ITEM = 0.001;
@@ -17,7 +16,7 @@ import {
 } from '../api/place';
 import { useFocusEffect } from '@react-navigation/native';
 
-export const useMapLogic = (mapRef) => {
+export const useMapLogic = (mapRef, showToast) => {
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -36,7 +35,6 @@ export const useMapLogic = (mapRef) => {
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
   const { userLocation, requestAndGetLocation } = useLocation();
-  const showToast = useToastStore((state) => state.showToast);
 
   const lastCameraRef = useRef({
     latitude: DEFAULT_LOCATION.latitude,
@@ -390,7 +388,7 @@ export const useMapLogic = (mapRef) => {
     const location = await requestAndGetLocation();
 
     if (!location) {
-      showToast('위치 권한이 없어 현재 위치 기준으로 볼 수 없어요', 'black');
+      showToast('위치 권한이 없어 현재 위치 기준으로 볼 수 없어요');
       return;
     }
 
