@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -13,7 +14,8 @@ import LabelTitle from '../../components/LabelTitle';
 import ReviewItem from '../../components/review/ReviewItem';
 // import ReviewActionModal from '../../components/review/ReviewActionModal'; // TODO: 스캔 플로우 복구 시 주석 해제
 import ReportReasonBottomSheet from '../../components/review/ReportReasonBottomSheet';
-import CustomToast from '../../components/CustomToast';
+import Toast from '../../components/common/Toast';
+import useToast from '../../hooks/useToast';
 import useCursorPagination from '../../hooks/useCursorPagination';
 import LoadingFooter from '../../components/common/LoadingFooter';
 import theme from '../../style';
@@ -36,6 +38,7 @@ const ReviewListScreen = () => {
   const [activeReviewId, setActiveReviewId] = useState(null);
   const [isReportSheetVisible, setIsReportSheetVisible] = useState(false);
   const [selectedReviewId, setSelectedReviewId] = useState(null);
+  const { toastVisible, toastMessage, showToast, hideToast } = useToast();
 
   const fetchReviewsFn = useCallback(
     (cursorCreatedAt, cursorId, cursorStar) =>
@@ -129,14 +132,17 @@ const ReviewListScreen = () => {
     };
 
     return (
-      <View style={styles.reviewItemWrapper}>
+      <Pressable
+        style={styles.reviewItemWrapper}
+        onPress={() => setActiveReviewId(null)}
+      >
         <ReviewItem
           item={reviewData}
           onMorePress={handleMorePress}
           isMoreOpen={activeReviewId === item.id}
           onSelectReport={handleSelectReport}
         />
-      </View>
+      </Pressable>
     );
   };
 
@@ -168,6 +174,7 @@ const ReviewListScreen = () => {
         ListFooterComponent={<LoadingFooter loading={loading} />}
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
+        onScrollBeginDrag={() => setActiveReviewId(null)}
         onRefresh={handleRefresh}
         refreshing={refreshing}
         onEndReached={handleLoadMore}
@@ -217,8 +224,14 @@ const ReviewListScreen = () => {
           setSelectedReviewId(null);
         }}
         reviewId={selectedReviewId}
+        showToast={showToast}
       />
-      <CustomToast />
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+        hasNavBar={false}
+      />
     </View>
   );
 };

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '@style/colors';
 import typography from '@style/typography';
-import useToastStore from '@store/toastStore';
 import { reportReview } from '@api/review';
 
 const REPORT_REASONS = [
@@ -15,7 +14,7 @@ const REPORT_REASONS = [
   '기타',
 ];
 
-const ReportReasonBottomSheet = ({ isVisible, onClose, reviewId }) => {
+const ReportReasonBottomSheet = ({ isVisible, onClose, reviewId, showToast }) => {
   const insets = useSafeAreaInsets();
   const [selectedReason, setSelectedReason] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,12 +32,15 @@ const ReportReasonBottomSheet = ({ isVisible, onClose, reviewId }) => {
     setIsSubmitting(true);
     try {
       await reportReview(reviewId, selectedReason);
-      useToastStore.getState().showToast('신고가 접수되었어요', 'black');
+      showToast('신고가 접수되었어요');
       onClose();
     } catch (error) {
-      useToastStore
-        .getState()
-        .showToast('신고 접수에 실패했어요. 다시 시도해주세요.', 'error');
+      if (error?.response?.status === 409) {
+        showToast('이미 신고한 리뷰예요');
+        onClose();
+      } else {
+        showToast('신고 접수에 실패했어요. 다시 시도해주세요.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -104,7 +106,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: colors.common.dim,
   },
   card: {
     marginHorizontal: 16,
