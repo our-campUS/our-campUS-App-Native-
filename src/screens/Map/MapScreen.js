@@ -84,7 +84,14 @@ const MapScreen = () => {
       // 0 아래로 튀면 음수 height가 되어 시트가 콘텐츠 높이로 순간 올라옴
       overshootClamping: !isSheetOpen,
     }).start();
-  }, [targetHeight, isSheetOpen, sheetHeightAnimated]);
+  }, [
+    selectedMarkerId,
+    searchKeyword,
+    selectedCategory,
+    targetHeight,
+    isSheetOpen,
+    sheetHeightAnimated,
+  ]);
 
   const uniqueMarkers = useMemo(() => {
     const seen = new Set();
