@@ -1,7 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { View, Text, Keyboard } from 'react-native';
-import { Platform } from 'react-native';
 
 import HomeIcon from '../../assets/Vector1.svg';
 import MapIcon from '../../assets/Vector2.svg';
@@ -11,6 +10,7 @@ import MyPageIcon from '../../assets/Vector5.svg';
 
 import colors from '../style/colors';
 import typography from '../style/typography';
+import useTabBarStyle from '../hooks/useTabBarStyle';
 
 import HomeScreen from '../screens/Home/HomeScreen';
 import MapScreen from '../screens/Map/MapScreen';
@@ -38,6 +38,8 @@ const ICONS = {
 };
 
 const MainTab = () => {
+  const tabBarStyle = useTabBarStyle();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -54,21 +56,7 @@ const MainTab = () => {
             />
           );
         },
-        tabBarStyle:
-          Platform.OS === 'ios'
-            ? {
-                height: 91,
-                paddingTop: 20,
-                paddingHorizontal: 20,
-                marginBottom: 10,
-                backgroundColor: colors.common.white,
-              }
-            : {
-                height: 91,
-                paddingTop: 20,
-                paddingHorizontal: 20,
-                backgroundColor: colors.common.white,
-              },
+        tabBarStyle,
         tabBarItemStyle: { height: 51, width: 67, gap: 6 },
         tabBarLabelStyle: [
           typography.caption2Bold,
@@ -94,20 +82,7 @@ const MainTab = () => {
 
           return {
             title: '학교상권',
-            tabBarStyle: hideTabBar
-              ? { display: 'none' }
-              : Platform.OS === 'ios'
-              ? {
-                  height: 91,
-                  paddingTop: 20,
-                  paddingHorizontal: 20,
-                  marginBottom: 10,
-                }
-              : {
-                  height: 91,
-                  paddingTop: 20,
-                  paddingHorizontal: 20,
-                },
+            tabBarStyle: hideTabBar ? { display: 'none' } : tabBarStyle,
           };
         }}
       />
@@ -132,22 +107,7 @@ const MainTab = () => {
 
           return {
             title: '마이페이지',
-            tabBarStyle: hideTabBar
-              ? { display: 'none' }
-              : Platform.OS === 'ios'
-              ? {
-                  height: 91,
-                  paddingTop: 20,
-                  paddingHorizontal: 20,
-                  marginBottom: 10,
-                  backgroundColor: colors.common.white,
-                }
-              : {
-                  height: 91,
-                  paddingTop: 20,
-                  paddingHorizontal: 20,
-                  backgroundColor: colors.common.white,
-                },
+            tabBarStyle: hideTabBar ? { display: 'none' } : tabBarStyle,
           };
         }}
       />
