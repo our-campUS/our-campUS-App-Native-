@@ -108,7 +108,7 @@ const MyPageProfileEditScreen = ({ navigation }) => {
     } catch (error) {
       console.log('로그아웃 처리 중 에러 발생');
     } finally {
-      logout();
+      await logout();
     }
   };
 
