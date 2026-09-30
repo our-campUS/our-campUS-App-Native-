@@ -283,20 +283,20 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.common.white,
+    backgroundColor: theme.colors.background,
     paddingHorizontal: 16,
     borderRadius: 18,
     ...theme.shadows.small,
   },
   reportPillTinted: {
-    backgroundColor: colors.blue[500],
+    backgroundColor: theme.colors.primary1,
   },
   reportPillTextTinted: {
-    color: colors.common.white,
+    color: theme.colors.textWhite,
   },
   reportPillText: {
     ...typography.heading6,
-    color: colors.gray[850],
+    color: theme.colors.text,
   },
   imageScrollWrapper: {
     marginBottom: 12,
