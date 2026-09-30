@@ -221,6 +221,11 @@ const WriteReviewScreen = () => {
         result = await createReview(reviewPayload);
       }
 
+      if (!result) {
+        showToast('부적절한 표현이 포함되어 등록할 수 없습니다.');
+        return;
+      }
+
       const reviewCaseType = isPartnership && placeId ? 3 : 4;
       const storePlaceName =
         store?.name || store?.placeName || route.params?.storeName || '';

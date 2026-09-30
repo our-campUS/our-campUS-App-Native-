@@ -17,7 +17,14 @@ import typography from '@style/typography';
 import theme from '@style';
 import { formatReviewDate } from '../../utils/dateTime';
 
-const ReviewItem = ({ item, variant = 'list', card = false, onMorePress }) => {
+const ReviewItem = ({
+  item,
+  variant = 'list',
+  card = false,
+  onMorePress,
+  isMoreOpen = false,
+  onSelectReport,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
   const [measured, setMeasured] = useState(false);
@@ -119,9 +126,33 @@ const ReviewItem = ({ item, variant = 'list', card = false, onMorePress }) => {
       <View style={styles.starRatingWrapper}>
         <View style={styles.listStarsRow}>{renderStars()}</View>
         {onMorePress && (
-          <Pressable onPress={() => onMorePress(item)} hitSlop={8}>
-            <ThreeDotIcon width={20} height={20} />
-          </Pressable>
+          <>
+            {isMoreOpen && (
+              <View style={styles.reportPillOverlay} pointerEvents="box-none">
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.reportPill,
+                    pressed && styles.reportPillTinted,
+                  ]}
+                  onPress={() => onSelectReport(item)}
+                >
+                  {({ pressed }) => (
+                    <Text
+                      style={[
+                        styles.reportPillText,
+                        pressed && styles.reportPillTextTinted,
+                      ]}
+                    >
+                      신고하기
+                    </Text>
+                  )}
+                </Pressable>
+              </View>
+            )}
+            <Pressable onPress={() => onMorePress(item)} hitSlop={8}>
+              <ThreeDotIcon width={20} height={20} />
+            </Pressable>
+          </>
         )}
       </View>
 
@@ -240,6 +271,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
+  },
+  reportPillOverlay: {
+    position: 'absolute',
+    top: '50%',
+    right: 28,
+    marginTop: -18,
+    zIndex: 10,
+  },
+  reportPill: {
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+    paddingHorizontal: 16,
+    borderRadius: 18,
+    ...theme.shadows.small,
+  },
+  reportPillTinted: {
+    backgroundColor: theme.colors.primary1,
+  },
+  reportPillTextTinted: {
+    color: theme.colors.textWhite,
+  },
+  reportPillText: {
+    ...typography.heading6,
+    color: theme.colors.text,
   },
   imageScrollWrapper: {
     marginBottom: 12,

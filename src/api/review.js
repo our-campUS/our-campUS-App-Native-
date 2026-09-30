@@ -110,3 +110,18 @@ export const editReview = async (reviewId, reviewData) => {
     throw error;
   }
 };
+
+// 리뷰 신고
+export const reportReview = async (reviewId, reason) => {
+  try {
+    const response = await api.post(`/reviews/${reviewId}/report`, {
+      reason,
+    });
+
+    console.log('리뷰 신고 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('리뷰 신고 실패:', error);
+    throw error;
+  }
+};
