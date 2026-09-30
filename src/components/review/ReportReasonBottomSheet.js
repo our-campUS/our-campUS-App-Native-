@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '@style/colors';
 import typography from '@style/typography';
+import theme from '@style';
 import { reportReview } from '@api/review';
 
 const REPORT_REASONS = [
@@ -37,10 +38,10 @@ const ReportReasonBottomSheet = ({ isVisible, onClose, reviewId, showToast }) =>
     } catch (error) {
       if (error?.response?.status === 409) {
         showToast('이미 신고한 리뷰예요');
-        onClose();
       } else {
         showToast('신고 접수에 실패했어요. 다시 시도해주세요.');
       }
+      onClose();
     } finally {
       setIsSubmitting(false);
     }
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.common.dim,
+    backgroundColor: theme.colors.overlay,
   },
   card: {
     marginHorizontal: 16,
@@ -125,16 +126,16 @@ const styles = StyleSheet.create({
   },
   optionDivider: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.gray[200],
+    borderBottomColor: theme.colors.border,
   },
   optionText: {
     ...typography.body3Regular,
-    color: colors.gray[850],
+    color: theme.colors.text,
     textAlign: 'center',
   },
   optionTextSelected: {
     ...typography.heading6,
-    color: colors.blue[500],
+    color: theme.colors.primary1,
   },
   submitButton: {
     height: 50,
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     ...typography.heading6,
-    color: colors.common.white,
+    color: theme.colors.textWhite,
   },
 });
 
