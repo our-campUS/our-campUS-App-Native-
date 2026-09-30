@@ -47,16 +47,20 @@ const ReportReasonBottomSheet = ({ isVisible, onClose, reviewId, showToast }) =>
     }
   };
 
+  const handleRequestClose = () => {
+    if (!isSubmitting) onClose();
+  };
+
   return (
     <Modal
       visible={isVisible}
       transparent={true}
       animationType="fade"
       statusBarTranslucent={true}
-      onRequestClose={onClose}
+      onRequestClose={handleRequestClose}
     >
       <View style={styles.container}>
-        <Pressable style={styles.overlay} onPress={onClose} />
+        <Pressable style={styles.overlay} onPress={handleRequestClose} />
         <View style={[styles.card, { marginBottom: 16 + insets.bottom }]}>
           <View style={styles.optionList}>
             {REPORT_REASONS.map((reason, index) => {
