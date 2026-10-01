@@ -44,7 +44,7 @@ export async function councilLogin(data) {
       councilNickname: response.data.data.councilNickname,
       councilProfileImageUrl: response.data.data.councilProfileImageUrl,
     };
-    useAuthStore.getState().loginCouncil({ user, accessToken, refreshToken });
+    await useAuthStore.getState().loginCouncil({ user, accessToken, refreshToken });
     return { success: true };
   } catch (error) {
     return { success: false, error: toLoginError(error) };

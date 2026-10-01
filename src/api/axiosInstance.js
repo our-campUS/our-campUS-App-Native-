@@ -54,7 +54,7 @@ const refreshAccessToken = async () => {
   if (response.data.code === 200) {
     const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
-    useAuthStore.getState().setAuthFromKakao({
+    await useAuthStore.getState().setAuthFromKakao({
       user: useAuthStore.getState().user,
       isLoggedIn: true,
       accessToken,
@@ -104,9 +104,9 @@ api.interceptors.response.use(
         }
         throw new Error('Token refresh failed');
       })
-      .catch((err) => {
+      .catch(async (err) => {
         // 리프레시 토큰도 만료 → 강제 로그아웃
-        useAuthStore.getState().logout();
+        await useAuthStore.getState().logout();
         throw err;
       })
       .finally(() => {
