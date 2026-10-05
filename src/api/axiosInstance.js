@@ -82,7 +82,10 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // 로그인 상태인데 refreshToken이 없으면 재발급이 불가능하다.
+    // (isLoggedIn과 Keychain 토큰이 어긋난 경우) 강제 로그아웃해 로그인 화면으로 보낸다.
     if (!useAuthStore.getState().refreshToken) {
+      await useAuthStore.getState().logout();
       return Promise.reject(error);
     }
 

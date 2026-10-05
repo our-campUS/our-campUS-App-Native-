@@ -56,6 +56,17 @@ const App = () => {
         }
         useAuthStore.getState().hydrateTokens(legacyTokens);
       }
+
+      // isLoggedIn과 Keychain은 저장소가 달라 동기화가 보장되지 않음.
+      // 로그인 상태이나 토큰이 없으면 로그아웃 처리
+      const {
+        isLoggedIn: persistedLoggedIn,
+        accessToken,
+        refreshToken,
+      } = useAuthStore.getState();
+      if (persistedLoggedIn && !accessToken && !refreshToken) {
+        await useAuthStore.getState().logout();
+      }
       if (!cancelled) setIsTokenHydrated(true);
     })();
 
