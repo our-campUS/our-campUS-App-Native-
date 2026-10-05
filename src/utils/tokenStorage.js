@@ -5,18 +5,36 @@ import * as Keychain from 'react-native-keychain';
 // 인증 토큰은 반드시 OS 보안 저장소를 거치도록 한다 (이슈 #168).
 const SERVICE = 'ourCampusApp.authTokens';
 
+const READ_RETRY_COUNT = 3;
+const READ_RETRY_DELAY_MS = 300;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Keychain 읽기는 기기가 잠겨 있을 때 등 일시적으로 실패할 수 있어서 재시도한다.
+// 3번 다 실패하면 토큰 없음으로 처리
 export async function getTokens() {
-  try {
-    const credentials = await Keychain.getGenericPassword({ service: SERVICE });
-    if (!credentials) {
-      return { accessToken: null, refreshToken: null };
+  for (let attempt = 1; attempt <= READ_RETRY_COUNT; attempt += 1) {
+    try {
+      const credentials = await Keychain.getGenericPassword({
+        service: SERVICE,
+      });
+      if (!credentials) {
+        return { accessToken: null, refreshToken: null };
+      }
+      const { accessToken, refreshToken } = JSON.parse(credentials.password);
+      return {
+        accessToken: accessToken || null,
+        refreshToken: refreshToken || null,
+      };
+    } catch (error) {
+      console.warn(
+        `[tokenStorage] Keychain 조회 실패 (${attempt}/${READ_RETRY_COUNT}):`,
+        error
+      );
+      if (attempt < READ_RETRY_COUNT) await sleep(READ_RETRY_DELAY_MS);
     }
-    const { accessToken, refreshToken } = JSON.parse(credentials.password);
-    return { accessToken: accessToken || null, refreshToken: refreshToken || null };
-  } catch (error) {
-    console.warn('[tokenStorage] Keychain 조회 실패:', error);
-    return { accessToken: null, refreshToken: null };
   }
+  return { accessToken: null, refreshToken: null };
 }
 
 export async function setTokens({ accessToken, refreshToken }) {
