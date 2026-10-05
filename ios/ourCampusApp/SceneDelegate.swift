@@ -28,12 +28,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     appDelegate?.reactNativeFactory = factory
 
     let window = UIWindow(windowScene: windowScene)
+    // iOS 13+ scene 라이프사이클에서는 launchOptions를 SceneDelegate가 직접 받지 못한다.
+    // 따라서 AppDelegate.didFinishLaunching에서 저장해 둔 값을 사용한다.
+    // TODO: 딥링크/푸시로 실행되는 경우는 connectionOptions를 따로 처리해야 함
     factory.startReactNative(
       withModuleName: "ourCampusApp",
       in: window,
       launchOptions: appDelegate?.launchOptions
     )
     self.window = window
+    // UIApplication.delegate.window를 참조하는 코드를 위한 호환용
     appDelegate?.window = window
   }
 }
