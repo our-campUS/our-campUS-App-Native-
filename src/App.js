@@ -5,7 +5,7 @@ import { StatusBar } from 'react-native';
 import { initKakao } from './api/signUp';
 import { useEffect, useState } from 'react';
 import useAuthStore from './store/authStore';
-import { getTokens, setTokens } from './utils/tokenStorage';
+import { getTokens, setTokens, clearTokens } from './utils/tokenStorage';
 import MainStack from './navigations/MainStack';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
@@ -44,7 +44,14 @@ const App = () => {
       const keychainTokens = await getTokens();
       if (cancelled) return;
 
-      if (keychainTokens.accessToken || keychainTokens.refreshToken) {
+      const hasKeychainTokens =
+        keychainTokens.accessToken || keychainTokens.refreshToken;
+
+      if (hasKeychainTokens && !useAuthStore.getState().isLoggedIn) {
+        // 로그아웃 상태인데 Keychain에 토큰이 남아 있는 경우(로그아웃 중 삭제 실패 등).
+        // 이전 세션의 토큰이 남지 않도록 정리하고 state에도 올리지 않는다.
+        await clearTokens();
+      } else if (hasKeychainTokens) {
         useAuthStore.getState().hydrateTokens(keychainTokens);
       } else {
         const legacyTokens = {
