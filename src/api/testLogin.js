@@ -21,7 +21,7 @@ export async function reviewerTestLogin(email) {
         isProfileNotCompleted,
       } = response.data.data;
 
-      useAuthStore.getState().setAuthFromKakao({
+      await useAuthStore.getState().setAuthFromKakao({
         user: {
           name: nickname,
           campusNickname,

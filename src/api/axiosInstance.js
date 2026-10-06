@@ -54,7 +54,7 @@ const refreshAccessToken = async () => {
   if (response.data.code === 200) {
     const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
-    useAuthStore.getState().setAuthFromKakao({
+    await useAuthStore.getState().setAuthFromKakao({
       user: useAuthStore.getState().user,
       isLoggedIn: true,
       accessToken,
@@ -82,7 +82,10 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // 로그인 상태인데 refreshToken이 없으면 재발급이 불가능하다.
+    // (isLoggedIn과 Keychain 토큰이 어긋난 경우) 강제 로그아웃해 로그인 화면으로 보낸다.
     if (!useAuthStore.getState().refreshToken) {
+      await useAuthStore.getState().logout();
       return Promise.reject(error);
     }
 
@@ -104,9 +107,9 @@ api.interceptors.response.use(
         }
         throw new Error('Token refresh failed');
       })
-      .catch((err) => {
+      .catch(async (err) => {
         // 리프레시 토큰도 만료 → 강제 로그아웃
-        useAuthStore.getState().logout();
+        await useAuthStore.getState().logout();
         throw err;
       })
       .finally(() => {

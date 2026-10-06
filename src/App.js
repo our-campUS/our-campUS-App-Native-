@@ -5,6 +5,7 @@ import { StatusBar } from 'react-native';
 import { initKakao } from './api/signUp';
 import { useEffect, useState } from 'react';
 import useAuthStore from './store/authStore';
+import { getTokens, setTokens, clearTokens } from './utils/tokenStorage';
 import MainStack from './navigations/MainStack';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
@@ -13,6 +14,7 @@ const App = () => {
   const [isHydrated, setIsHydrated] = useState(
     useAuthStore.persist.hasHydrated()
   );
+  const [isTokenHydrated, setIsTokenHydrated] = useState(false);
 
   useEffect(() => {
     initKakao();
@@ -27,7 +29,60 @@ const App = () => {
     return unsub;
   }, [isHydrated]);
 
-  if (!isHydrated) {
+  // Keychain에서 토큰을 읽어와 state에 채워 넣는다. isHydrated가 먼저
+  // 끝나야 하는 이유: 이 업데이트 이전 버전에서는 accessToken/refreshToken이
+  // AsyncStorage(auth-storage)에 같이 저장돼 있었는데, 아직 Keychain으로
+  // 옮겨지지 않은 구버전 설치라면 zustand-persist가 그 값을 state에
+  // 그대로 복원해 놓는다. 이 시점에 그 값이 남아 있으면 1회성으로
+  // Keychain에 옮겨 쓰고, hydrateTokens 호출로 authStore의 partialize가
+  // AsyncStorage에서 토큰 필드를 자연스럽게 제거하도록 한다.
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    let cancelled = false;
+    (async () => {
+      const keychainTokens = await getTokens();
+      if (cancelled) return;
+
+      const hasKeychainTokens =
+        keychainTokens.accessToken || keychainTokens.refreshToken;
+
+      if (hasKeychainTokens && !useAuthStore.getState().isLoggedIn) {
+        // 로그아웃 상태인데 Keychain에 토큰이 남아 있는 경우(로그아웃 중 삭제 실패 등).
+        // 이전 세션의 토큰이 남지 않도록 정리하고 state에도 올리지 않는다.
+        await clearTokens();
+      } else if (hasKeychainTokens) {
+        useAuthStore.getState().hydrateTokens(keychainTokens);
+      } else {
+        const legacyTokens = {
+          accessToken: useAuthStore.getState().accessToken,
+          refreshToken: useAuthStore.getState().refreshToken,
+        };
+        if (legacyTokens.accessToken || legacyTokens.refreshToken) {
+          await setTokens(legacyTokens);
+        }
+        useAuthStore.getState().hydrateTokens(legacyTokens);
+      }
+
+      // isLoggedIn과 Keychain은 저장소가 달라 동기화가 보장되지 않음.
+      // 로그인 상태이나 토큰이 없으면 로그아웃 처리
+      const {
+        isLoggedIn: persistedLoggedIn,
+        accessToken,
+        refreshToken,
+      } = useAuthStore.getState();
+      if (persistedLoggedIn && !accessToken && !refreshToken) {
+        await useAuthStore.getState().logout();
+      }
+      if (!cancelled) setIsTokenHydrated(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isHydrated]);
+
+  if (!isHydrated || !isTokenHydrated) {
     return (
       <View style={styles.loadingContainer}>
         <StatusBar style="auto" />
