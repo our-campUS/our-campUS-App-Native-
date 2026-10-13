@@ -10,6 +10,8 @@ import {
   loginWithKakaoAccount,
   getProfile,
 } from '@react-native-seoul/kakao-login';
+import { appleAuth } from '@invertase/react-native-apple-authentication';
+import { sha256 } from 'js-sha256';
 import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
 
@@ -62,6 +64,82 @@ export async function onKakaoLogin() {
   } catch (error) {
     console.error('❌ Kakao Login Error:', error?.message ?? error);
     return false;
+  }
+}
+
+export async function onAppleLogin() {
+  try {
+    // 1. 백엔드에서 1회용 nonce 발급
+    const nonceResponse = await api.post('auth/login/apple/nonce');
+    const { nonce } = nonceResponse.data.data;
+
+    // 2. Apple 네이티브 로그인 요청 — Apple에는 nonce의 SHA256 해시값을 전달하고,
+    //    원문 nonce는 그대로 들고 있다가 백엔드 검증용으로 다시 보낸다.
+    const appleAuthResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      nonce: sha256(nonce),
+    });
+
+    const { authorizationCode, fullName } = appleAuthResponse;
+    if (!authorizationCode) {
+      throw new Error('Apple 인증 코드를 받지 못했습니다.');
+    }
+
+    // fullName은 최초 로그인 시에만 내려오고, 이후 재로그인 시에는 null
+    const nickname = fullName?.givenName
+      ? [fullName.givenName, fullName.familyName].filter(Boolean).join(' ')
+      : undefined;
+
+    // 3. 백엔드로 authorizationCode + 원문 nonce 전달
+    const response = await api.post('auth/login/apple', {
+      authorizationCode,
+      nonce,
+      nickname,
+    });
+
+    if (response.data.code === 200 || response.data.code === 0) {
+      const {
+        nickname: serverNickname,
+        campusNickname,
+        userId,
+        kakaoId,
+        email,
+        profileImage,
+        accessToken,
+        refreshToken,
+        isProfileNotCompleted,
+      } = response.data.data;
+
+      await useAuthStore.getState().setAuthFromKakao({
+        user: {
+          name: serverNickname,
+          campusNickname,
+          userId,
+          kakaoId,
+          email,
+          profileImage,
+          role: 'USER',
+        },
+        accessToken,
+        refreshToken,
+      });
+
+      return {
+        isValid: true,
+        isProfileNotCompleted,
+        nickname: serverNickname,
+      };
+    }
+
+    return { isValid: false, isProfileNotCompleted: false };
+  } catch (error) {
+    // 사용자가 Apple 로그인 시트를 직접 취소한 경우 — 에러 토스트 띄우지 않음
+    if (error.code === appleAuth.Error.CANCELED) {
+      return { isValid: false, isProfileNotCompleted: false, isCanceled: true };
+    }
+    console.error('❌ Apple Login Error:', error?.message ?? error);
+    return { isValid: false, isProfileNotCompleted: false };
   }
 }
 
