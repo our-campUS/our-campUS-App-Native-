@@ -11,7 +11,6 @@ import {
   getProfile,
 } from '@react-native-seoul/kakao-login';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
-import { sha256 } from 'js-sha256';
 import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
 
@@ -73,12 +72,13 @@ export async function onAppleLogin() {
     const nonceResponse = await api.post('auth/login/apple/nonce');
     const { nonce } = nonceResponse.data.data;
 
-    // 2. Apple 네이티브 로그인 요청 — Apple에는 nonce의 SHA256 해시값을 전달하고,
-    //    원문 nonce는 그대로 들고 있다가 백엔드 검증용으로 다시 보낸다.
+    // 2. Apple 네이티브 로그인 요청 — 원문 nonce를 그대로 넘긴다.
+    //    라이브러리 네이티브 코드가 Apple에 보내기 전에 SHA256 해싱을 해 주므로
+    //    JS에서 미리 해싱하면 이중 해시가 되어 백엔드 nonce 검증이 실패한다.
     const appleAuthResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-      nonce: sha256(nonce),
+      nonce,
     });
 
     const { authorizationCode, fullName } = appleAuthResponse;
@@ -98,7 +98,7 @@ export async function onAppleLogin() {
       nickname,
     });
 
-    if (response.data.code === 200 || response.data.code === 0) {
+    if (response.data.code === 200) {
       const {
         nickname: serverNickname,
         campusNickname,
@@ -138,7 +138,11 @@ export async function onAppleLogin() {
     if (error.code === appleAuth.Error.CANCELED) {
       return { isValid: false, isProfileNotCompleted: false, isCanceled: true };
     }
-    console.error('❌ Apple Login Error:', error?.message ?? error);
+    console.error('❌ Apple Login Error:', error?.message ?? error, {
+      url: error?.config?.url,
+      status: error?.response?.status,
+      data: error?.response?.data,
+    });
     return { isValid: false, isProfileNotCompleted: false };
   }
 }
