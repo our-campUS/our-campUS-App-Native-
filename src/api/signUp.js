@@ -70,9 +70,8 @@ export async function onKakaoLogin() {
 
 const HANGUL_REGEX = /[가-힣]/;
 
-// Apple은 이름을 givenName/familyName으로 나눠 준다.
-// 한글 이름은 '성+이름'을 공백 없이(김다은), 그 외는 '이름 성' 순서로 조합한다.
-// 닉네임에는 공백을 쓸 수 없어(영문/한글/숫자만 허용) 한글일 때는 붙여 쓴다.
+// Apple 이름은 givenName, familyName으로 분리 전달.
+// 한글 이름은 성+이름 순서로 공백 없이 조합, 그 외는 이름 성 순서로 조합.
 const buildAppleNickname = (fullName) => {
   const { givenName, familyName } = fullName ?? {};
   if (!givenName && !familyName) {
@@ -86,13 +85,12 @@ const buildAppleNickname = (fullName) => {
 
 export async function onAppleLogin() {
   try {
-    // 1. 백엔드에서 1회용 nonce 발급
+    // 1. 백엔드 1회용 nonce 발급.
     const nonceResponse = await api.post('auth/login/apple/nonce');
     const { nonce } = nonceResponse.data.data;
 
-    // 2. Apple 네이티브 로그인 요청 — 원문 nonce를 그대로 넘긴다.
-    //    라이브러리 네이티브 코드가 Apple에 보내기 전에 SHA256 해싱을 해 주므로
-    //    여기서 미리 해싱하면 이중 해시가 된다. (ID Token의 nonce 클레임 = sha256(원문))
+    // 2. Apple 로그인 요청. nonce는 원문 그대로 전달.
+    //    SHA-256 해싱은 라이브러리가 Apple 전송 전에 처리하므로 여기서는 해싱 제외.
     const appleAuthResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
@@ -104,11 +102,11 @@ export async function onAppleLogin() {
       throw new Error('Apple 인증 코드를 받지 못했습니다.');
     }
 
-    // fullName은 최초 로그인 시에만 내려오고, 이후 재로그인 시에는 null
+    // 이름은 Apple 최초 로그인 시에만 전달, 이후에는 null.
     const nickname = buildAppleNickname(fullName);
 
-    // 3. 백엔드로 authorizationCode + nonce의 SHA-256 해시(소문자 hex) 전달.
-    //    서버는 이 값을 ID Token의 nonce 클레임과 비교하고 Redis에서 소비한다.
+    // 3. 백엔드 로그인. 서버가 ID Token의 nonce 클레임과 비교하므로
+    //    nonce는 SHA-256 해시값으로 전송.
     const response = await api.post('auth/login/apple', {
       authorizationCode,
       nonce: sha256(nonce),
@@ -151,7 +149,7 @@ export async function onAppleLogin() {
 
     return { isValid: false, isProfileNotCompleted: false };
   } catch (error) {
-    // 사용자가 Apple 로그인 시트를 직접 취소한 경우 — 에러 토스트 띄우지 않음
+    // 사용자가 Apple 로그인 시트를 닫은 경우는 에러 처리 제외.
     if (error.code === appleAuth.Error.CANCELED) {
       return { isValid: false, isProfileNotCompleted: false, isCanceled: true };
     }
