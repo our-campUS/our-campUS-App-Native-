@@ -26,6 +26,7 @@ import {
   uploadImageToPresignedUrl,
 } from '@api/uploadImage';
 import useImagePicker from '@/hooks/useImagePicker';
+import { getDisplayName } from '../../utils/displayName';
 
 const MyPageProfileEditScreen = ({ navigation }) => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
@@ -145,7 +146,7 @@ const MyPageProfileEditScreen = ({ navigation }) => {
             <EditIcon width={24} height={24} />
           </Pressable>
         </View>
-        <Text style={styles.nickname}>{user?.name || '사용자'}</Text>
+        <Text style={styles.nickname}>{getDisplayName(user?.name)}</Text>
         <View style={styles.profileInfoWrapper}>
           <ListItem
             title="닉네임"

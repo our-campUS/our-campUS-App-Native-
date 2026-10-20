@@ -15,6 +15,7 @@ import Button from '../../components/Button';
 import CheckIcon from '../../../assets/check.svg';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo, editNickname } from '../../api/user';
+import { getDisplayName } from '../../utils/displayName';
 
 const NICKNAME_REGEX = /^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]*$/;
 
@@ -67,7 +68,7 @@ const EditNicknameScreen = ({ navigation }) => {
         />
         <View style={styles.inputWrapper}>
           <Input
-            placeholder={user?.name || '사용자'}
+            placeholder={getDisplayName(user?.name)}
             value={nickname}
             onChangeText={handleChangeNickname}
             useTitle={true}
