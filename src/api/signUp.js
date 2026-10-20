@@ -11,6 +11,7 @@ import {
   getProfile,
 } from '@react-native-seoul/kakao-login';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
+import { sha256 } from 'js-sha256';
 import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
 
@@ -74,7 +75,7 @@ export async function onAppleLogin() {
 
     // 2. Apple 네이티브 로그인 요청 — 원문 nonce를 그대로 넘긴다.
     //    라이브러리 네이티브 코드가 Apple에 보내기 전에 SHA256 해싱을 해 주므로
-    //    JS에서 미리 해싱하면 이중 해시가 되어 백엔드 nonce 검증이 실패한다.
+    //    여기서 미리 해싱하면 이중 해시가 된다. (ID Token의 nonce 클레임 = sha256(원문))
     const appleAuthResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
@@ -91,10 +92,11 @@ export async function onAppleLogin() {
       ? [fullName.givenName, fullName.familyName].filter(Boolean).join(' ')
       : undefined;
 
-    // 3. 백엔드로 authorizationCode + 원문 nonce 전달
+    // 3. 백엔드로 authorizationCode + nonce의 SHA-256 해시(소문자 hex) 전달.
+    //    서버는 이 값을 ID Token의 nonce 클레임과 비교하고 Redis에서 소비한다.
     const response = await api.post('auth/login/apple', {
       authorizationCode,
-      nonce,
+      nonce: sha256(nonce),
       nickname,
     });
 
