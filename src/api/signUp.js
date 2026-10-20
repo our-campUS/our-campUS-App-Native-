@@ -68,6 +68,22 @@ export async function onKakaoLogin() {
   }
 }
 
+const HANGUL_REGEX = /[가-힣]/;
+
+// Apple은 이름을 givenName/familyName으로 나눠 준다.
+// 한글 이름은 '성+이름'을 공백 없이(김다은), 그 외는 '이름 성' 순서로 조합한다.
+// 닉네임에는 공백을 쓸 수 없어(영문/한글/숫자만 허용) 한글일 때는 붙여 쓴다.
+const buildAppleNickname = (fullName) => {
+  const { givenName, familyName } = fullName ?? {};
+  if (!givenName && !familyName) {
+    return undefined;
+  }
+  if (HANGUL_REGEX.test(`${familyName ?? ''}${givenName ?? ''}`)) {
+    return `${familyName ?? ''}${givenName ?? ''}`;
+  }
+  return [givenName, familyName].filter(Boolean).join(' ');
+};
+
 export async function onAppleLogin() {
   try {
     // 1. 백엔드에서 1회용 nonce 발급
@@ -89,9 +105,7 @@ export async function onAppleLogin() {
     }
 
     // fullName은 최초 로그인 시에만 내려오고, 이후 재로그인 시에는 null
-    const nickname = fullName?.givenName
-      ? [fullName.givenName, fullName.familyName].filter(Boolean).join(' ')
-      : undefined;
+    const nickname = buildAppleNickname(fullName);
 
     // 3. 백엔드로 authorizationCode + nonce의 SHA-256 해시(소문자 hex) 전달.
     //    서버는 이 값을 ID Token의 nonce 클레임과 비교하고 Redis에서 소비한다.
