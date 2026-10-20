@@ -14,6 +14,7 @@ import { appleAuth } from '@invertase/react-native-apple-authentication';
 import { sha256 } from 'js-sha256';
 import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
+import { getDisplayName } from '../utils/displayName';
 
 export async function onKakaoLogin() {
   try {
@@ -130,7 +131,7 @@ export async function onAppleLogin() {
       return {
         isValid: true,
         isProfileNotCompleted,
-        nickname: serverNickname,
+        nickname: getDisplayName(serverNickname),
       };
     }
 

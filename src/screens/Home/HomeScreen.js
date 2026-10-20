@@ -24,6 +24,7 @@ import { getUpcomingEventsAll } from '../../api/studentAffiliate';
 import { getRecommendTitle } from '../../constants/recommendTitles';
 import { checkUnreadNotification } from '../../api/notification';
 import VerticalEventTicker from '../../components/home/VerticalEventTicker';
+import { getDisplayName } from '../../utils/displayName';
 
 const HomeSection = ({
   title,
@@ -117,7 +118,9 @@ const HomeScreen = () => {
         <View style={styles.topArea}>
           <View style={styles.header}>
             <View style={styles.headerTopRow}>
-              <Text style={styles.greeting}>{user.name}님, 안녕하세요</Text>
+              <Text style={styles.greeting}>
+                {getDisplayName(user.name)}님, 안녕하세요
+              </Text>
 
               <TouchableOpacity
                 activeOpacity={0.7}
