@@ -10,8 +10,11 @@ import {
   loginWithKakaoAccount,
   getProfile,
 } from '@react-native-seoul/kakao-login';
+import { appleAuth } from '@invertase/react-native-apple-authentication';
+import { sha256 } from 'js-sha256';
 import api from './axiosInstance';
 import useAuthStore from '../store/authStore';
+import { getDisplayName } from '../utils/displayName';
 
 export async function onKakaoLogin() {
   try {
@@ -62,6 +65,100 @@ export async function onKakaoLogin() {
   } catch (error) {
     console.error('❌ Kakao Login Error:', error?.message ?? error);
     return false;
+  }
+}
+
+const HANGUL_REGEX = /[가-힣]/;
+
+// Apple 이름은 givenName, familyName으로 분리 전달.
+// 한글 이름은 성+이름 순서로 공백 없이 조합, 그 외는 이름 성 순서로 조합.
+const buildAppleNickname = (fullName) => {
+  const { givenName, familyName } = fullName ?? {};
+  if (!givenName && !familyName) {
+    return undefined;
+  }
+  if (HANGUL_REGEX.test(`${familyName ?? ''}${givenName ?? ''}`)) {
+    return `${familyName ?? ''}${givenName ?? ''}`;
+  }
+  return [givenName, familyName].filter(Boolean).join(' ');
+};
+
+export async function onAppleLogin() {
+  try {
+    // 1. 백엔드 1회용 nonce 발급.
+    const nonceResponse = await api.post('auth/login/apple/nonce');
+    const { nonce } = nonceResponse.data.data;
+
+    // 2. Apple 로그인 요청. nonce는 원문 그대로 전달.
+    //    SHA-256 해싱은 라이브러리가 Apple 전송 전에 처리하므로 여기서는 해싱 제외.
+    const appleAuthResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      nonce,
+    });
+
+    const { authorizationCode, fullName } = appleAuthResponse;
+    if (!authorizationCode) {
+      throw new Error('Apple 인증 코드를 받지 못했습니다.');
+    }
+
+    // 이름은 Apple 최초 로그인 시에만 전달, 이후에는 null.
+    const nickname = buildAppleNickname(fullName);
+
+    // 3. 백엔드 로그인. 서버가 ID Token의 nonce 클레임과 비교하므로
+    //    nonce는 SHA-256 해시값으로 전송.
+    const response = await api.post('auth/login/apple', {
+      authorizationCode,
+      nonce: sha256(nonce),
+      nickname,
+    });
+
+    if (response.data.code === 200) {
+      const {
+        nickname: serverNickname,
+        campusNickname,
+        userId,
+        kakaoId,
+        email,
+        profileImage,
+        accessToken,
+        refreshToken,
+        isProfileNotCompleted,
+      } = response.data.data;
+
+      await useAuthStore.getState().setAuthFromKakao({
+        user: {
+          name: serverNickname,
+          campusNickname,
+          userId,
+          kakaoId,
+          email,
+          profileImage,
+          role: 'USER',
+        },
+        accessToken,
+        refreshToken,
+      });
+
+      return {
+        isValid: true,
+        isProfileNotCompleted,
+        nickname: getDisplayName(serverNickname),
+      };
+    }
+
+    return { isValid: false, isProfileNotCompleted: false };
+  } catch (error) {
+    // 사용자가 Apple 로그인 시트를 닫은 경우는 에러 처리 제외.
+    if (error.code === appleAuth.Error.CANCELED) {
+      return { isValid: false, isProfileNotCompleted: false, isCanceled: true };
+    }
+    console.error('❌ Apple Login Error:', error?.message ?? error, {
+      url: error?.config?.url,
+      status: error?.response?.status,
+      data: error?.response?.data,
+    });
+    return { isValid: false, isProfileNotCompleted: false };
   }
 }
 

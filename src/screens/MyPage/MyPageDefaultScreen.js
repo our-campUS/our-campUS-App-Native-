@@ -20,6 +20,7 @@ import ListItem from '../../components/common/ListItem';
 import MY_PAGE_MENU_LINKS from '../../constants/myPageMenuLinks';
 import useAuthStore from '../../store/authStore';
 import { getUserInfo } from '../../api/user';
+import { getDisplayName } from '../../utils/displayName';
 
 const MyPageDefaultScreen = ({ navigation }) => {
   const user = useAuthStore((state) => state.user);
@@ -46,7 +47,7 @@ const MyPageDefaultScreen = ({ navigation }) => {
               style={styles.mainProfileImage}
             />
           </View>
-          <Text style={styles.nickname}>{user?.name || '사용자'}</Text>
+          <Text style={styles.nickname}>{getDisplayName(user?.name)}</Text>
           <Pressable
             onPress={() => navigation.navigate('MyPageProfileEditScreen')}
           >

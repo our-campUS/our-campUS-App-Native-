@@ -2,7 +2,7 @@ import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import Button from '../../components/Button';
 import colors from '../../style/colors';
 import typography from '../../style/typography';
-import { onKakaoLogin } from '../../api/signUp';
+import { onKakaoLogin, onAppleLogin } from '../../api/signUp';
 import { reviewerTestLogin } from '../../api/testLogin';
 import { Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -96,8 +96,21 @@ const LoginInitialScreen = ({ navigation }) => {
         {Platform.OS === 'ios' && (
           <Button
             title="Apple 시작하기"
-            onPress={() => {
-              navigation.navigate('SignUpStack');
+            onPress={async () => {
+              const result = await onAppleLogin();
+              if (result.isCanceled) return;
+              if (result.isValid) {
+                if (result.isProfileNotCompleted) {
+                  navigation.navigate('SignUpStack', {
+                    screen: 'SignUpFirstScreen',
+                    params: {
+                      userName: result.nickname,
+                    },
+                  });
+                } else {
+                  useAuthStore.getState().login();
+                }
+              }
             }}
             style={{
               width: 335,
